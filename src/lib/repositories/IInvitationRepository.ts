@@ -23,10 +23,11 @@ export interface IInvitationRepository {
 
   // ── Token lookup (also used by unauthenticated accept page) ───────────────
   /** Returns a single invitation by token, regardless of owner. Null when not found. */
-  getInvitationByToken(token: string): Invitation | null;
+  getInvitationByToken(token: string): Promise<Invitation | null>;
 
   // ── Write operations ───────────────────────────────────────────────────────
   createInvitation(input: CreateInvitationInput, invitedBy: string, inviterEmail?: string): Promise<Invitation>;
   acceptInvitation(token: string): Promise<void>;
+  submitGuardianRequest?(token: string, name: string, relationship: string): Promise<void>;
   revokeInvitation(id: string): Promise<void>;
 }

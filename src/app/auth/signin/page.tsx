@@ -3,6 +3,7 @@
 import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { safeAuthRedirect } from "@/lib/auth/safeRedirect";
 import { useAuth } from "@/hooks/useAuth";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import ThemeToggle from "@/components/ui/ThemeToggle";
@@ -36,7 +37,7 @@ function SignInContent() {
   const { signIn, isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const explicitRedirect = searchParams.get("redirect");
+  const explicitRedirect = safeAuthRedirect(searchParams.get("redirect"));
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

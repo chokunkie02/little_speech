@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { safeAuthRedirect } from "@/lib/auth/safeRedirect";
 import { useAuth } from "@/hooks/useAuth";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import ThemeToggle from "@/components/ui/ThemeToggle";
@@ -53,9 +54,10 @@ const ROLE_OPTIONS: { value: UserRole; label: string; desc: string; available: b
   { value: "school_admin", label: "ผู้ดูแลโรงเรียน", desc: "บริหารจัดการทั้งโรงเรียน", available: true },
 ];
 
-export default function SignUpPage() {
+function SignUpContent() {
   const { signUp, isAuthenticated, isLoading, user } = useAuth();
   const router = useRouter();
+  const redirect = safeAuthRedirect(useSearchParams().get("redirect"));
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -70,11 +72,12 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (mounted && !isLoading && isAuthenticated) {
-      if (user?.role === "school_admin") router.replace("/school");
+      if (redirect) router.replace(redirect);
+      else if (user?.role === "school_admin") router.replace("/school");
       else if (user?.role === "teacher") router.replace("/teacher");
       else router.replace("/training");
     }
-  }, [mounted, isLoading, isAuthenticated, router, user?.role]);
+  }, [mounted, isLoading, isAuthenticated, router, user?.role, redirect]);
 
   const passwordValid = PASSWORD_RULES.every((r) => r.test(password));
 
@@ -132,7 +135,7 @@ export default function SignUpPage() {
                 แล้วกลับมาเข้าสู่ระบบ
               </p>
               <Link
-                href="/auth/signin"
+                href={redirect ? `/auth/signin?redirect=${encodeURIComponent(redirect)}` : "/auth/signin"}
                 className="inline-block bg-primary text-white font-semibold rounded-xl px-6 py-2.5 text-sm hover:bg-primary/90 active:scale-[0.98] transition-all"
               >
                 ไปยังหน้าเข้าสู่ระบบ
@@ -277,7 +280,7 @@ export default function SignUpPage() {
 
               <p className="text-center text-xs text-text-muted mt-5">
                 มีบัญชีอยู่แล้ว?{" "}
-                <Link href="/auth/signin" className="text-primary font-semibold hover:underline">
+                <Link href={redirect ? `/auth/signin?redirect=${encodeURIComponent(redirect)}` : "/auth/signin"} className="text-primary font-semibold hover:underline">
                   เข้าสู่ระบบ
                 </Link>
               </p>
@@ -293,4 +296,8 @@ export default function SignUpPage() {
       </div>
     </main>
   );
+}
+
+export default function SignUpPage() {
+  return <Suspense><SignUpContent /></Suspense>;
 }

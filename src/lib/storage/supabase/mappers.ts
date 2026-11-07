@@ -233,6 +233,10 @@ export function dbToDomainInvitation(db: DbInvitation): Invitation {
     createdAt: db.created_at,
     acceptedAt: db.accepted_at ?? undefined,
     acceptedBy: db.accepted_by ?? undefined,
+    requiresTeacherApproval: db.requires_teacher_approval,
+    requestedAt: db.requested_at ?? undefined,
+    requesterName: db.requester_name ?? undefined,
+    requesterRelationship: db.requester_relationship ?? undefined,
     // childSnapshot is not stored in DB — must be fetched separately if needed
   };
 }

@@ -98,6 +98,11 @@ export type DbInvitation = {
   expires_at: string;
   accepted_at: string | null;
   accepted_by: string | null;
+  requires_teacher_approval: boolean;
+  requested_by: string | null;
+  requested_at: string | null;
+  requester_name: string | null;
+  requester_relationship: string | null;
   created_at: string;
   updated_at: string;
 };

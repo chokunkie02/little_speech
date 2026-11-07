@@ -1,5 +1,6 @@
 "use client";
 
+import GuardianLinkSection from "@/components/teacher/GuardianLinkSection";
 import AppShell from "@/components/layout/AppShell";
 import TeacherChildProgressCard from "@/components/teacher/TeacherChildProgressCard";
 import { useTeacherChildren } from "@/hooks/useTeacherChildren";
@@ -204,12 +205,10 @@ export default function TeacherDashboardPage() {
                         <span className="text-xs text-text-muted">ปี {room.academicYear}</span>
                       )}
                       <span className="ml-auto text-xs text-text-muted">
-                        {roomChildren.length} เด็ก
+                        {roomStudentIds.size} เด็ก
                       </span>
                     </div>
-                    {roomChildren.length === 0 ? (
-                      <p className="text-xs text-text-muted italic">ยังไม่มีเด็กในห้องนี้</p>
-                    ) : (
+                    {roomChildren.length > 0 && (
                       <div className="flex flex-wrap gap-2">
                         {roomChildren.map((c) => (
                           <button
@@ -222,6 +221,7 @@ export default function TeacherDashboardPage() {
                         ))}
                       </div>
                     )}
+                    <GuardianLinkSection key={`${user?.id}:${room.id}`} classroomId={room.id} />
                   </div>
                 );
               })}

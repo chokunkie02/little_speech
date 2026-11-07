@@ -53,7 +53,7 @@ export type InsertChildProfile =
 export type InsertPracticeSession = Omit<DbPracticeSession, "id" | "created_at">;
 export type InsertPracticeAttempt = Omit<DbPracticeAttempt, "id" | "created_at">;
 export type InsertObservationNote = Omit<DbObservationNote, "id" | "created_at" | "updated_at">;
-export type InsertInvitation = Omit<DbInvitation, "id" | "created_at" | "updated_at" | "accepted_at" | "accepted_by"> & { id?: string };
+export type InsertInvitation = Omit<DbInvitation, "id" | "created_at" | "updated_at" | "accepted_at" | "accepted_by" | "requires_teacher_approval" | "requested_by" | "requested_at" | "requester_name" | "requester_relationship"> & { id?: string };
 export type InsertChildAccess = Omit<DbChildAccess, "id" | "created_at" | "revoked_at"> & { id?: string };
 export type UpdateChildAccess = Partial<Omit<DbChildAccess, "id" | "created_at">>;
 export type InsertOrganization = Omit<DbOrganization, "id" | "created_at" | "updated_at"> & { id?: string };
@@ -163,6 +163,26 @@ export interface Database {
       };
       accept_invitation_with_access: {
         Args: { p_token: string; p_user_id: string };
+        Returns: void;
+      };
+      list_received_guardian_invites: {
+        Args: Record<string, never>;
+        Returns: DbInvitation[];
+      };
+      create_teacher_student: {
+        Args: { p_classroom_id: string; p_name: string; p_student_code: string; p_age: number; p_nickname: string };
+        Returns: string;
+      };
+      create_first_guardian_invite: {
+        Args: { p_child_id: string; p_email: string };
+        Returns: void;
+      };
+      submit_first_guardian_request: {
+        Args: { p_token: string; p_name: string; p_relationship: string };
+        Returns: void;
+      };
+      review_first_guardian_request: {
+        Args: { p_invitation_id: string; p_approve: boolean };
         Returns: void;
       };
       expire_stale_invitations: {

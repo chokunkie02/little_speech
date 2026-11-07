@@ -9,7 +9,7 @@ export default function InviteTokenRedirect() {
   const token = typeof params.token === "string" ? params.token : "";
 
   useEffect(() => {
-    router.replace(token ? `/invite/accept?token=${token}` : "/invite/accept");
+    router.replace(token ? `/invite/accept?token=${encodeURIComponent(token)}` : "/invite/accept");
   }, [token, router]);
 
   return (

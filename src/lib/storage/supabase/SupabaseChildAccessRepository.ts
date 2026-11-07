@@ -191,11 +191,11 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
     this._notify();
   }
 
-  public rehydrate(): void {
+  public rehydrate(): Promise<void> {
     this._hydrated = false;
     this._hydratePromise = null;
     this._hydrateGen++;
-    this._triggerHydrate();
+    return this._triggerHydrate();
   }
 
   public setScope(_userId: string | null): void {
@@ -208,11 +208,12 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
     this._listeners.forEach((cb) => cb());
   }
 
-  private _triggerHydrate(): void {
-    if (this._hydratePromise) return;
+  private _triggerHydrate(): Promise<void> {
+    if (this._hydratePromise) return this._hydratePromise;
     this._hydratePromise = this._hydrate().catch((err) => {
       warnRepo("SupabaseChildAccessRepository._hydrate", err);
     });
+    return this._hydratePromise;
   }
 
   private async _hydrate(): Promise<void> {

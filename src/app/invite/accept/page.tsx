@@ -86,20 +86,59 @@ function AcceptInviteContent() {
   const router = useRouter();
   const token = searchParams.get("token") ?? "";
 
-  const { getByToken, acceptInvitation } = useInvitations();
+  const { getByToken, acceptInvitation, submitGuardianRequest, openLinkedChild } = useInvitations();
   const { isAuthenticated, user, isLoading: authLoading } = useAuth();
 
-  const [invitation, setInvitation] = useState<Invitation | null | undefined>(undefined);
+  const [lookup, setLookup] = useState<{ key: string; invitation: Invitation | null; error?: string }>();
+  const [refresh, setRefresh] = useState(0);
+  const [name, setName] = useState("");
+  const [relationship, setRelationship] = useState("");
+  const lookupKey = JSON.stringify([token, user?.id, refresh]);
+  const currentLookup = lookup?.key === lookupKey ? lookup : undefined;
+  const invitation = currentLookup?.invitation;
   const [accepting, setAccepting] = useState(false);
   const [accepted, setAccepted] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const id = setTimeout(() => {
-      setInvitation(token ? getByToken(token) : null);
-    }, 50);
-    return () => clearTimeout(id);
-  }, [token, getByToken]);
+    if (authLoading) return;
+    let active = true;
+    const result = token ? getByToken(token) : Promise.resolve(null);
+    void result.then(
+      (invitation) => { if (active) setLookup({ key: lookupKey, invitation }); },
+      () => { if (active) setLookup({ key: lookupKey, invitation: null, error: "โหลดคำเชิญไม่สำเร็จ" }); },
+    );
+    return () => { active = false; };
+  }, [authLoading, token, getByToken, lookupKey]);
+
+  async function handleRequest(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!invitation || !name.trim() || !relationship.trim()) return;
+    setAccepting(true);
+    setError(null);
+    try {
+      await submitGuardianRequest(token, name, relationship);
+      setRefresh((value) => value + 1);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "ส่งคำขอไม่สำเร็จ");
+    } finally {
+      setAccepting(false);
+    }
+  }
+
+  async function handleOpenLinkedChild() {
+    if (!invitation?.childId) return;
+    setAccepting(true);
+    setError(null);
+    try {
+      await openLinkedChild(invitation.childId);
+      router.push("/training");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "เปิดโปรไฟล์เด็กไม่สำเร็จ");
+    } finally {
+      setAccepting(false);
+    }
+  }
 
   async function handleAccept() {
     if (!invitation) return;
@@ -133,6 +172,19 @@ function AcceptInviteContent() {
     );
   }
 
+  if (currentLookup?.error) {
+    return (
+      <main className="min-h-screen bg-bg flex items-center justify-center px-4">
+        <div className="space-y-4 text-center">
+          <p role="alert" className="text-error">{currentLookup.error}</p>
+          <button className="rounded-xl bg-primary px-6 py-2.5 text-white" onClick={() => setRefresh((value) => value + 1)}>
+            ลองใหม่
+          </button>
+        </div>
+      </main>
+    );
+  }
+
   // No token or token not found
   if (!invitation) {
     return (
@@ -156,7 +208,16 @@ function AcceptInviteContent() {
 
   const isExpiredOrRevoked = invitation.status === "expired" || invitation.status === "revoked";
   const isAlreadyAccepted = invitation.status === "accepted";
-  const canAccept = invitation.status === "pending" && isAuthenticated;
+  const guardianRequest = invitation.requiresTeacherApproval;
+  const awaitingReview = guardianRequest && invitation.status === "pending" && !!invitation.requestedAt;
+  const rejected = guardianRequest && invitation.status === "revoked" && !!invitation.requestedAt && !invitation.acceptedAt;
+  const canAccept = invitation.status === "pending" && isAuthenticated && !awaitingReview;
+  const matchingAccount = user?.role === "parent" && !!user.email &&
+    (!invitation.email || invitation.email.toLowerCase() === user.email.toLowerCase());
+  const statusLabel = awaitingReview ? "รอครูอนุมัติ"
+    : rejected ? "ไม่อนุมัติ"
+    : guardianRequest && isAlreadyAccepted ? "อนุมัติแล้ว"
+    : INVITATION_STATUS_LABELS[invitation.status];
   const accessRole = invitationRoleToAccessRole(invitation.role);
   const perms = ROLE_DEFAULT_PERMISSIONS[accessRole];
   const redirectParam = encodeURIComponent(`/invite/accept?token=${token}`);
@@ -180,7 +241,7 @@ function AcceptInviteContent() {
               <span className="font-semibold text-text truncate max-w-[200px]">{invitation.inviterEmail}</span>
             </div>
           )}
-          {invitation.childSnapshot && (
+          {!guardianRequest && invitation.childSnapshot && (
             <div className="flex items-center justify-between px-5 py-3.5">
               <span className="text-sm text-text-muted">เด็ก</span>
               <span className="font-semibold text-text">{invitation.childSnapshot.name}</span>
@@ -194,10 +255,10 @@ function AcceptInviteContent() {
               <span className="text-xs font-normal text-text-muted">({ACCESS_ROLE_LABELS[accessRole]})</span>
             </span>
           </div>
-          <div className="flex items-center justify-between px-5 py-3.5">
+          {invitation.email && <div className="flex items-center justify-between px-5 py-3.5">
             <span className="text-sm text-text-muted">อีเมลที่ได้รับเชิญ</span>
             <span className="font-semibold text-text truncate max-w-[200px]">{invitation.email}</span>
-          </div>
+          </div>}
           <div className="flex items-center justify-between px-5 py-3.5">
             <span className="text-sm text-text-muted">สถานะ</span>
             <span className={`text-sm font-semibold ${
@@ -205,21 +266,21 @@ function AcceptInviteContent() {
               : invitation.status === "accepted" ? "text-success"
               : "text-error"
             }`}>
-              {INVITATION_STATUS_LABELS[invitation.status]}
+              {statusLabel}
             </span>
           </div>
-          <div className="flex items-center justify-between px-5 py-3.5">
+          {!invitation.requestedAt && <div className="flex items-center justify-between px-5 py-3.5">
             <span className="text-sm text-text-muted">หมดอายุ</span>
             <span className="text-sm font-medium text-text">
               {new Date(invitation.expiresAt).toLocaleDateString("th-TH", {
                 day: "numeric", month: "long", year: "numeric",
               })}
             </span>
-          </div>
+          </div>}
         </div>
 
         {/* Permissions panel */}
-        <div className="bg-surface border border-border rounded-xl px-5 py-4">
+        {!guardianRequest && <div className="bg-surface border border-border rounded-xl px-5 py-4">
           <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">สิทธิ์การเข้าถึง</p>
           <div className="divide-y divide-border/60">
             <PermRow label="ดูความก้าวหน้า"    allowed={perms.canViewProgress} />
@@ -228,18 +289,18 @@ function AcceptInviteContent() {
             <PermRow label="แก้ไขข้อมูลเด็ก"    allowed={perms.canEditChild} />
             <PermRow label="ส่งออกรายงาน"       allowed={perms.canExportReport} />
           </div>
-        </div>
+        </div>}
 
         {/* State banners */}
         {isExpiredOrRevoked && (
           <div className="bg-error/8 border border-error/20 rounded-xl px-4 py-3 text-sm text-error">
-            คำเชิญนี้{invitation.status === "expired" ? "หมดอายุ" : "ถูกยกเลิก"}แล้ว กรุณาขอคำเชิญใหม่
+            {rejected ? "ครูไม่อนุมัติคำขอนี้ กรุณาติดต่อครูประจำห้อง" : `คำเชิญนี้${invitation.status === "expired" ? "หมดอายุ" : "ถูกยกเลิก"}แล้ว กรุณาขอคำเชิญใหม่`}
           </div>
         )}
 
         {isAlreadyAccepted && (
           <div className="bg-success/8 border border-success/20 rounded-xl px-4 py-3 text-sm text-success">
-            คำเชิญนี้ได้รับการตอบรับแล้ว
+            {guardianRequest ? "ครูอนุมัติแล้ว คุณเปิดโปรไฟล์เด็กจากตัวเลือกเด็กได้" : "คำเชิญนี้ได้รับการตอบรับแล้ว"}
           </div>
         )}
 
@@ -272,8 +333,45 @@ function AcceptInviteContent() {
           </div>
         )}
 
-        {/* Accept button */}
-        {canAccept && (
+        {awaitingReview && (
+          <div className="space-y-3 rounded-xl border border-warning/20 bg-warning/10 px-4 py-3 text-sm">
+            <p>ส่งคำขอแล้ว คุณจะเปิดข้อมูลเด็กได้เมื่อครูประจำห้องอนุมัติ</p>
+            <button type="button" className="font-semibold text-primary" onClick={() => setRefresh((value) => value + 1)}>
+              ตรวจสถานะล่าสุด
+            </button>
+          </div>
+        )}
+
+        {canAccept && guardianRequest && (matchingAccount ? (
+          <form onSubmit={handleRequest} className="space-y-4 bg-surface border border-border rounded-xl p-5">
+            <label className="block space-y-1.5 text-sm font-semibold">
+              <span>ชื่อและนามสกุลผู้ปกครอง</span>
+              <input className="w-full bg-bg border border-border rounded-lg px-3 py-2" autoComplete="name"
+                required maxLength={120} value={name} onChange={(event) => setName(event.target.value)} />
+            </label>
+            <label className="block space-y-1.5 text-sm font-semibold">
+              <span>ความสัมพันธ์กับเด็ก</span>
+              <input className="w-full bg-bg border border-border rounded-lg px-3 py-2"
+                required maxLength={60} placeholder="เช่น แม่ พ่อ หรือผู้ดูแล" value={relationship}
+                onChange={(event) => setRelationship(event.target.value)} />
+            </label>
+            <label className="block space-y-1.5 text-sm font-semibold">
+              <span>อีเมลจากบัญชี</span>
+              <input className="w-full bg-bg border border-border rounded-lg px-3 py-2 text-text-muted" value={user.email} readOnly />
+            </label>
+            <button className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white disabled:opacity-40"
+              disabled={accepting || !name.trim() || !relationship.trim()}>
+              {accepting ? "กำลังส่ง…" : "ส่งคำขอเชื่อม"}
+            </button>
+          </form>
+        ) : (
+          <p role="alert" className="rounded-xl border border-error/20 bg-error/8 px-4 py-3 text-sm text-error">
+            กรุณาเข้าสู่ระบบด้วยบัญชีผู้ปกครองที่ตรงกับคำเชิญ
+          </p>
+        ))}
+
+        {/* Legacy invitation */}
+        {canAccept && !guardianRequest && (
           <div className="space-y-3">
             {user && (
               <p className="text-xs text-text-muted text-center">
@@ -297,7 +395,13 @@ function AcceptInviteContent() {
         )}
 
         {/* Back link for terminal states */}
-        {(isExpiredOrRevoked || isAlreadyAccepted) && (
+        {guardianRequest && isAlreadyAccepted && invitation.childId && (
+          <button type="button" disabled={accepting} onClick={handleOpenLinkedChild}
+            className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white disabled:opacity-40">
+            {accepting ? "กำลังโหลด…" : "เปิดโปรไฟล์เด็ก"}
+          </button>
+        )}
+        {(isExpiredOrRevoked || (isAlreadyAccepted && (!guardianRequest || !invitation.childId))) && (
           <Link
             href="/"
             className="block text-center text-sm text-text-muted hover:text-text transition-colors"

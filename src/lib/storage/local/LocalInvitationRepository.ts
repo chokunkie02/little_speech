@@ -46,7 +46,7 @@ export class LocalInvitationRepository implements IInvitationRepository {
 
   // ── Token lookup ─────────────────────────────────────────────────────────────
 
-  getInvitationByToken(token: string): Invitation | null {
+  async getInvitationByToken(token: string): Promise<Invitation | null> {
     return storage.findByToken(token);
   }
 

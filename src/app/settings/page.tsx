@@ -267,20 +267,20 @@ function ReceivedInviteSection() {
       setError("กรุณาวางลิงก์คำเชิญหรือ token ที่ถูกต้อง");
       return;
     }
-    router.push(`/invite/accept?token=${token}`);
+    router.push(`/invite/accept?token=${encodeURIComponent(token)}`);
   }
 
   return (
     <div className="space-y-3">
       <p className="text-sm text-text-muted">
-        วางลิงก์คำเชิญหรือ token ที่ได้รับเพื่อดูรายละเอียดและตอบรับ
+        วางลิงก์หรือรหัสคำเชิญที่ได้รับเพื่อเปิดคำเชิญ
       </p>
       <div className="flex gap-2">
         <input
           type="text"
           value={input}
           onChange={(e) => { setInput(e.target.value); setError(null); }}
-          placeholder="https://…/invite/accept?token=… หรือ token"
+          placeholder="https://…/invite/accept?token=… หรือรหัส"
           className="flex-1 min-w-0 bg-bg border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
         />
         <button
@@ -302,7 +302,9 @@ function ReceivedInviteSection() {
 function PendingReceivedInvites() {
   const router = useRouter();
   const { receivedInvitations } = useInvitations();
-  const pending = receivedInvitations.filter((i) => i.status === "pending");
+  const pending = receivedInvitations.filter((invitation) =>
+    invitation.status === "pending" || (invitation.requiresTeacherApproval && invitation.requestedAt),
+  );
 
   if (pending.length === 0) return null;
 
@@ -321,14 +323,16 @@ function PendingReceivedInvites() {
               {inv.inviterEmail ?? "ผู้ส่งคำเชิญ"}
             </p>
             <p className="text-xs text-text-muted">
-              {INVITATION_ROLE_LABELS[inv.role]} · หมดอายุ {new Date(inv.expiresAt).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}
+              {INVITATION_ROLE_LABELS[inv.role]} · {inv.requiresTeacherApproval && inv.requestedAt
+                ? inv.status === "pending" ? "รอครูอนุมัติ" : inv.status === "accepted" ? "อนุมัติแล้ว" : "คำขอปิดแล้ว"
+                : `หมดอายุ ${new Date(inv.expiresAt).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}`}
             </p>
           </div>
           <button
-            onClick={() => router.push(`/invite/accept?token=${inv.token}`)}
+            onClick={() => router.push(`/invite/accept?token=${encodeURIComponent(inv.token)}`)}
             className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-all flex-shrink-0"
           >
-            ตอบรับ
+            {inv.requiresTeacherApproval ? "ดูคำเชิญ" : "ตอบรับ"}
           </button>
         </div>
       ))}

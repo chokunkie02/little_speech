@@ -14,7 +14,6 @@ const SERVER_INVITATIONS: Invitation[] = [];
  * Cache strategy:
  *  • _sent[]     — invitations the current user created (invited_by = auth.uid())
  *  • _received[] — invitations addressed to the current user's email
- *  • _tokenCache — single-token lookup cache (populated lazily by accept page)
  *
  * Sent and received MUST stay separate so the UI never displays an invite
  * addressed to the user under their own "sent history" list.
@@ -32,7 +31,6 @@ const SERVER_INVITATIONS: Invitation[] = [];
 export class SupabaseInvitationRepository implements IInvitationRepository {
   private _sent: Invitation[] = SERVER_INVITATIONS;
   private _received: Invitation[] = SERVER_INVITATIONS;
-  private _tokenCache = new Map<string, Invitation | "not_found">();
   private readonly _listeners = new Set<() => void>();
   private _hydrated = false;
   private _hydratePromise: Promise<void> | null = null;
@@ -68,18 +66,10 @@ export class SupabaseInvitationRepository implements IInvitationRepository {
 
   // ── Token lookup ─────────────────────────────────────────────────────────────
 
-  getInvitationByToken(token: string): Invitation | null {
-    const cached = this._tokenCache.get(token);
-    if (cached === "not_found") return null;
-    if (cached) return cached;
-    const fromAny = this._sent.find((i) => i.token === token)
-      ?? this._received.find((i) => i.token === token);
-    if (fromAny) {
-      this._tokenCache.set(token, fromAny);
-      return fromAny;
-    }
-    void this._fetchByToken(token);
-    return null;
+  async getInvitationByToken(token: string): Promise<Invitation | null> {
+    const { data, error } = await this.client.rpc("get_invitation_by_token", { p_token: token });
+    if (error) throw new Error(error.message);
+    return data?.[0] ? dbToDomainInvitation(data[0]) : null;
   }
 
   // ── Write operations ──────────────────────────────────────────────────────────
@@ -174,22 +164,16 @@ export class SupabaseInvitationRepository implements IInvitationRepository {
       throw new Error(error.message);
     }
 
-    // Update local caches (token + sent + received) so UI reflects accepted state
-    const acceptedAt = new Date().toISOString();
-    this._tokenCache.forEach((inv, key) => {
-      if (inv !== "not_found" && inv.token === token) {
-        this._tokenCache.set(key, { ...inv, status: "accepted", acceptedAt });
-      }
-    });
-    this._sent = this._sent.map((i) =>
-      i.token === token ? { ...i, status: "accepted", acceptedAt } : i,
-    );
-    this._received = this._received.map((i) =>
-      i.token === token ? { ...i, status: "accepted", acceptedAt } : i,
-    );
-    this._notify();
+    this.rehydrate();
+  }
 
-    // Fresh fetch so newly-created child_access permissions cascade into views
+  async submitGuardianRequest(token: string, name: string, relationship: string): Promise<void> {
+    const { error } = await this.client.rpc("submit_first_guardian_request", {
+      p_token: token,
+      p_name: name,
+      p_relationship: relationship,
+    });
+    if (error) throw new Error(error.message);
     this.rehydrate();
   }
 
@@ -219,7 +203,6 @@ export class SupabaseInvitationRepository implements IInvitationRepository {
     this._hydratePromise = null;
     this._sent = SERVER_INVITATIONS;
     this._received = SERVER_INVITATIONS;
-    this._tokenCache.clear();
     this._notify();
   }
 
@@ -273,10 +256,13 @@ export class SupabaseInvitationRepository implements IInvitationRepository {
           .from("invitations")
           .select("*")
           .eq("email", userEmail)
+          .eq("requires_teacher_approval", false)
           .order("created_at", { ascending: false })
       : Promise.resolve({ data: [] as never[], error: null });
 
-    const [sentRes, receivedRes] = await Promise.all([sentP, receivedP]);
+    const [sentRes, receivedRes, guardianRes] = await Promise.all([
+      sentP, receivedP, this.client.rpc("list_received_guardian_invites"),
+    ]);
 
     if (this._hydrateGen !== myGen) return;
 
@@ -285,43 +271,22 @@ export class SupabaseInvitationRepository implements IInvitationRepository {
         new QueryError("invitations", "select", sentRes.error));
     } else {
       this._sent = (sentRes.data ?? []).map(dbToDomainInvitation);
-      for (const inv of this._sent) this._tokenCache.set(inv.token, inv);
     }
 
     if (receivedRes.error) {
       warnRepo("SupabaseInvitationRepository._hydrate:received",
         new QueryError("invitations", "select", receivedRes.error));
-    } else {
-      this._received = (receivedRes.data ?? []).map(dbToDomainInvitation);
-      for (const inv of this._received) this._tokenCache.set(inv.token, inv);
     }
+    if (guardianRes.error) {
+      warnRepo("SupabaseInvitationRepository._hydrate:guardian",
+        new QueryError("invitations", "rpc:list_received_guardian_invites", guardianRes.error));
+    }
+    this._received = [...(receivedRes.data ?? []), ...(guardianRes.data ?? [])]
+      .map(dbToDomainInvitation)
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt));
 
     this._hydrated = true;
     this._notify();
   }
 
-  private async _fetchByToken(token: string): Promise<void> {
-    const { data, error } = await this.client.rpc("get_invitation_by_token", {
-      p_token: token,
-    });
-
-    if (error) {
-      warnRepo("SupabaseInvitationRepository._fetchByToken", new QueryError("invitations", "rpc:get_by_token", error));
-      this._tokenCache.set(token, "not_found");
-      this._notify();
-      return;
-    }
-
-    const rows = data as (typeof data extends Array<infer T> ? T : never)[] | null;
-    if (!rows || rows.length === 0) {
-      this._tokenCache.set(token, "not_found");
-      this._notify();
-      return;
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const inv = dbToDomainInvitation(rows[0] as any);
-    this._tokenCache.set(token, inv);
-    this._notify();
-  }
 }

@@ -6,7 +6,7 @@ import type { Invitation, CreateInvitationInput } from "@/types/invitations";
 import { useAuth } from "@/hooks/useAuth";
 import { invitationRoleToAccessRole } from "@/types/childAccess";
 
-interface Rehydratable { rehydrate(): void }
+interface Rehydratable { rehydrate(): void | Promise<void> }
 function hasRehydrate(repo: unknown): repo is Rehydratable {
   return typeof (repo as Rehydratable).rehydrate === "function";
 }
@@ -37,17 +37,7 @@ export function useInvitations() {
 
   const acceptInvitation = useCallback(
     async (token: string): Promise<void> => {
-      const inv = repo.getInvitationByToken(token);
-      if (process.env.NODE_ENV !== "production") {
-        console.debug("[useInvitations.acceptInvitation]", {
-          tokenFound: Boolean(inv),
-          tokenPrefix: token.slice(0, 8),
-          childId: inv?.childId ?? null,
-          acceptingUserId: user?.id ?? null,
-          acceptingEmail: user?.email ?? null,
-        });
-      }
-
+      const inv = await repo.getInvitationByToken(token);
       await repo.acceptInvitation(token);
 
       // Local mode only: server-side Supabase RPC already creates the grant,
@@ -78,11 +68,28 @@ export function useInvitations() {
   );
 
   const getByToken = useCallback(
-    (token: string): Invitation | null => {
+    (token: string): Promise<Invitation | null> => {
       return repo.getInvitationByToken(token);
     },
     [repo],
   );
+
+  const submitGuardianRequest = useCallback(
+    async (token: string, name: string, relationship: string): Promise<void> => {
+      if (!repo.submitGuardianRequest) throw new Error("การเชื่อมผู้ปกครองต้องใช้บัญชีออนไลน์");
+      await repo.submitGuardianRequest(token, name, relationship);
+    },
+    [repo],
+  );
+
+  const openLinkedChild = useCallback(async (childId: string): Promise<void> => {
+    if (hasRehydrate(accessRepo)) await accessRepo.rehydrate();
+    const linked = accessRepo.listReceivedGrants().some(
+      (grant) => grant.childId === childId && !grant.revokedAt && grant.childSnapshot,
+    );
+    if (!linked) throw new Error("โหลดโปรไฟล์ที่เชื่อมไม่สำเร็จ กรุณาลองใหม่");
+    profileRepo.setSelectedChildId(childId);
+  }, [accessRepo, profileRepo]);
 
   const pendingSentCount = sentInvitations.filter((inv) => inv.status === "pending").length;
   const pendingReceivedCount = receivedInvitations.filter((inv) => inv.status === "pending").length;
@@ -101,6 +108,8 @@ export function useInvitations() {
     createInvitation,
     acceptInvitation,
     revokeInvitation,
+    submitGuardianRequest,
+    openLinkedChild,
     getByToken,
   };
 }

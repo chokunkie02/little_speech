@@ -33,6 +33,10 @@ export interface Invitation {
   inviterEmail?: string;
   /** Snapshot of the child profile at invite time — used to show child name and seed local access grants. */
   childSnapshot?: ChildProfileData;
+  requiresTeacherApproval?: boolean;
+  requestedAt?: string;
+  requesterName?: string;
+  requesterRelationship?: string;
 }
 
 export interface CreateInvitationInput {
