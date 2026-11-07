@@ -52,6 +52,8 @@ function SignInContent() {
     if (mounted && !isLoading && isAuthenticated) {
       if (explicitRedirect) {
         router.replace(explicitRedirect);
+      } else if (user?.isPlatformAdmin) {
+        router.replace("/platform");
       } else if (user?.role === "school_admin") {
         router.replace("/school");
       } else if (user?.role === "teacher") {
@@ -60,7 +62,7 @@ function SignInContent() {
         router.replace("/training");
       }
     }
-  }, [mounted, isLoading, isAuthenticated, router, explicitRedirect, user?.role]);
+  }, [mounted, isLoading, isAuthenticated, router, explicitRedirect, user?.role, user?.isPlatformAdmin]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

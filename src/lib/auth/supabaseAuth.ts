@@ -16,6 +16,7 @@ function mapUser(u: User): AuthUser {
     email: u.email ?? "",
     createdAt: u.created_at,
     role: (u.user_metadata?.role as UserRole) ?? FALLBACK_ROLE,
+    isPlatformAdmin: u.app_metadata?.platform_admin === true,
   };
 }
 

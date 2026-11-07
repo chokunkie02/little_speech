@@ -62,7 +62,11 @@ function SignUpContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>(() => redirect?.startsWith("/invite/school-teacher?") ? "teacher" : "parent");
+  const [selectedRole, setSelectedRole] = useState<UserRole>(() => {
+    if (redirect?.startsWith("/invite/school-admin?")) return "school_admin";
+    if (redirect?.startsWith("/invite/school-teacher?")) return "teacher";
+    return "parent";
+  });
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -73,11 +77,12 @@ function SignUpContent() {
   useEffect(() => {
     if (mounted && !isLoading && isAuthenticated) {
       if (redirect) router.replace(redirect);
+      else if (user?.isPlatformAdmin) router.replace("/platform");
       else if (user?.role === "school_admin") router.replace("/school");
       else if (user?.role === "teacher") router.replace("/teacher");
       else router.replace("/training");
     }
-  }, [mounted, isLoading, isAuthenticated, router, user?.role, redirect]);
+  }, [mounted, isLoading, isAuthenticated, router, user?.role, user?.isPlatformAdmin, redirect]);
 
   const passwordValid = PASSWORD_RULES.every((r) => r.test(password));
 

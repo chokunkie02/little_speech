@@ -1,4 +1,4 @@
-import type { SchoolTeacherInvitation, SchoolTeacherInvitationStatus } from "@/types/school";
+import type { PlatformSchool, PlatformSchoolAdmins, SchoolTeacherInvitation, SchoolTeacherInvitationStatus } from "@/types/school";
 
 /**
  * Supabase Database type placeholder for Speech Adventure.
@@ -157,6 +157,30 @@ export interface Database {
     };
     Views: { [_ in never]: never };
     Functions: {
+      list_platform_schools: {
+        Args: Record<string, never>;
+        Returns: PlatformSchool[];
+      };
+      rename_platform_school: {
+        Args: { p_organization_id: string; p_name: string };
+        Returns: void;
+      };
+      get_platform_school_admins: {
+        Args: { p_organization_id: string };
+        Returns: PlatformSchoolAdmins;
+      };
+      create_school_admin_invitation: {
+        Args: { p_organization_id: string; p_email: string };
+        Returns: string;
+      };
+      get_school_admin_invitation: {
+        Args: { p_token: string };
+        Returns: { school_name: string; status: SchoolTeacherInvitationStatus } | null;
+      };
+      accept_school_admin_invitation: {
+        Args: { p_token: string };
+        Returns: void;
+      };
       create_school_teacher_invitation: {
         Args: { p_organization_id: string; p_email: string };
         Returns: string;

@@ -118,3 +118,19 @@ export interface SchoolTeacherInvitation {
   teacher_user_id: string | null;
   assigned: boolean;
 }
+
+export type PlatformSchool = {
+  id: string;
+  name: string;
+  created_at: string;
+  admin_count: number;
+  teacher_count: number;
+  classroom_count: number;
+  student_count: number;
+  recent_sessions: number;
+};
+
+export type PlatformSchoolAdmins = {
+  admins: { email: string }[];
+  invitations: { email: string; token: string | null; status: SchoolTeacherInvitationStatus }[];
+};

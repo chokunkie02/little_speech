@@ -16,6 +16,7 @@ export interface AuthUser {
   createdAt: string;
   /** Always present — defaults to "parent" for existing users with no stored role. */
   role: UserRole;
+  isPlatformAdmin?: boolean;
 }
 
 export interface AuthSession {
