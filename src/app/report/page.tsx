@@ -1,7 +1,12 @@
 "use client";
 
-import { useCallback } from "react";
+import { Suspense, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
+import SchoolProgressReportView from "@/components/report/SchoolProgressReportView";
 import AppShell from "@/components/layout/AppShell";
 import ReportHeader from "@/components/report/ReportHeader";
 import ReportMetricCard from "@/components/report/ReportMetricCard";
@@ -116,7 +121,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 
-export default function ReportPage() {
+function PersonalReportPage() {
   const { summary, getStageStatus, getStageAttempts, isHydrated, selectedSoundId } = useSpeechProgress();
   const { profile } = useChildProfile();
   const { recentNotes } = useObservationNotes();
@@ -906,5 +911,49 @@ export default function ReportPage() {
         </div>
       )}
     </AppShell>
+  );
+}
+
+function ReportEntry() {
+  const requestedChild = useSearchParams().get("child");
+  const { user, isLoading } = useAuth();
+  const { profile } = useChildProfile();
+  const online = isSupabaseProviderRequested() && isSupabaseConfigured();
+  const staff = user?.role === "teacher" || user?.role === "school_admin";
+  const childId = staff ? requestedChild : profile?.organizationId ? profile.id : null;
+  const backHref = user?.role === "school_admin" ? "/school" : user?.role === "teacher"
+    ? (childId ? `/progress?child=${encodeURIComponent(childId)}` : "/teacher") : "/progress";
+
+  if (!online || (!isLoading && !requestedChild && !childId && !staff && (profile || !user))
+    || (!isLoading && user?.role === "teacher" && !requestedChild && profile && !profile.organizationId)) {
+    return <PersonalReportPage key={profile?.id} />;
+  }
+
+  return (
+    <AppShell>
+      {isLoading ? (
+        <p role="status" className="p-6 text-sm text-text-muted">กำลังโหลด…</p>
+      ) : !user ? (
+        <Link className="inline-block p-6 text-sm font-semibold text-primary"
+          href={`/auth/signin?redirect=${encodeURIComponent(`/report?child=${encodeURIComponent(requestedChild ?? "")}`)}`}>
+          เข้าสู่ระบบเพื่อดูรายงาน
+        </Link>
+      ) : childId ? (
+        <SchoolProgressReportView key={`${user.id}:${childId}`} childId={childId} backHref={backHref} />
+      ) : (
+        <div className="space-y-2 p-6 text-sm text-text-muted">
+          <p>เลือกนักเรียนก่อนเปิดรายงาน</p>
+          {staff && <Link className="font-semibold text-primary" href={backHref}>ไปหน้ารายชื่อนักเรียน</Link>}
+        </div>
+      )}
+    </AppShell>
+  );
+}
+
+export default function ReportPage() {
+  return (
+    <Suspense fallback={<p role="status" className="p-6 text-sm text-text-muted">กำลังโหลด…</p>}>
+      <ReportEntry />
+    </Suspense>
   );
 }

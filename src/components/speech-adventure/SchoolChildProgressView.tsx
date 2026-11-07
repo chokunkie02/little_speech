@@ -97,6 +97,10 @@ export default function SchoolChildProgressView({
             <DetailMetricCard label="คะแนนเฉลี่ย" value={average} valueColor="var(--color-primary)" />
             <DetailMetricCard label="เซสชันที่จบแล้ว" value={sessions.filter((session) => session.status === "completed").length} />
           </div>
+          <Link className="inline-block rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-primary"
+            href={teacher ? `/report?child=${encodeURIComponent(childId)}` : "/report"}>
+            เปิดรายงานความก้าวหน้า
+          </Link>
           {!teacher && <p className="text-xs text-text-muted">
             ครูประจำห้องสามารถฟังเสียงการฝึกที่บันทึกไว้ของนักเรียนคนนี้ได้
           </p>}

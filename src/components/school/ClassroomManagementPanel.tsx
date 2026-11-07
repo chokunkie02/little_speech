@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import SchoolGuardianMembers from "@/components/layout/SchoolGuardianMembers";
 import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
@@ -482,6 +483,8 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
                             onClick={() => setGuardianRosterId(guardianRosterId === s.childId ? null : s.childId)}>
                             {guardianRosterId === s.childId ? "ซ่อนรายชื่อผู้ปกครอง" : "ดูผู้ปกครองที่เชื่อม"}
                           </button>
+                          <Link className="ml-3 text-xs font-semibold text-primary"
+                            href={`/report?child=${encodeURIComponent(s.childId)}`}>ดูรายงานความก้าวหน้า</Link>
                           {guardianRosterId === s.childId &&
                             <SchoolGuardianMembers childId={s.childId} mode="staff" onChanged={() => { refreshParentLinks(); }} />}
                         </div>

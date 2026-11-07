@@ -81,6 +81,15 @@ export type DbPracticeAttempt = {
   created_at: string;
 };
 
+export interface SchoolProgressReport {
+  child: { name: string; nickname: string | null };
+  attempt_count: number;
+  average_score: number | null;
+  completed_sessions: number;
+  sounds: { target_sound: string; attempts: number; average_score: number }[];
+  shared_notes: { id: string; title: string; content: string; created_at: string }[];
+}
+
 export interface SchoolChildProgress {
   child: { id: string; name: string; nickname: string | null };
   sessions: Pick<DbPracticeSession,

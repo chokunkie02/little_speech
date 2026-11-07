@@ -16,6 +16,7 @@ import type {
   DbChildProfile,
   DbPracticeSession,
   SchoolChildProgress,
+  SchoolProgressReport,
   DbPracticeAttempt,
   DbObservationNote,
   DbInvitation,
@@ -204,6 +205,10 @@ export interface Database {
       get_school_attempt_audio: {
         Args: { p_attempt_id: string };
         Returns: string | null;
+      };
+      get_school_progress_report: {
+        Args: { p_child_id: string; p_from: string; p_to: string };
+        Returns: SchoolProgressReport | null;
       };
       get_school_child_progress: {
         Args: { p_child_id: string };
