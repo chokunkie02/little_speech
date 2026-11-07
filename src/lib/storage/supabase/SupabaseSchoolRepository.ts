@@ -239,6 +239,9 @@ export class SupabaseSchoolRepository implements ISchoolRepository {
       .select()
       .single();
 
+    if (error?.code === "23505") {
+      throw new Error("นักเรียนอยู่ในห้องเรียนแล้ว กรุณาตรวจสอบห้องเดิม");
+    }
     if (error || !data) {
       warnRepo("SupabaseSchoolRepository.addChildToClassroom",
         new QueryError("classroom_students", "insert", error ?? new Error("no data")));
