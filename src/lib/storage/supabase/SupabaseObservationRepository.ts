@@ -254,6 +254,7 @@ export class SupabaseObservationRepository implements IObservationRepository {
     const { data, error } = await this.client
       .from("observation_notes")
       .select("*")
+      .is("teacher_visibility", null)
       .order("created_at", { ascending: false });
 
     // Bail if a newer rehydrate() superseded us

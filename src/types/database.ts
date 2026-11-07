@@ -216,6 +216,7 @@ export type DbObservationNote = {
   id: string;
   child_id: string;
   author_id: string;
+  teacher_visibility: "private" | "shared" | null;
   target_type: DbObservationTargetType;
   target_id: string | null;
   category: DbObservationCategory;

@@ -1313,7 +1313,7 @@ function ProgressEntry() {
             เข้าสู่ระบบเพื่อดูผลฝึก
           </Link>
         ) : schoolChildId ? (
-          <SchoolChildProgressView key={`${user.id}:${schoolChildId}`} childId={schoolChildId} teacher={teacher} />
+          <SchoolChildProgressView key={`${user.id}:${schoolChildId}`} childId={schoolChildId} teacher={teacher} viewerId={user.id} />
         ) : (
           <p className="p-6 text-sm text-text-muted">เลือกโปรไฟล์เด็กที่เชื่อมอยู่เพื่อดูผลฝึก</p>
         )}

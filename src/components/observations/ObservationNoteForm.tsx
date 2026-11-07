@@ -11,11 +11,13 @@ interface Props {
   onSave: (data: { targetType: ObservationTargetType; targetId?: string; category: ObservationCategory; title: string; content: string }) => void;
   onCancel: () => void;
   compact?: boolean;
+  busy?: boolean;
+  maxContentLength?: number;
 }
 
 const CATEGORIES: ObservationCategory[] = ["pronunciation", "attention", "progress", "recommendation", "other"];
 
-export default function ObservationNoteForm({ targetType = "general", targetId, initialData, onSave, onCancel, compact = false }: Props) {
+export default function ObservationNoteForm({ targetType = "general", targetId, initialData, onSave, onCancel, compact = false, busy = false, maxContentLength }: Props) {
   const [category, setCategory] = useState<ObservationCategory>(initialData?.category ?? "progress");
   const [title, setTitle] = useState(initialData?.title ?? "");
   const [content, setContent] = useState(initialData?.content ?? "");
@@ -23,6 +25,7 @@ export default function ObservationNoteForm({ targetType = "general", targetId, 
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (busy) return;
     if (!title.trim()) { setError("กรุณาใส่หัวข้อบันทึก"); return; }
     if (!content.trim() || content.trim().length < 5) { setError("กรุณาเขียนเนื้อหาอย่างน้อย 5 ตัวอักษร"); return; }
     setError("");
@@ -86,6 +89,7 @@ export default function ObservationNoteForm({ targetType = "general", targetId, 
           value={content}
           onChange={(e) => setContent(e.target.value)}
           rows={compact ? 3 : 4}
+          maxLength={maxContentLength}
           placeholder="เขียนสิ่งที่สังเกตได้หรือคำแนะนำสำหรับเด็ก..."
           className="w-full bg-surface border border-border rounded-xl px-3 py-2.5 text-sm text-text placeholder:text-text-muted/50 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition-all resize-none leading-relaxed"
         />
@@ -100,15 +104,17 @@ export default function ObservationNoteForm({ targetType = "general", targetId, 
         <button
           type="button"
           onClick={onCancel}
+          disabled={busy}
           className="px-4 py-2 rounded-xl text-sm font-medium text-text-muted border border-border hover:bg-gray-50 dark:hover:bg-white/5 transition-all"
         >
           ยกเลิก
         </button>
         <button
           type="submit"
+          disabled={busy}
           className="px-5 py-2 rounded-xl text-sm font-semibold text-white bg-primary hover:bg-primary/90 transition-all active:scale-[0.97]"
         >
-          บันทึก
+          {busy ? "กำลังบันทึก…" : "บันทึก"}
         </button>
       </div>
     </form>

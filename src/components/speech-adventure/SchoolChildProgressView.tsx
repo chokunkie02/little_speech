@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import DetailMetricCard from "@/components/details/DetailMetricCard";
+import SchoolObservations from "@/components/observations/SchoolObservations";
 import SchoolAttemptAudio from "@/components/details/SchoolAttemptAudio";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import type { SchoolChildProgress } from "@/types/database";
@@ -14,16 +15,17 @@ const dateFormat = new Intl.DateTimeFormat("th-TH", {
 const pageSize = 20;
 
 export default function SchoolChildProgressView({
-  childId, teacher,
+  childId, teacher, viewerId,
 }: {
   childId: string;
   teacher: boolean;
+  viewerId: string;
 }) {
   const [result, setResult] = useState<{
     data: SchoolChildProgress | null;
     error: boolean;
   }>();
-  const [tab, setTab] = useState<"attempts" | "sessions">("attempts");
+  const [tab, setTab] = useState<"attempts" | "sessions" | "notes">("attempts");
   const [visible, setVisible] = useState(pageSize);
   const [revision, setRevision] = useState(0);
   const [audioAttemptId, setAudioAttemptId] = useState<string | null>(null);
@@ -100,15 +102,17 @@ export default function SchoolChildProgressView({
           </p>}
           <section className="space-y-4 rounded-2xl border border-border bg-surface p-4 sm:p-5">
             <div className="flex gap-2" aria-label="เลือกประวัติการฝึก">
-              {(["attempts", "sessions"] as const).map((choice) => (
+              {(["attempts", "sessions", "notes"] as const).map((choice) => (
                 <button key={choice} type="button" aria-pressed={tab === choice}
                   className={`rounded-full px-4 py-1.5 text-sm font-medium ${tab === choice ? "bg-primary text-white" : "text-text-muted hover:bg-bg"}`}
                   onClick={() => { setAudioAttemptId(null); setTab(choice); setVisible(pageSize); }}>
-                  {choice === "attempts" ? "ประวัติ" : "เซสชัน"}
+                  {choice === "attempts" ? "ประวัติ" : choice === "sessions" ? "เซสชัน" : "ข้อสังเกต"}
                 </button>
               ))}
             </div>
-            {tab === "attempts" ? (
+            {tab === "notes" ? (
+              <SchoolObservations childId={childId} teacher={teacher} viewerId={viewerId} />
+            ) : tab === "attempts" ? (
               attempts.length ? (
                 <ul className="space-y-2">
                   {attempts.slice(0, visible).map((attempt) => (
@@ -158,7 +162,7 @@ export default function SchoolChildProgressView({
                 </ul>
               ) : <p className="py-3 text-sm text-text-muted">ยังไม่มีเซสชันที่จบแล้ว</p>
             )}
-            {visible < (tab === "attempts" ? attempts.length : sessions.length) &&
+            {tab !== "notes" && visible < (tab === "attempts" ? attempts.length : sessions.length) &&
               <button type="button" className="text-sm font-semibold text-primary"
                 onClick={() => setVisible((count) => count + pageSize)}>ดูเพิ่มเติม</button>}
           </section>

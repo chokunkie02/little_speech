@@ -53,7 +53,7 @@ export type InsertChildProfile =
   };
 export type InsertPracticeSession = Omit<DbPracticeSession, "id" | "created_at">;
 export type InsertPracticeAttempt = Omit<DbPracticeAttempt, "id" | "created_at">;
-export type InsertObservationNote = Omit<DbObservationNote, "id" | "created_at" | "updated_at">;
+export type InsertObservationNote = Omit<DbObservationNote, "id" | "created_at" | "updated_at" | "teacher_visibility">;
 export type InsertInvitation = Omit<DbInvitation, "id" | "created_at" | "updated_at" | "accepted_at" | "accepted_by" | "requires_teacher_approval" | "is_additional_guardian" | "requested_by" | "requested_at" | "requester_name" | "requester_relationship"> & { id?: string };
 export type InsertChildAccess = Omit<DbChildAccess, "id" | "created_at" | "revoked_at"> & { id?: string };
 export type UpdateChildAccess = Partial<Omit<DbChildAccess, "id" | "created_at">>;
@@ -192,6 +192,14 @@ export interface Database {
           status: DbInvitation["status"];
           accepted_at: string | null;
         }[];
+      };
+      create_school_observation: {
+        Args: { p_child_id: string; p_category: DbObservationCategory; p_title: string; p_content: string };
+        Returns: string;
+      };
+      set_school_observation_sharing: {
+        Args: { p_note_id: string; p_shared: boolean };
+        Returns: void;
       };
       get_school_attempt_audio: {
         Args: { p_attempt_id: string };
