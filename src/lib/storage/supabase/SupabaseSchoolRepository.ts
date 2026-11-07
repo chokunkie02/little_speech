@@ -630,6 +630,8 @@ export class SupabaseSchoolRepository implements ISchoolRepository {
   // ── Private ───────────────────────────────────────────────────────────────────
 
   private _notify(): void {
+    // useSchool subscribes to this snapshot for classroom and roster changes too.
+    this._orgs = [...this._orgs];
     this._listeners.forEach((cb) => cb());
   }
 
