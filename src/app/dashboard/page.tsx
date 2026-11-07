@@ -1,5 +1,7 @@
 "use client";
 
+import { plainFeedback } from "@/lib/speech-evaluation/plainFeedback";
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -61,13 +63,13 @@ function modeBadge(mode: TrainingMode) {
   if (mode === "kindergarten_phonics") {
     return (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-semibold">
-        🌟 เรียนเสียงไทย
+        <DisplayIcon name="star" className="mr-1" /> เรียนเสียงไทย
       </span>
     );
   }
   return (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-      🎯 ฝึกเสียงให้ชัด
+      <DisplayIcon name="target" className="mr-1" /> ฝึกเสียงให้ชัด
     </span>
   );
 }
@@ -107,7 +109,7 @@ function Skeleton({ className }: { className?: string }) {
 function EmptyState({ message, cta, href }: { message: string; cta: string; href: string }) {
   return (
     <div className="flex flex-col items-center gap-3 py-8 text-center">
-      <span className="text-4xl" aria-hidden="true">🌱</span>
+      <span className="text-4xl" aria-hidden="true"><DisplayIcon name="sprout" /></span>
       <p className="text-sm text-text-muted">{message}</p>
       <Link
         href={href}
@@ -250,7 +252,7 @@ export default function ParentDashboardPage() {
             <span className="text-text font-medium">หน้าหลัก</span>
           </nav>
           <h1 className="text-xl font-bold text-text">
-            วันนี้จะฝึกอะไรกับ{childFirstName}? 👋
+            วันนี้จะฝึกอะไรกับ{childFirstName}?
           </h1>
           <p className="text-sm text-text-muted mt-0.5">
             {trainingMode === "kindergarten_phonics"
@@ -344,7 +346,7 @@ export default function ParentDashboardPage() {
               >
                 <div className="flex items-start gap-3">
                   <span className="text-2xl flex-shrink-0 mt-0.5" aria-hidden="true">
-                    {speechRec.stageIcon}
+                    <DisplayIcon name={speechRec.stageIcon} />
                   </span>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">
@@ -396,7 +398,7 @@ export default function ParentDashboardPage() {
             phonicsRec ? (
               <div className="rounded-2xl border border-amber-200 dark:border-amber-800/40 bg-amber-50/50 dark:bg-amber-900/10 px-5 py-4 space-y-3">
                 <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0 mt-0.5" aria-hidden="true">🌟</span>
+                  <span className="text-2xl flex-shrink-0 mt-0.5" aria-hidden="true"><DisplayIcon name="star" /></span>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
                       {phonicsRec.action === "start"
@@ -476,7 +478,7 @@ export default function ParentDashboardPage() {
                 </div>
                 {latestSpeechAttempt.feedback && (
                   <p className="text-xs text-text-muted leading-relaxed line-clamp-2">
-                    {latestSpeechAttempt.feedback}
+                    {plainFeedback(latestSpeechAttempt.feedback)}
                   </p>
                 )}
                 <div className="flex items-center gap-2">
@@ -526,7 +528,7 @@ export default function ParentDashboardPage() {
                 </div>
                 {latestPhonicsAttempt.feedback && (
                   <p className="text-xs text-text-muted leading-relaxed line-clamp-2">
-                    {latestPhonicsAttempt.feedback}
+                    {plainFeedback(latestPhonicsAttempt.feedback)}
                   </p>
                 )}
                 <div className="flex items-center gap-2">
@@ -618,12 +620,12 @@ export default function ParentDashboardPage() {
                 href={practiceHref}
                 className="flex flex-col items-center gap-2 bg-primary/8 hover:bg-primary/14 border border-primary/20 rounded-xl px-3 py-3.5 text-center transition-all active:scale-[0.97] group"
               >
-                <span className="text-xl" aria-hidden="true">🎙️</span>
+                <span className="text-xl" aria-hidden="true"><DisplayIcon name="mic" /></span>
                 <span className="text-xs font-semibold text-primary leading-tight">ฝึกต่อ</span>
               </Link>
             ) : (
               <div className="flex flex-col items-center gap-2 bg-border/20 border border-border rounded-xl px-3 py-3.5 text-center cursor-not-allowed opacity-60">
-                <span className="text-xl" aria-hidden="true">🎙️</span>
+                <span className="text-xl" aria-hidden="true"><DisplayIcon name="mic" /></span>
                 <span className="text-xs font-semibold text-text-muted leading-tight">ฝึกต่อ</span>
               </div>
             )}
@@ -633,7 +635,7 @@ export default function ParentDashboardPage() {
               href={progressHref}
               className="flex flex-col items-center gap-2 bg-surface hover:bg-surface/80 border border-border rounded-xl px-3 py-3.5 text-center transition-all active:scale-[0.97]"
             >
-              <span className="text-xl" aria-hidden="true">📊</span>
+              <span className="text-xl" aria-hidden="true"><DisplayIcon name="chart" /></span>
               <span className="text-xs font-semibold text-text-muted leading-tight">ดูก้าวหน้า</span>
             </Link>
 
@@ -642,7 +644,7 @@ export default function ParentDashboardPage() {
               href={contentHref}
               className="flex flex-col items-center gap-2 bg-surface hover:bg-surface/80 border border-border rounded-xl px-3 py-3.5 text-center transition-all active:scale-[0.97]"
             >
-              <span className="text-xl" aria-hidden="true">📚</span>
+              <span className="text-xl" aria-hidden="true"><DisplayIcon name="book" /></span>
               <span className="text-xs font-semibold text-text-muted leading-tight">ดูเนื้อหา</span>
             </Link>
           </div>

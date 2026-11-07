@@ -1,5 +1,7 @@
 "use client";
 
+import { plainFeedback } from "@/lib/speech-evaluation/plainFeedback";
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import Link from "next/link";
 import { usePhonicsProgress } from "@/hooks/usePhonicsProgress";
 import { useChildProfile } from "@/hooks/useChildProfile";
@@ -144,7 +146,7 @@ function UnitProgressCard({
               : "bg-border/30 dark:bg-border/20"
           }`}
         >
-          {unit.icon}
+          <DisplayIcon name={unit.icon} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
@@ -239,7 +241,7 @@ function RecentAttemptRow({ attempt }: { attempt: PhonicsAttempt }) {
           {formatDate(attempt.createdAt)}
         </p>
         {attempt.feedback && (
-          <p className="text-xs text-text-muted/70 mt-0.5 truncate">{attempt.feedback}</p>
+          <p className="text-xs text-text-muted/70 mt-0.5 truncate">{plainFeedback(attempt.feedback)}</p>
         )}
       </div>
       <div className="flex flex-col items-end gap-1 flex-shrink-0">
@@ -247,7 +249,7 @@ function RecentAttemptRow({ attempt }: { attempt: PhonicsAttempt }) {
           {statusInfo.label}
         </span>
         {stars > 0 && (
-          <span className="text-xs text-amber-500">{"⭐".repeat(stars)}</span>
+          <span className="text-xs text-amber-500">{"★".repeat(stars)}</span>
         )}
       </div>
     </div>
@@ -317,7 +319,7 @@ export default function PhonicsProgressDashboard() {
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-0.5">
-              <span className="text-lg" aria-hidden="true">🌟</span>
+              <span className="text-lg" aria-hidden="true"><DisplayIcon name="star" /></span>
               <h2 className="text-xl font-bold text-text">ความก้าวหน้าเสียงไทย</h2>
             </div>
             <p className="text-sm text-text-muted">
@@ -339,7 +341,7 @@ export default function PhonicsProgressDashboard() {
       {/* ── No data: empty state ── */}
       {totalAttempts === 0 && (
         <div className="rounded-2xl border-2 border-dashed border-amber-200 dark:border-amber-700/50 bg-amber-50/60 dark:bg-amber-950/20 px-6 py-10 text-center space-y-4">
-          <div className="text-5xl" aria-hidden="true">🌱</div>
+          <div className="text-5xl" aria-hidden="true"><DisplayIcon name="sprout" /></div>
           <div>
             <h3 className="text-base font-bold text-amber-700 dark:text-amber-400">
               ยังไม่มีประวัติการเรียนเสียงไทย
@@ -369,11 +371,11 @@ export default function PhonicsProgressDashboard() {
             <StatCard label="ครั้งที่ฝึก" value={totalAttempts} accent />
             <StatCard label="บทเรียนที่ผ่าน" value={completedLessonsCount} />
             <StatCard label="คะแนนเฉลี่ย" value={`${avgScore}%`} accent />
-            <StatCard label="ดาวสะสม" value={`⭐ ${totalStars}`} />
+            <StatCard label="ดาวสะสม" value={`★ ${totalStars}`} />
           </div>
           {completedUnitsCount > 0 && (
             <p className="text-center text-xs text-text-muted/70 mt-2">
-              ผ่านหน่วยแล้ว {completedUnitsCount}/{units.length} หน่วย · {childName}กำลังเรียนรู้ได้ดี 🎉
+              ผ่านหน่วยแล้ว {completedUnitsCount}/{units.length} หน่วย · {childName}กำลังเรียนรู้ได้ดี
             </p>
           )}
         </section>
@@ -387,7 +389,7 @@ export default function PhonicsProgressDashboard() {
           </h3>
           <div className="rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-700/50 px-5 py-4 flex items-center gap-4">
             <div className="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-2xl flex-shrink-0">
-              {nextRec.unit.icon}
+              <DisplayIcon name={nextRec.unit.icon} />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 mb-0.5">
@@ -412,7 +414,7 @@ export default function PhonicsProgressDashboard() {
       {!nextRec && totalAttempts > 0 && (
         <div className="rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800/50 px-5 py-4 text-center">
           <p className="text-base font-bold text-green-700 dark:text-green-400">
-            🎊 ยอดเยี่ยมมาก! ผ่านทุกบทเรียนที่เปิดอยู่แล้ว
+             ยอดเยี่ยมมาก! ผ่านทุกบทเรียนที่เปิดอยู่แล้ว
           </p>
           <p className="text-sm text-green-600/80 dark:text-green-500/80 mt-1">
             หน่วยใหม่กำลังเตรียมพร้อม รอติดตามด้วยนะคะ

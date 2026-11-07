@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { Suspense, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -231,7 +232,7 @@ function PersonalReportPage() {
 
           {/* ── Development notice ── */}
           <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl px-4 py-3 print:hidden">
-            <span className="text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true">📋</span>
+            <span className="text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true"><DisplayIcon name="checklist" /></span>
             <p className="text-sm text-amber-700 dark:text-amber-300 leading-relaxed">
               รายงานเรียนเสียงไทยกำลังอยู่ในช่วงพัฒนา — สรุปพื้นฐานพร้อมใช้งานแล้ว
             </p>
@@ -273,7 +274,7 @@ function PersonalReportPage() {
                   </Link>
                 </>
               ) : (
-                <p className="text-sm text-text-muted">ผ่านครบทุกบทเรียนแล้ว 🌟</p>
+                <p className="text-sm text-text-muted">ผ่านครบทุกบทเรียนแล้ว</p>
               )}
             </div>
           </div>
@@ -346,7 +347,7 @@ function PersonalReportPage() {
                         {attempt.score}%
                       </p>
                       <p className="text-xs text-amber-500">
-                        {"⭐".repeat(attempt.starsEarned) || "–"}
+                        {"★".repeat(attempt.starsEarned) || "–"}
                       </p>
                     </div>
                   </div>
@@ -358,7 +359,7 @@ function PersonalReportPage() {
           {/* ── No data empty state ── */}
           {totalAttempts === 0 && (
             <div className="bg-surface border border-border rounded-xl p-8 text-center">
-              <div className="text-5xl mb-3" aria-hidden="true">🌱</div>
+              <div className="text-5xl mb-3" aria-hidden="true"><DisplayIcon name="sprout" /></div>
               <h2 className="text-base font-bold text-text mb-1">ยังไม่มีข้อมูลการเรียน</h2>
               <p className="text-sm text-text-muted mb-5">เริ่มเรียนบทเรียนแรกเพื่อสร้างรายงาน</p>
               <Link
@@ -624,7 +625,7 @@ function PersonalReportPage() {
                       style={{ backgroundColor: `${latestStage?.accentColor ?? "#6C63FF"}15` }}
                       aria-hidden="true"
                     >
-                      {latestStage?.icon ?? "🎯"}
+                      <DisplayIcon name={latestStage?.icon ?? "target"} />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-text print:text-black">

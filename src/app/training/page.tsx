@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -90,7 +91,7 @@ export default function TrainingMapPage() {
               className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto text-3xl"
               aria-hidden="true"
             >
-              👦
+              <DisplayIcon name="user" />
             </div>
             <div>
               <h2 className="text-lg font-bold text-text">เริ่มตั้งค่าโปรไฟล์เด็ก</h2>
@@ -243,7 +244,7 @@ export default function TrainingMapPage() {
               >
                 <p className="text-xs font-semibold text-text-muted uppercase tracking-wide mb-2">ขั้นต่อไปที่แนะนำ</p>
                 <div className="flex items-center gap-3">
-                  <span className="text-xl flex-shrink-0" aria-hidden="true">{currentStage.icon}</span>
+                  <span className="text-xl flex-shrink-0" aria-hidden="true"><DisplayIcon name={currentStage.icon} /></span>
                   <div className="min-w-0 flex-1">
                     <p className="font-semibold text-text text-sm leading-snug">{currentStage.name}</p>
                     <p className="text-xs text-text-muted mt-0.5">{currentStage.shortGoal}</p>

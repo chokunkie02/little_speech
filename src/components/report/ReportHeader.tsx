@@ -1,3 +1,5 @@
+import ProfileMark from "@/components/ui/ProfileMark";
+
 interface Props {
   childName: string;
   childNickname: string;
@@ -38,7 +40,7 @@ export default function ReportHeader({
           className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl flex-shrink-0 print:hidden"
           aria-hidden="true"
         >
-          {childAvatar}
+          <ProfileMark name={childNickname || childName} avatar={childAvatar} />
         </div>
 
         {/* Child info */}

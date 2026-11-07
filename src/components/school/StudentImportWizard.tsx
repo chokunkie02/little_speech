@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useRef, useState, useCallback } from "react";
 import { useSchoolImport } from "@/hooks/useSchoolImport";
 import { SAMPLE_CSV } from "@/lib/services/StudentImportService";
@@ -154,7 +155,7 @@ export default function StudentImportWizard({ organizationId, classrooms, onClos
                   onChange={handleFileChange}
                   className="hidden"
                 />
-                <div className="text-3xl mb-2">{csvText ? "✅" : "📂"}</div>
+                <div className="text-3xl mb-2"><DisplayIcon name={csvText ? "check" : "folder"} /></div>
                 {csvText ? (
                   <>
                     <p className="text-sm font-medium text-green-700 dark:text-green-400">
@@ -230,7 +231,7 @@ export default function StudentImportWizard({ organizationId, classrooms, onClos
                 )}
                 {preview.warningCount > 0 && (
                   <span className="px-3 py-1.5 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-400 text-xs font-semibold border border-yellow-200 dark:border-yellow-800">
-                    ⚠ {preview.warningCount} คำเตือน
+                     {preview.warningCount} คำเตือน
                   </span>
                 )}
                 {preview.errorCount > 0 && (

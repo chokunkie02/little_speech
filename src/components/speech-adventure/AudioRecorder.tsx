@@ -117,7 +117,7 @@ export default function AudioRecorder({
         {/* Pre-recording tips */}
         {canRecord && (
           <div className="flex items-center justify-center gap-2 text-xs text-text-muted/70 flex-wrap">
-            <span>🎤 พูดใกล้ไมค์</span>
+            <span>พูดใกล้ไมค์</span>
             <span aria-hidden="true">·</span>
             <span>พูดให้ชัด 1–3 วินาที</span>
             <span aria-hidden="true">·</span>

@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import Link from "next/link";
 import type { PracticeAttempt, TrainingStage } from "@/types/speechAdventure";
 
@@ -45,7 +46,7 @@ export default function LevelCompletionSummary({ attempts, stage, totalMissions,
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold text-white mb-6"
             style={{ backgroundColor: stage.accentColor }}
           >
-            <span aria-hidden="true">{stage.icon}</span>
+            <span aria-hidden="true"><DisplayIcon name={stage.icon} /></span>
             {stage.name}
           </div>
 

@@ -40,7 +40,7 @@ export default function SayAfterMeActivity({ item, onComplete }: Props) {
       setEvalResult({ score: result.score, status: result.status as EvalState["status"], feedback: result.feedback, isMock: result.isMock });
       setListened(true);
     } catch {
-      setEvalResult({ score: 60, status: "passed", feedback: "ลองอีกครั้งได้เลยนะ 😊", isMock: true });
+      setEvalResult({ score: 60, status: "passed", feedback: "ลองอีกครั้งได้เลยนะ", isMock: true });
     } finally {
       setEvaluating(false);
     }
@@ -60,7 +60,6 @@ export default function SayAfterMeActivity({ item, onComplete }: Props) {
     <div className="space-y-6">
       {/* Prompt */}
       <div className="text-center space-y-2">
-        {item.emoji && <div className="text-5xl mb-2" aria-hidden="true">{item.emoji}</div>}
         <div className="text-7xl font-bold text-amber-600 dark:text-amber-400 tracking-wider py-2">
           {item.prompt}
         </div>

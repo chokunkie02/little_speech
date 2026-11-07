@@ -50,7 +50,7 @@ export default function BlendSoundsActivity({ item, onComplete }: Props) {
       setEvalResult({ score: result.score, status: result.status as EvalState["status"], feedback: result.feedback, isMock: result.isMock });
       setListened(true);
     } catch {
-      setEvalResult({ score: 60, status: "passed", feedback: "ดีมาก ลองอีกครั้งได้เลย 😊", isMock: true });
+      setEvalResult({ score: 60, status: "passed", feedback: "ดีมาก ลองอีกครั้งได้เลย", isMock: true });
     } finally {
       setEvaluating(false);
     }
@@ -97,7 +97,6 @@ export default function BlendSoundsActivity({ item, onComplete }: Props) {
             <p className="text-sm text-text-muted mt-2">{item.instruction}</p>
           </div>
         )}
-        {item.emoji && <div className="text-4xl" aria-hidden="true">{item.emoji}</div>}
       </div>
 
       {/* Sample audio */}

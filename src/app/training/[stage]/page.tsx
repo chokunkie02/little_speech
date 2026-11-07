@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
@@ -140,7 +141,7 @@ export default function PracticePage() {
         </nav>
         <div className="max-w-3xl mx-auto px-6 py-16 flex flex-col items-center gap-6 text-center">
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl" aria-hidden="true">
-            👦
+            <DisplayIcon name="user" />
           </div>
           <div>
             <h2 className="text-xl font-bold text-text mb-2">ยังไม่ได้ตั้งค่าโปรไฟล์เด็ก</h2>
@@ -182,7 +183,7 @@ export default function PracticePage() {
             style={{ backgroundColor: stage ? `${stage.accentColor}15` : "var(--border)" }}
             aria-hidden="true"
           >
-            {stage?.icon ?? "🔒"}
+            <DisplayIcon name={stage?.icon ?? "lock"} />
           </div>
           <div>
             <h2 className="text-xl font-bold text-text mb-2">คุณมีสิทธิ์ดูความก้าวหน้าเท่านั้น</h2>
@@ -250,7 +251,7 @@ export default function PracticePage() {
             style={{ backgroundColor: `${stage.accentColor}15` }}
             aria-hidden="true"
           >
-            {stage.icon}
+            <DisplayIcon name={stage.icon} />
           </div>
           <h2 className="text-xl font-bold text-text mb-2">ยังไม่มีภารกิจสำหรับเสียงนี้</h2>
           <p className="text-text-muted mb-1 text-sm">
@@ -296,7 +297,7 @@ export default function PracticePage() {
               style={{ backgroundColor: `${stage.accentColor}20` }}
               aria-hidden="true"
             >
-              {stage.icon}
+              <DisplayIcon name={stage.icon} />
             </span>
             <h1 className="font-semibold text-text text-sm hidden sm:block">{stage.name}</h1>
           </div>
@@ -347,7 +348,7 @@ export default function PracticePage() {
                   style={{ backgroundColor: `${stage.accentColor}18` }}
                   aria-hidden="true"
                 >
-                  {stage.icon}
+                  <DisplayIcon name={stage.icon} />
                 </div>
 
                 <div className="flex-1 min-w-0">

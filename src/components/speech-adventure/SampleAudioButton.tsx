@@ -154,7 +154,7 @@ export default function SampleAudioButton({
         <span>{label}</span>
       </button>
       {btnState === "ready" && (
-        <p className="text-xs font-medium text-primary/70">ฟังก่อน แล้วลองพูดตามนะ 🎧</p>
+        <p className="text-xs font-medium text-primary/70">ฟังก่อน แล้วลองพูดตามนะ</p>
       )}
     </div>
   );

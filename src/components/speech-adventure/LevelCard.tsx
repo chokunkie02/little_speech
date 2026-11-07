@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import type { TrainingStage } from "@/types/speechAdventure";
 import Link from "next/link";
 
@@ -59,7 +60,7 @@ export default function LevelCard({ stage, index, canStartPractice = true }: Pro
               <polyline points="20 6 9 17 4 12" />
             </svg>
           ) : (
-            <span className={isCurrent ? "text-xl" : "text-lg"}>{stage.icon}</span>
+            <span className={isCurrent ? "text-xl" : "text-lg"}><DisplayIcon name={stage.icon} /></span>
           )}
         </div>
 

@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useState } from "react";
 import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
@@ -26,12 +27,12 @@ const TYPE_LABELS: Record<PracticeItemType, { label: string; skill: string }> = 
 // ── Kindergarten Phonics labels ────────────────────────────────────────────────
 
 const PHONICS_ACTIVITY_LABELS: Record<PhonicsActivityType, string> = {
-  listen_and_choose: "👂 ฟังและเลือก",
-  say_after_me: "🗣️ พูดตาม",
-  blend_sounds: "🔗 ผสมเสียง",
-  simple_word: "📝 คำง่าย",
-  final_consonant: "🔚 ตัวสะกด",
-  short_sentence: "💬 ประโยค",
+  listen_and_choose: "ฟังและเลือก",
+  say_after_me: "พูดตาม",
+  blend_sounds: "ผสมเสียง",
+  simple_word: "คำง่าย",
+  final_consonant: "ตัวสะกด",
+  short_sentence: "ประโยค",
 };
 
 const STAGE_ORDER = [
@@ -75,7 +76,7 @@ function StageContentCard({
           style={{ backgroundColor: `${stage.accentColor}14` }}
         >
           <span style={{ color: stage.accentColor, fontSize: "14px" }}>
-            {stage.icon}
+            <DisplayIcon name={stage.icon} />
           </span>
         </div>
         <div className="flex-1 min-w-0">
@@ -211,7 +212,7 @@ function PhonicsUnitCard({ unit }: { unit: PhonicsUnit }) {
       {/* Unit header */}
       <div className="flex items-center gap-3 px-4 py-3 border-b border-border bg-amber-50/60 dark:bg-amber-950/20">
         <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center text-base flex-shrink-0">
-          {unit.icon}
+          <DisplayIcon name={unit.icon} />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-0.5">
@@ -461,7 +462,7 @@ export default function LibraryPage() {
                 : "text-text-muted hover:text-text"
             }`}
           >
-            🎯 ฝึกเสียงให้ชัด
+            <DisplayIcon name="target" className="mr-1" /> ฝึกเสียงให้ชัด
           </button>
           <button
             type="button"
@@ -474,7 +475,7 @@ export default function LibraryPage() {
                 : "text-text-muted hover:text-text"
             }`}
           >
-            🌟 เรียนเสียงไทย
+            <DisplayIcon name="star" className="mr-1" /> เรียนเสียงไทย
           </button>
         </div>
 

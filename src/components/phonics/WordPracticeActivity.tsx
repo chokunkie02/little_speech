@@ -47,7 +47,7 @@ export default function WordPracticeActivity({ item, onComplete }: Props) {
       setEvalResult({ score: result.score, status: result.status as EvalState["status"], feedback: result.feedback, isMock: result.isMock });
       setListened(true);
     } catch {
-      setEvalResult({ score: 60, status: "passed", feedback: "ดีมาก ลองอีกครั้งได้เลย 😊", isMock: true });
+      setEvalResult({ score: 60, status: "passed", feedback: "ดีมาก ลองอีกครั้งได้เลย", isMock: true });
     } finally {
       setEvaluating(false);
     }
@@ -70,7 +70,6 @@ export default function WordPracticeActivity({ item, onComplete }: Props) {
         <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
           {TYPE_LABEL[item.type] ?? item.type}
         </p>
-        {item.emoji && <div className="text-5xl mb-1" aria-hidden="true">{item.emoji}</div>}
         <div className={`font-bold text-text tracking-wide py-2 ${isSentence ? "text-4xl" : "text-7xl"}`}>
           {item.prompt}
         </div>

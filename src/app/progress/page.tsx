@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { Suspense, useState, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -574,7 +575,7 @@ function ProgressDashboardPage() {
                       }}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <span className="text-2xl flex-shrink-0" aria-hidden="true">{currentStageForAction.icon}</span>
+                        <span className="text-2xl flex-shrink-0" aria-hidden="true"><DisplayIcon name={currentStageForAction.icon} /></span>
                         <div className="min-w-0">
                           <p className="font-bold text-text text-sm">{currentStageForAction.name}</p>
                           <p className="text-xs text-text-muted truncate">{currentStageForAction.shortGoal}</p>
@@ -701,7 +702,7 @@ function ProgressDashboardPage() {
                           onClick={() => setSelectedSession(session)}
                           className="w-full flex items-center gap-2.5 rounded-lg px-3 py-2.5 bg-bg dark:bg-white/3 border border-border text-left hover:border-primary/30 transition-all cursor-pointer"
                         >
-                          <span className="text-base flex-shrink-0" aria-hidden="true">{sessionStage?.icon ?? "🎯"}</span>
+                          <span className="text-base flex-shrink-0" aria-hidden="true"><DisplayIcon name={sessionStage?.icon ?? "target"} /></span>
                           <div className="flex-1 min-w-0">
                             <p className="text-xs font-semibold text-text truncate">{sessionStage?.name ?? session.stageId}</p>
                             <p className="text-xs text-text-muted">{session.averageScore}% · ★ {session.starsEarned}</p>
@@ -812,7 +813,7 @@ function ProgressDashboardPage() {
                         style={{ backgroundColor: `${sessionStage?.accentColor ?? "#6C63FF"}15` }}
                         aria-hidden="true"
                       >
-                        {sessionStage?.icon ?? "🎯"}
+                        <DisplayIcon name={sessionStage?.icon ?? "target"} />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-semibold text-text truncate">{sessionStage?.name ?? session.stageId}</p>
@@ -947,7 +948,7 @@ function ProgressDashboardPage() {
                         }`}
                         style={isActive ? { backgroundColor: stage.accentColor } : undefined}
                       >
-                        {stage.icon} {stage.name} ({count})
+                        <DisplayIcon name={stage.icon} /> {stage.name} ({count})
                       </button>
                     );
                   })}

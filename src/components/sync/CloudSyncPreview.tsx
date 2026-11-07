@@ -371,11 +371,11 @@ function ConfirmationCard({ totalRecords, hasConflict, onConfirm, onCancel }: Co
           </p>
           {hasConflict ? (
             <p className="text-xs text-warning mt-1 font-medium">
-              ⚠️ Cloud มีข้อมูลอยู่แล้ว — การอัปโหลดจะเพิ่มข้อมูลใหม่ต่อท้าย (ไม่เขียนทับ)
+               Cloud มีข้อมูลอยู่แล้ว — การอัปโหลดจะเพิ่มข้อมูลใหม่ต่อท้าย (ไม่เขียนทับ)
             </p>
           ) : (
             <p className="text-xs text-warning mt-1">
-              ⚠️ อย่ากดอัปโหลดซ้ำ เนื่องจากจะสร้างข้อมูลซ้ำในฐานข้อมูล
+               อย่ากดอัปโหลดซ้ำ เนื่องจากจะสร้างข้อมูลซ้ำในฐานข้อมูล
             </p>
           )}
         </div>

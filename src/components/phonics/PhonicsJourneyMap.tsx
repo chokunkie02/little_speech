@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useState } from "react";
 import Link from "next/link";
 import { getPhonicsUnits } from "@/data/kindergartenCurriculum";
@@ -8,12 +9,12 @@ import type { PhonicsUnit, PhonicsLesson, PhonicsActivityType } from "@/types/ph
 // ── Labels ────────────────────────────────────────────────────────────────────
 
 const ACTIVITY_LABELS: Record<PhonicsActivityType, string> = {
-  listen_and_choose: "👂 ฟังและเลือก",
-  say_after_me: "🗣️ พูดตาม",
-  blend_sounds: "🔗 ผสมเสียง",
-  simple_word: "📝 คำง่าย",
-  final_consonant: "🔚 ตัวสะกด",
-  short_sentence: "💬 ประโยค",
+  listen_and_choose: "ฟังและเลือก",
+  say_after_me: "พูดตาม",
+  blend_sounds: "ผสมเสียง",
+  simple_word: "คำง่าย",
+  final_consonant: "ตัวสะกด",
+  short_sentence: "ประโยค",
 };
 
 // ── Unit status ───────────────────────────────────────────────────────────────
@@ -162,7 +163,7 @@ function LessonPanel({
 
       <div className="px-4 py-2.5 border-t border-amber-200 dark:border-amber-700/40 bg-amber-50/80 dark:bg-amber-950/30">
         <p className="text-xs text-amber-600/70 dark:text-amber-500/70 text-center">
-          {hasAnyCompleted ? "ฟังก่อน แล้วลองพูดตามนะ 🎧" : "กดปุ่มเพื่อเข้าสู่กิจกรรม"}
+          {hasAnyCompleted ? "ฟังก่อน แล้วลองพูดตามนะ" : "กดปุ่มเพื่อเข้าสู่กิจกรรม"}
         </p>
       </div>
     </div>
@@ -222,7 +223,7 @@ function UnitCard({
               : "bg-border/40 dark:bg-border/20"
           }`}
         >
-          {unit.icon}
+          <DisplayIcon name={unit.icon} />
         </div>
 
         {/* Text */}

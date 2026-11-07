@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useState, useEffect, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useChildProfile } from "@/hooks/useChildProfile";
@@ -207,12 +208,12 @@ function OnboardingContent() {
 
               <div className="grid grid-cols-3 gap-3 text-sm">
                 {[
-                  { icon: "🎯", label: "7 ระดับการฝึก" },
-                  { icon: "🎙️", label: "อัดเสียงได้" },
-                  { icon: "📊", label: "ติดตามผล" },
+                  { icon: "target", label: "7 ระดับการฝึก" },
+                  { icon: "mic", label: "อัดเสียงได้" },
+                  { icon: "chart", label: "ติดตามผล" },
                 ].map((f) => (
                   <div key={f.label} className="bg-surface border border-border rounded-xl px-3 py-3 text-center">
-                    <div className="text-xl mb-1">{f.icon}</div>
+                    <div className="text-xl mb-1"><DisplayIcon name={f.icon} /></div>
                     <p className="text-xs text-text-muted">{f.label}</p>
                   </div>
                 ))}
@@ -364,7 +365,7 @@ function OnboardingContent() {
                       : "border-border bg-surface hover:border-primary/40"
                   }`}
                 >
-                  <span className={`text-3xl mt-0.5 flex-shrink-0`}>🎯</span>
+                  <span className={`text-3xl mt-0.5 flex-shrink-0`}><DisplayIcon name="target" /></span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <p className={`font-bold text-base ${trainingMode === "speech_clarity" ? "text-primary" : "text-text"}`}>
@@ -393,7 +394,7 @@ function OnboardingContent() {
                       : "border-border bg-surface hover:border-amber-400/60"
                   }`}
                 >
-                  <span className="text-3xl mt-0.5 flex-shrink-0">🌟</span>
+                  <span className="text-3xl mt-0.5 flex-shrink-0"><DisplayIcon name="star" /></span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">

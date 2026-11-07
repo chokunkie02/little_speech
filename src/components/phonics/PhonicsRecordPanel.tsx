@@ -1,5 +1,6 @@
 "use client";
 
+import { plainFeedback } from "@/lib/speech-evaluation/plainFeedback";
 /**
  * Shared recording + evaluation + next panel for phonics production activities.
  * Used by: SayAfterMeActivity, BlendSoundsActivity, WordPracticeActivity.
@@ -132,7 +133,7 @@ export default function PhonicsRecordPanel({
             {isRecording
               ? "กำลังบันทึก... กดหยุดเมื่อพูดเสร็จ"
               : hasRecording
-              ? "บันทึกเสร็จแล้ว ✅"
+              ? "บันทึกเสร็จแล้ว"
               : "กดเพื่อบันทึกเสียง"}
           </span>
         </div>
@@ -164,7 +165,7 @@ export default function PhonicsRecordPanel({
               disabled={evaluating}
               className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 border border-amber-300 dark:border-amber-700/60 text-sm font-semibold hover:bg-amber-200 dark:hover:bg-amber-800/50 transition-all active:scale-[0.97] disabled:opacity-50"
             >
-              {evaluating ? "กำลังตรวจสอบ..." : "✨ ตรวจสอบเสียง"}
+              {evaluating ? "กำลังตรวจสอบ..." : "ตรวจสอบเสียง"}
             </button>
           )}
         </div>
@@ -197,7 +198,7 @@ export default function PhonicsRecordPanel({
                 : "text-text"
             }`}
           >
-            {evalResult.feedback}
+            {plainFeedback(evalResult.feedback)}
           </p>
           <p className="text-xs text-text-muted text-center mt-1">
             คะแนน {evalResult.score}/100

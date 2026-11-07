@@ -9,7 +9,7 @@ export default function ProgressSummary({ summary }: Props) {
 
   return (
     <div className="bg-surface rounded-3xl p-6 shadow-sm">
-      <h3 className="text-lg font-bold text-text mb-4">📊 สรุปความก้าวหน้า</h3>
+      <h3 className="text-lg font-bold text-text mb-4">สรุปความก้าวหน้า</h3>
 
       {/* Pretest vs Review Comparison */}
       <div className="grid grid-cols-2 gap-4 mb-6">
@@ -42,7 +42,7 @@ export default function ProgressSummary({ summary }: Props) {
         </div>
         <div className="bg-bg rounded-2xl p-3">
           <p className="text-xs text-text-muted">ดาวทั้งหมด</p>
-          <p className="text-sm font-semibold text-secondary">⭐ {summary.starsEarned}</p>
+          <p className="text-sm font-semibold text-secondary">★ {summary.starsEarned}</p>
         </div>
         <div className="bg-bg rounded-2xl p-3">
           <p className="text-xs text-text-muted">จำนวนครั้งที่ฝึก</p>
@@ -64,7 +64,7 @@ export default function ProgressSummary({ summary }: Props) {
                 key={sound}
                 className="inline-flex items-center gap-1 bg-error/10 text-error px-3 py-1.5 rounded-full text-sm font-medium"
               >
-                ⚠️ {sound}
+                {sound}
               </span>
             ))}
           </div>

@@ -1,3 +1,4 @@
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import type { StageStatus } from "@/types/speechAdventure";
 
 export interface StageRow {
@@ -67,7 +68,7 @@ export default function ReportStageTable({ stages }: Props) {
                 style={{ backgroundColor: isLocked ? "#F1F5F9" : `${stage.accentColor}18` }}
                 aria-hidden="true"
               >
-                {stage.icon}
+                <DisplayIcon name={stage.icon} />
               </div>
 
               {/* Name */}

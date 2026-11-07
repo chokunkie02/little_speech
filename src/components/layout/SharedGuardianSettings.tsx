@@ -7,14 +7,14 @@ import { getSupabaseClient } from "@/lib/supabase/client";
 import ShareGuardianInvitation from "@/components/layout/ShareGuardianInvitation";
 import SchoolGuardianMembers from "@/components/layout/SchoolGuardianMembers";
 import type { Database } from "@/types/supabase";
+import ProfileMark, { profileAvatarOptions } from "@/components/ui/ProfileMark";
 import type { DbInvitation } from "@/types/database";
 
 type Review = Database["public"]["Functions"]["list_guardian_review_requests"]["Returns"][number];
 
-const avatars = ["🧒", "🐱", "🐻", "🐰", "🦊", "🐼"];
-
 export default function SharedGuardianSettings({ child }: { child: ChildProfileData }) {
   const childId = child.id;
+  const currentAvatar = profileAvatarOptions.find((option) => option.value === child.avatarEmoji)?.value ?? profileAvatarOptions[0].value;
   const { refreshChildAccess } = useChildAccess();
   const client = getSupabaseClient();
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -55,9 +55,9 @@ export default function SharedGuardianSettings({ child }: { child: ChildProfileD
 
   return (
     <div className="space-y-4 rounded-xl border border-border bg-surface p-5">
-      <p className="text-sm font-semibold">{child.avatarEmoji} {child.name}</p>
+      <p className="text-sm font-semibold"><ProfileMark name={child.nickname || child.name} avatar={currentAvatar} /> {child.name}</p>
       <details className="space-y-2 text-sm">
-        <summary className="cursor-pointer font-semibold">แก้ชื่อเล่นและรูปประจำตัว</summary>
+        <summary className="cursor-pointer font-semibold">แก้ชื่อเล่นและสีรูปประจำตัว</summary>
         <form key={`${child.nickname}:${child.avatarEmoji}`} className="flex flex-wrap items-end gap-2 pt-2"
           onSubmit={(event) => {
             event.preventDefault();
@@ -76,11 +76,11 @@ export default function SharedGuardianSettings({ child }: { child: ChildProfileD
             <input name="nickname" maxLength={60} defaultValue={child.nickname ?? ""}
               className="block w-full rounded-lg border border-border bg-bg px-3 py-2" />
           </label>
-          <label>รูปประจำตัว
-            <select name="avatar" defaultValue={child.avatarEmoji || avatars[0]}
+          <label>สีรูปประจำตัว
+            <select name="avatar" defaultValue={currentAvatar}
               className="block rounded-lg border border-border bg-bg px-3 py-2">
-              {[...new Set([child.avatarEmoji || avatars[0], ...avatars])].map((avatar) => (
-                <option key={avatar} value={avatar}>{avatar}</option>
+              {profileAvatarOptions.map(({ value, label }) => (
+                <option key={value} value={value}>{label}</option>
               ))}
             </select>
           </label>

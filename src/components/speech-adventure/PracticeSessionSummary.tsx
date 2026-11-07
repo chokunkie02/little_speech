@@ -1,5 +1,7 @@
 "use client";
 
+import { plainFeedback } from "@/lib/speech-evaluation/plainFeedback";
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useState } from "react";
 import Link from "next/link";
 import type { PracticeSession, PracticeAttempt, TrainingStage } from "@/types/speechAdventure";
@@ -59,7 +61,7 @@ export default function PracticeSessionSummary({ session, stage, onRetry, sessio
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-semibold text-white mb-4"
             style={{ backgroundColor: stage.accentColor }}
           >
-            <span aria-hidden="true">{stage.icon}</span>
+            <span aria-hidden="true"><DisplayIcon name={stage.icon} /></span>
             {stage.name}
           </div>
 
@@ -172,7 +174,7 @@ export default function PracticeSessionSummary({ session, stage, onRetry, sessio
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-text truncate">{attempt.promptText}</p>
                   {attempt.feedback && (
-                    <p className="text-xs text-text-muted truncate mt-0.5">{attempt.feedback}</p>
+                    <p className="text-xs text-text-muted truncate mt-0.5">{plainFeedback(attempt.feedback)}</p>
                   )}
                 </div>
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { plainFeedback } from "@/lib/speech-evaluation/plainFeedback";
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useEffect } from "react";
 import Link from "next/link";
 import { mockTrainingStages } from "@/data/speechAdventureMockData";
@@ -86,7 +88,7 @@ export default function AttemptDetailDrawer({ attempt, linkedSession, onClose, o
           <div className="h-1" style={{ backgroundColor: accentColor }} />
           <div className="flex items-center justify-between gap-3 px-5 py-4">
             <div className="flex items-center gap-2.5 min-w-0">
-              <span className="text-xl flex-shrink-0" aria-hidden="true">{stage?.icon ?? "🎯"}</span>
+              <span className="text-xl flex-shrink-0" aria-hidden="true"><DisplayIcon name={stage?.icon ?? "target"} /></span>
               <div className="min-w-0">
                 <p className="text-sm font-bold text-text truncate">{stage?.name ?? attempt.stageId}</p>
                 <p className="text-xs text-text-muted">รายละเอียดการฝึก</p>
@@ -177,7 +179,7 @@ export default function AttemptDetailDrawer({ attempt, linkedSession, onClose, o
                 <div className="flex gap-3">
                   <span className="text-xs text-text-muted w-28 flex-shrink-0 pt-0.5">ควรทำต่อไป</span>
                   <span className="text-sm text-text flex-1 leading-relaxed">
-                    {attempt.practiceTip ?? attempt.recommendation}
+                    {plainFeedback(attempt.practiceTip ?? attempt.recommendation)}
                   </span>
                 </div>
               )}
@@ -254,15 +256,15 @@ export default function AttemptDetailDrawer({ attempt, linkedSession, onClose, o
           {attempt.feedback && (
             <div className="bg-info/8 border border-info/20 rounded-xl p-4">
               <p className="text-xs font-semibold text-info mb-1.5">ผลการประเมินจาก AI</p>
-              <p className="text-sm text-text leading-relaxed">{attempt.feedback}</p>
+              <p className="text-sm text-text leading-relaxed">{plainFeedback(attempt.feedback)}</p>
             </div>
           )}
 
           {/* Practice tip — only if differs from recommendation to avoid duplication */}
           {attempt.practiceTip && attempt.practiceTip !== attempt.recommendation && (
             <div className="bg-success/8 border border-success/20 rounded-xl p-4">
-              <p className="text-xs font-semibold text-success mb-1.5">💡 เคล็ดลับการฝึก</p>
-              <p className="text-sm text-text leading-relaxed">{attempt.practiceTip}</p>
+              <p className="text-xs font-semibold text-success mb-1.5">เคล็ดลับการฝึก</p>
+              <p className="text-sm text-text leading-relaxed">{plainFeedback(attempt.practiceTip)}</p>
             </div>
           )}
 
@@ -303,7 +305,7 @@ export default function AttemptDetailDrawer({ attempt, linkedSession, onClose, o
                   style={{ backgroundColor: `${sessionStage?.accentColor ?? "#6C63FF"}15` }}
                   aria-hidden="true"
                 >
-                  {sessionStage?.icon ?? "🎯"}
+                  <DisplayIcon name={sessionStage?.icon ?? "target"} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-text truncate">

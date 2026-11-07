@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import { useSpeechProgress } from "@/hooks/useSpeechProgress";
@@ -345,7 +346,7 @@ function buildPhonicsMilestones(
   const milestones: PhonicsMilestone[] = [
     {
       id: "first_phonics",
-      icon: "🌱",
+      icon: "sprout",
       name: "เริ่มเรียนเสียงไทยแล้ว",
       description: "ฝึกบทเรียนแรกของสวนเสียง",
       color: "#4CAF82",
@@ -354,7 +355,7 @@ function buildPhonicsMilestones(
     },
     {
       id: "first_lesson",
-      icon: "⭐",
+      icon: "star",
       name: "นักเรียนตัวน้อย",
       description: "ผ่านบทเรียนแรกสำเร็จ",
       color: "#F59E0B",
@@ -362,7 +363,7 @@ function buildPhonicsMilestones(
     },
     {
       id: "listener",
-      icon: "👂",
+      icon: "listen",
       name: "นักฟังเสียงตัวน้อย",
       description: "ผ่าน 3 บทเรียนขึ้นไป",
       color: "#6C63FF",
@@ -370,7 +371,7 @@ function buildPhonicsMilestones(
     },
     {
       id: "k1_complete",
-      icon: "🎯",
+      icon: "target",
       name: "เรียนครบ K1",
       description: "ฟังและจดจำเสียงพยัญชนะครบแล้ว",
       color: "#F59E0B",
@@ -378,7 +379,7 @@ function buildPhonicsMilestones(
     },
     {
       id: "k2_complete",
-      icon: "🔤",
+      icon: "letters",
       name: "นักพยัญชนะ",
       description: "ผ่านระดับพยัญชนะต้น K2",
       color: "#F59E0B",
@@ -386,7 +387,7 @@ function buildPhonicsMilestones(
     },
     {
       id: "blender",
-      icon: "🔀",
+      icon: "shuffle",
       name: "นักผสมเสียง",
       description: "ผ่านระดับผสมเสียง K4",
       color: "#EC4899",
@@ -394,7 +395,7 @@ function buildPhonicsMilestones(
     },
     {
       id: "word_master",
-      icon: "📖",
+      icon: "book",
       name: "เก่งคำศัพท์",
       description: "ผ่านระดับคำง่าย K5",
       color: "#8B5CF6",
@@ -402,7 +403,7 @@ function buildPhonicsMilestones(
     },
     {
       id: "half_way",
-      icon: "🏅",
+      icon: "award",
       name: "ครึ่งทางแล้ว!",
       description: "ผ่านครึ่งหนึ่งของสวนเสียง (4 ระดับ)",
       color: "#F59E0B",
@@ -410,7 +411,7 @@ function buildPhonicsMilestones(
     },
     {
       id: "all_units",
-      icon: "🌟",
+      icon: "star",
       name: "ผ่านสวนเสียงครบแล้ว!",
       description: `ผ่านทั้ง ${units.length} ระดับในสวนเสียง`,
       color: "#F59E0B",
@@ -527,7 +528,7 @@ function PhonicsRewardsView() {
       {/* ── Empty state ── */}
       {totalAttempts === 0 && (
         <div className="bg-surface border border-border rounded-2xl p-8 text-center">
-          <div className="text-5xl mb-3" aria-hidden="true">🌱</div>
+          <div className="text-5xl mb-3" aria-hidden="true"><DisplayIcon name="sprout" /></div>
           <h2 className="text-base font-bold text-text mb-1">ยังไม่มีความสำเร็จ</h2>
           <p className="text-sm text-text-muted mb-5">เริ่มเรียนบทเรียนแรกเพื่อสะสมดาวและความสำเร็จ</p>
           <Link
@@ -542,7 +543,7 @@ function PhonicsRewardsView() {
       {/* ── Latest attempt ── */}
       {latestAttempt && (
         <div className="bg-surface border border-border rounded-xl px-4 py-3 flex items-center gap-3">
-          <div className="text-2xl flex-shrink-0" aria-hidden="true">🎙️</div>
+          <div className="text-2xl flex-shrink-0" aria-hidden="true"><DisplayIcon name="mic" /></div>
           <div className="flex-1 min-w-0">
             <p className="text-xs text-text-muted">ฝึกล่าสุด</p>
             <p className="text-sm font-semibold text-text truncate">
@@ -554,7 +555,7 @@ function PhonicsRewardsView() {
           </div>
           <div className="flex-shrink-0 text-right">
             <p className="text-sm font-bold text-amber-600 dark:text-amber-400">{latestAttempt.score}%</p>
-            <p className="text-xs text-amber-500">{"⭐".repeat(latestAttempt.starsEarned) || "–"}</p>
+            <p className="text-xs text-amber-500">{"★".repeat(latestAttempt.starsEarned) || "–"}</p>
           </div>
         </div>
       )}
@@ -577,7 +578,7 @@ function PhonicsRewardsView() {
                   style={{ backgroundColor: `${m.color}14` }}
                   aria-hidden="true"
                 >
-                  {m.icon}
+                  <DisplayIcon name={m.icon} />
                 </div>
                 <h3 className="text-xs font-bold text-text leading-tight mb-0.5">{m.name}</h3>
                 <p className="text-xs text-text-muted leading-snug">{m.description}</p>
@@ -600,7 +601,7 @@ function PhonicsRewardsView() {
                 className="flex flex-col items-center text-center p-4 bg-bg dark:bg-white/2 border border-dashed border-border/60 rounded-2xl opacity-50"
               >
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center mb-2 text-3xl bg-gray-100 dark:bg-white/6" aria-hidden="true">
-                  {m.icon}
+                  <DisplayIcon name={m.icon} />
                 </div>
                 <h3 className="text-xs font-bold text-text-muted leading-tight mb-0.5">{m.name}</h3>
                 <p className="text-xs text-text-muted/60 leading-snug">{m.description}</p>
@@ -655,7 +656,7 @@ export default function RewardsPage() {
               <span className="text-text font-medium">ความสำเร็จ</span>
             </nav>
             <h1 className="text-xl font-bold text-text">ความสำเร็จ</h1>
-            <p className="text-sm text-text-muted mt-0.5">ติดตามพัฒนาการสวนเสียงของน้อง 🌟</p>
+            <p className="text-sm text-text-muted mt-0.5">ติดตามพัฒนาการสวนเสียงของน้อง</p>
           </header>
           <PhonicsRewardsView />
           <div className="pb-4" />

@@ -80,7 +80,7 @@ function MockDashboard() {
       <div className="p-5 space-y-5">
         {/* Stats row */}
         <div className="grid grid-cols-3 gap-3">
-          <StatChip value="7" label="วันติดต่อกัน 🔥" color="bg-level-sound-prod/8 border-level-sound-prod/20" />
+          <StatChip value="7" label="วันติดต่อกัน" color="bg-level-sound-prod/8 border-level-sound-prod/20" />
           <StatChip value="38" label="ครั้งที่ฝึก" color="bg-primary/8 border-primary/20" />
           <StatChip value="85%" label="คะแนนเฉลี่ย" color="bg-success/8 border-success/20" />
         </div>

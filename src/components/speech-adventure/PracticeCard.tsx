@@ -1,5 +1,6 @@
 "use client";
 
+import { plainFeedback } from "@/lib/speech-evaluation/plainFeedback";
 import { useState, useCallback, useRef } from "react";
 import type { PracticeItem, EvaluationResult, PracticeAttempt } from "@/types/speechAdventure";
 import type { SpeechEvaluationResult } from "@/lib/speech-evaluation/types";
@@ -270,9 +271,6 @@ export default function PracticeCard({
           </>
         ) : (
           <>
-            {item.emoji && (
-              <p className="text-4xl mb-3 leading-none" aria-hidden="true">{item.emoji}</p>
-            )}
             <p
               className={`font-bold leading-tight ${sizeClass}`}
               style={{ color: accentColor }}
@@ -301,13 +299,13 @@ export default function PracticeCard({
               borderColor: !result.isPassed ? "rgba(255,107,107,0.20)" : `${accentColor}20`,
             }}
           >
-            <p className="font-semibold text-text">{evalResult.feedback}</p>
+            <p className="font-semibold text-text">{plainFeedback(evalResult.feedback)}</p>
 
             {/* Practice tip — shown prominently when score is low */}
             {(evalResult.practiceTip ?? evalResult.recommendation) && (
               <div className={`rounded-lg px-3 py-2 ${!result.isPassed ? "bg-info/8 border border-info/15" : ""}`}>
                 <p className="text-text-muted text-xs">
-                  💡 {evalResult.practiceTip ?? evalResult.recommendation}
+                  {plainFeedback(evalResult.practiceTip ?? evalResult.recommendation)}
                 </p>
               </div>
             )}
@@ -475,7 +473,6 @@ export default function PracticeCard({
               {/* Gentle listen-first nudge — shown once if recording starts without listening */}
               {showListenNudge && (
                 <div className="mb-3 flex items-center gap-2 bg-info/8 border border-info/20 rounded-xl px-3 py-2 animate-slide-up">
-                  <span className="text-info text-sm flex-shrink-0">💡</span>
                   <p className="text-xs text-info flex-1">ลองฟังเสียงตัวอย่างก่อนนะ จะช่วยให้พูดตามได้ง่ายขึ้น</p>
                   <button
                     type="button"

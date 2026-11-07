@@ -1,3 +1,4 @@
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import type { StageStatus } from "@/types/speechAdventure";
 
 interface Props {
@@ -47,7 +48,7 @@ export default function StageProgressCard({
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
         ) : (
-          stageIcon
+          <DisplayIcon name={stageIcon} />
         )}
       </div>
 

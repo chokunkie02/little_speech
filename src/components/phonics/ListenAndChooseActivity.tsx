@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useState } from "react";
 import SampleAudioButton from "@/components/speech-adventure/SampleAudioButton";
 import type { PhonicsPracticeItem, PhonicsActivityResult } from "@/types/phonics";
@@ -34,9 +35,6 @@ export default function ListenAndChooseActivity({ item, onComplete }: Props) {
     <div className="space-y-7">
       {/* Prompt header */}
       <div className="text-center space-y-2">
-        {item.emoji && (
-          <div className="text-6xl mb-2" aria-hidden="true">{item.emoji}</div>
-        )}
         <p className="text-sm text-text-muted leading-relaxed">{item.instruction}</p>
       </div>
 
@@ -90,7 +88,7 @@ export default function ListenAndChooseActivity({ item, onComplete }: Props) {
                     className="absolute top-1.5 right-2 text-base"
                     aria-hidden="true"
                   >
-                    ✅
+                    <DisplayIcon name="check" />
                   </span>
                 )}
               </button>
@@ -103,7 +101,7 @@ export default function ListenAndChooseActivity({ item, onComplete }: Props) {
       {passed && (
         <div className="animate-slide-up rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800/50 px-4 py-3 text-center">
           <p className="font-bold text-green-700 dark:text-green-400 text-base">
-            ถูกต้องเลย! 🎉
+            ถูกต้องเลย!
           </p>
           <p className="text-sm text-green-600/80 dark:text-green-500/70 mt-0.5">
             เก่งมาก เสียง <strong>{item.correctAnswer}</strong> ใช่เลย
@@ -119,7 +117,7 @@ export default function ListenAndChooseActivity({ item, onComplete }: Props) {
             passed: true,
             score: 100,
             status: "passed",
-            feedback: "ถูกต้องเลย! 🎉",
+            feedback: "ถูกต้องเลย!",
             isMock: true,
             durationMs: Date.now() - startTimeRef,
           })

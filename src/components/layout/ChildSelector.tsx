@@ -1,5 +1,7 @@
 "use client";
 
+import ProfileMark from "@/components/ui/ProfileMark";
+
 import { useState, useRef, useEffect } from "react";
 import { useChildProfile } from "@/hooks/useChildProfile";
 import { useSpeechProgress } from "@/hooks/useSpeechProgress";
@@ -57,7 +59,6 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
   if (!isHydrated || !profile) return null;
 
   const childName = profile.nickname || profile.name;
-  const initial = profile.organizationId && profile.avatarEmoji ? profile.avatarEmoji : childName.charAt(0);
 
   function handleSelect(child: ChildProfileData) {
     selectChild(child.id);
@@ -77,7 +78,7 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
           aria-expanded={open}
           aria-label={`เปลี่ยนเด็ก — กำลังเลือก ${childName}`}
         >
-          {initial}
+          <ProfileMark name={childName} avatar={profile.avatarEmoji} />
         </button>
         <AddChildModal open={addingChild} onClose={() => setAddingChild(false)} />
       </>
@@ -95,7 +96,7 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
           aria-label={`เปลี่ยนเด็ก — กำลังเลือก ${childName}`}
         >
           <div className="w-7 h-7 rounded-full bg-primary/12 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
-            {initial}
+            <ProfileMark name={childName} avatar={profile.avatarEmoji} />
           </div>
           <span className="text-sm font-semibold text-text truncate flex-1 text-left">
             {childName}
@@ -129,7 +130,7 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                     isSelected ? "bg-primary/20 text-primary" : "bg-primary/10 text-primary"
                   }`}>
-                    {child.organizationId && child.avatarEmoji ? child.avatarEmoji : (child.nickname || child.name).charAt(0)}
+                    <ProfileMark name={child.nickname || child.name} avatar={child.avatarEmoji} />
                   </div>
                   <span className="truncate flex-1">{child.nickname || child.name}</span>
                   {isSelected && (
@@ -164,7 +165,7 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                         isSelected ? "bg-primary/20 text-primary" : "bg-border/80 text-text-muted"
                       }`}>
-                        {child.organizationId && child.avatarEmoji ? child.avatarEmoji : (child.nickname || child.name).charAt(0)}
+                        <ProfileMark name={child.nickname || child.name} avatar={child.avatarEmoji} />
                       </div>
                       <span className="truncate flex-1">{child.nickname || child.name}</span>
                       <span className="text-[10px] text-text-muted flex-shrink-0">แชร์</span>

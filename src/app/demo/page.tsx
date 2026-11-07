@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import Link from "next/link";
 import AppShell from "@/components/layout/AppShell";
 import { useChildProfile } from "@/hooks/useChildProfile";
@@ -129,12 +130,12 @@ function PhonicsShowcase() {
   const hasProgress = isHydrated && summary.totalAttempts > 0;
 
   const PHONICS_MILESTONES = [
-    { icon: "🌱", name: "เริ่มเรียนเสียงไทยแล้ว", desc: "ฝึกกิจกรรมแรกในสวนเสียง", done: isHydrated && summary.totalAttempts >= 1 },
-    { icon: "⭐", name: "ผ่านบทเรียนแรก", desc: "ผ่านบทเรียนสำเร็จเป็นครั้งแรก", done: isHydrated && completedLessonIds.size >= 1 },
-    { icon: "👂", name: "นักฟังเสียงตัวน้อย", desc: "ผ่าน 3 บทเรียนขึ้นไป", done: isHydrated && completedLessonIds.size >= 3 },
-    { icon: "🔀", name: "นักผสมเสียง", desc: "ผ่านระดับผสมเสียง K4", done: isHydrated && completedUnitIds.has("K4") },
-    { icon: "📖", name: "นักอ่านคำง่าย", desc: "ผ่านระดับคำง่าย K5", done: isHydrated && completedUnitIds.has("K5") },
-    { icon: "🏅", name: "เก็บดาวจากสวนเสียง", desc: "สะสมดาวจากการเรียน", done: isHydrated && summary.totalAttempts >= 5 },
+    { icon: "sprout", name: "เริ่มเรียนเสียงไทยแล้ว", desc: "ฝึกกิจกรรมแรกในสวนเสียง", done: isHydrated && summary.totalAttempts >= 1 },
+    { icon: "star", name: "ผ่านบทเรียนแรก", desc: "ผ่านบทเรียนสำเร็จเป็นครั้งแรก", done: isHydrated && completedLessonIds.size >= 1 },
+    { icon: "listen", name: "นักฟังเสียงตัวน้อย", desc: "ผ่าน 3 บทเรียนขึ้นไป", done: isHydrated && completedLessonIds.size >= 3 },
+    { icon: "shuffle", name: "นักผสมเสียง", desc: "ผ่านระดับผสมเสียง K4", done: isHydrated && completedUnitIds.has("K4") },
+    { icon: "book", name: "นักอ่านคำง่าย", desc: "ผ่านระดับคำง่าย K5", done: isHydrated && completedUnitIds.has("K5") },
+    { icon: "award", name: "เก็บดาวจากสวนเสียง", desc: "สะสมดาวจากการเรียน", done: isHydrated && summary.totalAttempts >= 5 },
   ];
 
   return (
@@ -142,12 +143,12 @@ function PhonicsShowcase() {
       {/* ── Hero ── */}
       <div className="text-center space-y-4">
         <div className="w-16 h-16 rounded-2xl bg-amber-500 flex items-center justify-center mx-auto shadow-lg shadow-amber-300/30">
-          <span className="text-3xl" aria-hidden="true">🌟</span>
+          <span className="text-3xl" aria-hidden="true"><DisplayIcon name="star" /></span>
         </div>
         <h1 className="text-3xl font-bold text-text">สวนเสียง</h1>
         <p className="text-lg text-text-muted max-w-xl mx-auto leading-relaxed">
           เรียนเสียงไทยสำหรับเด็กปฐมวัย ผ่าน 7 ระดับที่เรียงจากง่ายไปยาก
-          ฟังก่อน แล้วลองพูดตามนะ 🎧
+          ฟังก่อน แล้วลองพูดตามนะ
         </p>
         <div className="flex items-center justify-center gap-3 pt-2 flex-wrap">
           <Btn href="/training" amber>เริ่มเรียนเลย</Btn>
@@ -170,7 +171,7 @@ function PhonicsShowcase() {
               </div>
             ))}
           </div>
-          <p className="text-xs text-text-muted text-center mt-2">เก่งมาก น้องสะสมดาวได้แล้ว ✨</p>
+          <p className="text-xs text-text-muted text-center mt-2">เก่งมาก น้องสะสมดาวได้แล้ว</p>
         </Section>
       )}
 
@@ -194,7 +195,7 @@ function PhonicsShowcase() {
                   {i < units.length - 1 && <div className="w-px h-3 bg-border mt-1" aria-hidden="true" />}
                 </div>
                 <div className="flex-1 flex items-center gap-3 bg-bg dark:bg-white/3 rounded-xl px-3 py-2.5 border border-border">
-                  <span className="text-base flex-shrink-0" aria-hidden="true">{unit.icon}</span>
+                  <span className="text-base flex-shrink-0" aria-hidden="true"><DisplayIcon name={unit.icon} /></span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-text">{unit.title}</p>
                     <p className="text-xs text-text-muted">{unit.description}</p>
@@ -216,15 +217,15 @@ function PhonicsShowcase() {
       <Section id="activities" label="รูปแบบกิจกรรม">
         <div className="grid gap-3 sm:grid-cols-2">
           {[
-            { icon: "👂", name: "ฟังและเลือก", desc: "ฟังเสียงแล้วแตะตัวอักษรที่ถูกต้อง เหมาะกับผู้เริ่มต้น" },
-            { icon: "🗣️", name: "พูดตาม", desc: "ฟังเสียงตัวอย่างแล้วพูดตาม ระบบบันทึกและประเมินเสียง" },
-            { icon: "🔀", name: "ผสมเสียง", desc: "เรียนผสมพยัญชนะ + สระ = พยางค์ ด้วยภาพสมการ" },
-            { icon: "📖", name: "คำและประโยค", desc: "ฝึกออกเสียงคำสั้นและประโยคง่ายๆ ในชีวิตประจำวัน" },
+            { icon: "listen", name: "ฟังและเลือก", desc: "ฟังเสียงแล้วแตะตัวอักษรที่ถูกต้อง เหมาะกับผู้เริ่มต้น" },
+            { icon: "mic", name: "พูดตาม", desc: "ฟังเสียงตัวอย่างแล้วพูดตาม ระบบบันทึกและประเมินเสียง" },
+            { icon: "shuffle", name: "ผสมเสียง", desc: "เรียนผสมพยัญชนะ + สระ = พยางค์ ด้วยภาพสมการ" },
+            { icon: "book", name: "คำและประโยค", desc: "ฝึกออกเสียงคำสั้นและประโยคง่ายๆ ในชีวิตประจำวัน" },
           ].map((a) => (
             <Card key={a.name}>
               <div className="flex items-start gap-3">
                 <div className="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center flex-shrink-0 text-xl" aria-hidden="true">
-                  {a.icon}
+                  <DisplayIcon name={a.icon} />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-text">{a.name}</h3>
@@ -262,7 +263,7 @@ function PhonicsShowcase() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-2 text-2xl ${
                   m.done ? "bg-amber-100 dark:bg-amber-900/40" : "bg-gray-100 dark:bg-white/6"
                 }`} aria-hidden="true">
-                  {m.icon}
+                  <DisplayIcon name={m.icon} />
                 </div>
                 <p className={`text-xs font-bold leading-tight mb-0.5 ${m.done ? "text-text" : "text-text-muted"}`}>{m.name}</p>
                 <p className="text-xs text-text-muted/70 leading-snug">{m.desc}</p>
@@ -378,7 +379,7 @@ function SpeechClarityShowcase() {
                   {i < mockTrainingStages.length - 1 && <div className="w-px h-3 bg-border mt-1" aria-hidden="true" />}
                 </div>
                 <div className="flex-1 flex items-center gap-3 bg-bg dark:bg-white/3 rounded-xl px-3 py-2.5 border border-border">
-                  <span className="text-base flex-shrink-0" aria-hidden="true">{stage.icon}</span>
+                  <span className="text-base flex-shrink-0" aria-hidden="true"><DisplayIcon name={stage.icon} /></span>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-text">{stage.name}</p>
                     <p className="text-xs text-text-muted">{stage.shortGoal}</p>

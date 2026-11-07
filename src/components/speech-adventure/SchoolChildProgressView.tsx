@@ -1,5 +1,6 @@
 "use client";
 
+import { plainFeedback } from "@/lib/speech-evaluation/plainFeedback";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import DetailMetricCard from "@/components/details/DetailMetricCard";
@@ -133,8 +134,8 @@ export default function SchoolChildProgressView({
                           </span>
                         </summary>
                         <div className="mt-2 space-y-1 text-sm text-text-muted">
-                          <p>{attempt.feedback || "ไม่มีคำแนะนำสำหรับครั้งนี้"}</p>
-                          {attempt.recommendation && <p>{attempt.recommendation}</p>}
+                          <p>{plainFeedback(attempt.feedback) || "ไม่มีคำแนะนำสำหรับครั้งนี้"}</p>
+                          {attempt.recommendation && <p>{plainFeedback(attempt.recommendation)}</p>}
                           {attempt.has_audio && (
                             <div className="pt-2">
                               <button type="button" className="text-sm font-semibold text-primary"

@@ -101,7 +101,7 @@ function MockEvalCard() {
       {/* Feedback */}
       <div className="px-5 pb-4">
         <div className="bg-primary/5 border border-primary/15 rounded-xl px-3 py-2.5">
-          <p className="text-xs text-primary font-medium mb-0.5">💡 คำแนะนำ</p>
+          <p className="text-xs text-primary font-medium mb-0.5">คำแนะนำ</p>
           <p className="text-xs text-text-muted leading-relaxed">
             เสียง ก ดีขึ้นมาก! ลองฝึกให้ปลายลิ้นแตะเพดานปากให้ชัดขึ้นอีกนิด
           </p>

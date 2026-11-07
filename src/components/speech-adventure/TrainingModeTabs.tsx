@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import type { TrainingMode } from "@/lib/child-profile/childProfileStorage";
 
 interface Props {
@@ -9,8 +10,8 @@ interface Props {
 }
 
 const TABS: { mode: TrainingMode; icon: string; label: string }[] = [
-  { mode: "speech_clarity", icon: "🎯", label: "ฝึกเสียงให้ชัด" },
-  { mode: "kindergarten_phonics", icon: "🌟", label: "เรียนเสียงไทย" },
+  { mode: "speech_clarity", icon: "target", label: "ฝึกเสียงให้ชัด" },
+  { mode: "kindergarten_phonics", icon: "star", label: "เรียนเสียงไทย" },
 ];
 
 export default function TrainingModeTabs({ activeMode, onModeChange, disabled }: Props) {
@@ -32,7 +33,7 @@ export default function TrainingModeTabs({ activeMode, onModeChange, disabled }:
                 : "text-text-muted hover:text-text hover:bg-bg"
             } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
           >
-            <span aria-hidden="true">{icon}</span>
+            <span aria-hidden="true"><DisplayIcon name={icon} /></span>
             <span>{label}</span>
           </button>
         );

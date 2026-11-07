@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useEffect } from "react";
 import { mockTrainingStages } from "@/data/speechAdventureMockData";
 import type { PracticeSession, PracticeAttempt } from "@/types/speechAdventure";
@@ -81,7 +82,7 @@ export default function SessionDetailDrawer({ session, allAttempts, onClose, onA
           <div className="h-1" style={{ backgroundColor: accentColor }} />
           <div className="flex items-center justify-between gap-3 px-5 py-4">
             <div className="flex items-center gap-2.5 min-w-0">
-              <span className="text-xl flex-shrink-0" aria-hidden="true">{stage?.icon ?? "🎯"}</span>
+              <span className="text-xl flex-shrink-0" aria-hidden="true"><DisplayIcon name={stage?.icon ?? "target"} /></span>
               <div className="min-w-0">
                 <p className="text-sm font-bold text-text truncate">{stage?.name ?? session.stageId}</p>
                 <p className="text-xs text-text-muted">รายละเอียดเซสชัน</p>

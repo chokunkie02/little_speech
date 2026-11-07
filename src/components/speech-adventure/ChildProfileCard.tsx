@@ -1,3 +1,4 @@
+import ProfileMark from "@/components/ui/ProfileMark";
 import type { ChildProfile } from "@/types/speechAdventure";
 
 interface Props {
@@ -22,7 +23,7 @@ export default function ChildProfileCard({
     return (
       <div className="flex items-center gap-3 bg-surface border border-border rounded-xl px-4 py-3">
         <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-lg flex-shrink-0" aria-hidden="true">
-          {profile.avatarEmoji}
+          <ProfileMark name={profile.nickname || profile.name} avatar={profile.avatarEmoji} />
         </div>
         <div className="min-w-0">
           <p className="font-semibold text-text text-sm truncate">{profile.nickname}</p>
@@ -40,7 +41,7 @@ export default function ChildProfileCard({
     <div className="bg-surface border border-border rounded-xl p-5">
       <div className="flex items-center gap-4 mb-5">
         <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-3xl flex-shrink-0" aria-hidden="true">
-          {profile.avatarEmoji}
+          <ProfileMark name={profile.nickname || profile.name} avatar={profile.avatarEmoji} />
         </div>
         <div>
           <h2 className="text-lg font-bold text-text">{profile.name}</h2>

@@ -1,5 +1,6 @@
 "use client";
 
+import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useState, useEffect, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -56,7 +57,6 @@ function SummaryScreen({
   const totalStars = results.reduce((s, r) => s + phonicsStars(r.score), 0);
   const pct = total > 0 ? Math.round((passedCount / total) * 100) : 0;
 
-  const emoji = pct === 100 ? "🌟" : pct >= 70 ? "⭐" : "💪";
   const headline = pct === 100 ? "เยี่ยมมากเลย!" : pct >= 70 ? "ทำได้ดีมาก!" : "ไม่เป็นไรค่ะ ลองอีกครั้งนะ";
 
   return (
@@ -74,7 +74,7 @@ function SummaryScreen({
 
       <div className="flex-1 flex items-center justify-center px-6 py-10">
         <div className="w-full max-w-sm text-center space-y-6">
-          <div className="text-7xl" aria-hidden="true">{emoji}</div>
+          <div className="text-7xl" aria-hidden="true"><DisplayIcon name={pct >= 70 ? "star" : "sprout"} /></div>
 
           <div>
             <h2 className="text-2xl font-bold text-text">{headline}</h2>
@@ -92,7 +92,7 @@ function SummaryScreen({
               <p className="text-xs text-text-muted mt-0.5">ผ่านกิจกรรม</p>
             </div>
             <div className="bg-surface border border-border rounded-xl py-3 text-center">
-              <p className="text-xl font-bold text-amber-500">{"⭐".repeat(Math.min(totalStars, 3))}{totalStars === 0 ? "–" : ""}</p>
+              <p className="text-xl font-bold text-amber-500">{"★".repeat(Math.min(totalStars, 3))}{totalStars === 0 ? "–" : ""}</p>
               <p className="text-xs text-text-muted mt-0.5">{totalStars} ดาว</p>
             </div>
           </div>
@@ -106,7 +106,7 @@ function SummaryScreen({
           <div className="space-y-3 pt-2">
             <button type="button" onClick={() => router.push("/training")}
               className="w-full py-3.5 rounded-xl bg-amber-500 text-white font-semibold text-base hover:bg-amber-600 transition-all shadow-sm shadow-amber-300/40 active:scale-[0.98]">
-              กลับไปสวนเสียง 🌟
+              กลับไปสวนเสียง
             </button>
             <button type="button" onClick={onRetry}
               className="w-full py-3 rounded-xl border border-border text-text-muted hover:text-text hover:border-amber-400/60 font-medium text-sm transition-all active:scale-[0.98]">
@@ -162,7 +162,7 @@ export default function PhonicsLessonPage() {
   if (isHydrated && !hasProfile) {
     return (
       <main className="min-h-screen bg-bg flex flex-col items-center justify-center px-6 py-10 gap-4 text-center">
-        <div className="text-5xl" aria-hidden="true">🌱</div>
+        <div className="text-5xl" aria-hidden="true"><DisplayIcon name="sprout" /></div>
         <p className="text-text font-semibold">กรุณาตั้งค่าโปรไฟล์เด็กก่อนนะคะ</p>
         <p className="text-sm text-text-muted">เพื่อบันทึกความก้าวหน้าในการเรียน</p>
         <Link href="/onboarding" className="px-6 py-3 rounded-xl bg-amber-500 text-white font-semibold text-sm hover:bg-amber-600 transition-all shadow-sm shadow-amber-300/30">
