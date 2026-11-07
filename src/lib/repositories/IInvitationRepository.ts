@@ -10,6 +10,7 @@ import type { Invitation, CreateInvitationInput } from "@/types/invitations";
  * addressed to the current user under their own "sent history" list.
  */
 export interface IInvitationRepository {
+  rehydrate?(): void;
   // ── useSyncExternalStore plumbing ──────────────────────────────────────────
   subscribe(callback: () => void): () => void;
 

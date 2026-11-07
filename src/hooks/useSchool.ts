@@ -123,11 +123,6 @@ export function useSchool() {
     return school.ensureParentInvitationForChild(childId, parentEmail, invitedBy, inviterEmail);
   }
 
-  async function revokeParentLink(childId: string): Promise<void> {
-    if (!school) throw new Error("School repository not available");
-    return school.revokeParentLink(childId);
-  }
-
   return {
     organizations,
     listClassrooms,
@@ -146,6 +141,5 @@ export function useSchool() {
     archiveStudent,
     listStudentParentLinks,
     ensureParentInvitationForChild,
-    revokeParentLink,
   };
 }

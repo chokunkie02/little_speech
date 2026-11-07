@@ -44,6 +44,7 @@ export function useChildAccess() {
   );
 
   return {
+    refreshChildAccess: repo.rehydrate?.bind(repo),
     receivedGrants,
     issuedGrants,
     grantChildAccess,

@@ -53,7 +53,7 @@ export type InsertChildProfile =
 export type InsertPracticeSession = Omit<DbPracticeSession, "id" | "created_at">;
 export type InsertPracticeAttempt = Omit<DbPracticeAttempt, "id" | "created_at">;
 export type InsertObservationNote = Omit<DbObservationNote, "id" | "created_at" | "updated_at">;
-export type InsertInvitation = Omit<DbInvitation, "id" | "created_at" | "updated_at" | "accepted_at" | "accepted_by" | "requires_teacher_approval" | "requested_by" | "requested_at" | "requester_name" | "requester_relationship"> & { id?: string };
+export type InsertInvitation = Omit<DbInvitation, "id" | "created_at" | "updated_at" | "accepted_at" | "accepted_by" | "requires_teacher_approval" | "is_additional_guardian" | "requested_by" | "requested_at" | "requester_name" | "requester_relationship"> & { id?: string };
 export type InsertChildAccess = Omit<DbChildAccess, "id" | "created_at" | "revoked_at"> & { id?: string };
 export type UpdateChildAccess = Partial<Omit<DbChildAccess, "id" | "created_at">>;
 export type InsertOrganization = Omit<DbOrganization, "id" | "created_at" | "updated_at"> & { id?: string };
@@ -173,6 +173,29 @@ export interface Database {
         Args: { p_classroom_id: string; p_name: string; p_student_code: string; p_age: number; p_nickname: string };
         Returns: string;
       };
+      create_guardian_invite: {
+        Args: { p_child_id: string; p_email: string };
+        Returns: Pick<DbInvitation, "id" | "email" | "token">;
+      };
+      update_guardian_child_display: {
+        Args: { p_child_id: string; p_nickname: string; p_avatar: string };
+        Returns: void;
+      };
+      list_guardian_review_requests: {
+        Args: { p_child_id: string };
+        Returns: {
+          id: string;
+          requester_name: string;
+          requester_relationship: string;
+          email: string;
+          status: DbInvitation["status"];
+          accepted_at: string | null;
+        }[];
+      };
+      list_school_guardian_members: {
+        Args: { p_child_id: string };
+        Returns: { id: string; name: string | null; relationship: string | null; email: string; is_self: boolean }[];
+      };
       create_first_guardian_invite: {
         Args: { p_child_id: string; p_email: string };
         Returns: void;
@@ -198,10 +221,6 @@ export interface Database {
         Returns: string;
       };
       archive_student: {
-        Args: { p_child_id: string };
-        Returns: void;
-      };
-      revoke_parent_link_for_child: {
         Args: { p_child_id: string };
         Returns: void;
       };

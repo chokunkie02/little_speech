@@ -1,6 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import SchoolGuardianMembers from "@/components/layout/SchoolGuardianMembers";
+import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
 import type { Classroom, UserDisplayInfo, StudentParentLinkInfo, ParentLinkStatus } from "@/types/school";
 import { PARENT_LINK_STATUS_LABELS } from "@/types/school";
 import { useSchool } from "@/hooks/useSchool";
@@ -90,7 +93,6 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
     archiveStudent,
     listStudentParentLinks,
     ensureParentInvitationForChild,
-    revokeParentLink,
   } = useSchool();
   const { profiles, sharedProfiles } = useChildProfile();
   const { user } = useAuth();
@@ -102,8 +104,8 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
   const [parentLinks, setParentLinks] = useState<StudentParentLinkInfo[]>([]);
   const [copiedToken, setCopiedToken] = useState<string | null>(null);
   const [createInviteBusy, setCreateInviteBusy] = useState<string | null>(null); // childId
-  const [revokeParentBusy, setRevokeParentBusy] = useState<string | null>(null); // childId
-  const [confirmRevokeParentId, setConfirmRevokeParentId] = useState<string | null>(null);
+  const [guardianRosterId, setGuardianRosterId] = useState<string | null>(null);
+  const schoolOnline = isSupabaseProviderRequested() && isSupabaseConfigured();
   const [parentLinkError, setParentLinkError] = useState<string | null>(null);
 
   // ── Student name resolution ───────────────────────────────────────────────────
@@ -254,20 +256,6 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
       setParentLinkError(err instanceof Error ? err.message : "สร้างคำเชิญไม่สำเร็จ");
     } finally {
       setCreateInviteBusy(null);
-    }
-  }
-
-  async function handleRevokeParentLink(childId: string) {
-    setRevokeParentBusy(childId);
-    setParentLinkError(null);
-    try {
-      await revokeParentLink(childId);
-      setConfirmRevokeParentId(null);
-      refreshParentLinks();
-    } catch (err) {
-      setParentLinkError(err instanceof Error ? err.message : "ถอนสิทธิ์ไม่สำเร็จ");
-    } finally {
-      setRevokeParentBusy(null);
     }
   }
 
@@ -425,9 +413,8 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
               <ul className="space-y-2 mb-3">
                 {students.map((s) => {
                   const parentInfo = parentLinkMap.get(s.childId);
-                  const canRevoke = parentInfo && (parentInfo.parentLinkStatus === "pending" || parentInfo.parentLinkStatus === "accepted");
                   const canCreate = parentInfo?.parentLinkStatus === "missing_invite" && parentInfo.parentEmail;
-                  const hasToken  = parentInfo?.invitationToken && (parentInfo.parentLinkStatus === "pending" || parentInfo.parentLinkStatus === "accepted");
+                  const hasToken  = parentInfo?.invitationToken && parentInfo.parentLinkStatus === "pending";
 
                   return (
                     <li key={s.childId} className="rounded-xl border border-border bg-black/[0.03] dark:bg-white/[0.03] overflow-hidden">
@@ -484,34 +471,19 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
                                 {createInviteBusy === s.childId ? "กำลังสร้าง…" : "สร้างคำเชิญ"}
                               </button>
                             )}
-                            {/* Revoke */}
-                            {canRevoke && confirmRevokeParentId !== s.childId && (
-                              <button
-                                onClick={() => { setConfirmRevokeParentId(s.childId); setParentLinkError(null); }}
-                                className="text-[10px] text-error/70 hover:text-error transition-colors"
-                              >
-                                ถอนสิทธิ์
-                              </button>
-                            )}
-                            {confirmRevokeParentId === s.childId && (
-                              <span className="flex items-center gap-1">
-                                <button
-                                  onClick={() => void handleRevokeParentLink(s.childId)}
-                                  disabled={revokeParentBusy === s.childId}
-                                  className="text-[10px] px-2 py-0.5 rounded bg-error text-white hover:bg-error/90 transition-all disabled:opacity-50"
-                                >
-                                  {revokeParentBusy === s.childId ? "…" : "ยืนยัน"}
-                                </button>
-                                <button
-                                  onClick={() => setConfirmRevokeParentId(null)}
-                                  disabled={revokeParentBusy === s.childId}
-                                  className="text-[10px] px-2 py-0.5 rounded border border-border text-text-muted hover:text-text transition-all disabled:opacity-50"
-                                >
-                                  ยกเลิก
-                                </button>
-                              </span>
-                            )}
                           </div>
+                        </div>
+                      )}
+
+                      {schoolOnline && (
+                        <div className="space-y-2 border-t border-border/40 px-3 py-2">
+                          <button className="text-xs font-semibold text-primary"
+                            aria-expanded={guardianRosterId === s.childId}
+                            onClick={() => setGuardianRosterId(guardianRosterId === s.childId ? null : s.childId)}>
+                            {guardianRosterId === s.childId ? "ซ่อนรายชื่อผู้ปกครอง" : "ดูผู้ปกครองที่เชื่อม"}
+                          </button>
+                          {guardianRosterId === s.childId &&
+                            <SchoolGuardianMembers childId={s.childId} mode="staff" onChanged={() => { refreshParentLinks(); }} />}
                         </div>
                       )}
 

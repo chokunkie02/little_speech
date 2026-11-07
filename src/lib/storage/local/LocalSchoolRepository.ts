@@ -336,10 +336,6 @@ export class LocalSchoolRepository implements ISchoolRepository {
     return { id: _id(), token: _id() };
   }
 
-  async revokeParentLink(_childId: string): Promise<void> {
-    // Not implemented in local/demo mode — no-op
-  }
-
   // ── Scope ─────────────────────────────────────────────────────────────────────
 
   setScope(userId: string | null): void {

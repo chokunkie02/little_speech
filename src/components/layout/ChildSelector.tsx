@@ -56,8 +56,8 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
   // Don't render until hydrated (prevents SSR mismatch)
   if (!isHydrated || !profile) return null;
 
-  const childName = profile.name;
-  const initial = childName.charAt(0);
+  const childName = profile.nickname || profile.name;
+  const initial = profile.organizationId && profile.avatarEmoji ? profile.avatarEmoji : childName.charAt(0);
 
   function handleSelect(child: ChildProfileData) {
     selectChild(child.id);
@@ -129,9 +129,9 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                     isSelected ? "bg-primary/20 text-primary" : "bg-primary/10 text-primary"
                   }`}>
-                    {child.name.charAt(0)}
+                    {child.organizationId && child.avatarEmoji ? child.avatarEmoji : (child.nickname || child.name).charAt(0)}
                   </div>
-                  <span className="truncate flex-1">{child.name}</span>
+                  <span className="truncate flex-1">{child.nickname || child.name}</span>
                   {isSelected && (
                     <span className="flex-shrink-0 text-primary">
                       <CheckIcon />
@@ -164,9 +164,9 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                         isSelected ? "bg-primary/20 text-primary" : "bg-border/80 text-text-muted"
                       }`}>
-                        {child.name.charAt(0)}
+                        {child.organizationId && child.avatarEmoji ? child.avatarEmoji : (child.nickname || child.name).charAt(0)}
                       </div>
-                      <span className="truncate flex-1">{child.name}</span>
+                      <span className="truncate flex-1">{child.nickname || child.name}</span>
                       <span className="text-[10px] text-text-muted flex-shrink-0">แชร์</span>
                       {isSelected && (
                         <span className="flex-shrink-0 text-primary">

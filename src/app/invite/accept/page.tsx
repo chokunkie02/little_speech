@@ -214,7 +214,7 @@ function AcceptInviteContent() {
   const canAccept = invitation.status === "pending" && isAuthenticated && !awaitingReview;
   const matchingAccount = user?.role === "parent" && !!user.email &&
     (!invitation.email || invitation.email.toLowerCase() === user.email.toLowerCase());
-  const statusLabel = awaitingReview ? "รอครูอนุมัติ"
+  const statusLabel = awaitingReview ? (invitation.isAdditionalGuardian ? "รออนุมัติ" : "รอครูอนุมัติ")
     : rejected ? "ไม่อนุมัติ"
     : guardianRequest && isAlreadyAccepted ? "อนุมัติแล้ว"
     : INVITATION_STATUS_LABELS[invitation.status];
@@ -294,13 +294,15 @@ function AcceptInviteContent() {
         {/* State banners */}
         {isExpiredOrRevoked && (
           <div className="bg-error/8 border border-error/20 rounded-xl px-4 py-3 text-sm text-error">
-            {rejected ? "ครูไม่อนุมัติคำขอนี้ กรุณาติดต่อครูประจำห้อง" : `คำเชิญนี้${invitation.status === "expired" ? "หมดอายุ" : "ถูกยกเลิก"}แล้ว กรุณาขอคำเชิญใหม่`}
+            {guardianRequest && invitation.status === "revoked" && invitation.acceptedAt
+              ? "บัญชีนี้ยกเลิกการเชื่อมกับเด็กแล้ว"
+              : rejected ? "คำขอนี้ไม่ได้รับอนุมัติ กรุณาติดต่อครูประจำห้อง" : `คำเชิญนี้${invitation.status === "expired" ? "หมดอายุ" : "ถูกยกเลิก"}แล้ว กรุณาขอคำเชิญใหม่`}
           </div>
         )}
 
         {isAlreadyAccepted && (
           <div className="bg-success/8 border border-success/20 rounded-xl px-4 py-3 text-sm text-success">
-            {guardianRequest ? "ครูอนุมัติแล้ว คุณเปิดโปรไฟล์เด็กจากตัวเลือกเด็กได้" : "คำเชิญนี้ได้รับการตอบรับแล้ว"}
+            {guardianRequest ? "คำขอได้รับอนุมัติแล้ว คุณเปิดโปรไฟล์เด็กได้" : "คำเชิญนี้ได้รับการตอบรับแล้ว"}
           </div>
         )}
 
@@ -335,7 +337,9 @@ function AcceptInviteContent() {
 
         {awaitingReview && (
           <div className="space-y-3 rounded-xl border border-warning/20 bg-warning/10 px-4 py-3 text-sm">
-            <p>ส่งคำขอแล้ว คุณจะเปิดข้อมูลเด็กได้เมื่อครูประจำห้องอนุมัติ</p>
+            <p>{invitation.isAdditionalGuardian
+              ? "ส่งคำขอแล้ว คุณจะเปิดข้อมูลเด็กได้เมื่อครูประจำห้องหรือผู้ปกครองที่เชื่อมอยู่อนุมัติ"
+              : "ส่งคำขอแล้ว คุณจะเปิดข้อมูลเด็กได้เมื่อครูประจำห้องอนุมัติ"}</p>
             <button type="button" className="font-semibold text-primary" onClick={() => setRefresh((value) => value + 1)}>
               ตรวจสถานะล่าสุด
             </button>

@@ -522,7 +522,7 @@ export class SupabaseSchoolRepository implements ISchoolRepository {
         .eq("organization_id", organizationId),
       this.client
         .from("invitations")
-        .select("id, child_id, email, status, token")
+        .select("id, child_id, status, token, requested_at")
         .in("child_id", childIds)
         .eq("role", "parent")
         .order("created_at", { ascending: false }),
@@ -534,14 +534,14 @@ export class SupabaseSchoolRepository implements ISchoolRepository {
       return [];
     }
 
-    // Map childId → best invitation (pending > accepted > revoked)
-    const priority = (s: string) => (s === "pending" ? 3 : s === "accepted" ? 2 : 1);
-    const invMap = new Map<string, { id: string; token: string; status: string }>();
+    // An existing approved guardian takes priority over an invitation in progress.
+    const priority = (s: string) => (s === "accepted" ? 3 : s === "pending" ? 2 : 1);
+    const invMap = new Map<string, { id: string; token: string | null; status: string }>();
     for (const inv of (invitationsRes.data ?? [])) {
       if (!inv.child_id) continue;
       const existing = invMap.get(inv.child_id);
       if (!existing || priority(inv.status) > priority(existing.status)) {
-        invMap.set(inv.child_id, { id: inv.id, token: inv.token, status: inv.status });
+        invMap.set(inv.child_id, { id: inv.id, token: inv.status === "pending" && !inv.requested_at ? inv.token : null, status: inv.status });
       }
     }
 
@@ -550,12 +550,10 @@ export class SupabaseSchoolRepository implements ISchoolRepository {
       const parentEmail = (p as { parent_email_pending?: string | null }).parent_email_pending ?? null;
 
       let parentLinkStatus: ParentLinkStatus;
-      if (!parentEmail) {
-        parentLinkStatus = "no_parent_email";
-      } else if (!inv) {
-        parentLinkStatus = "missing_invite";
-      } else {
+      if (inv) {
         parentLinkStatus = inv.status as ParentLinkStatus;
+      } else {
+        parentLinkStatus = parentEmail ? "missing_invite" : "no_parent_email";
       }
 
       return {
@@ -626,13 +624,6 @@ export class SupabaseSchoolRepository implements ISchoolRepository {
     }
 
     return { id, token };
-  }
-
-  async revokeParentLink(childId: string): Promise<void> {
-    const { error } = await this.client.rpc("revoke_parent_link_for_child", {
-      p_child_id: childId,
-    });
-    if (error) throw new Error(error.message);
   }
 
   public setScope(_userId: string | null): void {

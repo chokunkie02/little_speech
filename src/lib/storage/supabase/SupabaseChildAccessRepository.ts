@@ -102,48 +102,19 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
   }
 
   async revokeChildAccess(grantId: string): Promise<void> {
-    if (process.env.NODE_ENV !== "production") {
-      console.debug("[revokeChildAccess] start", { grantId });
-    }
-
-    const now = new Date().toISOString();
-    const updateList = (list: ChildAccess[]) =>
-      list.map((g) => (g.id === grantId ? { ...g, revokedAt: now } : g));
-    const prevReceived = this._received;
-    const prevIssued = this._issued;
-    this._received = updateList(this._received);
-    this._issued = updateList(this._issued);
-    this._notify();
-
-    // Use SECURITY DEFINER RPC — avoids any residual RLS complexity on UPDATE.
-    // The function enforces child ownership internally before setting revoked_at
-    // and is idempotent (re-revoking an already-revoked row is a no-op).
-    const { error } = await this.client.rpc("revoke_child_access", {
-      p_access_id: grantId,
-    });
-
+    const { error } = await this.client.rpc("revoke_child_access", { p_access_id: grantId });
     if (error) {
-      if (process.env.NODE_ENV !== "production") {
-        console.error("[revokeChildAccess] rpc error", {
-          grantId,
-          code: (error as { code?: string }).code,
-          message: error.message,
-          details: (error as { details?: string }).details,
-        });
-      }
       warnRepo("SupabaseChildAccessRepository.revokeChildAccess", new QueryError("child_access", "rpc:revoke", error));
-      this._received = prevReceived;
-      this._issued = prevIssued;
-      this._notify();
       throw new Error(error.message);
     }
 
-    if (process.env.NODE_ENV !== "production") {
-      console.debug("[revokeChildAccess] rpc ok — rehydrating", { grantId });
-    }
-    // Canonicalize cache from server state so the revoked_at timestamp and
-    // any concurrent changes are reflected exactly.
-    this.rehydrate();
+    const revokedAt = new Date().toISOString();
+    this._received = this._received.filter((grant) => grant.id !== grantId);
+    this._issued = this._issued.map((grant) =>
+      grant.id === grantId ? { ...grant, revokedAt } : grant,
+    );
+    this._notify();
+    void this.rehydrate();
   }
 
   async updateChildPermissions(

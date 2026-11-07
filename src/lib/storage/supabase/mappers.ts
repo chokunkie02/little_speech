@@ -102,6 +102,9 @@ export function dbToDomainProfile(db: DbChildProfile): ChildProfileData {
   return {
     id: db.id,
     name: db.name,
+    organizationId: db.organization_id ?? undefined,
+    nickname: db.nickname ?? undefined,
+    avatarEmoji: db.avatar_emoji ?? undefined,
     age: db.age,
     targetSound: db.target_sound,
     trainingGoal: db.training_goal,
@@ -234,6 +237,7 @@ export function dbToDomainInvitation(db: DbInvitation): Invitation {
     acceptedAt: db.accepted_at ?? undefined,
     acceptedBy: db.accepted_by ?? undefined,
     requiresTeacherApproval: db.requires_teacher_approval,
+    isAdditionalGuardian: db.is_additional_guardian,
     requestedAt: db.requested_at ?? undefined,
     requesterName: db.requester_name ?? undefined,
     requesterRelationship: db.requester_relationship ?? undefined,

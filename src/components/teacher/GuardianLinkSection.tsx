@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { QRCodeSVG } from "qrcode.react";
+import ShareGuardianInvitation from "@/components/layout/ShareGuardianInvitation";
+import SchoolGuardianMembers from "@/components/layout/SchoolGuardianMembers";
 import { useRepositories } from "@/lib/providers/RepositoryProvider";
 import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
 import { getSupabaseClient } from "@/lib/supabase/client";
@@ -52,40 +53,6 @@ async function loadRoom(classroomId: string): Promise<RoomData> {
   };
 }
 
-function ShareInvitation({ invitation }: { invitation: DbInvitation }) {
-  const [showQr, setShowQr] = useState(false);
-  const [copyStatus, setCopyStatus] = useState("");
-  const link = new URL("/invite/accept", window.location.origin);
-  link.searchParams.set("token", invitation.token);
-  const url = link.toString();
-
-  async function copy(value: string, label: string) {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopyStatus(label);
-    } catch {
-      setCopyStatus("คัดลอกไม่สำเร็จ กรุณาคัดลอกลิงก์จากช่องด้านบน");
-    }
-  }
-
-  const mail = `mailto:${encodeURIComponent(invitation.email)}?subject=${encodeURIComponent("คำเชิญเชื่อมผู้ปกครอง Speech Adventure")}&body=${encodeURIComponent(url)}`;
-  return (
-    <div className="space-y-2">
-      <input aria-label="ลิงก์เชิญผู้ปกครอง" readOnly value={url} className={inputClass} />
-      <div className="flex flex-wrap gap-2">
-        <button className={secondaryClass} onClick={() => void copy(url, "คัดลอกลิงก์แล้ว")}>คัดลอกลิงก์</button>
-        <button className={secondaryClass} onClick={() => void copy(invitation.token, "คัดลอกรหัสแล้ว")}>คัดลอกรหัส</button>
-        <button className={secondaryClass} onClick={() => setShowQr(!showQr)} aria-expanded={showQr}>
-          {showQr ? "ซ่อน QR" : "แสดง QR"}
-        </button>
-        {invitation.email && <a className={secondaryClass} href={mail}>เปิดแอปอีเมล</a>}
-      </div>
-      {showQr && <QRCodeSVG value={url} size={160} marginSize={4} title="สแกนเพื่อส่งคำขอเชื่อม" />}
-      <p role="status" className="text-xs text-text-muted">{copyStatus}</p>
-    </div>
-  );
-}
-
 export default function GuardianLinkSection({ classroomId }: { classroomId: string }) {
   const { school } = useRepositories();
   const client = isSupabaseProviderRequested() ? getSupabaseClient() : null;
@@ -120,6 +87,7 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
       setRefresh((value) => value + 1);
     } catch (err) {
       setError(err instanceof Error ? err.message : "ทำรายการไม่สำเร็จ");
+      setRefresh((value) => value + 1);
     } finally {
       setBusy(false);
     }
@@ -128,6 +96,7 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
   const childId = room?.students.find((student) => student.id === selectedId)?.id ?? room?.students[0]?.id;
   const currentInvites = room?.invitations.filter((invitation) => invitation.child_id === childId) ?? [];
   const linked = !!childId && room?.linkedStudentIds.has(childId);
+  const decided = currentInvites.filter((invite) => invite.requested_at && invite.status !== "pending");
   const names = new Map(room?.students.map((student) => [student.id, student.name]));
   const requests = room?.invitations.filter((invitation) =>
     invitation.status === "pending" && invitation.requested_at && names.has(invitation.child_id ?? ""),
@@ -190,28 +159,40 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
               ))}
             </select>
           </label>
-          {linked ? <p className="text-sm text-success">เชื่อมผู้ปกครองแล้ว</p> : (
-            <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => {
-              event.preventDefault();
-              void run(async () => {
-                const { error } = await client.rpc("create_first_guardian_invite", { p_child_id: childId, p_email: email });
-                if (error) throw new Error(error.message);
-              }, "ลิงก์เชิญพร้อมใช้งาน");
-            }}>
-              <label className="min-w-52 flex-1 text-sm">อีเมลผู้ปกครอง (ไม่บังคับ)
-                <input className={inputClass} type="email" maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} />
-              </label>
-              <button className={primaryClass} disabled={busy}>สร้างลิงก์เชิญ</button>
-            </form>
-          )}
-          {!linked && currentInvites.filter((invite) =>
-            invite.status === "pending" && !invite.requested_at,
+          {linked && <p className="text-sm text-success">เชื่อมผู้ปกครองแล้ว</p>}
+          <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => {
+            event.preventDefault();
+            void run(async () => {
+              const { error } = await client.rpc("create_guardian_invite", { p_child_id: childId, p_email: email });
+              if (error) throw new Error(error.message);
+            }, "ลิงก์เชิญพร้อมใช้งาน");
+          }}>
+            <label className="min-w-52 flex-1 text-sm">อีเมลผู้ปกครอง (ไม่บังคับ)
+              <input className={inputClass} type="email" maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} />
+            </label>
+            <button className={primaryClass} disabled={busy}>{linked ? "เชิญผู้ปกครองร่วม" : "สร้างลิงก์เชิญ"}</button>
+          </form>
+          {currentInvites.filter((invite) =>
+            invite.status === "pending" && !invite.requested_at && invite.is_additional_guardian === !!linked,
           ).map((invite) => (
             <div key={invite.id} className="space-y-2 border-t border-border pt-3">
               <p className="text-xs text-text-muted">{invite.email || "ลิงก์สำหรับแชร์"} · หมดอายุ {new Date(invite.expires_at).toLocaleDateString("th-TH")}</p>
-              <ShareInvitation invitation={invite} />
+              <ShareGuardianInvitation invitation={invite} />
             </div>
           ))}
+          {decided.length > 0 && (
+            <details className="border-t border-border pt-3 text-sm">
+              <summary className="cursor-pointer font-semibold">ผลคำขอที่ผ่านมา</summary>
+              <ul className="mt-2 space-y-1">
+                {decided.map((invite) => (
+                  <li key={invite.id}>{invite.requester_name} · {
+                    invite.status === "accepted" ? "อนุมัติแล้ว" : invite.accepted_at ? "ยกเลิกการเชื่อมแล้ว" : "ไม่ได้รับอนุมัติ"
+                  }</li>
+                ))}
+              </ul>
+            </details>
+          )}
+          <SchoolGuardianMembers key={childId} childId={childId} mode="staff" revision={refresh} onChanged={() => setRefresh((value) => value + 1)} />
         </div>
       )}
       {room && !childId && <p className="text-sm text-text-muted">เพิ่มนักเรียนในห้องก่อนสร้างลิงก์เชิญ</p>}
@@ -224,13 +205,13 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
               <p className="font-semibold">{request.requester_name} · {request.requester_relationship}</p>
               <p className="text-text-muted break-all">{request.email}</p>
               <p>นักเรียน {names.get(request.child_id ?? "")}</p>
-              {room?.linkedStudentIds.has(request.child_id ?? "") &&
+              {!request.is_additional_guardian && room?.linkedStudentIds.has(request.child_id ?? "") &&
                 <p className="text-text-muted">นักเรียนเชื่อมผู้ปกครองแล้ว</p>}
             </div>
             <div className="flex gap-2">
               {[true, false].map((approve) => (
                 <button key={String(approve)} className={approve ? primaryClass : secondaryClass}
-                  disabled={busy || (approve && !!room?.linkedStudentIds.has(request.child_id ?? ""))}
+                  disabled={busy || (approve && !request.is_additional_guardian && !!room?.linkedStudentIds.has(request.child_id ?? ""))}
                   onClick={() => void run(async () => {
                     const { error } = await client.rpc("review_first_guardian_request", {
                       p_invitation_id: request.id, p_approve: approve,

@@ -49,7 +49,7 @@ export function useChildProfile() {
 
   // Shared child profiles derived from active received grants
   const sharedProfiles = useMemo<ChildProfileData[]>(
-    () => receivedGrants.flatMap((g) => (g.childSnapshot ? [g.childSnapshot] : [])),
+    () => receivedGrants.flatMap((g) => (!g.revokedAt && g.childSnapshot ? [g.childSnapshot] : [])),
     [receivedGrants],
   );
 

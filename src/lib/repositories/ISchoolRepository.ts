@@ -101,13 +101,6 @@ export interface ISchoolRepository {
     inviterEmail?: string,
   ): Promise<{ id: string; token: string }>;
 
-  /**
-   * Revokes all active parent invitations and guardian child_access for a student.
-   * Calls the revoke_parent_link_for_child SECURITY DEFINER RPC.
-   * Practice data is NOT deleted.
-   */
-  revokeParentLink(childId: string): Promise<void>;
-
   // ── Scope ─────────────────────────────────────────────────────────────────────
   setScope(userId: string | null): void;
 }

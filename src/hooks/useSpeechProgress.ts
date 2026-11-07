@@ -15,6 +15,7 @@ import {
   getSessionSummary as storageGetSessionSummary,
 } from "@/lib/speechProgressStorage";
 import { useRepositories } from "@/lib/providers/RepositoryProvider";
+import { useAuth } from "@/hooks/useAuth";
 import { useChildProfile } from "@/hooks/useChildProfile";
 
 // ── isHydrated detection ──────────────────────────────────────────────────────
@@ -31,6 +32,7 @@ const serverSnapshot = () => false as const;
 export function useSpeechProgress() {
   const { progress: repo } = useRepositories();
   const { profile } = useChildProfile();
+  const { isAuthenticated } = useAuth();
 
   // progress is synchronized via the repository's pub-sub.
   // getServerProgress() is used on the server AND during client hydration so
@@ -55,24 +57,23 @@ export function useSpeechProgress() {
   );
 
   // Always filter by the selected child's ID so owned and shared children
-  // never bleed into each other. When no child is selected (profile === null),
-  // activeChildId = null and no filtering is applied (anonymous/legacy fallback).
+  // never bleed into each other. Only anonymous local practice has no child context.
   const activeChildId = profile?.id ?? null;
 
   const filteredAttempts = useMemo(
     () =>
       activeChildId
         ? progress.attempts.filter((a) => a.childId === activeChildId)
-        : progress.attempts,
-    [progress.attempts, activeChildId],
+        : isAuthenticated ? [] : progress.attempts,
+    [progress.attempts, activeChildId, isAuthenticated],
   );
 
   const filteredSessions = useMemo(
     () =>
       activeChildId
         ? progress.sessions.filter((s) => s.childId === activeChildId)
-        : progress.sessions,
-    [progress.sessions, activeChildId],
+        : isAuthenticated ? [] : progress.sessions,
+    [progress.sessions, activeChildId, isAuthenticated],
   );
 
   // Memoized so consumers receive a stable reference between renders.

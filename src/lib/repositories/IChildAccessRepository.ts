@@ -11,6 +11,7 @@ import type { ChildAccess, GrantChildAccessInput, ChildPermissions } from "@/typ
  * on the same device can read/mutate the same grants array in local/demo mode.
  */
 export interface IChildAccessRepository {
+  rehydrate?(): Promise<void>;
   subscribe(callback: () => void): () => void;
 
   /** Active (non-revoked) grants received by the scoped user. */

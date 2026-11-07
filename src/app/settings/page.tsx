@@ -3,6 +3,8 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import SharedGuardianSettings from "@/components/layout/SharedGuardianSettings";
+import { useChildProfile } from "@/hooks/useChildProfile";
 import AppShell from "@/components/layout/AppShell";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import CloudSyncPreview from "@/components/sync/CloudSyncPreview";
@@ -324,7 +326,7 @@ function PendingReceivedInvites() {
             </p>
             <p className="text-xs text-text-muted">
               {INVITATION_ROLE_LABELS[inv.role]} · {inv.requiresTeacherApproval && inv.requestedAt
-                ? inv.status === "pending" ? "รอครูอนุมัติ" : inv.status === "accepted" ? "อนุมัติแล้ว" : "คำขอปิดแล้ว"
+                ? inv.status === "pending" ? (inv.isAdditionalGuardian ? "รออนุมัติ" : "รอครูอนุมัติ") : inv.status === "accepted" ? "อนุมัติแล้ว" : "คำขอปิดแล้ว"
                 : `หมดอายุ ${new Date(inv.expiresAt).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}`}
             </p>
           </div>
@@ -546,6 +548,11 @@ function DataManagerSection() {
 export default function SettingsPage() {
   const { user } = useAuth();
   const { isOwner, isSharedChild } = useCurrentChildAccess();
+  const { profile } = useChildProfile();
+  const { receivedGrants } = useChildAccess();
+  const isSchoolGuardian = !!profile?.organizationId && receivedGrants.some(
+    (grant) => grant.childId === profile.id && grant.role === "guardian" && !grant.revokedAt,
+  );
 
   // Anonymous (local mode) defaults to parent flow
   const isParentUser = !user || isParent(user);
@@ -656,6 +663,11 @@ export default function SettingsPage() {
                   </div>
                 </section>
               </>
+            ) : isSchoolGuardian && profile ? (
+              <section>
+                <SectionHeader title="ผู้ปกครองร่วม" description="จัดการการเชื่อมของเด็กที่เลือก" />
+                <SharedGuardianSettings key={`${user?.id}:${profile.id}`} child={profile} />
+              </section>
             ) : isSharedChild ? (
               <section>
                 <SectionHeader title="การจัดการสิทธิ์" />

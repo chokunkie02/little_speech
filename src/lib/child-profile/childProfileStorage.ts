@@ -50,6 +50,9 @@ export function setScope(userId: string | null): void {
 
 export interface ChildProfileData {
   id: string;
+  organizationId?: string;
+  nickname?: string;
+  avatarEmoji?: string;
   name: string;
   age: number;
   targetSound: string;

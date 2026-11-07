@@ -143,6 +143,16 @@ export function RepositoryProvider({ children, overrides }: RepositoryProviderPr
     [overrides?.progress, overrides?.profile, overrides?.observations, overrides?.invitations, overrides?.childAccess, overrides?.school],
   );
 
+  useEffect(() => {
+    if (!user?.id || !value.childAccess.rehydrate) return;
+    function refreshAccess() {
+      void value.childAccess.rehydrate?.();
+      value.invitations.rehydrate?.();
+    }
+    window.addEventListener("focus", refreshAccess);
+    return () => window.removeEventListener("focus", refreshAccess);
+  }, [user?.id, value.childAccess, value.invitations]);
+
   // Track the last userId we acted on — prevents duplicate calls and lets us
   // detect the direction of the transition (sign-in, sign-out, account switch).
   const prevUserIdRef = useRef<string | null>(null);

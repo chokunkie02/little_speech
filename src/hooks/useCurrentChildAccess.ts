@@ -22,16 +22,16 @@ export interface CurrentChildAccess extends ChildPermissions {
  * - No child selected: returns FULL_PERMISSIONS with isOwner=false / isSharedChild=false.
  */
 export function useCurrentChildAccess(): CurrentChildAccess {
-  const { profile, isOwner, selectedChildId } = useChildProfile();
+  const { profile, isOwner } = useChildProfile();
   const { receivedGrants } = useChildAccess();
 
   const permissions = useMemo<ChildPermissions>(() => {
     if (isOwner || !profile) return FULL_PERMISSIONS;
     const grant = receivedGrants.find(
-      (g) => g.childId === selectedChildId && !g.revokedAt,
+      (g) => g.childId === profile.id && !g.revokedAt,
     );
     return grant?.permissions ?? FULL_PERMISSIONS;
-  }, [isOwner, profile, receivedGrants, selectedChildId]);
+  }, [isOwner, profile, receivedGrants]);
 
   return {
     isOwner,
