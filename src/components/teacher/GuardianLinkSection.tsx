@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import ShareGuardianInvitation from "@/components/layout/ShareGuardianInvitation";
 import SchoolGuardianMembers from "@/components/layout/SchoolGuardianMembers";
 import { useRepositories } from "@/lib/providers/RepositoryProvider";
@@ -159,7 +160,12 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
               ))}
             </select>
           </label>
-          {linked && <p className="text-sm text-success">เชื่อมผู้ปกครองแล้ว</p>}
+          <div className="flex flex-wrap items-center gap-3">
+            <Link className={secondaryClass} href={`/progress?child=${encodeURIComponent(childId)}`}>
+              ดูความก้าวหน้า
+            </Link>
+            {linked && <p className="text-sm text-success">เชื่อมผู้ปกครองแล้ว</p>}
+          </div>
           <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => {
             event.preventDefault();
             void run(async () => {

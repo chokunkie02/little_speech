@@ -1,7 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { Suspense, useState, useMemo } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
+import SchoolChildProgressView from "@/components/speech-adventure/SchoolChildProgressView";
 import ChildProfileCard from "@/components/speech-adventure/ChildProfileCard";
 import StageProgressCard from "@/components/speech-adventure/StageProgressCard";
 import PermissionBanner from "@/components/ui/PermissionBanner";
@@ -96,7 +101,7 @@ type TabId = (typeof TABS)[number]["id"];
 
 // ─── Page ───────────────────────────────────────────────────────────────────────
 
-export default function ProgressDashboardPage() {
+function ProgressDashboardPage() {
   const { progress: progressRepo, observations: obsRepo } = useRepositories();
   const { progress, attempts, sessions, clearProgressForChild, getStageStatus, getStageAttempts, isHydrated } =
     useSpeechProgress();
@@ -1285,5 +1290,44 @@ export default function ProgressDashboardPage() {
         }}
       />
     </AppShell>
+  );
+}
+
+function ProgressEntry() {
+  const requestedChild = useSearchParams().get("child");
+  const { user, isLoading } = useAuth();
+  const { profile, isOwner } = useChildProfile();
+  const online = isSupabaseProviderRequested() && isSupabaseConfigured();
+  const teacher = user?.role === "teacher";
+  const schoolChildId = ((teacher || !user) && requestedChild)
+    || (!isOwner && profile?.organizationId ? profile.id : null);
+
+  if (online && (isLoading || schoolChildId || (user?.role === "parent" && !profile))) {
+    return (
+      <AppShell>
+        {isLoading ? (
+          <p role="status" className="p-6 text-sm text-text-muted">กำลังโหลด…</p>
+        ) : !user ? (
+          <Link className="inline-block p-6 text-sm font-semibold text-primary"
+            href={`/auth/signin?redirect=${encodeURIComponent(`/progress?child=${encodeURIComponent(requestedChild ?? "")}`)}`}>
+            เข้าสู่ระบบเพื่อดูผลฝึก
+          </Link>
+        ) : schoolChildId ? (
+          <SchoolChildProgressView key={`${user.id}:${schoolChildId}`} childId={schoolChildId} teacher={teacher} />
+        ) : (
+          <p className="p-6 text-sm text-text-muted">เลือกโปรไฟล์เด็กที่เชื่อมอยู่เพื่อดูผลฝึก</p>
+        )}
+      </AppShell>
+    );
+  }
+
+  return <ProgressDashboardPage key={profile?.id} />;
+}
+
+export default function ProgressPage() {
+  return (
+    <Suspense fallback={<p role="status" className="p-6 text-sm text-text-muted">กำลังโหลด…</p>}>
+      <ProgressEntry />
+    </Suspense>
   );
 }

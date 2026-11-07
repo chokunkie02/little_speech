@@ -15,6 +15,7 @@
 import type {
   DbChildProfile,
   DbPracticeSession,
+  SchoolChildProgress,
   DbPracticeAttempt,
   DbObservationNote,
   DbInvitation,
@@ -191,6 +192,10 @@ export interface Database {
           status: DbInvitation["status"];
           accepted_at: string | null;
         }[];
+      };
+      get_school_child_progress: {
+        Args: { p_child_id: string };
+        Returns: SchoolChildProgress | null;
       };
       list_school_guardian_members: {
         Args: { p_child_id: string };

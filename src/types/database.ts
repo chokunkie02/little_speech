@@ -81,6 +81,16 @@ export type DbPracticeAttempt = {
   created_at: string;
 };
 
+export interface SchoolChildProgress {
+  child: { id: string; name: string; nickname: string | null };
+  sessions: Pick<DbPracticeSession,
+    "id" | "started_at" | "target_sound" | "completed_missions" | "total_missions" | "average_score" | "status"
+  >[];
+  attempts: Pick<DbPracticeAttempt,
+    "id" | "created_at" | "target_sound" | "prompt_text" | "score" | "feedback" | "recommendation"
+  >[];
+}
+
 // ── invitations ───────────────────────────────────────────────────────────────
 
 export type DbInvitationRole = "parent" | "teacher" | "therapist" | "school_admin" | "viewer";
