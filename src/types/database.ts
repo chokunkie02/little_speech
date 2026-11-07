@@ -86,9 +86,9 @@ export interface SchoolChildProgress {
   sessions: Pick<DbPracticeSession,
     "id" | "started_at" | "target_sound" | "completed_missions" | "total_missions" | "average_score" | "status"
   >[];
-  attempts: Pick<DbPracticeAttempt,
+  attempts: (Pick<DbPracticeAttempt,
     "id" | "created_at" | "target_sound" | "prompt_text" | "score" | "feedback" | "recommendation"
-  >[];
+  > & { has_audio: boolean })[];
 }
 
 // ── invitations ───────────────────────────────────────────────────────────────

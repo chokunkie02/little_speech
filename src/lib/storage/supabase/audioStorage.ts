@@ -136,6 +136,21 @@ export async function getPracticeAudioUrl(
   return { url: data.signedUrl, error: null };
 }
 
+/** Resolves a school attempt and downloads with the signed-in account. */
+export async function downloadSchoolAttemptAudio(attemptId: string, signal: AbortSignal): Promise<Blob | null> {
+  const client = getSupabaseClient();
+  if (!client) return null;
+
+  const { data: path, error: accessError } = await client.rpc("get_school_attempt_audio", {
+    p_attempt_id: attemptId,
+  }).abortSignal(signal);
+  if (accessError || !path) return null;
+
+  const { data, error } = await client.storage.from(PRACTICE_AUDIO_BUCKET)
+    .download(path, {}, { signal, cache: "no-store" });
+  return error ? null : data;
+}
+
 // ── Delete ────────────────────────────────────────────────────────────────────
 
 /**

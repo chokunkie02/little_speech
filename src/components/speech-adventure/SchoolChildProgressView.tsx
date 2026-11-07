@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import DetailMetricCard from "@/components/details/DetailMetricCard";
+import SchoolAttemptAudio from "@/components/details/SchoolAttemptAudio";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import type { SchoolChildProgress } from "@/types/database";
 
@@ -25,6 +26,7 @@ export default function SchoolChildProgressView({
   const [tab, setTab] = useState<"attempts" | "sessions">("attempts");
   const [visible, setVisible] = useState(pageSize);
   const [revision, setRevision] = useState(0);
+  const [audioAttemptId, setAudioAttemptId] = useState<string | null>(null);
 
   useEffect(() => {
     const client = getSupabaseClient();
@@ -46,10 +48,14 @@ export default function SchoolChildProgressView({
     }
 
     void load();
-    window.addEventListener("focus", load);
+    function recheckAccess() {
+      setAudioAttemptId(null);
+      void load();
+    }
+    window.addEventListener("focus", recheckAccess);
     return () => {
       active = false;
-      window.removeEventListener("focus", load);
+      window.removeEventListener("focus", recheckAccess);
     };
   }, [childId, revision]);
 
@@ -71,7 +77,7 @@ export default function SchoolChildProgressView({
           </p>}
         </div>
         <button type="button" className="rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-primary"
-          onClick={() => { setResult(undefined); setRevision((value) => value + 1); }}>
+          onClick={() => { setAudioAttemptId(null); setResult(undefined); setRevision((value) => value + 1); }}>
           โหลดผลล่าสุด
         </button>
       </header>
@@ -89,12 +95,15 @@ export default function SchoolChildProgressView({
             <DetailMetricCard label="คะแนนเฉลี่ย" value={average} valueColor="var(--color-primary)" />
             <DetailMetricCard label="เซสชันที่จบแล้ว" value={sessions.filter((session) => session.status === "completed").length} />
           </div>
+          {!teacher && <p className="text-xs text-text-muted">
+            ครูประจำห้องสามารถฟังเสียงการฝึกที่บันทึกไว้ของนักเรียนคนนี้ได้
+          </p>}
           <section className="space-y-4 rounded-2xl border border-border bg-surface p-4 sm:p-5">
             <div className="flex gap-2" aria-label="เลือกประวัติการฝึก">
               {(["attempts", "sessions"] as const).map((choice) => (
                 <button key={choice} type="button" aria-pressed={tab === choice}
                   className={`rounded-full px-4 py-1.5 text-sm font-medium ${tab === choice ? "bg-primary text-white" : "text-text-muted hover:bg-bg"}`}
-                  onClick={() => { setTab(choice); setVisible(pageSize); }}>
+                  onClick={() => { setAudioAttemptId(null); setTab(choice); setVisible(pageSize); }}>
                   {choice === "attempts" ? "ประวัติ" : "เซสชัน"}
                 </button>
               ))}
@@ -104,7 +113,11 @@ export default function SchoolChildProgressView({
                 <ul className="space-y-2">
                   {attempts.slice(0, visible).map((attempt) => (
                     <li key={attempt.id} className="rounded-xl border border-border p-3">
-                      <details>
+                      <details onToggle={(event) => {
+                        if (!event.currentTarget.open) {
+                          setAudioAttemptId((current) => current === attempt.id ? null : current);
+                        }
+                      }}>
                         <summary className="cursor-pointer text-sm font-semibold">
                           {attempt.prompt_text} · {attempt.score}%
                           <span className="ml-2 text-xs font-normal text-text-muted">
@@ -114,6 +127,16 @@ export default function SchoolChildProgressView({
                         <div className="mt-2 space-y-1 text-sm text-text-muted">
                           <p>{attempt.feedback || "ไม่มีคำแนะนำสำหรับครั้งนี้"}</p>
                           {attempt.recommendation && <p>{attempt.recommendation}</p>}
+                          {attempt.has_audio && (
+                            <div className="pt-2">
+                              <button type="button" className="text-sm font-semibold text-primary"
+                                aria-expanded={audioAttemptId === attempt.id}
+                                onClick={() => setAudioAttemptId((current) => current === attempt.id ? null : attempt.id)}>
+                                {audioAttemptId === attempt.id ? "ปิดเครื่องเล่นเสียง" : "เปิดเสียงบันทึก"}
+                              </button>
+                              {audioAttemptId === attempt.id && <SchoolAttemptAudio attemptId={attempt.id} />}
+                            </div>
+                          )}
                         </div>
                       </details>
                     </li>

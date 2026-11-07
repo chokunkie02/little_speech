@@ -193,6 +193,10 @@ export interface Database {
           accepted_at: string | null;
         }[];
       };
+      get_school_attempt_audio: {
+        Args: { p_attempt_id: string };
+        Returns: string | null;
+      };
       get_school_child_progress: {
         Args: { p_child_id: string };
         Returns: SchoolChildProgress | null;
