@@ -7,6 +7,7 @@ import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import type { Classroom, UserDisplayInfo, StudentParentLinkInfo, ParentLinkStatus } from "@/types/school";
 import { PARENT_LINK_STATUS_LABELS } from "@/types/school";
+import { useSchoolTeacherInvitations } from "@/hooks/useSchoolTeacherInvitations";
 import { useSchool } from "@/hooks/useSchool";
 import { useChildProfile } from "@/hooks/useChildProfile";
 import { useAuth } from "@/hooks/useAuth";
@@ -82,6 +83,7 @@ function ParentStatusBadge({ status }: { status: ParentLinkStatus }) {
 
 export default function ClassroomManagementPanel({ classroom, onClose }: Props) {
   const {
+    organizations,
     listChildrenForClassroom,
     listTeachersForClassroom,
     assignTeacher,
@@ -107,6 +109,15 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
   const [createInviteBusy, setCreateInviteBusy] = useState<string | null>(null); // childId
   const [guardianRosterId, setGuardianRosterId] = useState<string | null>(null);
   const schoolOnline = isSupabaseProviderRequested() && isSupabaseConfigured();
+  const schoolInvitations = schoolOnline && organizations.some(
+    (organization) => organization.id === classroom.organizationId && organization.type === "school",
+  );
+  const { current: invitations, reload: reloadInvitations } = useSchoolTeacherInvitations(
+    schoolInvitations ? classroom.organizationId : null,
+  );
+  const availableTeachers = invitations?.rows.filter(
+    (invitation) => invitation.status === "accepted" && invitation.teacher_user_id && !invitation.assigned,
+  ) ?? [];
   const [parentLinkError, setParentLinkError] = useState<string | null>(null);
 
   // ── Student name resolution ───────────────────────────────────────────────────
@@ -168,6 +179,7 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
   // ── Teacher email search form ─────────────────────────────────────────────────
   type SearchState = "idle" | "not-found" | UserDisplayInfo;
   const [teacherEmail, setTeacherEmail] = useState("");
+  const [chosenTeacherId, setChosenTeacherId] = useState("");
   const [searchState, setSearchState] = useState<SearchState>("idle");
   const [searchBusy, setSearchBusy] = useState(false);
   const [assignBusy, setAssignBusy] = useState(false);
@@ -191,11 +203,14 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
   }
 
   async function handleConfirmAddTeacher() {
-    if (typeof searchState !== "object") return;
+    const teacherId = schoolInvitations ? chosenTeacherId : typeof searchState === "object" ? searchState.userId : "";
+    if (!teacherId || assignBusy) return;
     setAssignBusy(true);
     setTeacherError("");
     try {
-      await assignTeacher(classroom.id, searchState.userId);
+      await assignTeacher(classroom.id, teacherId);
+      setChosenTeacherId("");
+      if (schoolInvitations) reloadInvitations();
       setTeacherEmail("");
       setSearchState("idle");
     } catch (err) {
@@ -206,7 +221,12 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
   }
 
   async function handleRemoveTeacher(teacherUserId: string) {
-    try { await removeTeacher(classroom.id, teacherUserId); } catch { /* silent */ }
+    try {
+      await removeTeacher(classroom.id, teacherUserId);
+      if (schoolInvitations) reloadInvitations();
+    } catch (err) {
+      setTeacherError(err instanceof Error ? err.message : "นำครูออกจากห้องไม่สำเร็จ");
+    }
   }
 
   // ── Add student form ──────────────────────────────────────────────────────────
@@ -350,6 +370,30 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
               <p className="text-xs text-text-muted italic mb-3">ยังไม่มีครูผู้สอน</p>
             )}
 
+            {schoolInvitations ? (
+              teachers.length === 0 && (
+                <form className="space-y-2" onSubmit={(event) => { event.preventDefault(); void handleConfirmAddTeacher(); }}>
+                  <label className="block text-xs font-semibold">ครูที่ตอบรับและยังไม่มีห้องประจำ
+                    <select className="block w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm"
+                      value={chosenTeacherId} onChange={(event) => setChosenTeacherId(event.target.value)}>
+                      <option value="">เลือกครู</option>
+                      {availableTeachers.map((invitation) => (
+                        <option key={invitation.teacher_user_id} value={invitation.teacher_user_id ?? ""}>{invitation.email}</option>
+                      ))}
+                    </select>
+                  </label>
+                  {invitations?.failed && <p role="alert" className="text-xs text-error">โหลดรายชื่อครูไม่สำเร็จ</p>}
+                  {invitations && !invitations.failed && !availableTeachers.length &&
+                    <p className="text-xs text-text-muted">ยังไม่มีครูพร้อมจัดเข้าห้อง ให้สร้างคำเชิญในหน้าโรงเรียนก่อน</p>}
+                  <div className="flex gap-2">
+                    <button type="submit" disabled={assignBusy || !availableTeachers.some((invite) => invite.teacher_user_id === chosenTeacherId)}
+                      className="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50">จัดครูเข้าห้อง</button>
+                    <button type="button" className="text-xs font-semibold text-primary" onClick={reloadInvitations}>โหลดรายชื่อล่าสุด</button>
+                  </div>
+                </form>
+              )
+            ) : (
+              <>
             {/* Email search */}
             <form onSubmit={handleSearchTeacher} className="flex gap-2">
               <input
@@ -395,6 +439,9 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
               <p className="mt-2 text-xs text-text-muted italic">
                 ไม่พบผู้ใช้นี้ในระบบ กรุณาส่งคำเชิญก่อน
               </p>
+            )}
+
+              </>
             )}
 
             {teacherError && <p className="text-xs text-error mt-1">{teacherError}</p>}

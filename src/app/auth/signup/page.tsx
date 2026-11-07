@@ -62,7 +62,7 @@ function SignUpContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<UserRole>("parent");
+  const [selectedRole, setSelectedRole] = useState<UserRole>(() => redirect?.startsWith("/invite/school-teacher?") ? "teacher" : "parent");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);

@@ -1,3 +1,5 @@
+import type { SchoolTeacherInvitation, SchoolTeacherInvitationStatus } from "@/types/school";
+
 /**
  * Supabase Database type placeholder for Speech Adventure.
  *
@@ -155,6 +157,26 @@ export interface Database {
     };
     Views: { [_ in never]: never };
     Functions: {
+      create_school_teacher_invitation: {
+        Args: { p_organization_id: string; p_email: string };
+        Returns: string;
+      };
+      list_school_teacher_invitations: {
+        Args: { p_organization_id: string };
+        Returns: SchoolTeacherInvitation[];
+      };
+      get_school_teacher_invitation: {
+        Args: { p_token: string };
+        Returns: { school_name: string; status: SchoolTeacherInvitationStatus } | null;
+      };
+      accept_school_teacher_invitation: {
+        Args: { p_token: string };
+        Returns: void;
+      };
+      assign_school_teacher: {
+        Args: { p_classroom_id: string; p_teacher_user_id: string };
+        Returns: DbClassroomTeacher;
+      };
       get_invitation_by_token: {
         Args: { p_token: string };
         Returns: DbInvitation[];

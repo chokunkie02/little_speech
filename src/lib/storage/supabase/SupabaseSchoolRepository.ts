@@ -191,10 +191,7 @@ export class SupabaseSchoolRepository implements ISchoolRepository {
     if (existing) return existing;
 
     const { data, error } = await this.client
-      .from("classroom_teachers")
-      .insert({ classroom_id: classroomId, teacher_user_id: teacherUserId })
-      .select()
-      .single();
+      .rpc("assign_school_teacher", { p_classroom_id: classroomId, p_teacher_user_id: teacherUserId });
 
     if (error || !data) {
       warnRepo("SupabaseSchoolRepository.assignTeacherToClassroom",

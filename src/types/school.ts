@@ -107,3 +107,14 @@ export const ORG_MEMBER_ROLE_LABELS: Record<OrgMemberRole, string> = {
   parent: "ผู้ปกครอง",
   viewer: "ผู้ชม",
 };
+
+
+export type SchoolTeacherInvitationStatus = "pending" | "accepted" | "expired";
+
+export interface SchoolTeacherInvitation {
+  email: string;
+  token: string | null;
+  status: SchoolTeacherInvitationStatus;
+  teacher_user_id: string | null;
+  assigned: boolean;
+}

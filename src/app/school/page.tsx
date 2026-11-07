@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import SchoolTeacherInvitations from "@/components/school/SchoolTeacherInvitations";
+import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
 import AppShell from "@/components/layout/AppShell";
 import ClassroomCard from "@/components/school/ClassroomCard";
 import ClassroomManagementPanel from "@/components/school/ClassroomManagementPanel";
@@ -251,6 +254,9 @@ export default function SchoolAdminPage() {
             )}
 
             {/* Selected org detail */}
+            {selectedOrg?.type === "school" && isSupabaseProviderRequested() && isSupabaseConfigured() && (
+              <SchoolTeacherInvitations key={selectedOrg.id} organizationId={selectedOrg.id} />
+            )}
             {selectedOrg && (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
