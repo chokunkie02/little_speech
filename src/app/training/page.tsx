@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import ChildProfileCard from "@/components/speech-adventure/ChildProfileCard";
 import TargetSoundSelector from "@/components/speech-adventure/TargetSoundSelector";
 import TrainingMap from "@/components/speech-adventure/TrainingMap";
+import { LearningEntryCard } from "@/features/learning-studio/LearningEntryCard";
 import TrainingModeTabs from "@/components/speech-adventure/TrainingModeTabs";
 import AppShell from "@/components/layout/AppShell";
 import { useSpeechProgress } from "@/hooks/useSpeechProgress";
@@ -155,6 +156,8 @@ export default function TrainingMapPage() {
             )}
           </div>
         </header>
+
+        <LearningEntryCard />
 
         {/* ── 2-Column Layout ── */}
         <div className="lg:grid lg:grid-cols-[1fr_320px] lg:gap-6 lg:items-start space-y-6 lg:space-y-0">

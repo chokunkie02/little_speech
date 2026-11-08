@@ -1,0 +1,2950 @@
+{
+  "version": 3,
+  "voice": "th-TH-PremwadeeNeural",
+  "rate": "-4%",
+  "pitch": "+0Hz",
+  "entries": [
+    {
+      "text": "ปู",
+      "kind": "sample",
+      "id": "259418f8430228",
+      "duration": 0.84,
+      "path": "/learning-studio/audio/v3-259418f8430228.mp3",
+      "bytes": 8684,
+      "spokenText": "ปู",
+      "phrases": [
+        {
+          "text": "ปู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฟังแล้วแตะภาพที่ได้ยิน",
+      "kind": "instruction",
+      "id": "e7c7015d3428ef",
+      "duration": 4.128,
+      "path": "/learning-studio/audio/v3-e7c7015d3428ef.mp3",
+      "bytes": 41564,
+      "spokenText": "ลองฟังดูก่อนนะจ๊ะ แล้วแตะภาพ ที่ตรงกับเสียงได้เลย",
+      "phrases": [
+        {
+          "text": "ลองฟังดูก่อนนะจ๊ะ",
+          "pauseAfterMs": 400
+        },
+        {
+          "text": "แล้วแตะภาพ ที่ตรงกับเสียงได้เลย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "งู",
+      "kind": "sample",
+      "id": "e4fa65bb82c843",
+      "duration": 0.84,
+      "path": "/learning-studio/audio/v3-e4fa65bb82c843.mp3",
+      "bytes": 8684,
+      "spokenText": "งู",
+      "phrases": [
+        {
+          "text": "งู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปา",
+      "kind": "sample",
+      "id": "85521cf2f4cb39",
+      "duration": 0.864,
+      "path": "/learning-studio/audio/v3-85521cf2f4cb39.mp3",
+      "bytes": 8924,
+      "spokenText": "ปา",
+      "phrases": [
+        {
+          "text": "ปา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มาดูปากทีละจังหวะ แล้วค่อยลองพูดไปด้วยกันนะ",
+      "kind": "instruction",
+      "id": "0b5ca992fc9509",
+      "duration": 3.528,
+      "path": "/learning-studio/audio/v3-0b5ca992fc9509.mp3",
+      "bytes": 35564,
+      "spokenText": "มาดูปากทีละจังหวะ แล้วค่อยลองพูดไปด้วยกันนะ",
+      "phrases": [
+        {
+          "text": "มาดูปากทีละจังหวะ",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วค่อยลองพูดไปด้วยกันนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปี",
+      "kind": "sample",
+      "id": "1545840360a61c",
+      "duration": 0.936,
+      "path": "/learning-studio/audio/v3-1545840360a61c.mp3",
+      "bytes": 9644,
+      "spokenText": "ปี",
+      "phrases": [
+        {
+          "text": "ปี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฟังพยางค์แล้วลองพูดตาม",
+      "kind": "instruction",
+      "id": "9e7c91d2f2146d",
+      "duration": 4.512,
+      "path": "/learning-studio/audio/v3-9e7c91d2f2146d.mp3",
+      "bytes": 45404,
+      "spokenText": "ฟังเสียงสั้น ๆ กันก่อนนะ แล้วลองพูดตามได้เลย พี่รอฟังจ้ะ",
+      "phrases": [
+        {
+          "text": "ฟังเสียงสั้น ๆ กันก่อนนะ",
+          "pauseAfterMs": 400
+        },
+        {
+          "text": "แล้วลองพูดตามได้เลย พี่รอฟังจ้ะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ดูภาพแล้วลองบอกชื่อให้เพื่อนฟัง",
+      "kind": "instruction",
+      "id": "6ff15a9b363aee",
+      "duration": 4.32,
+      "path": "/learning-studio/audio/v3-6ff15a9b363aee.mp3",
+      "bytes": 43484,
+      "spokenText": "ดูภาพนี้ด้วยกันนะ นึกออกแล้ว ลองบอกชื่อให้พี่ฟังได้เลย",
+      "phrases": [
+        {
+          "text": "ดูภาพนี้ด้วยกันนะ",
+          "pauseAfterMs": 400
+        },
+        {
+          "text": "นึกออกแล้ว ลองบอกชื่อให้พี่ฟังได้เลย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปาก",
+      "kind": "sample",
+      "id": "265d9ef5fc21f8",
+      "duration": 0.72,
+      "path": "/learning-studio/audio/v3-265d9ef5fc21f8.mp3",
+      "bytes": 7484,
+      "spokenText": "ปาก",
+      "phrases": [
+        {
+          "text": "ปาก",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ป้า",
+      "kind": "sample",
+      "id": "b30d3fe699379a",
+      "duration": 0.96,
+      "path": "/learning-studio/audio/v3-b30d3fe699379a.mp3",
+      "bytes": 9884,
+      "spokenText": "ป้า",
+      "phrases": [
+        {
+          "text": "ป้า",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปูตัวเล็ก",
+      "kind": "sample",
+      "id": "9eb803b8706788",
+      "duration": 1.008,
+      "path": "/learning-studio/audio/v3-9eb803b8706788.mp3",
+      "bytes": 10364,
+      "spokenText": "ปูตัวเล็ก",
+      "phrases": [
+        {
+          "text": "ปูตัวเล็ก",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฟังตัวอย่างแล้วลองพูดข้อความที่ยาวขึ้น",
+      "kind": "instruction",
+      "id": "7b7954c6e11421",
+      "duration": 4.152,
+      "path": "/learning-studio/audio/v3-7b7954c6e11421.mp3",
+      "bytes": 41804,
+      "spokenText": "ฟังพี่พูดก่อนนะ แล้วเราค่อยลองพูดตาม ทีละนิดก็ได้จ้ะ",
+      "phrases": [
+        {
+          "text": "ฟังพี่พูดก่อนนะ",
+          "pauseAfterMs": 400
+        },
+        {
+          "text": "แล้วเราค่อยลองพูดตาม ทีละนิดก็ได้จ้ะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปูเดินบนทราย",
+      "kind": "sample",
+      "id": "e78a6e1f729ee3",
+      "duration": 1.416,
+      "path": "/learning-studio/audio/v3-e78a6e1f729ee3.mp3",
+      "bytes": 14444,
+      "spokenText": "ปูเดินบนทราย",
+      "phrases": [
+        {
+          "text": "ปูเดินบนทราย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปูอยู่ในกล่อง",
+      "kind": "sample",
+      "id": "eaa3cd66ff2db3",
+      "duration": 1.296,
+      "path": "/learning-studio/audio/v3-eaa3cd66ff2db3.mp3",
+      "bytes": 13244,
+      "spokenText": "ปูอยู่ในกล่อง",
+      "phrases": [
+        {
+          "text": "ปูอยู่ในกล่อง",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ดูภาพแล้วลองบอกว่าเกิดอะไรขึ้น",
+      "kind": "instruction",
+      "id": "bd44778c37f62f",
+      "duration": 4.2,
+      "path": "/learning-studio/audio/v3-bd44778c37f62f.mp3",
+      "bytes": 42284,
+      "spokenText": "ลองดูภาพนี้นะ เห็นอะไรเกิดขึ้น เล่าให้พี่ฟังได้เลยจ้ะ",
+      "phrases": [
+        {
+          "text": "ลองดูภาพนี้นะ",
+          "pauseAfterMs": 400
+        },
+        {
+          "text": "เห็นอะไรเกิดขึ้น เล่าให้พี่ฟังได้เลยจ้ะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ซ่อนรูปสัตว์ แล้วบอกให้ผู้ใหญ่หาตามคำใบ้",
+      "kind": "instruction",
+      "id": "92e5281d3123ff",
+      "duration": 3.576,
+      "path": "/learning-studio/audio/v3-92e5281d3123ff.mp3",
+      "bytes": 36044,
+      "spokenText": "ซ่อนรูปสัตว์ แล้วบอกให้ผู้ใหญ่หาตามคำใบ้",
+      "phrases": [
+        {
+          "text": "ซ่อนรูปสัตว์",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วบอกให้ผู้ใหญ่หาตามคำใบ้",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ชวนคุยว่าเห็นอะไรในภาพ และกำลังทำอะไร",
+      "kind": "instruction",
+      "id": "6ec42b92237f34",
+      "duration": 3.0,
+      "path": "/learning-studio/audio/v3-6ec42b92237f34.mp3",
+      "bytes": 30284,
+      "spokenText": "ชวนคุยว่าเห็นอะไรในภาพ และกำลังทำอะไร",
+      "phrases": [
+        {
+          "text": "ชวนคุยว่าเห็นอะไรในภาพ และกำลังทำอะไร",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "วันนี้หนูชอบอะไร",
+      "kind": "sample",
+      "id": "78032ddea877e1",
+      "duration": 1.728,
+      "path": "/learning-studio/audio/v3-78032ddea877e1.mp3",
+      "bytes": 17564,
+      "spokenText": "วันนี้หนูชอบอะไร",
+      "phrases": [
+        {
+          "text": "วันนี้หนูชอบอะไร",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "พักจากหน้าจอ แล้วชวนคุยเรื่องที่เด็กสนใจ",
+      "kind": "instruction",
+      "id": "895959714a72f8",
+      "duration": 3.792,
+      "path": "/learning-studio/audio/v3-895959714a72f8.mp3",
+      "bytes": 38204,
+      "spokenText": "พักจากหน้าจอ แล้วชวนคุยเรื่องที่เด็กสนใจ",
+      "phrases": [
+        {
+          "text": "พักจากหน้าจอ",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วชวนคุยเรื่องที่เด็กสนใจ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กา",
+      "kind": "sample",
+      "id": "dc3e3eb8843e34",
+      "duration": 0.888,
+      "path": "/learning-studio/audio/v3-dc3e3eb8843e34.mp3",
+      "bytes": 9164,
+      "spokenText": "กา",
+      "phrases": [
+        {
+          "text": "กา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ตา",
+      "kind": "sample",
+      "id": "f03eb06044b81f",
+      "duration": 0.864,
+      "path": "/learning-studio/audio/v3-f03eb06044b81f.mp3",
+      "bytes": 8924,
+      "spokenText": "ตา",
+      "phrases": [
+        {
+          "text": "ตา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กี",
+      "kind": "sample",
+      "id": "831ccac59c9d4e",
+      "duration": 0.816,
+      "path": "/learning-studio/audio/v3-831ccac59c9d4e.mp3",
+      "bytes": 8444,
+      "spokenText": "กี",
+      "phrases": [
+        {
+          "text": "กี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กู",
+      "kind": "sample",
+      "id": "6f5cd4bf83f5bf",
+      "duration": 0.84,
+      "path": "/learning-studio/audio/v3-6f5cd4bf83f5bf.mp3",
+      "bytes": 8684,
+      "spokenText": "กู",
+      "phrases": [
+        {
+          "text": "กู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไก่",
+      "kind": "sample",
+      "id": "29230e88304410",
+      "duration": 0.912,
+      "path": "/learning-studio/audio/v3-29230e88304410.mp3",
+      "bytes": 9404,
+      "spokenText": "ไก่",
+      "phrases": [
+        {
+          "text": "ไก่",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กุ้ง",
+      "kind": "sample",
+      "id": "e22d0c2603b2a5",
+      "duration": 0.792,
+      "path": "/learning-studio/audio/v3-e22d0c2603b2a5.mp3",
+      "bytes": 8204,
+      "spokenText": "กุ้ง",
+      "phrases": [
+        {
+          "text": "กุ้ง",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไก่ตัวโต",
+      "kind": "sample",
+      "id": "346b5b97f1aeaa",
+      "duration": 1.416,
+      "path": "/learning-studio/audio/v3-346b5b97f1aeaa.mp3",
+      "bytes": 14444,
+      "spokenText": "ไก่ตัวโต",
+      "phrases": [
+        {
+          "text": "ไก่ตัวโต",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไก่กินข้าว",
+      "kind": "sample",
+      "id": "9bda375ac611cb",
+      "duration": 1.392,
+      "path": "/learning-studio/audio/v3-9bda375ac611cb.mp3",
+      "bytes": 14204,
+      "spokenText": "ไก่กินข้าว",
+      "phrases": [
+        {
+          "text": "ไก่กินข้าว",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กาอยู่บนต้นไม้",
+      "kind": "sample",
+      "id": "399f3fca18c325",
+      "duration": 1.512,
+      "path": "/learning-studio/audio/v3-399f3fca18c325.mp3",
+      "bytes": 15404,
+      "spokenText": "กาอยู่บนต้นไม้",
+      "phrases": [
+        {
+          "text": "กาอยู่บนต้นไม้",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กาอยู่ในกล่อง",
+      "kind": "sample",
+      "id": "a51e4a0a8849e5",
+      "duration": 1.416,
+      "path": "/learning-studio/audio/v3-a51e4a0a8849e5.mp3",
+      "bytes": 14444,
+      "spokenText": "กาอยู่ในกล่อง",
+      "phrases": [
+        {
+          "text": "กาอยู่ในกล่อง",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มือ",
+      "kind": "sample",
+      "id": "c95e274a010b84",
+      "duration": 0.816,
+      "path": "/learning-studio/audio/v3-c95e274a010b84.mp3",
+      "bytes": 8444,
+      "spokenText": "มือ",
+      "phrases": [
+        {
+          "text": "มือ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ม้า",
+      "kind": "sample",
+      "id": "300573bf77288f",
+      "duration": 0.888,
+      "path": "/learning-studio/audio/v3-300573bf77288f.mp3",
+      "bytes": 9164,
+      "spokenText": "ม้า",
+      "phrases": [
+        {
+          "text": "ม้า",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลองฟังอีกครั้งแล้วเลือกภาพ",
+      "kind": "instruction",
+      "id": "32ee3db857791c",
+      "duration": 3.672,
+      "path": "/learning-studio/audio/v3-32ee3db857791c.mp3",
+      "bytes": 37004,
+      "spokenText": "ฟังกันอีกครั้งนะ ได้ยินแล้ว ลองเลือกภาพดูจ้ะ",
+      "phrases": [
+        {
+          "text": "ฟังกันอีกครั้งนะ",
+          "pauseAfterMs": 400
+        },
+        {
+          "text": "ได้ยินแล้ว ลองเลือกภาพดูจ้ะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มา",
+      "kind": "sample",
+      "id": "648cd43a05845d",
+      "duration": 0.888,
+      "path": "/learning-studio/audio/v3-648cd43a05845d.mp3",
+      "bytes": 9164,
+      "spokenText": "มา",
+      "phrases": [
+        {
+          "text": "มา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มี",
+      "kind": "sample",
+      "id": "5e79e325bad461",
+      "duration": 0.864,
+      "path": "/learning-studio/audio/v3-5e79e325bad461.mp3",
+      "bytes": 8924,
+      "spokenText": "มี",
+      "phrases": [
+        {
+          "text": "มี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มู",
+      "kind": "sample",
+      "id": "b8191d67a41b32",
+      "duration": 0.864,
+      "path": "/learning-studio/audio/v3-b8191d67a41b32.mp3",
+      "bytes": 8924,
+      "spokenText": "มู",
+      "phrases": [
+        {
+          "text": "มู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "แมว",
+      "kind": "sample",
+      "id": "1d7ced57ce8c57",
+      "duration": 0.888,
+      "path": "/learning-studio/audio/v3-1d7ced57ce8c57.mp3",
+      "bytes": 9164,
+      "spokenText": "แมว",
+      "phrases": [
+        {
+          "text": "แมว",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "แมวตัวเล็ก",
+      "kind": "sample",
+      "id": "18b7da7e34c05c",
+      "duration": 1.104,
+      "path": "/learning-studio/audio/v3-18b7da7e34c05c.mp3",
+      "bytes": 11324,
+      "spokenText": "แมวตัวเล็ก",
+      "phrases": [
+        {
+          "text": "แมวตัวเล็ก",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "แมวกินปลา",
+      "kind": "sample",
+      "id": "669f2bb6571b03",
+      "duration": 1.344,
+      "path": "/learning-studio/audio/v3-669f2bb6571b03.mp3",
+      "bytes": 13724,
+      "spokenText": "แมวกินปลา",
+      "phrases": [
+        {
+          "text": "แมวกินปลา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ม้าอยู่ในสวน",
+      "kind": "sample",
+      "id": "cb419bd6e8244c",
+      "duration": 1.44,
+      "path": "/learning-studio/audio/v3-cb419bd6e8244c.mp3",
+      "bytes": 14684,
+      "spokenText": "ม้าอยู่ในสวน",
+      "phrases": [
+        {
+          "text": "ม้าอยู่ในสวน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ม้าอยู่ในกล่อง",
+      "kind": "sample",
+      "id": "e164ce74a9388b",
+      "duration": 1.344,
+      "path": "/learning-studio/audio/v3-e164ce74a9388b.mp3",
+      "bytes": 13724,
+      "spokenText": "ม้าอยู่ในกล่อง",
+      "phrases": [
+        {
+          "text": "ม้าอยู่ในกล่อง",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "แก้วน้ำ",
+      "kind": "sample",
+      "id": "ed18905aab35ad",
+      "duration": 1.128,
+      "path": "/learning-studio/audio/v3-ed18905aab35ad.mp3",
+      "bytes": 11564,
+      "spokenText": "แก้วน้ำ",
+      "phrases": [
+        {
+          "text": "แก้วน้ำ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฟังให้จบ แล้วเลือกภาพที่พี่พูดถึงนะ",
+      "kind": "instruction",
+      "id": "34e0358309be5c",
+      "duration": 3.096,
+      "path": "/learning-studio/audio/v3-34e0358309be5c.mp3",
+      "bytes": 31244,
+      "spokenText": "ฟังให้จบ แล้วเลือกภาพที่พี่พูดถึงนะ",
+      "phrases": [
+        {
+          "text": "ฟังให้จบ",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วเลือกภาพที่พี่พูดถึงนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลูกบอล",
+      "kind": "sample",
+      "id": "1f7d4f9bd72380",
+      "duration": 1.104,
+      "path": "/learning-studio/audio/v3-1f7d4f9bd72380.mp3",
+      "bytes": 11324,
+      "spokenText": "ลูกบอล",
+      "phrases": [
+        {
+          "text": "ลูกบอล",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "หนูขอน้ำ",
+      "kind": "sample",
+      "id": "f81c42862b46b6",
+      "duration": 1.296,
+      "path": "/learning-studio/audio/v3-f81c42862b46b6.mp3",
+      "bytes": 13244,
+      "spokenText": "หนูขอน้ำ",
+      "phrases": [
+        {
+          "text": "หนูขอน้ำ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ดูภาพ ลองบอกว่าหนูต้องการอะไร",
+      "kind": "instruction",
+      "id": "61768f4d4b1a11",
+      "duration": 2.52,
+      "path": "/learning-studio/audio/v3-61768f4d4b1a11.mp3",
+      "bytes": 25484,
+      "spokenText": "ดูภาพ ลองบอกว่าหนูต้องการอะไร",
+      "phrases": [
+        {
+          "text": "ดูภาพ ลองบอกว่าหนูต้องการอะไร",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ขอเล่นบอลด้วย",
+      "kind": "sample",
+      "id": "e5ba4f0907ab2e",
+      "duration": 1.44,
+      "path": "/learning-studio/audio/v3-e5ba4f0907ab2e.mp3",
+      "bytes": 14684,
+      "spokenText": "ขอเล่นบอลด้วย",
+      "phrases": [
+        {
+          "text": "ขอเล่นบอลด้วย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลองชวนเพื่อนเล่นบอล",
+      "kind": "instruction",
+      "id": "ea8cb51951bc90",
+      "duration": 1.68,
+      "path": "/learning-studio/audio/v3-ea8cb51951bc90.mp3",
+      "bytes": 17084,
+      "spokenText": "ลองชวนเพื่อนเล่นบอล",
+      "phrases": [
+        {
+          "text": "ลองชวนเพื่อนเล่นบอล",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ช่วยเปิดกล่องให้หน่อย",
+      "kind": "sample",
+      "id": "b05ea34f7b9224",
+      "duration": 1.584,
+      "path": "/learning-studio/audio/v3-b05ea34f7b9224.mp3",
+      "bytes": 16124,
+      "spokenText": "ช่วยเปิดกล่องให้หน่อย",
+      "phrases": [
+        {
+          "text": "ช่วยเปิดกล่องให้หน่อย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เล่นเปิดกล่องกับผู้ใหญ่ แล้วลองขอให้ช่วย",
+      "kind": "instruction",
+      "id": "4b88774d2e587f",
+      "duration": 3.432,
+      "path": "/learning-studio/audio/v3-4b88774d2e587f.mp3",
+      "bytes": 34604,
+      "spokenText": "เล่นเปิดกล่องกับผู้ใหญ่ แล้วลองขอให้ช่วย",
+      "phrases": [
+        {
+          "text": "เล่นเปิดกล่องกับผู้ใหญ่",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วลองขอให้ช่วย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ดูภาพแล้วเล่าให้ฟังว่าเกิดอะไรขึ้น",
+      "kind": "instruction",
+      "id": "9a3d208051d336",
+      "duration": 2.616,
+      "path": "/learning-studio/audio/v3-9a3d208051d336.mp3",
+      "bytes": 26444,
+      "spokenText": "ดูภาพแล้วเล่าให้ฟังว่าเกิดอะไรขึ้น",
+      "phrases": [
+        {
+          "text": "ดูภาพแล้วเล่าให้ฟังว่าเกิดอะไรขึ้น",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไก่กำลังกินข้าว",
+      "kind": "sample",
+      "id": "4c8e2b37c4c21f",
+      "duration": 1.68,
+      "path": "/learning-studio/audio/v3-4c8e2b37c4c21f.mp3",
+      "bytes": 17084,
+      "spokenText": "ไก่กำลังกินข้าว",
+      "phrases": [
+        {
+          "text": "ไก่กำลังกินข้าว",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไก่กำลังทำอะไร แล้วจะทำอะไรต่อ",
+      "kind": "instruction",
+      "id": "7ea25ca9595f52",
+      "duration": 3.408,
+      "path": "/learning-studio/audio/v3-7ea25ca9595f52.mp3",
+      "bytes": 34364,
+      "spokenText": "ไก่กำลังทำอะไร แล้วจะทำอะไรต่อ",
+      "phrases": [
+        {
+          "text": "ไก่กำลังทำอะไร",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วจะทำอะไรต่อ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "วันนี้หนูเล่นอะไร",
+      "kind": "sample",
+      "id": "732e818fb4763e",
+      "duration": 1.704,
+      "path": "/learning-studio/audio/v3-732e818fb4763e.mp3",
+      "bytes": 17324,
+      "spokenText": "วันนี้หนูเล่นอะไร",
+      "phrases": [
+        {
+          "text": "วันนี้หนูเล่นอะไร",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ชวนผู้ใหญ่คุยเรื่องที่เล่นวันนี้ แล้วฟังคำตอบของกันและกัน",
+      "kind": "instruction",
+      "id": "6029d4cbc6ff24",
+      "duration": 4.488,
+      "path": "/learning-studio/audio/v3-6029d4cbc6ff24.mp3",
+      "bytes": 45164,
+      "spokenText": "ชวนผู้ใหญ่คุยเรื่องที่เล่นวันนี้ แล้วฟังคำตอบของกันและกัน",
+      "phrases": [
+        {
+          "text": "ชวนผู้ใหญ่คุยเรื่องที่เล่นวันนี้",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วฟังคำตอบของกันและกัน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปอ",
+      "kind": "sample",
+      "id": "677b47480c1b17",
+      "duration": 0.84,
+      "path": "/learning-studio/audio/v3-677b47480c1b17.mp3",
+      "bytes": 8684,
+      "spokenText": "ปอ",
+      "phrases": [
+        {
+          "text": "ปอ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฟังเสียง แล้วแตะตัวอักษรที่ได้ยิน",
+      "kind": "instruction",
+      "id": "6b0fc964ea3cad",
+      "duration": 3.336,
+      "path": "/learning-studio/audio/v3-6b0fc964ea3cad.mp3",
+      "bytes": 33644,
+      "spokenText": "ฟังเสียง แล้วแตะตัวอักษรที่ได้ยิน",
+      "phrases": [
+        {
+          "text": "ฟังเสียง",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วแตะตัวอักษรที่ได้ยิน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กอ",
+      "kind": "sample",
+      "id": "14304d8654861d",
+      "duration": 0.816,
+      "path": "/learning-studio/audio/v3-14304d8654861d.mp3",
+      "bytes": 8444,
+      "spokenText": "กอ",
+      "phrases": [
+        {
+          "text": "กอ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มอ",
+      "kind": "sample",
+      "id": "2b20caabcece4c",
+      "duration": 0.84,
+      "path": "/learning-studio/audio/v3-2b20caabcece4c.mp3",
+      "bytes": 8684,
+      "spokenText": "มอ",
+      "phrases": [
+        {
+          "text": "มอ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฟังตัวอย่าง แล้วลองพูดพยางค์ที่ผสมได้",
+      "kind": "instruction",
+      "id": "807c914ced630e",
+      "duration": 3.648,
+      "path": "/learning-studio/audio/v3-807c914ced630e.mp3",
+      "bytes": 36764,
+      "spokenText": "ฟังตัวอย่าง แล้วลองพูดพยางค์ที่ผสมได้",
+      "phrases": [
+        {
+          "text": "ฟังตัวอย่าง",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วลองพูดพยางค์ที่ผสมได้",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลองอ่านคำนี้ หรือฟังตัวอย่างแล้วพูดตาม",
+      "kind": "instruction",
+      "id": "13711283ed8056",
+      "duration": 2.784,
+      "path": "/learning-studio/audio/v3-13711283ed8056.mp3",
+      "bytes": 28124,
+      "spokenText": "ลองอ่านคำนี้ หรือฟังตัวอย่างแล้วพูดตาม",
+      "phrases": [
+        {
+          "text": "ลองอ่านคำนี้ หรือฟังตัวอย่างแล้วพูดตาม",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ค่อย ๆ อ่านข้อความสั้น ๆ",
+      "kind": "instruction",
+      "id": "43c378dcb0357b",
+      "duration": 1.992,
+      "path": "/learning-studio/audio/v3-43c378dcb0357b.mp3",
+      "bytes": 20204,
+      "spokenText": "ค่อย ๆ อ่านข้อความสั้น ๆ",
+      "phrases": [
+        {
+          "text": "ค่อย ๆ อ่านข้อความสั้น ๆ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลองอ่านประโยคนี้ให้ผู้ใหญ่ฟัง",
+      "kind": "instruction",
+      "id": "1cee20740eed66",
+      "duration": 2.28,
+      "path": "/learning-studio/audio/v3-1cee20740eed66.mp3",
+      "bytes": 23084,
+      "spokenText": "ลองอ่านประโยคนี้ให้ผู้ใหญ่ฟัง",
+      "phrases": [
+        {
+          "text": "ลองอ่านประโยคนี้ให้ผู้ใหญ่ฟัง",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปากกา",
+      "kind": "sample",
+      "id": "70d0d4b6c6070a",
+      "duration": 1.272,
+      "path": "/learning-studio/audio/v3-70d0d4b6c6070a.mp3",
+      "bytes": 13004,
+      "spokenText": "ปากกา",
+      "phrases": [
+        {
+          "text": "ปากกา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ตั้งใจฟังสักนิด แล้วเลือกภาพที่ตรงกับเสียงนะ",
+      "kind": "instruction",
+      "id": "05d961b1b12961",
+      "duration": 3.576,
+      "path": "/learning-studio/audio/v3-05d961b1b12961.mp3",
+      "bytes": 36044,
+      "spokenText": "ตั้งใจฟังสักนิด แล้วเลือกภาพที่ตรงกับเสียงนะ",
+      "phrases": [
+        {
+          "text": "ตั้งใจฟังสักนิด",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วเลือกภาพที่ตรงกับเสียงนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กระเป๋า",
+      "kind": "sample",
+      "id": "005144477a48fc",
+      "duration": 1.056,
+      "path": "/learning-studio/audio/v3-005144477a48fc.mp3",
+      "bytes": 10844,
+      "spokenText": "กระเป๋า",
+      "phrases": [
+        {
+          "text": "กระเป๋า",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปูทะเล",
+      "kind": "sample",
+      "id": "01435eec018fc1",
+      "duration": 1.152,
+      "path": "/learning-studio/audio/v3-01435eec018fc1.mp3",
+      "bytes": 11804,
+      "spokenText": "ปูทะเล",
+      "phrases": [
+        {
+          "text": "ปูทะเล",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปา ปู",
+      "kind": "sample",
+      "id": "ca4c8d333c2d2c",
+      "duration": 1.776,
+      "path": "/learning-studio/audio/v3-ca4c8d333c2d2c.mp3",
+      "bytes": 18044,
+      "spokenText": "ปา ปู",
+      "phrases": [
+        {
+          "text": "ปา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฟังทีละชุด แล้วลองพูดตามลำดับเสียงนะ ไม่ต้องรีบ",
+      "kind": "instruction",
+      "id": "2563508f762e4a",
+      "duration": 4.608,
+      "path": "/learning-studio/audio/v3-2563508f762e4a.mp3",
+      "bytes": 46364,
+      "spokenText": "ฟังทีละชุด แล้วลองพูดตามลำดับเสียงนะ ไม่ต้องรีบ",
+      "phrases": [
+        {
+          "text": "ฟังทีละชุด",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วลองพูดตามลำดับเสียงนะ",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "ไม่ต้องรีบ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปี ปา",
+      "kind": "sample",
+      "id": "ca81929dc46553",
+      "duration": 1.872,
+      "path": "/learning-studio/audio/v3-ca81929dc46553.mp3",
+      "bytes": 19004,
+      "spokenText": "ปี ปา",
+      "phrases": [
+        {
+          "text": "ปี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปู ปี",
+      "kind": "sample",
+      "id": "f67d2aed3e9265",
+      "duration": 1.848,
+      "path": "/learning-studio/audio/v3-f67d2aed3e9265.mp3",
+      "bytes": 18764,
+      "spokenText": "ปู ปี",
+      "phrases": [
+        {
+          "text": "ปู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ดูภาพให้ดี แล้วลองบอกชื่อด้วยตัวเองนะ",
+      "kind": "instruction",
+      "id": "7c77de9b4b469f",
+      "duration": 3.528,
+      "path": "/learning-studio/audio/v3-7c77de9b4b469f.mp3",
+      "bytes": 35564,
+      "spokenText": "ดูภาพให้ดี แล้วลองบอกชื่อด้วยตัวเองนะ",
+      "phrases": [
+        {
+          "text": "ดูภาพให้ดี",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วลองบอกชื่อด้วยตัวเองนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปูตัวเล็กเดินบนทราย",
+      "kind": "sample",
+      "id": "f33a1370ee6edb",
+      "duration": 1.92,
+      "path": "/learning-studio/audio/v3-f33a1370ee6edb.mp3",
+      "bytes": 19484,
+      "spokenText": "ปูตัวเล็กเดินบนทราย",
+      "phrases": [
+        {
+          "text": "ปูตัวเล็กเดินบนทราย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลองฟัง แล้วพูดข้อความที่ยาวขึ้นทีละช่วงนะ",
+      "kind": "instruction",
+      "id": "5107e549c57dd3",
+      "duration": 3.696,
+      "path": "/learning-studio/audio/v3-5107e549c57dd3.mp3",
+      "bytes": 37244,
+      "spokenText": "ลองฟัง แล้วพูดข้อความที่ยาวขึ้นทีละช่วงนะ",
+      "phrases": [
+        {
+          "text": "ลองฟัง",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วพูดข้อความที่ยาวขึ้นทีละช่วงนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปูอยู่ในกล่องใบใหญ่",
+      "kind": "sample",
+      "id": "26739d5602142a",
+      "duration": 1.584,
+      "path": "/learning-studio/audio/v3-26739d5602142a.mp3",
+      "bytes": 16124,
+      "spokenText": "ปูอยู่ในกล่องใบใหญ่",
+      "phrases": [
+        {
+          "text": "ปูอยู่ในกล่องใบใหญ่",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไก่กำลังกินข้าวเปล่า",
+      "kind": "sample",
+      "id": "dff1da78a13bac",
+      "duration": 1.8,
+      "path": "/learning-studio/audio/v3-dff1da78a13bac.mp3",
+      "bytes": 18284,
+      "spokenText": "ไก่กำลังกินข้าวเปล่า",
+      "phrases": [
+        {
+          "text": "ไก่กำลังกินข้าวเปล่า",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลองเล่าภาพด้วยคำของเราเอง ให้คนฟังนึกภาพตามได้นะ",
+      "kind": "instruction",
+      "id": "0270279537ca33",
+      "duration": 3.552,
+      "path": "/learning-studio/audio/v3-0270279537ca33.mp3",
+      "bytes": 35804,
+      "spokenText": "ลองเล่าภาพด้วยคำของเราเอง ให้คนฟังนึกภาพตามได้นะ",
+      "phrases": [
+        {
+          "text": "ลองเล่าภาพด้วยคำของเราเอง ให้คนฟังนึกภาพตามได้นะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เล่าภาพให้ผู้ใหญ่ฟัง แล้วผลัดกันถามตอบนะ",
+      "kind": "instruction",
+      "id": "db9247d1ed658b",
+      "duration": 3.6,
+      "path": "/learning-studio/audio/v3-db9247d1ed658b.mp3",
+      "bytes": 36284,
+      "spokenText": "เล่าภาพให้ผู้ใหญ่ฟัง แล้วผลัดกันถามตอบนะ",
+      "phrases": [
+        {
+          "text": "เล่าภาพให้ผู้ใหญ่ฟัง",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วผลัดกันถามตอบนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กล้วย",
+      "kind": "sample",
+      "id": "59a1edc07c800c",
+      "duration": 0.84,
+      "path": "/learning-studio/audio/v3-59a1edc07c800c.mp3",
+      "bytes": 8684,
+      "spokenText": "กล้วย",
+      "phrases": [
+        {
+          "text": "กล้วย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "นาฬิกา",
+      "kind": "sample",
+      "id": "51d51094ebdc8f",
+      "duration": 1.248,
+      "path": "/learning-studio/audio/v3-51d51094ebdc8f.mp3",
+      "bytes": 12764,
+      "spokenText": "นาฬิกา",
+      "phrases": [
+        {
+          "text": "นาฬิกา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กา กู",
+      "kind": "sample",
+      "id": "48b06ddb1ad6aa",
+      "duration": 1.776,
+      "path": "/learning-studio/audio/v3-48b06ddb1ad6aa.mp3",
+      "bytes": 18044,
+      "spokenText": "กา กู",
+      "phrases": [
+        {
+          "text": "กา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กี กา",
+      "kind": "sample",
+      "id": "7da63c48710574",
+      "duration": 1.776,
+      "path": "/learning-studio/audio/v3-7da63c48710574.mp3",
+      "bytes": 18044,
+      "spokenText": "กี กา",
+      "phrases": [
+        {
+          "text": "กี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กู กี",
+      "kind": "sample",
+      "id": "ac35c1e27c555e",
+      "duration": 1.728,
+      "path": "/learning-studio/audio/v3-ac35c1e27c555e.mp3",
+      "bytes": 17564,
+      "spokenText": "กู กี",
+      "phrases": [
+        {
+          "text": "กู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กาเกาะอยู่บนต้นไม้",
+      "kind": "sample",
+      "id": "897ebb4d756d7a",
+      "duration": 1.752,
+      "path": "/learning-studio/audio/v3-897ebb4d756d7a.mp3",
+      "bytes": 17804,
+      "spokenText": "กาเกาะอยู่บนต้นไม้",
+      "phrases": [
+        {
+          "text": "กาเกาะอยู่บนต้นไม้",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มะพร้าว",
+      "kind": "sample",
+      "id": "0fd0b4a6e3c6d8",
+      "duration": 1.08,
+      "path": "/learning-studio/audio/v3-0fd0b4a6e3c6d8.mp3",
+      "bytes": 11084,
+      "spokenText": "มะพร้าว",
+      "phrases": [
+        {
+          "text": "มะพร้าว",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มังคุด",
+      "kind": "sample",
+      "id": "582f7b971a7fd2",
+      "duration": 0.864,
+      "path": "/learning-studio/audio/v3-582f7b971a7fd2.mp3",
+      "bytes": 8924,
+      "spokenText": "มังคุด",
+      "phrases": [
+        {
+          "text": "มังคุด",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "แมวเหมียว",
+      "kind": "sample",
+      "id": "08b1b376fcaf3e",
+      "duration": 1.152,
+      "path": "/learning-studio/audio/v3-08b1b376fcaf3e.mp3",
+      "bytes": 11804,
+      "spokenText": "แมวเหมียว",
+      "phrases": [
+        {
+          "text": "แมวเหมียว",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มา มู",
+      "kind": "sample",
+      "id": "bad419651287d6",
+      "duration": 1.824,
+      "path": "/learning-studio/audio/v3-bad419651287d6.mp3",
+      "bytes": 18524,
+      "spokenText": "มา มู",
+      "phrases": [
+        {
+          "text": "มา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มี มา",
+      "kind": "sample",
+      "id": "4c618695ff46d9",
+      "duration": 1.8,
+      "path": "/learning-studio/audio/v3-4c618695ff46d9.mp3",
+      "bytes": 18284,
+      "spokenText": "มี มา",
+      "phrases": [
+        {
+          "text": "มี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มู มี",
+      "kind": "sample",
+      "id": "5ade3d83b73871",
+      "duration": 1.776,
+      "path": "/learning-studio/audio/v3-5ade3d83b73871.mp3",
+      "bytes": 18044,
+      "spokenText": "มู มี",
+      "phrases": [
+        {
+          "text": "มู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "แมวกำลังกินปลา",
+      "kind": "sample",
+      "id": "47f7e1073a257f",
+      "duration": 1.656,
+      "path": "/learning-studio/audio/v3-47f7e1073a257f.mp3",
+      "bytes": 16844,
+      "spokenText": "แมวกำลังกินปลา",
+      "phrases": [
+        {
+          "text": "แมวกำลังกินปลา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ม้ายืนอยู่ในสวน",
+      "kind": "sample",
+      "id": "ee329afff7e0d8",
+      "duration": 1.608,
+      "path": "/learning-studio/audio/v3-ee329afff7e0d8.mp3",
+      "bytes": 16364,
+      "spokenText": "ม้ายืนอยู่ในสวน",
+      "phrases": [
+        {
+          "text": "ม้ายืนอยู่ในสวน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มีปูตัวเล็กอยู่บนทราย",
+      "kind": "sample",
+      "id": "c0304cdc933e95",
+      "duration": 1.92,
+      "path": "/learning-studio/audio/v3-c0304cdc933e95.mp3",
+      "bytes": 19484,
+      "spokenText": "มีปูตัวเล็กอยู่บนทราย",
+      "phrases": [
+        {
+          "text": "มีปูตัวเล็กอยู่บนทราย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฟังข้อความให้จบ แล้วเลือกภาพเหตุการณ์ที่ตรงกันนะ",
+      "kind": "instruction",
+      "id": "0b3afd0b7df68f",
+      "duration": 3.696,
+      "path": "/learning-studio/audio/v3-0b3afd0b7df68f.mp3",
+      "bytes": 37244,
+      "spokenText": "ฟังข้อความให้จบ แล้วเลือกภาพเหตุการณ์ที่ตรงกันนะ",
+      "phrases": [
+        {
+          "text": "ฟังข้อความให้จบ",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วเลือกภาพเหตุการณ์ที่ตรงกันนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "หนูขอน้ำหน่อยได้ไหม",
+      "kind": "sample",
+      "id": "41b79f20e4d984",
+      "duration": 1.656,
+      "path": "/learning-studio/audio/v3-41b79f20e4d984.mp3",
+      "bytes": 16844,
+      "spokenText": "หนูขอน้ำหน่อยได้ไหม",
+      "phrases": [
+        {
+          "text": "หนูขอน้ำหน่อยได้ไหม",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลองขอสิ่งที่อยากได้ หรือขอความช่วยเหลืออย่างสุภาพนะ",
+      "kind": "instruction",
+      "id": "264c865ea71548",
+      "duration": 3.528,
+      "path": "/learning-studio/audio/v3-264c865ea71548.mp3",
+      "bytes": 35564,
+      "spokenText": "ลองขอสิ่งที่อยากได้ หรือขอความช่วยเหลืออย่างสุภาพนะ",
+      "phrases": [
+        {
+          "text": "ลองขอสิ่งที่อยากได้ หรือขอความช่วยเหลืออย่างสุภาพนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ขอเล่นบอลกับเพื่อนได้ไหม",
+      "kind": "sample",
+      "id": "82c670f7d5a269",
+      "duration": 1.848,
+      "path": "/learning-studio/audio/v3-82c670f7d5a269.mp3",
+      "bytes": 18764,
+      "spokenText": "ขอเล่นบอลกับเพื่อนได้ไหม",
+      "phrases": [
+        {
+          "text": "ขอเล่นบอลกับเพื่อนได้ไหม",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ช่วยเปิดกล่องให้หน่อยได้ไหม",
+      "kind": "sample",
+      "id": "a58353a301fc85",
+      "duration": 1.92,
+      "path": "/learning-studio/audio/v3-a58353a301fc85.mp3",
+      "bytes": 19484,
+      "spokenText": "ช่วยเปิดกล่องให้หน่อยได้ไหม",
+      "phrases": [
+        {
+          "text": "ช่วยเปิดกล่องให้หน่อยได้ไหม",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เล่าสิ่งที่เห็น แล้วผลัดกันคุยกับผู้ใหญ่สักหน่อยนะ",
+      "kind": "instruction",
+      "id": "4437b8b33ed92b",
+      "duration": 3.888,
+      "path": "/learning-studio/audio/v3-4437b8b33ed92b.mp3",
+      "bytes": 39164,
+      "spokenText": "เล่าสิ่งที่เห็น แล้วผลัดกันคุยกับผู้ใหญ่สักหน่อยนะ",
+      "phrases": [
+        {
+          "text": "เล่าสิ่งที่เห็น",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วผลัดกันคุยกับผู้ใหญ่สักหน่อยนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลองอ่านข้อความทีละช่วง จะฟังตัวอย่างก่อนก็ได้นะ",
+      "kind": "instruction",
+      "id": "cf0ca93394a960",
+      "duration": 3.36,
+      "path": "/learning-studio/audio/v3-cf0ca93394a960.mp3",
+      "bytes": 33884,
+      "spokenText": "ลองอ่านข้อความทีละช่วง จะฟังตัวอย่างก่อนก็ได้นะ",
+      "phrases": [
+        {
+          "text": "ลองอ่านข้อความทีละช่วง จะฟังตัวอย่างก่อนก็ได้นะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กระเป๋านักเรียน",
+      "kind": "sample",
+      "id": "ce9a662c9269a4",
+      "duration": 1.44,
+      "path": "/learning-studio/audio/v3-ce9a662c9269a4.mp3",
+      "bytes": 14684,
+      "spokenText": "กระเป๋านักเรียน",
+      "phrases": [
+        {
+          "text": "กระเป๋านักเรียน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "นาฬิกาปลุก",
+      "kind": "sample",
+      "id": "48cd7228969867",
+      "duration": 1.152,
+      "path": "/learning-studio/audio/v3-48cd7228969867.mp3",
+      "bytes": 11804,
+      "spokenText": "นาฬิกาปลุก",
+      "phrases": [
+        {
+          "text": "นาฬิกาปลุก",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "โรงเรียนประถม",
+      "kind": "sample",
+      "id": "7968db6670d7af",
+      "duration": 1.464,
+      "path": "/learning-studio/audio/v3-7968db6670d7af.mp3",
+      "bytes": 14924,
+      "spokenText": "โรงเรียนประถม",
+      "phrases": [
+        {
+          "text": "โรงเรียนประถม",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปา ปี ปู",
+      "kind": "sample",
+      "id": "f0c4984a7f2d13",
+      "duration": 2.784,
+      "path": "/learning-studio/audio/v3-f0c4984a7f2d13.mp3",
+      "bytes": 28124,
+      "spokenText": "ปา ปี ปู",
+      "phrases": [
+        {
+          "text": "ปา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปู ปา ปี",
+      "kind": "sample",
+      "id": "a57ec4f85e14ab",
+      "duration": 2.784,
+      "path": "/learning-studio/audio/v3-a57ec4f85e14ab.mp3",
+      "bytes": 28124,
+      "spokenText": "ปู ปา ปี",
+      "phrases": [
+        {
+          "text": "ปู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปี ปู ปา",
+      "kind": "sample",
+      "id": "ab75ad6ec20293",
+      "duration": 2.784,
+      "path": "/learning-studio/audio/v3-ab75ad6ec20293.mp3",
+      "bytes": 28124,
+      "spokenText": "ปี ปู ปา",
+      "phrases": [
+        {
+          "text": "ปี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปูตัวเล็กกำลังเดินอยู่บนทรายริมทะเล",
+      "kind": "sample",
+      "id": "b9f754e16d67d8",
+      "duration": 2.712,
+      "path": "/learning-studio/audio/v3-b9f754e16d67d8.mp3",
+      "bytes": 27404,
+      "spokenText": "ปูตัวเล็กกำลังเดินอยู่บนทรายริมทะเล",
+      "phrases": [
+        {
+          "text": "ปูตัวเล็กกำลังเดินอยู่บนทรายริมทะเล",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ในกล่องใบใหญ่มีปูตัวเล็กอยู่ข้างใน",
+      "kind": "sample",
+      "id": "e1d19119958a0e",
+      "duration": 2.736,
+      "path": "/learning-studio/audio/v3-e1d19119958a0e.mp3",
+      "bytes": 27644,
+      "spokenText": "ในกล่องใบใหญ่มีปูตัวเล็กอยู่ข้างใน",
+      "phrases": [
+        {
+          "text": "ในกล่องใบใหญ่มีปูตัวเล็กอยู่ข้างใน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไก่กำลังก้มลงกินข้าวเปล่าในชาม",
+      "kind": "sample",
+      "id": "a7fda7446eb29b",
+      "duration": 2.592,
+      "path": "/learning-studio/audio/v3-a7fda7446eb29b.mp3",
+      "bytes": 26204,
+      "spokenText": "ไก่กำลังก้มลงกินข้าวเปล่าในชาม",
+      "phrases": [
+        {
+          "text": "ไก่กำลังก้มลงกินข้าวเปล่าในชาม",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลองเพิ่มรายละเอียดจากภาพ ให้ผู้ใหญ่รู้ว่าใครทำอะไร ที่ไหนนะ",
+      "kind": "instruction",
+      "id": "40ecfacbc2dac7",
+      "duration": 3.912,
+      "path": "/learning-studio/audio/v3-40ecfacbc2dac7.mp3",
+      "bytes": 39404,
+      "spokenText": "ลองเพิ่มรายละเอียดจากภาพ ให้ผู้ใหญ่รู้ว่าใครทำอะไร ที่ไหนนะ",
+      "phrases": [
+        {
+          "text": "ลองเพิ่มรายละเอียดจากภาพ ให้ผู้ใหญ่รู้ว่าใครทำอะไร ที่ไหนนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กล้วยหอม",
+      "kind": "sample",
+      "id": "8c10720ad56ecb",
+      "duration": 1.128,
+      "path": "/learning-studio/audio/v3-8c10720ad56ecb.mp3",
+      "bytes": 11564,
+      "spokenText": "กล้วยหอม",
+      "phrases": [
+        {
+          "text": "กล้วยหอม",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กา กี กู",
+      "kind": "sample",
+      "id": "b40644f23daef9",
+      "duration": 2.664,
+      "path": "/learning-studio/audio/v3-b40644f23daef9.mp3",
+      "bytes": 26924,
+      "spokenText": "กา กี กู",
+      "phrases": [
+        {
+          "text": "กา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กู กา กี",
+      "kind": "sample",
+      "id": "ec3030b24337f4",
+      "duration": 2.664,
+      "path": "/learning-studio/audio/v3-ec3030b24337f4.mp3",
+      "bytes": 26924,
+      "spokenText": "กู กา กี",
+      "phrases": [
+        {
+          "text": "กู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กี กู กา",
+      "kind": "sample",
+      "id": "b616d1a13c841c",
+      "duration": 2.664,
+      "path": "/learning-studio/audio/v3-b616d1a13c841c.mp3",
+      "bytes": 26924,
+      "spokenText": "กี กู กา",
+      "phrases": [
+        {
+          "text": "กี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "นกกากำลังเกาะอยู่บนกิ่งไม้",
+      "kind": "sample",
+      "id": "45d1b5f5d64502",
+      "duration": 2.304,
+      "path": "/learning-studio/audio/v3-45d1b5f5d64502.mp3",
+      "bytes": 23324,
+      "spokenText": "นกกากำลังเกาะอยู่บนกิ่งไม้",
+      "phrases": [
+        {
+          "text": "นกกากำลังเกาะอยู่บนกิ่งไม้",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไก่ตัวหนึ่งกำลังก้มลงกินข้าวในชาม",
+      "kind": "sample",
+      "id": "3dc6aafc953448",
+      "duration": 2.76,
+      "path": "/learning-studio/audio/v3-3dc6aafc953448.mp3",
+      "bytes": 27884,
+      "spokenText": "ไก่ตัวหนึ่งกำลังก้มลงกินข้าวในชาม",
+      "phrases": [
+        {
+          "text": "ไก่ตัวหนึ่งกำลังก้มลงกินข้าวในชาม",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ในกล่องใบใหญ่มีปูอยู่ข้างใน",
+      "kind": "sample",
+      "id": "e9aae0152ec622",
+      "duration": 2.376,
+      "path": "/learning-studio/audio/v3-e9aae0152ec622.mp3",
+      "bytes": 24044,
+      "spokenText": "ในกล่องใบใหญ่มีปูอยู่ข้างใน",
+      "phrases": [
+        {
+          "text": "ในกล่องใบใหญ่มีปูอยู่ข้างใน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มะพร้าวอ่อน",
+      "kind": "sample",
+      "id": "8c81c329ddfc6b",
+      "duration": 1.296,
+      "path": "/learning-studio/audio/v3-8c81c329ddfc6b.mp3",
+      "bytes": 13244,
+      "spokenText": "มะพร้าวอ่อน",
+      "phrases": [
+        {
+          "text": "มะพร้าวอ่อน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ร่มกันฝน",
+      "kind": "sample",
+      "id": "cf7c8f99586421",
+      "duration": 1.248,
+      "path": "/learning-studio/audio/v3-cf7c8f99586421.mp3",
+      "bytes": 12764,
+      "spokenText": "ร่มกันฝน",
+      "phrases": [
+        {
+          "text": "ร่มกันฝน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มา มี มู",
+      "kind": "sample",
+      "id": "5b38bf5fce6574",
+      "duration": 2.736,
+      "path": "/learning-studio/audio/v3-5b38bf5fce6574.mp3",
+      "bytes": 27644,
+      "spokenText": "มา มี มู",
+      "phrases": [
+        {
+          "text": "มา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มู มา มี",
+      "kind": "sample",
+      "id": "37c30622c79556",
+      "duration": 2.736,
+      "path": "/learning-studio/audio/v3-37c30622c79556.mp3",
+      "bytes": 27644,
+      "spokenText": "มู มา มี",
+      "phrases": [
+        {
+          "text": "มู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มี มู มา",
+      "kind": "sample",
+      "id": "96417a6dccc5b9",
+      "duration": 2.736,
+      "path": "/learning-studio/audio/v3-96417a6dccc5b9.mp3",
+      "bytes": 27644,
+      "spokenText": "มี มู มา",
+      "phrases": [
+        {
+          "text": "มี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "แมวตัวเล็กกำลังก้มลงกินปลา",
+      "kind": "sample",
+      "id": "17c23e7f127eff",
+      "duration": 2.304,
+      "path": "/learning-studio/audio/v3-17c23e7f127eff.mp3",
+      "bytes": 23324,
+      "spokenText": "แมวตัวเล็กกำลังก้มลงกินปลา",
+      "phrases": [
+        {
+          "text": "แมวตัวเล็กกำลังก้มลงกินปลา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ม้าตัวหนึ่งกำลังยืนอยู่ในสวน",
+      "kind": "sample",
+      "id": "29cc348e5303da",
+      "duration": 2.256,
+      "path": "/learning-studio/audio/v3-29cc348e5303da.mp3",
+      "bytes": 22844,
+      "spokenText": "ม้าตัวหนึ่งกำลังยืนอยู่ในสวน",
+      "phrases": [
+        {
+          "text": "ม้าตัวหนึ่งกำลังยืนอยู่ในสวน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มองเห็นปูตัวเล็กเดินอยู่ริมทะเล",
+      "kind": "sample",
+      "id": "cb8817f85b21cd",
+      "duration": 2.52,
+      "path": "/learning-studio/audio/v3-cb8817f85b21cd.mp3",
+      "bytes": 25484,
+      "spokenText": "มองเห็นปูตัวเล็กเดินอยู่ริมทะเล",
+      "phrases": [
+        {
+          "text": "มองเห็นปูตัวเล็กเดินอยู่ริมทะเล",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ขอน้ำดื่มหน่อย เพราะหนูกระหายน้ำ",
+      "kind": "sample",
+      "id": "5ac2dde411c412",
+      "duration": 2.592,
+      "path": "/learning-studio/audio/v3-5ac2dde411c412.mp3",
+      "bytes": 26204,
+      "spokenText": "ขอน้ำดื่มหน่อย เพราะหนูกระหายน้ำ",
+      "phrases": [
+        {
+          "text": "ขอน้ำดื่มหน่อย เพราะหนูกระหายน้ำ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ลองบอกความต้องการ พร้อมเหตุผลหรือขั้นตอนที่อยากให้ช่วยนะ",
+      "kind": "instruction",
+      "id": "158eb504398fe8",
+      "duration": 3.72,
+      "path": "/learning-studio/audio/v3-158eb504398fe8.mp3",
+      "bytes": 37484,
+      "spokenText": "ลองบอกความต้องการ พร้อมเหตุผลหรือขั้นตอนที่อยากให้ช่วยนะ",
+      "phrases": [
+        {
+          "text": "ลองบอกความต้องการ พร้อมเหตุผลหรือขั้นตอนที่อยากให้ช่วยนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ขอเล่นบอลด้วย แล้วเราผลัดกันเล่นนะ",
+      "kind": "sample",
+      "id": "0a8f2ea72b446d",
+      "duration": 2.232,
+      "path": "/learning-studio/audio/v3-0a8f2ea72b446d.mp3",
+      "bytes": 22604,
+      "spokenText": "ขอเล่นบอลด้วย แล้วเราผลัดกันเล่นนะ",
+      "phrases": [
+        {
+          "text": "ขอเล่นบอลด้วย แล้วเราผลัดกันเล่นนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ช่วยเปิดกล่องนี้ให้หน่อย แล้วหนูจะเก็บของ",
+      "kind": "sample",
+      "id": "55c5ccc5824905",
+      "duration": 2.712,
+      "path": "/learning-studio/audio/v3-55c5ccc5824905.mp3",
+      "bytes": 27404,
+      "spokenText": "ช่วยเปิดกล่องนี้ให้หน่อย แล้วหนูจะเก็บของ",
+      "phrases": [
+        {
+          "text": "ช่วยเปิดกล่องนี้ให้หน่อย แล้วหนูจะเก็บของ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เล่าภาพโดยเพิ่มรายละเอียด แล้วลองถามผู้ใหญ่กลับบ้างนะ",
+      "kind": "instruction",
+      "id": "cd61ddb2b538d0",
+      "duration": 4.128,
+      "path": "/learning-studio/audio/v3-cd61ddb2b538d0.mp3",
+      "bytes": 41564,
+      "spokenText": "เล่าภาพโดยเพิ่มรายละเอียด แล้วลองถามผู้ใหญ่กลับบ้างนะ",
+      "phrases": [
+        {
+          "text": "เล่าภาพโดยเพิ่มรายละเอียด",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วลองถามผู้ใหญ่กลับบ้างนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฟังคำให้จบ แล้วเลือกข้อความที่ตรงกับเสียงนะ",
+      "kind": "instruction",
+      "id": "2378d090bbc313",
+      "duration": 3.432,
+      "path": "/learning-studio/audio/v3-2378d090bbc313.mp3",
+      "bytes": 34604,
+      "spokenText": "ฟังคำให้จบ แล้วเลือกข้อความที่ตรงกับเสียงนะ",
+      "phrases": [
+        {
+          "text": "ฟังคำให้จบ",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วเลือกข้อความที่ตรงกับเสียงนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปา ปี ปู ปา",
+      "kind": "sample",
+      "id": "2e9ce518c4bca0",
+      "duration": 3.696,
+      "path": "/learning-studio/audio/v3-2e9ce518c4bca0.mp3",
+      "bytes": 37244,
+      "spokenText": "ปา ปี ปู ปา",
+      "phrases": [
+        {
+          "text": "ปา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปี ปู ปา ปี",
+      "kind": "sample",
+      "id": "1c5c98c36efa7e",
+      "duration": 3.768,
+      "path": "/learning-studio/audio/v3-1c5c98c36efa7e.mp3",
+      "bytes": 37964,
+      "spokenText": "ปี ปู ปา ปี",
+      "phrases": [
+        {
+          "text": "ปี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ปู ปา ปี ปู",
+      "kind": "sample",
+      "id": "43aa7aa79ef62d",
+      "duration": 3.696,
+      "path": "/learning-studio/audio/v3-43aa7aa79ef62d.mp3",
+      "bytes": 37244,
+      "spokenText": "ปู ปา ปี ปู",
+      "phrases": [
+        {
+          "text": "ปู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ปู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฉันมองเห็นปูตัวเล็กอยู่บนทราย และมีทะเลอยู่ในภาพด้วย",
+      "kind": "sample",
+      "id": "9071a2b967322e",
+      "duration": 4.368,
+      "path": "/learning-studio/audio/v3-9071a2b967322e.mp3",
+      "bytes": 43964,
+      "spokenText": "ฉันมองเห็นปูตัวเล็กอยู่บนทราย และมีทะเลอยู่ในภาพด้วย",
+      "phrases": [
+        {
+          "text": "ฉันมองเห็นปูตัวเล็กอยู่บนทราย",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "และมีทะเลอยู่ในภาพด้วย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เมื่อมองเข้าไปในกล่อง ฉันพบว่ามีปูตัวเล็กอยู่ข้างใน",
+      "kind": "sample",
+      "id": "968f9041052aaf",
+      "duration": 3.408,
+      "path": "/learning-studio/audio/v3-968f9041052aaf.mp3",
+      "bytes": 34364,
+      "spokenText": "เมื่อมองเข้าไปในกล่อง ฉันพบว่ามีปูตัวเล็กอยู่ข้างใน",
+      "phrases": [
+        {
+          "text": "เมื่อมองเข้าไปในกล่อง ฉันพบว่ามีปูตัวเล็กอยู่ข้างใน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไก่กำลังก้มลงกินข้าวเปล่าในชาม ส่วนชามวางอยู่ตรงหน้าไก่",
+      "kind": "sample",
+      "id": "40f4593d5adeb9",
+      "duration": 4.728,
+      "path": "/learning-studio/audio/v3-40f4593d5adeb9.mp3",
+      "bytes": 47564,
+      "spokenText": "ไก่กำลังก้มลงกินข้าวเปล่าในชาม ส่วนชามวางอยู่ตรงหน้าไก่",
+      "phrases": [
+        {
+          "text": "ไก่กำลังก้มลงกินข้าวเปล่าในชาม",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "ส่วนชามวางอยู่ตรงหน้าไก่",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เล่าให้คนที่ยังไม่เห็นภาพเข้าใจ แล้วชวนกันถามเหตุผลหรือแต่งเรื่องต่อโดยบอกว่าเป็นสิ่งที่เราคิดนะ",
+      "kind": "instruction",
+      "id": "363a8b4124642c",
+      "duration": 6.456,
+      "path": "/learning-studio/audio/v3-363a8b4124642c.mp3",
+      "bytes": 64844,
+      "spokenText": "เล่าให้คนที่ยังไม่เห็นภาพเข้าใจ แล้วชวนกันถามเหตุผลหรือแต่งเรื่องต่อโดยบอกว่าเป็นสิ่งที่เราคิดนะ",
+      "phrases": [
+        {
+          "text": "เล่าให้คนที่ยังไม่เห็นภาพเข้าใจ",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วชวนกันถามเหตุผลหรือแต่งเรื่องต่อโดยบอกว่าเป็นสิ่งที่เราคิดนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กา กี กู กา",
+      "kind": "sample",
+      "id": "cdca4b482c12bd",
+      "duration": 3.624,
+      "path": "/learning-studio/audio/v3-cdca4b482c12bd.mp3",
+      "bytes": 36524,
+      "spokenText": "กา กี กู กา",
+      "phrases": [
+        {
+          "text": "กา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กี กู กา กี",
+      "kind": "sample",
+      "id": "b7ea222ff269ba",
+      "duration": 3.552,
+      "path": "/learning-studio/audio/v3-b7ea222ff269ba.mp3",
+      "bytes": 35804,
+      "spokenText": "กี กู กา กี",
+      "phrases": [
+        {
+          "text": "กี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "กู กา กี กู",
+      "kind": "sample",
+      "id": "04ef8a58681097",
+      "duration": 3.576,
+      "path": "/learning-studio/audio/v3-04ef8a58681097.mp3",
+      "bytes": 36044,
+      "spokenText": "กู กา กี กู",
+      "phrases": [
+        {
+          "text": "กู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "กู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เมื่อมองขึ้นไปบนต้นไม้ ฉันเห็นนกกาเกาะอยู่บนกิ่งไม้",
+      "kind": "sample",
+      "id": "6851ecf45571dd",
+      "duration": 3.576,
+      "path": "/learning-studio/audio/v3-6851ecf45571dd.mp3",
+      "bytes": 36044,
+      "spokenText": "เมื่อมองขึ้นไปบนต้นไม้ ฉันเห็นนกกาเกาะอยู่บนกิ่งไม้",
+      "phrases": [
+        {
+          "text": "เมื่อมองขึ้นไปบนต้นไม้ ฉันเห็นนกกาเกาะอยู่บนกิ่งไม้",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไก่ตัวหนึ่งกำลังกินข้าวในชาม และฉันมองเห็นชามอยู่ตรงหน้าไก่",
+      "kind": "sample",
+      "id": "c26beae49a6142",
+      "duration": 4.728,
+      "path": "/learning-studio/audio/v3-c26beae49a6142.mp3",
+      "bytes": 47564,
+      "spokenText": "ไก่ตัวหนึ่งกำลังกินข้าวในชาม และฉันมองเห็นชามอยู่ตรงหน้าไก่",
+      "phrases": [
+        {
+          "text": "ไก่ตัวหนึ่งกำลังกินข้าวในชาม",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "และฉันมองเห็นชามอยู่ตรงหน้าไก่",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฉันสังเกตเห็นกล่องใบหนึ่ง และมีปูตัวเล็กอยู่ข้างในกล่อง",
+      "kind": "sample",
+      "id": "938ae3075314c4",
+      "duration": 4.176,
+      "path": "/learning-studio/audio/v3-938ae3075314c4.mp3",
+      "bytes": 42044,
+      "spokenText": "ฉันสังเกตเห็นกล่องใบหนึ่ง และมีปูตัวเล็กอยู่ข้างในกล่อง",
+      "phrases": [
+        {
+          "text": "ฉันสังเกตเห็นกล่องใบหนึ่ง",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "และมีปูตัวเล็กอยู่ข้างในกล่อง",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มะพร้าวน้ำหอม",
+      "kind": "sample",
+      "id": "7c82f1dbcbcecf",
+      "duration": 1.416,
+      "path": "/learning-studio/audio/v3-7c82f1dbcbcecf.mp3",
+      "bytes": 14444,
+      "spokenText": "มะพร้าวน้ำหอม",
+      "phrases": [
+        {
+          "text": "มะพร้าวน้ำหอม",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ตลาดผลไม้",
+      "kind": "sample",
+      "id": "79726bb0bb59f3",
+      "duration": 1.56,
+      "path": "/learning-studio/audio/v3-79726bb0bb59f3.mp3",
+      "bytes": 15884,
+      "spokenText": "ตลาดผลไม้",
+      "phrases": [
+        {
+          "text": "ตลาดผลไม้",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มา มี มู มา",
+      "kind": "sample",
+      "id": "7d357391c9694d",
+      "duration": 3.696,
+      "path": "/learning-studio/audio/v3-7d357391c9694d.mp3",
+      "bytes": 37244,
+      "spokenText": "มา มี มู มา",
+      "phrases": [
+        {
+          "text": "มา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มา",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มี มู มา มี",
+      "kind": "sample",
+      "id": "75d3206a90d65e",
+      "duration": 3.648,
+      "path": "/learning-studio/audio/v3-75d3206a90d65e.mp3",
+      "bytes": 36764,
+      "spokenText": "มี มู มา มี",
+      "phrases": [
+        {
+          "text": "มี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มี",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "มู มา มี มู",
+      "kind": "sample",
+      "id": "f0808339435da8",
+      "duration": 3.648,
+      "path": "/learning-studio/audio/v3-f0808339435da8.mp3",
+      "bytes": 36764,
+      "spokenText": "มู มา มี มู",
+      "phrases": [
+        {
+          "text": "มู",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มี",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "มู",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "แมวตัวเล็กกำลังกินปลา และมีปลาอยู่บนจานตรงหน้าแมว",
+      "kind": "sample",
+      "id": "21bba418389802",
+      "duration": 4.248,
+      "path": "/learning-studio/audio/v3-21bba418389802.mp3",
+      "bytes": 42764,
+      "spokenText": "แมวตัวเล็กกำลังกินปลา และมีปลาอยู่บนจานตรงหน้าแมว",
+      "phrases": [
+        {
+          "text": "แมวตัวเล็กกำลังกินปลา",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "และมีปลาอยู่บนจานตรงหน้าแมว",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ม้าตัวหนึ่งยืนอยู่ในสวน และมีต้นไม้กับดอกไม้อยู่ใกล้ ๆ",
+      "kind": "sample",
+      "id": "e53770b176c37d",
+      "duration": 4.44,
+      "path": "/learning-studio/audio/v3-e53770b176c37d.mp3",
+      "bytes": 44684,
+      "spokenText": "ม้าตัวหนึ่งยืนอยู่ในสวน และมีต้นไม้กับดอกไม้อยู่ใกล้ ๆ",
+      "phrases": [
+        {
+          "text": "ม้าตัวหนึ่งยืนอยู่ในสวน",
+          "pauseAfterMs": 320
+        },
+        {
+          "text": "และมีต้นไม้กับดอกไม้อยู่ใกล้ ๆ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เมื่อมองไปที่ชายทะเล ฉันเห็นปูตัวเล็กอยู่บนพื้นทราย",
+      "kind": "sample",
+      "id": "496c38d57ad8b0",
+      "duration": 3.504,
+      "path": "/learning-studio/audio/v3-496c38d57ad8b0.mp3",
+      "bytes": 35324,
+      "spokenText": "เมื่อมองไปที่ชายทะเล ฉันเห็นปูตัวเล็กอยู่บนพื้นทราย",
+      "phrases": [
+        {
+          "text": "เมื่อมองไปที่ชายทะเล ฉันเห็นปูตัวเล็กอยู่บนพื้นทราย",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ขอน้ำดื่มหน่อยได้ไหม หลังจากเล่นบอลแล้วฉันรู้สึกกระหายน้ำ",
+      "kind": "sample",
+      "id": "1e4a543c6b4c6a",
+      "duration": 3.864,
+      "path": "/learning-studio/audio/v3-1e4a543c6b4c6a.mp3",
+      "bytes": 38924,
+      "spokenText": "ขอน้ำดื่มหน่อยได้ไหม หลังจากเล่นบอลแล้วฉันรู้สึกกระหายน้ำ",
+      "phrases": [
+        {
+          "text": "ขอน้ำดื่มหน่อยได้ไหม หลังจากเล่นบอลแล้วฉันรู้สึกกระหายน้ำ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เรามาวางแผนเล่นบอลด้วยกัน แล้วตกลงกันว่าจะผลัดกันอย่างไร",
+      "kind": "sample",
+      "id": "f7470210570dc4",
+      "duration": 3.816,
+      "path": "/learning-studio/audio/v3-f7470210570dc4.mp3",
+      "bytes": 38444,
+      "spokenText": "เรามาวางแผนเล่นบอลด้วยกัน แล้วตกลงกันว่าจะผลัดกันอย่างไร",
+      "phrases": [
+        {
+          "text": "เรามาวางแผนเล่นบอลด้วยกัน แล้วตกลงกันว่าจะผลัดกันอย่างไร",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ช่วยแนะนำวิธีเปิดกล่องนี้ได้ไหม ฉันจะลองทำเองตามขั้นตอน",
+      "kind": "sample",
+      "id": "477a4d8bf07d00",
+      "duration": 3.912,
+      "path": "/learning-studio/audio/v3-477a4d8bf07d00.mp3",
+      "bytes": 39404,
+      "spokenText": "ช่วยแนะนำวิธีเปิดกล่องนี้ได้ไหม ฉันจะลองทำเองตามขั้นตอน",
+      "phrases": [
+        {
+          "text": "ช่วยแนะนำวิธีเปิดกล่องนี้ได้ไหม ฉันจะลองทำเองตามขั้นตอน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เริ่มจากสิ่งที่เห็น แล้วแต่งเรื่องต่อพร้อมบอกว่าเราคิดอย่างไร หรือมีเหตุผลอะไรนะ",
+      "kind": "instruction",
+      "id": "1c64efcc11bbff",
+      "duration": 5.664,
+      "path": "/learning-studio/audio/v3-1c64efcc11bbff.mp3",
+      "bytes": 56924,
+      "spokenText": "เริ่มจากสิ่งที่เห็น แล้วแต่งเรื่องต่อพร้อมบอกว่าเราคิดอย่างไร หรือมีเหตุผลอะไรนะ",
+      "phrases": [
+        {
+          "text": "เริ่มจากสิ่งที่เห็น",
+          "pauseAfterMs": 380
+        },
+        {
+          "text": "แล้วแต่งเรื่องต่อพร้อมบอกว่าเราคิดอย่างไร หรือมีเหตุผลอะไรนะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "สวัสดีจ้ะ วันนี้พี่ปูจะชวนมาฟังเสียง แล้วลองพูดไปด้วยกันนะ ค่อย ๆ ลอง ไม่ต้องรีบเลยจ้ะ",
+      "kind": "guidance",
+      "id": "dcf82ba58ce394",
+      "duration": 7.872,
+      "path": "/learning-studio/audio/v3-dcf82ba58ce394.mp3",
+      "bytes": 79004,
+      "spokenText": "สวัสดีจ้ะ พี่ปูเองนะ วันนี้ มาเล่นฟังเสียง แล้วลองพูดไปด้วยกันดีไหม ค่อย ๆ ลองได้เลย พี่รอฟังอยู่จ้ะ",
+      "phrases": [
+        {
+          "text": "สวัสดีจ้ะ พี่ปูเองนะ",
+          "pauseAfterMs": 450
+        },
+        {
+          "text": "วันนี้ มาเล่นฟังเสียง แล้วลองพูดไปด้วยกันดีไหม",
+          "pauseAfterMs": 500
+        },
+        {
+          "text": "ค่อย ๆ ลองได้เลย พี่รอฟังอยู่จ้ะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ฟังเสียง แล้วลองเลือกภาพที่ได้ยินนะ",
+      "kind": "guidance",
+      "id": "6801e65f151de5",
+      "duration": 4.08,
+      "path": "/learning-studio/audio/v3-6801e65f151de5.mp3",
+      "bytes": 41084,
+      "spokenText": "มาฟังเสียงกันนะ แล้วลองเลือกภาพ ที่ตรงกับเสียงได้เลยจ้ะ",
+      "phrases": [
+        {
+          "text": "มาฟังเสียงกันนะ",
+          "pauseAfterMs": 400
+        },
+        {
+          "text": "แล้วลองเลือกภาพ ที่ตรงกับเสียงได้เลยจ้ะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "เก่งมากจ้ะ ขอบคุณที่ลองทำไปด้วยกันนะ",
+      "kind": "guidance",
+      "id": "463faad9956f17",
+      "duration": 4.08,
+      "path": "/learning-studio/audio/v3-463faad9956f17.mp3",
+      "bytes": 41084,
+      "spokenText": "เก่งมากเลย พี่ดีใจนะ ที่เราได้ลองทำไปด้วยกัน",
+      "phrases": [
+        {
+          "text": "เก่งมากเลย",
+          "pauseAfterMs": 400
+        },
+        {
+          "text": "พี่ดีใจนะ ที่เราได้ลองทำไปด้วยกัน",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "ไม่เป็นไรเลยจ้ะ มาฟังอีกครั้ง แล้วค่อย ๆ ลองกันใหม่นะ",
+      "kind": "guidance",
+      "id": "cd0b354ed6b043",
+      "duration": 5.76,
+      "path": "/learning-studio/audio/v3-cd0b354ed6b043.mp3",
+      "bytes": 57884,
+      "spokenText": "ไม่เป็นไรเลยนะ เรามาฟังกันอีกครั้ง แล้วค่อย ๆ ลองใหม่ พี่อยู่ตรงนี้จ้ะ",
+      "phrases": [
+        {
+          "text": "ไม่เป็นไรเลยนะ",
+          "pauseAfterMs": 450
+        },
+        {
+          "text": "เรามาฟังกันอีกครั้ง",
+          "pauseAfterMs": 400
+        },
+        {
+          "text": "แล้วค่อย ๆ ลองใหม่ พี่อยู่ตรงนี้จ้ะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    },
+    {
+      "text": "จบภารกิจรอบนี้แล้ว เก่งมากจ้ะ พักสักนิด แล้วค่อยไปผจญภัยกันต่อนะ",
+      "kind": "guidance",
+      "id": "fe8189934e9b48",
+      "duration": 7.224,
+      "path": "/learning-studio/audio/v3-fe8189934e9b48.mp3",
+      "bytes": 72524,
+      "spokenText": "เย้ เราทำภารกิจรอบนี้เสร็จแล้ว ขอบคุณที่ตั้งใจลองนะ พักกันสักนิด แล้วค่อยไปเล่นกันต่อจ้ะ",
+      "phrases": [
+        {
+          "text": "เย้ เราทำภารกิจรอบนี้เสร็จแล้ว",
+          "pauseAfterMs": 450
+        },
+        {
+          "text": "ขอบคุณที่ตั้งใจลองนะ",
+          "pauseAfterMs": 500
+        },
+        {
+          "text": "พักกันสักนิด แล้วค่อยไปเล่นกันต่อจ้ะ",
+          "pauseAfterMs": 0
+        }
+      ],
+      "voiceRevision": "v3-phrased-natural-1"
+    }
+  ],
+  "voiceRevision": "v3-phrased-natural-1",
+  "description": "Thai synthetic voice; conversational phrases and explicit pauses, without pitch shifting."
+}

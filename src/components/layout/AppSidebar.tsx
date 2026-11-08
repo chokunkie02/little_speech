@@ -89,7 +89,8 @@ export default function AppSidebar() {
     : PARENT_NAV_ITEMS;
 
   const isActive = (item: (typeof NAV_ITEMS)[0]) =>
-    item.exact ? pathname === item.href : (pathname?.startsWith(item.href) ?? false);
+    (item.href === "/training" && pathname === "/learning") ||
+    (item.exact ? pathname === item.href : (pathname?.startsWith(item.href) ?? false));
 
   const stars = isHydrated ? summary.starsEarned : 0;
   const currentStageId = isHydrated ? summary.currentStageId : null;

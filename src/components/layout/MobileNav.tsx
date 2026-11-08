@@ -39,7 +39,8 @@ export default function MobileNav() {
     : PARENT_MOBILE;
 
   const isActive = (item: NavItem) =>
-    item.exact ? pathname === item.href : (pathname?.startsWith(item.href) ?? false);
+    (item.href === "/training" && pathname === "/learning") ||
+    (item.exact ? pathname === item.href : (pathname?.startsWith(item.href) ?? false));
 
   return (
     <nav

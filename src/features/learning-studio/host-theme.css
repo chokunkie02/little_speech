@@ -1,0 +1,103 @@
+/* The practice layout is scoped to this feature and uses the host theme. */
+.learning-studio-scope.learning-studio-scope {
+  --primary: var(--color-primary);
+  --primary-soft: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  --orange: var(--color-secondary);
+  --success: var(--color-success);
+  --error: var(--color-error);
+  --info: var(--color-info);
+  --bg: var(--color-bg);
+  --surface: var(--color-surface);
+  --text: var(--color-text);
+  --muted: var(--color-text-muted);
+  --border: var(--color-border);
+  font-family: var(--font-sans);
+}
+
+.learning-studio-scope > .app-shell > .main-shell {
+  margin-left: 0;
+}
+
+.learning-studio-scope .studio-header {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: 1rem clamp(1rem, 3vw, 2rem) 0;
+}
+
+.learning-studio-scope .studio-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.learning-studio-scope .studio-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.learning-studio-scope .studio-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  padding: 0.375rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--surface);
+}
+
+.learning-studio-scope .studio-nav button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.learning-studio-scope .studio-nav button:hover,
+.learning-studio-scope .studio-nav button[aria-current="page"] {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.learning-studio-scope .studio-nav button[aria-current="page"] {
+  font-weight: 600;
+}
+
+.learning-studio-scope .studio-storage-note {
+  margin-top: 0.75rem;
+  color: var(--muted);
+  font-size: 0.8125rem;
+}
+
+.learning-studio-scope .main-shell > .content {
+  max-width: 72rem;
+  padding-inline: clamp(1rem, 3vw, 2rem);
+}
+
+.learning-studio-scope .main-shell .hero,
+.learning-studio-scope .main-shell .practice-card,
+.learning-studio-scope .main-shell .panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.learning-studio-scope .main-shell .section-head h1 {
+  color: var(--text);
+  font-weight: 700;
+}
+
+.learning-studio-scope .main-shell .button.primary {
+  background: var(--primary);
+  color: white;
+}
+
+@media print {
+  .learning-studio-scope .studio-header { display: none; }
+}
