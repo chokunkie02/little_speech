@@ -28,13 +28,13 @@ export default function ProfilePage() {
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-2xl space-y-4 px-4 py-5 sm:px-6">
+      <div className="mx-auto max-w-5xl space-y-4 px-4 py-5 sm:px-6">
         <header className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h1 className="text-xl font-bold text-text">ข้อมูลลูก</h1>
             <p className="mt-1 text-sm text-text-muted">ข้อมูลเด็กที่เลือก แผนฝึก และคนที่เชื่อมกับโปรไฟล์นี้</p>
           </div>
-          {!isLoading && parent && profile && <button type="button" className={secondary} onClick={() => setAdding(true)}>เพิ่มเด็ก</button>}
+          {!user && !isLoading && parent && profile && <button type="button" className={secondary} onClick={() => setAdding(true)}>เพิ่มเด็ก</button>}
         </header>
         {!isHydrated || isLoading ? <p role="status" className="text-sm text-text-muted">กำลังโหลดข้อมูลลูก…</p>
           : !parent ? <p className={card + " text-sm"}>เปิดข้อมูลนักเรียนจากหน้าจัดการของบัญชีคุณ</p>
@@ -43,12 +43,12 @@ export default function ProfilePage() {
               <h2 className="font-semibold">ยังไม่ได้เลือกโปรไฟล์เด็ก</h2>
               <p className="text-sm text-text-muted">สร้างโปรไฟล์สำหรับฝึกที่บ้าน หรือเปิดคำเชิญที่ได้รับจากครู</p>
               <div className="flex flex-wrap gap-2">
-                <Link href="/onboarding" className={primary}>สร้างโปรไฟล์เด็ก</Link>
-                <Link href="/settings#invitations" className={secondary}>เปิดคำเชิญ</Link>
+                {!user && <Link href="/onboarding" className={primary}>สร้างโปรไฟล์เด็ก</Link>}
+                <Link href={user ? "/inbox" : "/settings#invitations"} className={secondary}>เปิดคำเชิญ</Link>
               </div>
             </section>
           ) : (
-            <>
+            <div className={`grid items-start gap-4 ${schoolGuardian || (isOwner && !profile.organizationId) ? "lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]" : ""}`}>
               <section className={card + " space-y-4"} aria-label="ข้อมูลเด็กที่เลือก">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 font-bold text-primary">
@@ -60,12 +60,12 @@ export default function ProfilePage() {
                   </div>
                   {isOwner && !profile.organizationId && <Link href="/onboarding?edit=true" className={secondary}>แก้ไขข้อมูลลูก</Link>}
                 </div>
-                <dl className="grid grid-cols-2 gap-3 border-t border-border pt-3 text-sm">
+                <dl className="grid grid-cols-2 gap-3 rounded-xl bg-bg p-3 text-sm">
                   {[
-                    ["ชื่อเล่น", profile.nickname || "—"],
+                    ["ชื่อเล่น", profile.nickname || "ยังไม่ได้ระบุ"],
                     ["อายุ", profile.age + " ปี"],
                     ["โหมดฝึก", profile.trainingMode === "kindergarten_phonics" ? "เรียนเสียงไทย" : "ฝึกออกเสียง"],
-                    ["เป้าหมาย", goals[profile.trainingGoal] || profile.trainingGoal || "—"],
+                    ["เป้าหมาย", goals[profile.trainingGoal] || profile.trainingGoal || "ยังไม่ได้กำหนด"],
                   ].map(([label, value]) => (
                     <div key={label} className="min-w-0">
                       <dt className="text-xs text-text-muted">{label}</dt>
@@ -96,7 +96,7 @@ export default function ProfilePage() {
                   </details>
                 </section>
               ) : null}
-            </>
+            </div>
           )}
         <AddChildModal open={adding} onClose={() => setAdding(false)} />
       </div>

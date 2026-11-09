@@ -1,7 +1,7 @@
 "use client";
 
 interface Props {
-  onPrint: () => void;
+  onPrint?: () => void;
   backHref?: string;
 }
 
@@ -25,7 +25,7 @@ function ArrowLeftIcon() {
 
 export default function PrintActions({ onPrint, backHref = "/progress" }: Props) {
   return (
-    <div className="print:hidden sticky bottom-0 z-20 bg-surface/95 backdrop-blur-md border-t border-border">
+    <div className="print:hidden sticky bottom-16 lg:bottom-0 z-20 bg-surface/95 backdrop-blur-md border-t border-border">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
         <a
           href={backHref}
@@ -40,8 +40,10 @@ export default function PrintActions({ onPrint, backHref = "/progress" }: Props)
         </p>
 
         <button
+          type="button"
           onClick={onPrint}
-          className="flex items-center gap-2 bg-primary text-white font-semibold px-5 py-2.5 rounded-xl text-sm hover:bg-primary/90 transition-all active:scale-[0.98] shadow-sm shadow-primary/20"
+          disabled={!onPrint}
+          className="disabled:opacity-50 flex items-center gap-2 bg-primary text-white font-semibold px-5 py-2.5 rounded-xl text-sm hover:bg-primary/90 transition-all active:scale-[0.98] shadow-sm shadow-primary/20"
         >
           <PrinterIcon />
           พิมพ์ / บันทึก PDF

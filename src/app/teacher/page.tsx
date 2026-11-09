@@ -146,7 +146,7 @@ export default function TeacherDashboardPage() {
                         ))}
                       </div>
                     )}
-                    <GuardianLinkSection key={`${user?.id}:${room.id}`} classroomId={room.id} />
+                    <GuardianLinkSection key={`${user?.id}:${room.id}`} classroomId={room.id} classroomName={room.name} />
                   </div>
                 );
               })}

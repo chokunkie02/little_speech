@@ -1,5 +1,7 @@
 "use client";
 
+import { useOverlayFocus } from "./useOverlayFocus";
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useChildProfile } from "@/hooks/useChildProfile";
 import { useSpeechProgress } from "@/hooks/useSpeechProgress";
@@ -85,14 +87,8 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
     onClose();
   }, [resetForm, onClose]);
 
-  useEffect(() => {
-    if (!open) return;
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") handleClose();
-    }
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [open, handleClose]);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  useOverlayFocus(open, dialogRef, handleClose);
 
   if (!open) return null;
 
@@ -132,6 +128,7 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
 
       {/* Panel — bottom sheet on mobile, centered modal on sm+ */}
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label="เพิ่มเด็ก"

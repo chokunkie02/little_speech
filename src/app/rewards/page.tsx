@@ -122,8 +122,8 @@ function LockedBadgeCard({ progress }: { progress: RewardProgress }) {
           <LockIcon size={10} />
         </span>
       </div>
-      <h3 className="text-xs font-bold text-text-muted/60 leading-tight mb-0.5">{badge.name}</h3>
-      <p className="text-xs text-text-muted/40 leading-snug mb-2">{badge.description}</p>
+      <h3 className="text-xs font-bold text-text leading-tight mb-0.5">{badge.name}</h3>
+      <p className="text-xs text-text-muted leading-snug mb-2">{badge.description}</p>
 
       {target > 1 && (
         <div className="w-full mb-1.5">
@@ -133,13 +133,13 @@ function LockedBadgeCard({ progress }: { progress: RewardProgress }) {
               style={{ width: `${percentage}%`, backgroundColor: badge.color, opacity: 0.5 }}
             />
           </div>
-          <p className="text-xs text-text-muted/50 mt-1">
+          <p className="text-xs text-text-muted mt-1">
             {current} / {target}
           </p>
         </div>
       )}
 
-      <p className="text-xs text-text-muted/40 italic">{hint}</p>
+      <p className="text-xs text-text-muted italic">{hint}</p>
     </div>
   );
 }
@@ -689,7 +689,7 @@ export default function RewardsPage() {
         </div>
 
         {/* ── Hero stat bar ── */}
-        <div
+        {(!isHydrated || summary.totalAttempts > 0) && <div
           className="rounded-2xl border border-border p-5"
           style={{ background: "linear-gradient(135deg, rgba(108,99,255,0.06) 0%, rgba(255,179,71,0.04) 100%)" }}
         >
@@ -727,10 +727,10 @@ export default function RewardsPage() {
               />
             </div>
           </div>
-        </div>
+        </div>}
 
         {/* ── Next Reward / Next Action Card ── */}
-        {isHydrated && (
+        {isHydrated && summary.totalAttempts > 0 && (
           <NextActionCard
             nextBadge={nextBadge ?? null}
             allCompleted={allCompleted}

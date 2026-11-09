@@ -12,6 +12,7 @@ import type { ChildAccess, GrantChildAccessInput, ChildPermissions } from "@/typ
  */
 export interface IChildAccessRepository {
   rehydrate?(): Promise<void>;
+  getReceivedStatus?(userId: string): "loading" | "ready" | "error";
   subscribe(callback: () => void): () => void;
 
   /** Active (non-revoked) grants received by the scoped user. */

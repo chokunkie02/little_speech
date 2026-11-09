@@ -61,13 +61,13 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section className="mt-14 sm:mt-18" aria-labelledby="how-it-works-heading">
+    <section className="mt-8 sm:mt-10" aria-labelledby="how-it-works-heading">
       {/* Section header */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-6">
         <div className="inline-flex items-center gap-2 bg-primary/8 border border-primary/15 rounded-full px-4 py-1.5 mb-4 text-sm font-medium text-primary">
           วิธีการทำงาน
         </div>
-        <h2 id="how-it-works-heading" className="text-2xl md:text-3xl font-bold text-text mb-3">
+        <h2 id="how-it-works-heading" className="scroll-mt-24 text-2xl md:text-3xl font-bold text-text mb-3">
           ง่าย เป็นระบบ และสนุก
         </h2>
         <p className="text-text-muted max-w-md mx-auto leading-relaxed">

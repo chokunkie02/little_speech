@@ -16,6 +16,7 @@ const secondaryClass = "rounded-lg border border-border px-3 py-2 text-sm font-s
 interface Student {
   id: string;
   name: string;
+  nickname: string | null;
   student_code: string | null;
 }
 
@@ -35,7 +36,7 @@ async function loadRoom(classroomId: string): Promise<RoomData> {
   if (!ids.length) return { students: [], invitations: [], linkedStudentIds: new Set() };
 
   const [students, invites, guardians] = await Promise.all([
-    client.from("child_profiles").select("id,name,student_code").in("id", ids)
+    client.from("child_profiles").select("id,name,nickname,student_code").in("id", ids)
       .is("archived_at", null).order("name"),
     client.from("invitations").select("*").in("child_id", ids)
       .eq("requires_teacher_approval", true).order("created_at", { ascending: false }),
@@ -47,17 +48,20 @@ async function loadRoom(classroomId: string): Promise<RoomData> {
   const now = Date.now();
   return {
     students: students.data ?? [],
-    invitations: (invites.data ?? []).filter((invite) =>
-      invite.status !== "pending" || invite.requested_at || Date.parse(invite.expires_at) > now,
+    invitations: (invites.data ?? []).map((invite) =>
+      invite.status === "pending" && !invite.requested_at && Date.parse(invite.expires_at) <= now
+        ? { ...invite, status: "expired" }
+        : invite,
     ),
     linkedStudentIds: new Set(guardians.data?.map((guardian) => guardian.child_id)),
   };
 }
 
-export default function GuardianLinkSection({ classroomId }: { classroomId: string }) {
+export default function GuardianLinkSection({ classroomId, classroomName }: { classroomId: string; classroomName: string }) {
   const { school } = useRepositories();
   const client = isSupabaseProviderRequested() ? getSupabaseClient() : null;
   const [room, setRoom] = useState<RoomData>();
+  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState("");
   const [email, setEmail] = useState("");
   const [addingStudent, setAddingStudent] = useState(false);
@@ -94,10 +98,15 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
     }
   }
 
-  const childId = room?.students.find((student) => student.id === selectedId)?.id ?? room?.students[0]?.id;
+  const term = query.trim().normalize("NFC").toLocaleLowerCase("th");
+  const visibleStudents = (room?.students ?? []).filter((student) =>
+    [student.name, student.nickname, student.student_code].some((value) => value?.normalize("NFC").toLocaleLowerCase("th").includes(term)),
+  );
+  const selectedStudent = visibleStudents.find((student) => student.id === selectedId) ?? (!term ? visibleStudents[0] : undefined);
+  const childId = selectedStudent?.id;
   const currentInvites = room?.invitations.filter((invitation) => invitation.child_id === childId) ?? [];
   const linked = !!childId && room?.linkedStudentIds.has(childId);
-  const decided = currentInvites.filter((invite) => invite.requested_at && invite.status !== "pending");
+  const decided = currentInvites.filter((invite) => !invite.inbox_direct && invite.requested_at && invite.status !== "pending");
   const names = new Map(room?.students.map((student) => [student.id, student.name]));
   const requests = room?.invitations.filter((invitation) =>
     invitation.status === "pending" && invitation.requested_at && names.has(invitation.child_id ?? ""),
@@ -106,7 +115,7 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
   return (
     <section aria-label="เชื่อมผู้ปกครอง" className="space-y-3 border-t border-border pt-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <h3 className="text-sm font-bold">เชื่อมผู้ปกครอง</h3>
+        <h3 className="text-sm font-bold">นักเรียนและคำเชิญผู้ปกครอง</h3>
         <div className="flex gap-2">
           <button className={secondaryClass} disabled={busy} onClick={() => {
             setError("");
@@ -119,6 +128,37 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
       </div>
       {error && <p role="alert" className="rounded-lg bg-error/10 p-3 text-sm text-error">{error}</p>}
       {notice && <p role="status" className="rounded-lg bg-success/10 p-3 text-sm">{notice}</p>}
+
+      {requests.length > 0 && (
+      <div className="space-y-2 rounded-xl border border-warning/40 bg-warning/8 p-3">
+        <h4 className="text-sm font-semibold">คำขอรอตรวจ ({requests.length})</h4>
+        {requests.map((request) => (
+          <div key={request.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-3">
+            <div className="space-y-1 text-sm">
+              <p className="font-semibold">นักเรียน {names.get(request.child_id ?? "")}</p>
+              <p>{request.requester_name} · {request.requester_relationship}</p>
+              <p className="text-text-muted break-all">{request.email}</p>
+              {!request.is_additional_guardian && room?.linkedStudentIds.has(request.child_id ?? "") &&
+                <p className="text-text-muted">นักเรียนเชื่อมผู้ปกครองแล้ว</p>}
+            </div>
+            <div className="flex gap-2">
+              {[true, false].map((approve) => (
+                <button key={String(approve)} className={approve ? primaryClass : secondaryClass}
+                  disabled={busy || (approve && !request.is_additional_guardian && !!room?.linkedStudentIds.has(request.child_id ?? ""))}
+                  onClick={() => void run(async () => {
+                    const { error } = await client.rpc("review_first_guardian_request", {
+                      p_invitation_id: request.id, p_approve: approve,
+                    });
+                    if (error) throw new Error(error.message);
+                  }, approve ? "อนุมัติและเชื่อมผู้ปกครองแล้ว" : "ไม่อนุมัติคำขอแล้ว")}>
+                  {approve ? "อนุมัติ" : "ไม่อนุมัติ"}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+      )}
 
       {addingStudent && (
         <form className="grid gap-3 rounded-xl border border-border p-3 sm:grid-cols-2" onSubmit={(event) => {
@@ -138,6 +178,7 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
             setAddingStudent(false);
           }, "เพิ่มนักเรียนแล้ว");
         }}>
+          <h4 className="font-semibold sm:col-span-2">ข้อมูลนักเรียนใหม่ · {classroomName}</h4>
           <label className="text-sm">ชื่อและนามสกุล<input required maxLength={120} name="name" className={inputClass} /></label>
           <label className="text-sm">ชื่อเล่น<input maxLength={60} name="nickname" className={inputClass} /></label>
           <label className="text-sm">รหัสนักเรียน<input required maxLength={40} name="studentCode" className={inputClass} /></label>
@@ -146,40 +187,61 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
         </form>
       )}
 
-      {room && childId && (
-        <div className="space-y-3 rounded-xl border border-border p-3">
-          <label className="block text-sm">นักเรียน
-            <select className={inputClass} value={childId} onChange={(event) => {
-              setSelectedId(event.target.value);
-              setEmail("");
-            }}>
-              {room.students.map((student) => (
-                <option key={student.id} value={student.id}>
-                  {student.name}{student.student_code ? ` · ${student.student_code}` : ""}
-                </option>
-              ))}
-            </select>
+      {!!room?.students.length && (
+        <div className="space-y-2">
+          <label className="block text-sm">ค้นหานักเรียนด้วยชื่อ ชื่อเล่น หรือรหัส
+            <input type="search" className={inputClass} value={query} onChange={(event) => {
+              setQuery(event.target.value); setSelectedId(""); setEmail("");
+            }} />
           </label>
+          {visibleStudents.length === 0 ? <p role="status" className="text-sm text-text-muted">ไม่พบนักเรียนที่ตรงกับคำค้น</p> :
+            <ul className="max-h-56 space-y-1 overflow-auto">{visibleStudents.map((student) => <li key={student.id}>
+              <button type="button" aria-pressed={childId === student.id} className="w-full rounded-lg border border-border px-3 py-2 text-left text-sm aria-pressed:bg-primary/10"
+                onClick={() => { setSelectedId(student.id); setEmail(""); setNotice(""); setError(""); }}>
+                <span className="block font-semibold">{student.name}</span>
+                <span className="text-xs text-text-muted">{[student.student_code, student.nickname, classroomName].filter(Boolean).join(" · ")}</span>
+              </button>
+            </li>)}</ul>}
+        </div>
+      )}
+      {selectedStudent && childId && (
+        <div className="space-y-3 rounded-xl border border-border bg-bg p-4">
+          <h4 className="font-semibold">เชิญผู้ปกครองของ {selectedStudent.name}</h4>
+          <p className="text-xs text-text-muted">{classroomName} · {selectedStudent.student_code}</p>
           <div className="flex flex-wrap items-center gap-3">
             <Link className={secondaryClass} href={`/progress?child=${encodeURIComponent(childId)}`}>
               ดูความก้าวหน้า
             </Link>
             {linked && <p className="text-sm text-success">เชื่อมผู้ปกครองแล้ว</p>}
           </div>
-          <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => {
+          <form className="flex flex-wrap items-end gap-2 border-t border-border pt-3" onSubmit={(event) => {
             event.preventDefault();
             void run(async () => {
-              const { error } = await client.rpc("create_guardian_invite", { p_child_id: childId, p_email: email });
+              const { error } = await client.rpc("send_guardian_inbox_invite", { p_child_id: childId, p_email: email });
               if (error) throw new Error(error.message);
-            }, "ลิงก์เชิญพร้อมใช้งาน");
+              setEmail("");
+            }, "ส่งคำเชิญแล้ว · รอตอบรับ");
           }}>
-            <label className="min-w-0 flex-[1_1_13rem] text-sm">อีเมลผู้ปกครอง (ไม่บังคับ)
-              <input className={inputClass} type="email" maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} />
+            <label className="min-w-0 flex-[1_1_13rem] text-sm">อีเมลผู้ปกครอง
+              <input className={inputClass} type="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} />
             </label>
-            <button className={primaryClass} disabled={busy}>{linked ? "เชิญผู้ปกครองร่วม" : "สร้างลิงก์เชิญ"}</button>
+            <button className={primaryClass} disabled={busy}>ส่งคำเชิญ</button>
           </form>
+          {currentInvites.some((invite) => invite.inbox_direct) && <ul className="space-y-2">
+            {currentInvites.filter((invite) => invite.inbox_direct).map((invite) => {
+              const pending = invite.status === "pending";
+              const label = pending ? "รอตอบรับ" : invite.status === "accepted" ? "ตอบรับแล้ว" : invite.status === "revoked" ? "ยกเลิกแล้ว" : "หมดอายุ";
+              return <li key={invite.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border p-2 text-sm">
+                <span className="break-all">{invite.email} · {label}</span>
+                {pending && <button className={secondaryClass} disabled={busy} onClick={() => void run(async () => {
+                  const { error } = await client.rpc("revoke_guardian_inbox_invite", { p_invitation_id: invite.id });
+                  if (error) throw new Error(error.message);
+                }, "ยกเลิกคำเชิญแล้ว")}>ยกเลิกคำเชิญ</button>}
+              </li>;
+            })}
+          </ul>}
           {currentInvites.filter((invite) =>
-            invite.status === "pending" && !invite.requested_at && invite.is_additional_guardian === !!linked,
+            !invite.inbox_direct && invite.status === "pending" && !invite.requested_at,
           ).map((invite) => (
             <div key={invite.id} className="space-y-2 border-t border-border pt-3">
               <p className="text-xs text-text-muted">{invite.email || "ลิงก์สำหรับแชร์"} · หมดอายุ {new Date(invite.expires_at).toLocaleDateString("th-TH")}</p>
@@ -201,36 +263,8 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
           <SchoolGuardianMembers key={childId} childId={childId} mode="staff" revision={refresh} onChanged={() => setRefresh((value) => value + 1)} />
         </div>
       )}
-      {room && !childId && <p className="text-sm text-text-muted">เพิ่มนักเรียนในห้องก่อนสร้างลิงก์เชิญ</p>}
+      {room?.students.length === 0 && <p className="text-sm text-text-muted">เพิ่มนักเรียนในห้องก่อนส่งคำเชิญ</p>}
 
-      <div className="space-y-2">
-        <h4 className="text-sm font-semibold">คำขอรอตรวจ ({requests.length})</h4>
-        {requests.map((request) => (
-          <div key={request.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-3">
-            <div className="space-y-1 text-sm">
-              <p className="font-semibold">{request.requester_name} · {request.requester_relationship}</p>
-              <p className="text-text-muted break-all">{request.email}</p>
-              <p>นักเรียน {names.get(request.child_id ?? "")}</p>
-              {!request.is_additional_guardian && room?.linkedStudentIds.has(request.child_id ?? "") &&
-                <p className="text-text-muted">นักเรียนเชื่อมผู้ปกครองแล้ว</p>}
-            </div>
-            <div className="flex gap-2">
-              {[true, false].map((approve) => (
-                <button key={String(approve)} className={approve ? primaryClass : secondaryClass}
-                  disabled={busy || (approve && !request.is_additional_guardian && !!room?.linkedStudentIds.has(request.child_id ?? ""))}
-                  onClick={() => void run(async () => {
-                    const { error } = await client.rpc("review_first_guardian_request", {
-                      p_invitation_id: request.id, p_approve: approve,
-                    });
-                    if (error) throw new Error(error.message);
-                  }, approve ? "อนุมัติและเชื่อมผู้ปกครองแล้ว" : "ไม่อนุมัติคำขอแล้ว")}>
-                  {approve ? "อนุมัติ" : "ไม่อนุมัติ"}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
     </section>
   );
 }

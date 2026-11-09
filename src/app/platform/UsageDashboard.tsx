@@ -65,7 +65,7 @@ export default function UsageDashboard() {
           </div>
           <span className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">ข้อมูลจำลอง</span>
         </div>
-        <div className="mt-4 flex flex-wrap gap-3">
+        <div className="mt-4 flex flex-wrap items-end gap-3 border-t border-border pt-3">
           <div className="flex w-full flex-col gap-1 text-xs font-semibold sm:w-auto">
             <label htmlFor="usage-period">ช่วงเวลา</label>
             <select id="usage-period" className={control} value={period} onChange={(event) => setPeriod(event.target.value as DemoPeriod)}>
@@ -208,18 +208,19 @@ export default function UsageDashboard() {
       <section className={panel} aria-labelledby="school-usage-heading">
         <h3 id="school-usage-heading" className="font-bold">เปรียบเทียบการใช้งานรายโรงเรียน</h3>
         <p className="mt-1 text-xs text-text-muted">เลือกชื่อโรงเรียนเพื่อกรองกราฟและตัวเลขด้านบน ตารางแสดงทุกโรงเรียนในช่วงเดียวกัน</p>
-        <div className="mt-3 overflow-x-auto">
+        <p className="mt-2 text-xs text-text-muted lg:hidden">เลื่อนตารางแนวนอนเพื่อดูทุกคอลัมน์</p>
+        <div className="mt-3 overflow-x-auto rounded-lg focus-visible:ring-2 focus-visible:ring-primary" role="region" aria-label="ตารางเปรียบเทียบโรงเรียน" tabIndex={0}>
           <table className="w-full min-w-[38rem] text-right text-sm tabular-nums">
             <thead className="border-b border-border text-xs text-text-muted">
               <tr>{["โรงเรียน", "บัญชีที่เริ่ม", "รอบที่เริ่ม", "รอบที่จบ", "บัญชีที่ฝึกจบ", "กลับมาวันที่ 7"].map((label, index) =>
-                <th key={label} scope="col" className={`px-2 py-3 font-semibold ${index === 0 ? "text-left" : ""}`}>{label}</th>
+                <th key={label} scope="col" className={`px-2 py-3 font-semibold ${index === 0 ? "sticky left-0 z-10 bg-surface text-left" : ""}`}>{label}</th>
               )}</tr>
             </thead>
             <tbody>
               {demoSchools.map(({ id, name }, index) => {
                 const row = rows[index];
                 return <tr key={id} className={`border-b border-border last:border-0 ${school === id ? "bg-primary/8" : ""}`}>
-                  <th scope="row" className="px-2 py-3 text-left font-semibold">
+                  <th scope="row" className="sticky left-0 z-10 bg-surface px-2 py-3 text-left font-semibold">
                     <button type="button" aria-pressed={school === id} className="text-left text-primary hover:underline"
                       onClick={() => setSchool(school === id ? "all" : id)}>{name}</button>
                   </th>

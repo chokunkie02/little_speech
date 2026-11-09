@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
 import PlatformUsage from "./PlatformUsage";
 import ThemeToggle from "@/components/ui/ThemeToggle";
@@ -95,6 +95,7 @@ function SchoolDetails({ school, onChange }: { school: PlatformSchool; onChange:
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold">{school.name}</h2>
+          <p className="break-all text-xs text-text-muted">รหัสโรงเรียน {school.id}</p>
           <p className="text-xs text-text-muted">
             วันที่สมัคร {new Date(school.created_at).toLocaleDateString("th-TH", { timeZone: "Asia/Bangkok" })}
           </p>
@@ -104,25 +105,6 @@ function SchoolDetails({ school, onChange }: { school: PlatformSchool; onChange:
           onChange();
         }}>โหลดสถานะล่าสุด</button>
       </div>
-      <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => void submit(event, "rename")}>
-        <label className="min-w-48 flex-1 text-sm font-semibold">ชื่อโรงเรียน
-          <input className={input} value={name} onChange={(event) => setName(event.target.value)} required maxLength={120} />
-        </label>
-        <button className={secondary} disabled={busy || !name.trim() || name.trim() === school.name}>บันทึกชื่อ</button>
-      </form>
-
-      <div className="space-y-3 border-t border-border pt-5">
-        <h3 className="font-bold">แอดมินโรงเรียน</h3>
-        <p className="text-sm text-text-muted">ผู้ดูแลแต่ละบัญชีมีสิทธิ์เท่ากันภายในโรงเรียนนี้</p>
-        {readError && <p role="alert" className="text-sm text-error">{readError}</p>}
-        {!details && !readError && <p role="status" className="text-sm text-text-muted">กำลังโหลดรายชื่อผู้ดูแล…</p>}
-        {details && (details.admins.length > 0
-          ? <ul className="space-y-2">{details.admins.map(({ email }) => (
-            <li key={email} className="break-all rounded-xl border border-border p-3 text-sm">{email} <span className="text-success">· ใช้งาน</span></li>
-          ))}</ul>
-          : <p className="text-sm text-text-muted">ยังไม่มีแอดมินที่ใช้งาน</p>)}
-      </div>
-
       <div className="space-y-3 border-t border-border pt-5">
         <h3 className="font-bold">เชิญแอดมินโรงเรียน</h3>
         <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => void submit(event, "invite")}>
@@ -155,6 +137,28 @@ function SchoolDetails({ school, onChange }: { school: PlatformSchool; onChange:
           })}</ul>
           : <p className="text-sm text-text-muted">ยังไม่มีคำเชิญแอดมินโรงเรียน</p>)}
       </div>
+      <div className="space-y-3 border-t border-border pt-5">
+        <h3 className="font-bold">แอดมินโรงเรียน</h3>
+        <p className="text-sm text-text-muted">ผู้ดูแลแต่ละบัญชีมีสิทธิ์เท่ากันภายในโรงเรียนนี้</p>
+        {readError && <p role="alert" className="text-sm text-error">{readError}</p>}
+        {!details && !readError && <p role="status" className="text-sm text-text-muted">กำลังโหลดรายชื่อผู้ดูแล…</p>}
+        {details && (details.admins.length > 0
+          ? <ul className="space-y-2">{details.admins.map(({ email }) => (
+            <li key={email} className="break-all rounded-xl border border-border p-3 text-sm">{email} <span className="text-success">· ใช้งาน</span></li>
+          ))}</ul>
+          : <p className="text-sm text-text-muted">ยังไม่มีแอดมินที่ใช้งาน</p>)}
+      </div>
+
+      <details className="space-y-3 border-t border-border pt-4">
+        <summary className="cursor-pointer text-sm font-semibold text-primary">แก้ชื่อโรงเรียน</summary>
+      <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => void submit(event, "rename")}>
+        <label className="min-w-48 flex-1 text-sm font-semibold">ชื่อโรงเรียน
+          <input className={input} value={name} onChange={(event) => setName(event.target.value)} required maxLength={120} />
+        </label>
+        <button className={secondary} disabled={busy || !name.trim() || name.trim() === school.name}>บันทึกชื่อ</button>
+      </form>
+
+      </details>
     </section>
   );
 }
@@ -170,8 +174,29 @@ function PlatformOverview() {
   const [createError, setCreateError] = useState("");
   const [createdNotice, setCreatedNotice] = useState("");
   const [query, setQuery] = useState("");
+  const [searchResult, setSearchResult] = useState<{ term: string; ids: string[]; error: boolean }>();
+  const search = query.trim().normalize("NFC").toLocaleLowerCase("th");
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string>();
+  const detailRef = useRef<HTMLDivElement>(null);
+  const createButtonRef = useRef<HTMLButtonElement>(null);
+  const schoolNameRef = useRef<HTMLInputElement>(null);
+  const restoreCreateFocus = useRef(false);
+
+  useEffect(() => {
+    if (showCreate) {
+      schoolNameRef.current?.focus({ preventScroll: true });
+    } else if (restoreCreateFocus.current) {
+      restoreCreateFocus.current = false;
+      createButtonRef.current?.focus();
+    }
+  }, [showCreate]);
+
+  function openDetails() {
+    if (!window.matchMedia("(min-width: 1024px)").matches) {
+      requestAnimationFrame(() => detailRef.current?.scrollIntoView({ block: "start" }));
+    }
+  }
   const selected = schools?.find((school) => school.id === selectedId);
 
   useEffect(() => {
@@ -194,6 +219,20 @@ function PlatformOverview() {
     void load();
     return () => { active = false; };
   }, [revision]);
+
+  useEffect(() => {
+    if (!search) return;
+    let active = true;
+    const timer = window.setTimeout(async () => {
+      try {
+        const response = await getSupabaseClient()?.rpc("search_platform_school_ids", { p_query: search });
+        if (active) setSearchResult({ term: search, ids: response?.data ?? [], error: !response || !!response.error });
+      } catch {
+        if (active) setSearchResult({ term: search, ids: [], error: true });
+      }
+    }, 250);
+    return () => { active = false; window.clearTimeout(timer); };
+  }, [search, revision]);
 
   const reload = () => setRevision((value) => value + 1);
   async function createSchool(event: FormEvent<HTMLFormElement>) {
@@ -218,6 +257,7 @@ function PlatformOverview() {
       setAdminEmail("");
       setShowCreate(false);
       setCreatedNotice("สร้างโรงเรียนแล้ว คัดลอกลิงก์ให้ผู้ดูแลคนแรกจากรายการคำเชิญในรายละเอียดโรงเรียน");
+      openDetails();
       reload();
     } catch (cause) {
       setCreateError(cause instanceof Error ? cause.message : "สร้างโรงเรียนไม่สำเร็จ");
@@ -231,8 +271,10 @@ function PlatformOverview() {
       ? <div className={panel}><p role="alert" className="mb-3 text-sm text-error">{error}</p><button className={secondary} onClick={reload}>ลองอีกครั้ง</button></div>
       : <p role="status" className="text-text-muted">กำลังโหลดโรงเรียน…</p>;
   }
-  const search = query.trim().normalize("NFC").toLocaleLowerCase("th");
-  const matches = schools.filter((school) => school.name.normalize("NFC").toLocaleLowerCase("th").includes(search));
+  const searched = searchResult?.term === search ? searchResult : undefined;
+  const matchIds = new Set(searched?.ids ?? []);
+  const matches = schools.filter((school) => !search || matchIds.has(school.id));
+  const selectedMatch = selected && (!search || matchIds.has(selected.id)) ? selected : undefined;
   matches.sort((first, second) => Date.parse(second.created_at) - Date.parse(first.created_at));
   const pageCount = Math.max(1, Math.ceil(matches.length / schoolsPerPage));
   const currentPage = Math.min(page, pageCount);
@@ -253,59 +295,39 @@ function PlatformOverview() {
     <>
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="font-bold">โรงเรียนและผู้ดูแล</h2>
-        <button type="button" className={button} aria-expanded={showCreate} aria-controls="create-school"
-          onClick={() => setShowCreate((open) => !open)}>
+        <button ref={createButtonRef} type="button" className={button} aria-expanded={showCreate} aria-controls={showCreate ? "create-school" : undefined}
+          disabled={showCreate} onClick={() => { setShowCreate(true); openDetails(); }}>
           เพิ่มโรงเรียน
         </button>
       </div>
-      <section id="create-school" hidden={!showCreate} className={panel + " space-y-3"} aria-labelledby="create-school-heading">
-        <h2 id="create-school-heading" className="font-bold">สร้างโรงเรียนใหม่</h2>
-        <form className="flex flex-wrap items-end gap-3" onSubmit={(event) => void createSchool(event)}>
-          <label className="min-w-48 flex-1 text-sm font-semibold">
-            ชื่อโรงเรียนใหม่
-            <input className={input} value={schoolName} onChange={(event) => setSchoolName(event.target.value)}
-              required maxLength={120} disabled={creating} />
-          </label>
-          <label className="min-w-48 flex-1 text-sm font-semibold">
-            อีเมลผู้ดูแลคนแรก
-            <input type="email" className={input} value={adminEmail} onChange={(event) => setAdminEmail(event.target.value)}
-              required maxLength={254} disabled={creating} />
-          </label>
-          <button className={button} disabled={creating || !schoolName.trim()}>
-            {creating ? "กำลังสร้าง…" : "สร้างโรงเรียน"}
-          </button>
-        </form>
-        <p className="text-xs text-text-muted">ระบบสร้างลิงก์คำเชิญพร้อมโรงเรียน ผู้ดูแลตอบรับด้วยบัญชีผู้ดูแลโรงเรียนที่ยืนยันอีเมลนี้แล้ว</p>
-        {createError && <p role="alert" className="text-sm text-error">{createError}</p>}
-      </section>
       {createdNotice && <p role="status" className={panel + " text-sm text-success"}>{createdNotice}</p>}
-      <dl className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        {stats.map(({ label, value }) => <div key={label} className={panel}>
+      <dl className="grid grid-cols-2 gap-2 rounded-2xl border border-border bg-surface p-2 sm:grid-cols-3 lg:grid-cols-5">
+        {stats.map(({ label, value }) => <div key={label} className="rounded-xl bg-bg px-3 py-2">
           <dt className="text-xs font-medium text-text-muted">{label}</dt>
-          <dd className="mt-2 text-2xl font-bold text-primary">{value.toLocaleString("th-TH")}</dd>
+          <dd className="mt-1 text-xl font-bold text-text">{value.toLocaleString("th-TH")}</dd>
         </div>)}
       </dl>
-      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+      <div className={`grid items-start gap-4 ${showCreate || selectedMatch ? "lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]" : ""}`}>
         <section className={panel + " space-y-3"}>
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="font-bold">โรงเรียนในระบบ</h2>
             <button type="button" onClick={reload} className="text-xs font-semibold text-primary">โหลดรายการล่าสุด</button>
           </div>
           <label className="block text-sm font-semibold">
-            ค้นหาชื่อโรงเรียน
-            <input type="search" className={input} placeholder="พิมพ์ชื่อโรงเรียน" value={query} onChange={(event) => {
+            ค้นหาโรงเรียน
+            <input type="search" className={input} maxLength={254} placeholder="ชื่อ รหัสโรงเรียน หรืออีเมลผู้ดูแล" value={query} onChange={(event) => {
               setQuery(event.target.value);
               setPage(1);
             }} />
           </label>
           <p role="status" className="text-xs text-text-muted">
-            {matches.length > 0
+            {search && !searched ? "กำลังค้นหา…" : searched?.error ? "ค้นหาไม่สำเร็จ กรุณาลองใหม่" : matches.length > 0
               ? `แสดง ${start + 1}–${start + visibleSchools.length} จาก ${matches.length} โรงเรียน · ใหม่ล่าสุดก่อน`
               : schools.length === 0 ? "ยังไม่มีโรงเรียนสมัครใช้งาน" : "ไม่พบโรงเรียนที่ตรงกับคำค้น"}
           </p>
-          {visibleSchools.length > 0 && <ul className="space-y-2">
+          {visibleSchools.length > 0 && <ul className={showCreate || selectedMatch ? "space-y-2" : "grid gap-2 sm:grid-cols-2 lg:grid-cols-3"}>
             {visibleSchools.map((school) => <li key={school.id}>
-              <button type="button" aria-pressed={selectedId === school.id} onClick={() => setSelectedId(school.id)}
+              <button type="button" aria-pressed={selectedId === school.id} onClick={() => { setSelectedId(school.id); setShowCreate(false); openDetails(); }}
                 className="w-full rounded-xl border border-border px-3 py-2.5 text-left text-sm aria-pressed:border-primary aria-pressed:bg-primary/10">
                 <span className="block break-words font-semibold">{school.name}</span>
                 <span className="block text-xs text-text-muted">
@@ -320,9 +342,31 @@ function PlatformOverview() {
             <button type="button" className={secondary} disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}>ถัดไป</button>
           </nav>}
         </section>
-        {selected
-          ? <SchoolDetails key={selected.id} school={selected} onChange={reload} />
-          : <p className={panel + " text-sm text-text-muted"}>เลือกโรงเรียนเพื่อดูรายละเอียดและจัดการคำเชิญผู้ดูแล</p>}
+        {(showCreate || selectedMatch) && <div ref={detailRef} className="min-w-0 scroll-mt-4">
+          {showCreate ? (
+            <section id="create-school" className={panel + " space-y-3"} aria-labelledby="create-school-heading">
+              <h2 id="create-school-heading" className="font-bold">สร้างโรงเรียนใหม่</h2>
+              <form className="flex flex-wrap items-end gap-3" onSubmit={(event) => void createSchool(event)}>
+                <label className="min-w-0 basis-full text-sm font-semibold">
+                  ชื่อโรงเรียนใหม่
+                  <input ref={schoolNameRef} className={input} value={schoolName} onChange={(event) => setSchoolName(event.target.value)}
+                    required maxLength={120} disabled={creating} />
+                </label>
+                <label className="min-w-0 basis-full text-sm font-semibold">
+                  อีเมลผู้ดูแลคนแรก
+                  <input type="email" className={input} value={adminEmail} onChange={(event) => setAdminEmail(event.target.value)}
+                    required maxLength={254} disabled={creating} />
+                </label>
+                <button className={button} disabled={creating || !schoolName.trim() || !adminEmail.trim()}>
+                  {creating ? "กำลังสร้าง…" : "สร้างโรงเรียน"}
+                </button>
+                <button type="button" className={secondary} disabled={creating} onClick={() => { restoreCreateFocus.current = true; setShowCreate(false); }}>ยกเลิก</button>
+              </form>
+              <p className="text-xs text-text-muted">ระบบสร้างลิงก์คำเชิญพร้อมโรงเรียน ผู้ดูแลตอบรับด้วยบัญชีผู้ดูแลโรงเรียนที่ยืนยันอีเมลนี้แล้ว</p>
+              {createError && <p role="alert" className="text-sm text-error">{createError}</p>}
+            </section>
+          ) : selectedMatch && <SchoolDetails key={selectedMatch.id} school={selectedMatch} onChange={reload} />}
+        </div>}
       </div>
     </>
   );
@@ -361,7 +405,7 @@ export default function PlatformAdminPage() {
               <div hidden={view !== "schools"} className="space-y-5">
                 <PlatformOverview key={user.id} />
               </div>
-              {view === "usage" && <PlatformUsage />}
+              <div hidden={view !== "usage"}><PlatformUsage /></div>
             </>}
       </div>
     </main>

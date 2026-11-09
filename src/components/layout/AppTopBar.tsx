@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useGuardianWorkspace } from "./GuardianWorkspace";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useSidebar } from "./SidebarContext";
 import { useSpeechProgress } from "@/hooks/useSpeechProgress";
@@ -28,6 +29,7 @@ export default function AppTopBar() {
   const { mobileOpen, setMobileOpen } = useSidebar();
   const { summary, isHydrated, selectedSoundId } = useSpeechProgress();
   const { profile, isHydrated: profileHydrated } = useChildProfile();
+  const { restricted } = useGuardianWorkspace();
   const stars = isHydrated ? summary.starsEarned : 0;
 
   return (
@@ -58,7 +60,7 @@ export default function AppTopBar() {
         </Link>
 
         {/* Child chip — tapping opens drawer where full selector lives */}
-        {profileHydrated && profile && (
+        {!restricted && profileHydrated && profile && (
           <button
             onClick={() => setMobileOpen(true)}
             className="flex items-center gap-1.5 max-w-[120px] min-w-0 px-2 py-1 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10 transition-all flex-shrink-0"
@@ -75,14 +77,14 @@ export default function AppTopBar() {
         <div className="flex-1 min-w-0" />
 
         {/* Target sound */}
-        {isHydrated && selectedSoundId && (
+        {!restricted && isHydrated && selectedSoundId && (
           <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold flex-shrink-0">
             เสียง {selectedSoundId}
           </span>
         )}
 
         {/* Stars */}
-        {isHydrated && stars > 0 && (
+        {!restricted && isHydrated && stars > 0 && (
           <Link
             href="/rewards"
             className="flex items-center gap-0.5 text-xs font-bold text-secondary hover:text-secondary/80 transition-colors flex-shrink-0"

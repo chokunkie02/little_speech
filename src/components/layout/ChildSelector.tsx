@@ -7,6 +7,7 @@ import { useChildProfile } from "@/hooks/useChildProfile";
 import { useSpeechProgress } from "@/hooks/useSpeechProgress";
 import type { ChildProfileData } from "@/lib/child-profile/childProfileStorage";
 import AddChildModal from "./AddChildModal";
+import { useAuth } from "@/hooks/useAuth";
 
 function ChevronDownIcon() {
   return (
@@ -40,9 +41,18 @@ interface ChildSelectorProps {
 export default function ChildSelector({ collapsed = false }: ChildSelectorProps) {
   const { profile, profiles, sharedProfiles, selectedChildId, isHydrated, selectChild } = useChildProfile();
   const { setSelectedSound, switchChildProgress } = useSpeechProgress();
+  const { user, isLoading } = useAuth();
   const [open, setOpen] = useState(false);
   const [addingChild, setAddingChild] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const options = wrapperRef.current?.querySelectorAll<HTMLButtonElement>('[role="option"]');
+    const selected = Array.from(options ?? []).find((option) => option.getAttribute("aria-selected") === "true");
+    (selected ?? options?.[0])?.focus();
+  }, [open]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -65,12 +75,30 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
     setSelectedSound(child.targetSound);
     switchChildProgress(child.id);
     setOpen(false);
+    triggerRef.current?.focus();
   }
 
   return (
     <>
-      <div ref={wrapperRef} className="relative">
+      <div ref={wrapperRef} className="relative" onKeyDown={(event) => {
+        if (event.key === "Escape" && open) {
+          event.preventDefault();
+          event.stopPropagation();
+          setOpen(false);
+          triggerRef.current?.focus();
+        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+          event.preventDefault();
+          if (!open) { setOpen(true); return; }
+          const options = Array.from(wrapperRef.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []);
+          if (!options.length) return;
+          const current = options.findIndex((option) => option === document.activeElement);
+          const step = event.key === "ArrowDown" ? 1 : -1;
+          const next = current < 0 ? (step > 0 ? 0 : options.length - 1) : (current + step + options.length) % options.length;
+          options[next]?.focus();
+        }
+      }}>
         <button
+          ref={triggerRef}
           onClick={() => setOpen((v) => !v)}
           className={collapsed
             ? "grid size-8 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
@@ -103,6 +131,7 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
                 <button
                   key={child.id}
                   role="option"
+                  tabIndex={-1}
                   aria-selected={isSelected}
                   onClick={() => handleSelect(child)}
                   className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm transition-colors text-left ${
@@ -138,6 +167,7 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
                     <button
                       key={child.id}
                       role="option"
+                  tabIndex={-1}
                       aria-selected={isSelected}
                       onClick={() => handleSelect(child)}
                       className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm transition-colors text-left ${
@@ -165,7 +195,7 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
             )}
 
             {/* Add Child */}
-            <div className="border-t border-border">
+            {!user && !isLoading && <div className="border-t border-border">
               <button
                 onClick={() => { setOpen(false); setAddingChild(true); }}
                 className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-text-muted hover:text-primary hover:bg-primary/5 transition-colors"
@@ -175,12 +205,12 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
                 </span>
                 <span className="flex-1 text-left">เพิ่มเด็ก</span>
               </button>
-            </div>
+            </div>}
           </div>
         )}
       </div>
 
-      <AddChildModal open={addingChild} onClose={() => setAddingChild(false)} />
+      <AddChildModal open={!user && !isLoading && addingChild} onClose={() => { setAddingChild(false); triggerRef.current?.focus(); }} />
     </>
   );
 }

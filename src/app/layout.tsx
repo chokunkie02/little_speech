@@ -3,6 +3,7 @@ import { ThemeProvider } from "@/components/ui/ThemeProvider";
 import { RepositoryProvider } from "@/lib/providers/RepositoryProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
 import WebUsageTracker from "@/components/analytics/WebUsageTracker";
+import { GuardianWorkspace } from "@/components/layout/GuardianWorkspace";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -26,7 +27,7 @@ export default function RootLayout({
           <WebUsageTracker />
           <RepositoryProvider>
             <ThemeProvider>
-              {children}
+              <GuardianWorkspace>{children}</GuardianWorkspace>
             </ThemeProvider>
           </RepositoryProvider>
         </AuthProvider>

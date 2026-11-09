@@ -943,7 +943,7 @@ function ReportEntry() {
           เข้าสู่ระบบเพื่อดูรายงาน
         </Link>
       ) : childId ? (
-        <SchoolProgressReportView key={`${user.id}:${childId}`} childId={childId} backHref={backHref} />
+        <SchoolProgressReportView key={`${user.id}:${childId}`} childId={childId} backHref={backHref} audience={user.role === "school_admin" ? "ผู้ดูแลโรงเรียน" : user.role === "teacher" ? "ครู" : "ผู้ปกครอง"} />
       ) : (
         <div className="space-y-2 p-6 text-sm text-text-muted">
           <p>เลือกนักเรียนก่อนเปิดรายงาน</p>

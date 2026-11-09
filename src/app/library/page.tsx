@@ -347,7 +347,7 @@ function PhonicsContent() {
         <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
           ลำดับการเรียน
         </p>
-        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {units.map((unit) => (
             <div
               key={unit.id}
@@ -415,8 +415,8 @@ export default function LibraryPage() {
 
   const headerSubtitle =
     contentMode === "kindergarten_phonics"
-      ? "เรียนเสียงไทย · 7 ระดับ · เรียงจากง่ายไปยาก"
-      : `เนื้อหา ${totalSpeechContent} ภารกิจสำหรับ ${mockTargetSounds.length} เสียงเป้าหมาย · ${STAGE_ORDER.length} ระดับ`;
+      ? "เรียนเสียงไทย · 7 ขั้นของคลังเดิม"
+      : `เนื้อหา ${totalSpeechContent} ภารกิจสำหรับ ${mockTargetSounds.length} เสียงเป้าหมาย · ${STAGE_ORDER.length} ขั้นของคลังเดิม`;
 
   return (
     <AppShell>
@@ -433,8 +433,9 @@ export default function LibraryPage() {
           </nav>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
             <div>
-              <h1 className="text-xl font-bold text-text">เนื้อหาการฝึกทั้งหมด</h1>
+              <h1 className="text-xl font-bold text-text">คลังเนื้อหาการฝึก</h1>
               <p className="text-sm text-text-muted mt-0.5">{headerSubtitle}</p>
+              <p className="mt-1 text-xs text-text-muted">ในห้องฝึกใหม่ 4 ระดับใช้กำหนดความยากของเนื้อหา ส่วนคลังนี้แบ่งตามขั้นของแบบฝึกเดิม</p>
             </div>
             <Link
               href="/training"
@@ -557,7 +558,7 @@ export default function LibraryPage() {
               <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
                 คำอธิบายระดับ
               </p>
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                 {mockTrainingStages.map((stage) => (
                   <div
                     key={stage.id}

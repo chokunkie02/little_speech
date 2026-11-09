@@ -13,11 +13,10 @@ export function LevelPicker({
     <section className={`level-picker ${compact ? "compact" : ""}`}>
       <div className="level-picker-heading">
         <div>
-          <span className="eyebrow">CHOOSE YOUR ADVENTURE</span>
           <h2>เลือกระดับที่อยากลอง</h2>
           <p>ทุกระดับเลือกได้ ย้อนมาฝึกพื้นฐานได้เสมอ</p>
         </div>
-        <span className="level-current">ตอนนี้ · {getLevel(value).label}</span>
+        <span className="level-current">ระดับที่ใช้ · {getLevel(value).label}</span>
       </div>
       <div className="level-options">
         {LEVELS.map((l, i) => (

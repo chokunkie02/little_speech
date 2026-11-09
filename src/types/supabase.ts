@@ -37,8 +37,6 @@ import type {
   DbClassroomStudent,
   DbClassroomTeacher,
   DbOrganizationType,
-  DbOrgMemberRole,
-  DbOrgMemberStatus,
   DbUserDisplayProfile,
 } from "@/types/database";
 
@@ -58,7 +56,7 @@ export type InsertChildProfile =
 export type InsertPracticeSession = Omit<DbPracticeSession, "id" | "created_at">;
 export type InsertPracticeAttempt = Omit<DbPracticeAttempt, "id" | "created_at">;
 export type InsertObservationNote = Omit<DbObservationNote, "id" | "created_at" | "updated_at" | "teacher_visibility">;
-export type InsertInvitation = Omit<DbInvitation, "id" | "created_at" | "updated_at" | "accepted_at" | "accepted_by" | "requires_teacher_approval" | "is_additional_guardian" | "requested_by" | "requested_at" | "requester_name" | "requester_relationship"> & { id?: string };
+export type InsertInvitation = Omit<DbInvitation, "id" | "created_at" | "updated_at" | "accepted_at" | "accepted_by" | "requires_teacher_approval" | "is_additional_guardian" | "inbox_direct" | "requested_by" | "requested_at" | "requester_name" | "requester_relationship"> & { id?: string };
 export type InsertChildAccess = Omit<DbChildAccess, "id" | "created_at" | "revoked_at"> & { id?: string };
 export type UpdateChildAccess = Partial<Omit<DbChildAccess, "id" | "created_at">>;
 export type InsertOrganization = Omit<DbOrganization, "id" | "created_at" | "updated_at"> & { id?: string };
@@ -164,6 +162,37 @@ export interface Database {
     };
     Views: { [_ in never]: never };
     Functions: {
+      lookup_parent_setup: {
+        Args: { p_organization_id: string; p_email: string };
+        Returns: { exists: boolean; pending_id?: string; incompatible?: boolean; pending_elsewhere?: boolean };
+      };
+      matches_parent_activation: {
+        Args: { p_email: string; p_code: string };
+        Returns: boolean;
+      };
+      send_guardian_inbox_invite: {
+        Args: { p_child_id: string; p_email: string };
+        Returns: string;
+      };
+      revoke_guardian_inbox_invite: { Args: { p_invitation_id: string }; Returns: void };
+      list_guardian_inbox: {
+        Args: Record<string, never>;
+        Returns: {
+          id: string; child_name: string; school_name: string; classroom_name: string | null;
+          inviter_email: string | null; status: "pending" | "review" | "accepted" | "expired" | "revoked";
+          expires_at: string; legacy_token: string | null;
+          sender_name: string | null; linked_child_id: string | null;
+        }[];
+      };
+      accept_guardian_inbox_invite: {
+        Args: { p_invitation_id: string; p_relationship: string };
+        Returns: string;
+      };
+      search_school_people: {
+        Args: { p_organization_id: string; p_query: string };
+        Returns: import("./school").SchoolPersonMatch[];
+      };
+      search_platform_school_ids: { Args: { p_query: string }; Returns: string[] };
       record_web_usage: {
         Args: { p_visit_id: string; p_active: boolean };
         Returns: void;

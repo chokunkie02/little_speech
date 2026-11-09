@@ -21,9 +21,9 @@ function LandingNav() {
       className="sticky top-0 z-30 bg-bg/90 backdrop-blur-md border-b border-border"
       aria-label="Main navigation"
     >
-      <div className="flex items-center justify-between px-6 py-3.5 max-w-5xl mx-auto">
+      <div className="flex items-center justify-between gap-2 px-3 py-3 max-w-5xl sm:px-6 mx-auto">
         {/* Logo */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-1.5 sm:gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center flex-shrink-0" aria-hidden="true">
             <svg
               width="14"
@@ -40,22 +40,22 @@ function LandingNav() {
               <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
             </svg>
           </div>
-          <span className="font-bold text-base text-text">Speech Adventure</span>
+          <span className="font-bold text-sm text-text sm:text-base">Speech Adventure</span>
         </div>
 
         {/* Nav actions */}
         <div className="flex items-center gap-1.5">
           <ThemeToggle />
-          <div className="w-px h-5 bg-border mx-1.5" aria-hidden="true" />
+          <div className="hidden h-5 w-px bg-border sm:block" aria-hidden="true" />
           <Link
             href="/auth/signin"
-            className="text-sm font-medium text-text-muted hover:text-text px-3 py-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-white/8 transition-all"
+            className="text-sm font-medium text-text-muted hover:text-text whitespace-nowrap px-1.5 py-1.5 sm:px-3 rounded-lg hover:bg-gray-100 dark:hover:bg-white/8 transition-all"
           >
             เข้าสู่ระบบ
           </Link>
           <Link
             href="/auth/signup"
-            className="text-sm font-semibold text-white bg-primary px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-all active:scale-[0.97]"
+            className="hidden whitespace-nowrap text-sm font-semibold text-white bg-primary px-3 sm:inline-flex py-1.5 rounded-lg hover:bg-primary/90 transition-all active:scale-[0.97]"
           >
             เริ่มต้นฟรี
           </Link>
@@ -74,13 +74,13 @@ function StatsStrip() {
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-2.5 mt-4 sm:gap-4" aria-label="สถิติแพลตฟอร์ม">
+    <div className="mt-3 grid grid-cols-3 divide-x divide-border rounded-xl border border-border bg-surface py-2" aria-label="สถิติแพลตฟอร์ม">
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="bg-surface border border-border rounded-xl px-2 py-2.5 text-center sm:px-4"
+          className="px-1.5 py-1 text-center sm:px-3"
         >
-          <p className="text-xl font-bold text-primary">{stat.value}</p>
+          <p className="text-base font-bold text-text">{stat.value}</p>
           <p className="text-xs text-text-muted mt-0.5">{stat.label}</p>
         </div>
       ))}

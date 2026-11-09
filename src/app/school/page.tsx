@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import SchoolGuardianTools from "@/components/school/SchoolGuardianTools";
 import SchoolTeacherInvitations from "@/components/school/SchoolTeacherInvitations";
 import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
@@ -153,7 +154,7 @@ export default function SchoolAdminPage() {
           </div>
           <button
             onClick={() => setShowCreateOrg(true)}
-            className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-all active:scale-[0.97]"
+            className="flex items-center gap-1.5 px-4 py-2 rounded-xl border border-border bg-surface text-primary text-sm font-semibold hover:bg-primary/10 transition-all"
           >
             <PlusIcon size={15} />
             สร้างองค์กร
@@ -263,16 +264,16 @@ export default function SchoolAdminPage() {
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <button
+                    {!isSupabaseProviderRequested() && <button
                       onClick={() => setShowImportWizard(true)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-sm text-text-muted hover:text-text hover:bg-gray-50 dark:hover:bg-white/5 transition-all"
                     >
                       <UploadIcon size={14} />
                       นำเข้านักเรียน
-                    </button>
+                    </button>}
                     <button
                       onClick={() => setShowCreateRoom(true)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-sm text-text-muted hover:text-text hover:bg-gray-50 dark:hover:bg-white/5 transition-all"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-primary text-sm font-semibold text-white hover:bg-primary/90 transition-all"
                     >
                       <PlusIcon size={14} />
                       เพิ่มห้องเรียน
@@ -287,8 +288,8 @@ export default function SchoolAdminPage() {
                     className="bg-surface border border-border rounded-2xl p-5 space-y-4"
                   >
                     <h3 className="text-sm font-semibold text-text">สร้างห้องเรียนใหม่</h3>
-                    <div className="grid gap-3 sm:grid-cols-3">
-                      <div className="sm:col-span-3">
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr]">
+                      <div className="sm:col-span-2 lg:col-span-1">
                         <label htmlFor="room-name" className="block text-xs font-medium text-text-muted mb-1">
                           ชื่อห้อง
                         </label>
@@ -355,7 +356,7 @@ export default function SchoolAdminPage() {
                     <p className="text-sm text-text-muted">ยังไม่มีห้องเรียน กดปุ่ม &ldquo;เพิ่มห้องเรียน&rdquo; เพื่อเริ่ม</p>
                   </div>
                 ) : (
-                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                  <div className={`grid gap-4 ${classrooms.length > 1 ? "sm:grid-cols-2 xl:grid-cols-3" : ""}`}>
                     {classrooms.map((room) => (
                       <ClassroomCard
                         key={room.id}
@@ -371,7 +372,10 @@ export default function SchoolAdminPage() {
                 )}
 
                 {selectedOrg?.type === "school" && isSupabaseProviderRequested() && isSupabaseConfigured() && (
-                  <SchoolTeacherInvitations key={selectedOrg.id} organizationId={selectedOrg.id} />
+                  <div className="space-y-4" key={selectedOrg.id}>
+                    <SchoolGuardianTools key={selectedOrg.id} organizationId={selectedOrg.id} onOpenClassroom={setSelectedClassroomId} />
+                    <SchoolTeacherInvitations organizationId={selectedOrg.id} />
+                  </div>
                 )}
                 {/* Classroom panel is rendered as a modal overlay at the page root */}
               </div>

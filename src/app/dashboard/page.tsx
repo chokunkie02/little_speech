@@ -136,7 +136,7 @@ function StarsRow({ stars, max = 3 }: { stars: number; max?: number }) {
 export default function ParentDashboardPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
-  const { profile, hasProfile, isHydrated, profiles, selectChild, selectedChildId } = useChildProfile();
+  const { profile, hasProfile, isHydrated } = useChildProfile();
   const { summary, isHydrated: spHydrated, selectedSoundId } = useSpeechProgress();
   const {
     summary: phonicsSummary,
@@ -280,29 +280,9 @@ export default function ParentDashboardPage() {
             href="/profile"
             className="text-xs text-text-muted hover:text-primary transition-colors px-2 py-1 rounded-lg hover:bg-primary/8 flex-shrink-0"
           >
-            แก้ไข
+            ข้อมูลลูก
           </Link>
         </section>
-
-        {/* ── Multi-child switcher (only if >1 child) ── */}
-        {profiles.length > 1 && (
-          <section aria-label="เปลี่ยนเด็ก" className="bg-surface/60 border border-border rounded-xl px-4 py-2.5 flex items-center gap-2 overflow-x-auto">
-            <span className="text-xs text-text-muted flex-shrink-0">เปลี่ยนเด็ก:</span>
-            {profiles.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => selectChild(p.id)}
-                className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-medium transition-all ${
-                  p.id === selectedChildId
-                    ? "bg-primary text-white"
-                    : "bg-border/40 text-text-muted hover:bg-primary/10 hover:text-primary"
-                }`}
-              >
-                {p.name.split(" ")[0]}
-              </button>
-            ))}
-          </section>
-        )}
 
         {/* ── Today's practice plan ── */}
         <section aria-labelledby="plan-heading">
@@ -493,30 +473,14 @@ export default function ParentDashboardPage() {
 
         {/* ── Quick actions ── */}
         <section aria-label="ทางลัด" className="pb-4">
-          <div className="grid grid-cols-3 gap-3">
-            {/* Primary: ฝึกต่อ */}
-            {canStartPractice ? (
-              <Link
-                href={practiceHref}
-                className="flex flex-col items-center gap-2 bg-primary/8 hover:bg-primary/14 border border-primary/20 rounded-xl px-3 py-3.5 text-center transition-all active:scale-[0.97] group"
-              >
-                <span className="text-xl" aria-hidden="true"><DisplayIcon name="mic" /></span>
-                <span className="text-xs font-semibold text-primary leading-tight">ฝึกต่อ</span>
-              </Link>
-            ) : (
-              <div className="flex flex-col items-center gap-2 bg-border/20 border border-border rounded-xl px-3 py-3.5 text-center cursor-not-allowed opacity-60">
-                <span className="text-xl" aria-hidden="true"><DisplayIcon name="mic" /></span>
-                <span className="text-xs font-semibold text-text-muted leading-tight">ฝึกต่อ</span>
-              </div>
-            )}
-
+          <div className="grid grid-cols-2 gap-3">
             {/* ดูความก้าวหน้า */}
             <Link
               href={progressHref}
               className="flex flex-col items-center gap-2 bg-surface hover:bg-surface/80 border border-border rounded-xl px-3 py-3.5 text-center transition-all active:scale-[0.97]"
             >
               <span className="text-xl" aria-hidden="true"><DisplayIcon name="chart" /></span>
-              <span className="text-xs font-semibold text-text-muted leading-tight">ดูก้าวหน้า</span>
+              <span className="text-xs font-semibold text-text-muted leading-tight">ดูความก้าวหน้า</span>
             </Link>
 
             {/* ดูเนื้อหา */}

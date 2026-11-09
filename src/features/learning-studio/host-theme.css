@@ -106,3 +106,42 @@
 @media print {
   .learning-studio-scope .studio-header { display: none; }
 }
+
+@media screen {
+  .learning-studio-scope .hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .55fr); }
+  .learning-studio-scope .hero-copy .hero-learner { margin-bottom: .4rem; font-weight: 600; }
+  .learning-studio-scope .level-options > button.selected { border: 2px solid var(--primary); }
+  .learning-studio-scope .level-options h3 { font-size: .9rem; font-weight: 600; }
+  .learning-studio-scope .level-options small,
+  .learning-studio-scope .level-example,
+  .learning-studio-scope .level-select-label { font-size: .75rem; color: var(--muted); }
+  .learning-studio-scope .plan-actions { display: flex; align-items: center; flex-wrap: wrap; gap: .65rem; margin-top: 1rem; }
+  .learning-studio-scope .plan-preview .preview-facts strong { font-size: .85rem; }
+  .learning-studio-scope .journey-card { min-height: 0; gap: .8rem; }
+  .learning-studio-scope .journey-card.is-current { border-color: var(--primary); }
+  .learning-studio-scope .current-stage { color: var(--primary); font-weight: 700; }
+  .learning-studio-scope .preview-mouth .mouth-active-photo { width: min(100%, 11rem); }
+  .learning-studio-scope .speaking-layout.with-mouth { display: grid; gap: 1rem; align-items: start; }
+  .learning-studio-scope .speaking-media .mouth-coach { margin-bottom: 0; }
+  .learning-studio-scope .speaking-media .mouth-active-photo { width: min(100%, 12rem); }
+  .learning-studio-scope .speaking-controls { min-width: 0; }
+  .learning-studio-scope .speaking-controls audio { max-width: 100%; }
+  .learning-studio-scope .summary-page .celebration-art { width: 5rem; height: 5rem; margin-bottom: .4rem; }
+  .learning-studio-scope .summary-page .celebration-art > .art { max-width: 100%; }
+  .learning-studio-scope .summary-stats strong { overflow-wrap: anywhere; }
+  .learning-studio-scope .guide-layout .prose p,
+  .learning-studio-scope .guide-layout .prose li { font-size: .95rem; line-height: 1.7; }
+  .learning-studio-scope .guide-layout details summary { cursor: pointer; font-weight: 600; margin-top: 1rem; }
+}
+@media screen and (max-width: 849px) {
+  .learning-studio-scope .speaking-layout.with-mouth .speaking-media { grid-row: 2; }
+  .learning-studio-scope .speaking-layout.with-mouth .speaking-controls { grid-row: 1; }
+}
+@media screen and (min-width: 850px) {
+  .learning-studio-scope .main-shell > .practice-content .practice-card { max-width: 55rem; }
+  .learning-studio-scope .speaking-layout.with-mouth { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+@media screen and (max-width: 640px) {
+  .learning-studio-scope .hero { grid-template-columns: minmax(0, 1fr); }
+  .learning-studio-scope .level-picker-heading { align-items: flex-start; flex-direction: column; gap: .35rem; }
+}

@@ -119,6 +119,14 @@ export interface SchoolTeacherInvitation {
   assigned: boolean;
 }
 
+export type SchoolPersonMatch = {
+  kind: "student" | "teacher" | "guardian";
+  name: string;
+  detail: string;
+  child_id: string | null;
+  classroom_id: string | null;
+};
+
 export type PlatformSchool = {
   id: string;
   name: string;

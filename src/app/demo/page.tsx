@@ -553,6 +553,9 @@ export default function DemoShowcasePage() {
 
   return (
     <AppShell>
+      <aside className="mx-auto mt-4 max-w-4xl rounded-xl border border-border bg-surface p-4 text-sm text-text-muted">
+        ตัวอย่างเส้นทางเดิม · สำหรับลองดูรูปแบบกิจกรรมและรายงาน ส่วนนักเรียนใช้เมนู «ฝึกและเรียน» เพื่อเปิดห้องฝึกปัจจุบัน
+      </aside>
       {isPhonicsMode ? <PhonicsShowcase /> : <SpeechClarityShowcase />}
     </AppShell>
   );

@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useOverlayFocus } from "@/components/layout/useOverlayFocus";
 import Link from "next/link";
 import SchoolGuardianMembers from "@/components/layout/SchoolGuardianMembers";
 import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
@@ -82,6 +83,9 @@ function ParentStatusBadge({ status }: { status: ParentLinkStatus }) {
 // ── Panel ─────────────────────────────────────────────────────────────────────
 
 export default function ClassroomManagementPanel({ classroom, onClose }: Props) {
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const titleId = useId();
+  useOverlayFocus(true, dialogRef, onClose);
   const {
     organizations,
     listChildrenForClassroom,
@@ -308,15 +312,19 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
 
   return (
     // Modal overlay — fixed position so it's always visible regardless of scroll
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm" onClick={onClose}>
+    <div className="fixed inset-0 z-40 flex items-center justify-center p-4 bg-black/35" onClick={onClose}>
       <div
-        className="w-full max-w-lg max-h-[88vh] flex flex-col bg-surface rounded-2xl shadow-2xl border border-border overflow-hidden"
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="w-full max-w-2xl max-h-[88dvh] flex flex-col bg-surface rounded-2xl shadow-2xl border border-border overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-2 px-6 py-4 border-b border-border flex-shrink-0">
           <div>
-            <h2 className="text-base font-bold text-text">{classroom.name}</h2>
+            <h2 id={titleId} className="text-base font-bold text-text">{classroom.name}</h2>
             {meta && <p className="text-xs text-text-muted mt-0.5">{meta}</p>}
           </div>
           <button
@@ -329,13 +337,11 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
         </div>
 
         {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-7">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 sm:p-6">
 
           {/* ── Teachers ──────────────────────────────────────────────── */}
-          <section>
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
-              ครูผู้สอน ({teachers.length})
-            </p>
+          <section className="rounded-xl border border-border p-4">
+            <h3 className="mb-3 text-sm font-bold text-text">ครูประจำห้อง ({teachers.length})</h3>
 
             {teachers.length > 0 ? (
               <ul className="space-y-2 mb-3">
@@ -448,10 +454,8 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
           </section>
 
           {/* ── Students ──────────────────────────────────────────────── */}
-          <section>
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-3">
-              นักเรียน ({students.length})
-            </p>
+          <section className="rounded-xl border border-border p-4">
+            <h3 className="mb-3 text-sm font-bold text-text">นักเรียน ({students.length})</h3>
 
             {parentLinkError && (
               <p className="text-xs text-error mb-2">{parentLinkError}</p>
@@ -572,6 +576,7 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
               <p className="text-xs text-text-muted italic mb-3">ยังไม่มีนักเรียน</p>
             )}
 
+            {schoolInvitations ? <p className="text-sm text-text-muted">ครูประจำห้องเพิ่มนักเรียนจากแดชบอร์ดครู</p> :
             <form onSubmit={handleAddStudent} className="space-y-2">
               {allProfiles.length > 0 && (
                 <select
@@ -605,7 +610,7 @@ export default function ClassroomManagementPanel({ classroom, onClose }: Props) 
               >
                 {studentBusy ? "กำลังเพิ่ม…" : "เพิ่มนักเรียน"}
               </button>
-            </form>
+            </form>}
             {studentError && <p className="text-xs text-error mt-1">{studentError}</p>}
           </section>
         </div>

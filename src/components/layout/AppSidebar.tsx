@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useOverlayFocus } from "./useOverlayFocus";
+import { useGuardianWorkspace } from "./GuardianWorkspace";
 import { usePathname } from "next/navigation";
 import { LogOut, Menu } from "lucide-react";
 import NavIcon, { type NavIconName } from "./NavIcon";
@@ -68,6 +70,8 @@ function CloseIcon() {
 export default function AppSidebar() {
   const pathname = usePathname();
   const { collapsed, toggle, mounted, mobileOpen, setMobileOpen } = useSidebar();
+  const drawerRef = useRef<HTMLElement>(null);
+  useOverlayFocus(mobileOpen, drawerRef, () => setMobileOpen(false));
   const { summary, isHydrated, selectedSoundId } = useSpeechProgress();
   const { profile } = useChildProfile();
   const { user, signOut } = useAuth();
@@ -75,11 +79,17 @@ export default function AppSidebar() {
 
   const isSpeechMode = !isHydrated || profile?.trainingMode !== "kindergarten_phonics";
 
+  const { parent, restricted, pending } = useGuardianWorkspace();
+  const parentItems: NavItem[] = parent ? [
+    PARENT_NAV_ITEMS[0],
+    { href: "/inbox", label: pending ? `กล่องข้อความ (${pending})` : "กล่องข้อความ", icon: "inbox" },
+    ...PARENT_NAV_ITEMS.slice(1).filter((item) => !restricted || item.href === "/settings"),
+  ] : PARENT_NAV_ITEMS;
   const NAV_ITEMS: NavItem[] = isSchoolAdmin(user)
     ? SCHOOL_ADMIN_NAV_ITEMS
     : isTeacher(user)
     ? TEACHER_NAV_ITEMS
-    : PARENT_NAV_ITEMS;
+    : parentItems;
 
   const isActive = (item: (typeof NAV_ITEMS)[0]) =>
     (item.href === "/training" && pathname === "/learning") ||
@@ -116,7 +126,7 @@ export default function AppSidebar() {
       {staffRole}
     </p>
   );
-  const contextSection = !staffRole && (
+  const contextSection = !staffRole && !restricted && (
     <div className={`px-3 py-3 border-b border-border flex-shrink-0 ${isCollapsed ? "flex items-center justify-center" : "space-y-2.5"}`}>
       {isCollapsed ? (
         <ChildSelector collapsed />
@@ -140,7 +150,7 @@ export default function AppSidebar() {
           </div>
 
           {/* Continue Training CTA — mode-aware */}
-          {isHydrated && isSpeechMode && currentStage && (
+          {pathname !== "/dashboard" && isHydrated && isSpeechMode && currentStage && (
             <Link
               href="/training"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-all active:scale-[0.97]"
@@ -151,7 +161,7 @@ export default function AppSidebar() {
               ฝึกต่อ
             </Link>
           )}
-          {isHydrated && !isSpeechMode && (
+          {pathname !== "/dashboard" && isHydrated && !isSpeechMode && (
             <Link
               href="/training"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-xl bg-amber-500 text-white text-xs font-semibold hover:bg-amber-600 transition-all active:scale-[0.97]"
@@ -248,8 +258,9 @@ export default function AppSidebar() {
                   : "text-text-muted hover:text-text hover:bg-gray-50 dark:hover:bg-white/5"
               }`}
             >
-              <span className="flex-shrink-0 flex items-center justify-center w-5">
+              <span className="relative flex-shrink-0 flex items-center justify-center w-5">
                 <NavIcon name={item.icon} active={active} size={17} />
+                {item.icon === "inbox" && isCollapsed && pending > 0 && <span aria-hidden="true" className="absolute -right-2 -top-2 rounded-full bg-primary px-1 text-[9px] font-bold text-white">{pending > 9 ? "9+" : pending}</span>}
               </span>
               <span className={`truncate whitespace-nowrap transition-all duration-200 ${labelCls}`}>
                 {item.label}
@@ -300,6 +311,9 @@ export default function AppSidebar() {
         }`}
         aria-label="เมนูหลัก"
         id="mobile-sidebar"
+        ref={drawerRef}
+        role="dialog"
+        aria-modal={mobileOpen || undefined}
         aria-hidden={!mobileOpen}
         inert={!mobileOpen}
       >
@@ -314,13 +328,14 @@ export default function AppSidebar() {
           <button
             onClick={() => setMobileOpen(false)}
             aria-label="ปิดเมนู"
+            data-overlay-focus
             className="w-8 h-8 rounded-lg flex items-center justify-center text-text-muted hover:text-text hover:bg-gray-100 dark:hover:bg-white/10 transition-all"
           >
             <CloseIcon />
           </button>
         </div>
 
-        {!staffRole && (
+        {!staffRole && !restricted && (
           <div className="shrink-0 space-y-2.5 border-b border-border px-4 py-3">
             <ChildSelector />
             <div className="flex items-center gap-2 flex-wrap">
@@ -336,7 +351,7 @@ export default function AppSidebar() {
                 </Link>
               )}
             </div>
-            {isHydrated && isSpeechMode && currentStage && (
+            {pathname !== "/dashboard" && isHydrated && isSpeechMode && currentStage && (
               <Link
                 href="/training"
                 onClick={() => setMobileOpen(false)}
@@ -345,7 +360,7 @@ export default function AppSidebar() {
                 ฝึกต่อ
               </Link>
             )}
-            {isHydrated && !isSpeechMode && (
+            {pathname !== "/dashboard" && isHydrated && !isSpeechMode && (
               <Link
                 href="/training"
                 onClick={() => setMobileOpen(false)}

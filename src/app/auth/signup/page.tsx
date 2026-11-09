@@ -70,19 +70,16 @@ function SignUpContent() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
-    if (mounted && !isLoading && isAuthenticated) {
+    if (!isLoading && isAuthenticated) {
       if (redirect) router.replace(redirect);
       else if (user?.isPlatformAdmin) router.replace("/platform");
       else if (user?.role === "school_admin") router.replace("/school");
       else if (user?.role === "teacher") router.replace("/teacher");
-      else router.replace("/training");
+      else router.replace("/dashboard");
     }
-  }, [mounted, isLoading, isAuthenticated, router, user?.role, user?.isPlatformAdmin, redirect]);
+  }, [isLoading, isAuthenticated, router, user?.role, user?.isPlatformAdmin, redirect]);
 
   const passwordValid = PASSWORD_RULES.every((r) => r.test(password));
 
@@ -103,7 +100,7 @@ function SignUpContent() {
     }
   }
 
-  if (!mounted) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-bg flex items-center justify-center">
         <div className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
@@ -114,7 +111,7 @@ function SignUpContent() {
   return (
     <main className="min-h-screen bg-bg flex flex-col">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-3.5 border-b border-border bg-bg/90 backdrop-blur-md">
+      <nav className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6" aria-label="บัญชีผู้ใช้">
         <Link href="/" className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
             <MicIcon />
@@ -124,8 +121,8 @@ function SignUpContent() {
         <ThemeToggle />
       </nav>
 
-      <div className="flex-1 flex items-center justify-center px-4 py-6 sm:py-9">
-        <div className="w-full max-w-sm">
+      <div className="flex-1 flex items-start justify-center px-4 py-7 sm:py-10 lg:py-12">
+        <div className="w-full max-w-lg">
           {success ? (
             /* Success state */
             <div className="bg-surface border border-border rounded-2xl p-8 shadow-sm text-center">
@@ -148,9 +145,9 @@ function SignUpContent() {
             </div>
           ) : (
             <>
-              <div className="text-center mb-5">
+              <div className="mb-4">
                 <h1 className="text-2xl font-bold text-text mb-1.5">สร้างบัญชีใหม่</h1>
-                <p className="text-sm text-text-muted">เริ่มติดตามพัฒนาการการพูดของบุตรหลาน</p>
+                <p className="text-sm text-text-muted">เลือกบทบาทที่ตรงกับการใช้งานของคุณ</p>
               </div>
 
               {!isSupabaseConfigured() && (
@@ -233,9 +230,9 @@ function SignUpContent() {
                 </div>
 
                 {/* Role */}
-                <div className="space-y-2">
-                  <p className="text-sm font-semibold text-text">ฉันเป็น…</p>
-                  <div className="grid grid-cols-2 gap-2">
+                <fieldset className="space-y-2">
+                  <legend className="text-sm font-semibold text-text">บทบาทของบัญชี</legend>
+                  <div className="grid gap-2 sm:grid-cols-2">
                     {ROLE_OPTIONS.map((opt) => {
                       const active = selectedRole === opt.value;
                       return (
@@ -243,6 +240,7 @@ function SignUpContent() {
                           key={opt.value}
                           type="button"
                           disabled={!opt.available}
+                          aria-pressed={active}
                           onClick={() => opt.available && setSelectedRole(opt.value)}
                           className={[
                             "relative rounded-xl border px-3 py-2.5 text-left transition-all",
@@ -253,8 +251,8 @@ function SignUpContent() {
                               : "border-border bg-bg opacity-50 cursor-not-allowed",
                           ].join(" ")}
                         >
-                          <span className="block text-xs font-semibold text-text">{opt.label}</span>
-                          <span className="block text-[10px] text-text-muted leading-tight mt-0.5">{opt.desc}</span>
+                          <span className="block text-sm font-semibold text-text">{opt.label}</span>
+                          <span className="block text-xs text-text-muted leading-relaxed mt-1">{opt.desc}</span>
                           {!opt.available && (
                             <span className="absolute top-1.5 right-1.5 bg-surface border border-border text-[9px] text-text-muted font-medium px-1 py-0.5 rounded-md leading-none">
                               เร็วๆ นี้
@@ -264,7 +262,7 @@ function SignUpContent() {
                       );
                     })}
                   </div>
-                </div>
+                </fieldset>
 
                 {/* Error */}
                 {error && (

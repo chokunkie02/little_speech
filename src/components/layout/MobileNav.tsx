@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useGuardianWorkspace } from "./GuardianWorkspace";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useSidebar } from "./SidebarContext";
@@ -35,11 +36,17 @@ export default function MobileNav() {
   const { user } = useAuth();
   const { mobileOpen, setMobileOpen } = useSidebar();
 
+  const { parent, restricted, pending } = useGuardianWorkspace();
+  const parentItems: NavItem[] = parent ? [
+    PARENT_MOBILE[0],
+    { href: "/inbox", label: pending ? `ข้อความ (${pending})` : "ข้อความ", icon: "inbox" },
+    ...PARENT_MOBILE.slice(1).filter((item) => restricted ? item.href === "/settings" : !["/library", "/rewards"].includes(item.href)),
+  ] : PARENT_MOBILE;
   const items = isSchoolAdmin(user)
     ? SCHOOL_MOBILE
     : isTeacher(user)
     ? TEACHER_MOBILE
-    : PARENT_MOBILE;
+    : parentItems;
 
   const isActive = (item: NavItem) =>
     (item.href === "/training" && pathname === "/learning") ||

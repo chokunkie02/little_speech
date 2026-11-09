@@ -35,7 +35,7 @@ function EyeIcon({ show }: { show: boolean }) {
 }
 
 const SIGN_IN_ROLES = {
-  parent: { label: "ผู้ปกครอง", home: "/training" },
+  parent: { label: "ผู้ปกครอง", home: "/dashboard" },
   teacher: { label: "ครู", home: "/teacher" },
   school_admin: { label: "ผู้ดูแลโรงเรียน", home: "/school" },
   platform_admin: { label: "แอดมินระบบ", home: "/platform" },
@@ -67,8 +67,8 @@ function SignInContent() {
   const accountHome = accountRole ? SIGN_IN_ROLES[accountRole].home : "/training";
   const destination = explicitRedirect && (!redirectRole || redirectRole === accountRole)
     ? explicitRedirect : accountHome;
-  const [roleChoice, setRoleChoice] = useState<SignInRole>();
-  const selectedRole = roleChoice ?? redirectRole;
+  const [roleChoice, setRoleChoice] = useState<SignInRole | "auto">();
+  const selectedRole = roleChoice === "auto" ? undefined : roleChoice ?? redirectRole;
   const roleMismatch = !!user && !!selectedRole && selectedRole !== accountRole;
 
   const [email, setEmail] = useState("");
@@ -110,7 +110,7 @@ function SignInContent() {
   return (
     <main className="min-h-screen bg-bg flex flex-col">
       {/* Nav */}
-      <nav className="flex items-center justify-between px-6 py-3.5 border-b border-border bg-bg/90 backdrop-blur-md">
+      <nav className="mx-auto flex w-full max-w-5xl items-center justify-between gap-3 border-b border-border px-4 py-3 sm:px-6" aria-label="บัญชีผู้ใช้">
         <Link href="/" className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center flex-shrink-0">
             <MicIcon />
@@ -121,11 +121,11 @@ function SignInContent() {
       </nav>
 
       {/* Form area */}
-      <div className="flex-1 flex items-center justify-center px-4 py-6 sm:py-9">
-        <div className="w-full max-w-sm">
-          <div className="text-center mb-5">
+      <div className="flex-1 flex items-start justify-center px-4 py-7 sm:py-10 lg:py-12">
+        <div className="w-full max-w-lg">
+          <div className="mb-4">
             <h1 className="text-2xl font-bold text-text mb-1.5">ยินดีต้อนรับกลับ</h1>
-            <p className="text-sm text-text-muted">กรอกอีเมลและรหัสผ่าน แล้วเลือกบทบาทของบัญชี</p>
+            <p className="text-sm text-text-muted">ใช้อีเมลและรหัสผ่านของบัญชี Speech Adventure</p>
           </div>
 
           {/* Supabase not configured notice */}
@@ -200,7 +200,7 @@ function SignInContent() {
               </div>
 
               <fieldset className="space-y-2" disabled={submitting || !!user}>
-                <legend className="text-sm font-semibold text-text">เข้าสู่ระบบในบทบาท</legend>
+                <legend className="text-sm font-semibold text-text">บทบาท (เลือกได้)</legend>
                 <div className="grid grid-cols-2 gap-2">
                   {roleOptions.map((role) => (
                     <label key={role} className="cursor-pointer">
@@ -212,7 +212,10 @@ function SignInContent() {
                     </label>
                   ))}
                 </div>
-                {!selectedRole && <p className="text-xs text-text-muted">หากข้ามการเลือก ระบบจะเปิดหน้าตามบทบาทของบัญชี</p>}
+                <label className="flex cursor-pointer items-center gap-2 rounded-xl border border-border bg-bg px-3 py-2 text-sm">
+                  <input type="radio" name="role" checked={!selectedRole} onChange={() => setRoleChoice("auto")} className="accent-primary" />
+                  ใช้บทบาทของบัญชีอัตโนมัติ
+                </label>
               </fieldset>
 
               {/* Error */}
@@ -233,6 +236,7 @@ function SignInContent() {
             </form>
           )}
 
+          <p className="mt-4 text-center text-sm"><Link href="/auth/activate" className="font-semibold text-primary">เข้าใช้ครั้งแรกด้วยรหัสจากโรงเรียน</Link></p>
           <p className="text-center text-xs text-text-muted mt-5">
             ยังไม่มีบัญชี?{" "}
             <Link href={explicitRedirect ? `/auth/signup?redirect=${encodeURIComponent(explicitRedirect)}` : "/auth/signup"} className="text-primary font-semibold hover:underline">

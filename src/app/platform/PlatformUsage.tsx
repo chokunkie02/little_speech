@@ -31,7 +31,7 @@ function LiveUsage() {
   }, [days, revision]);
 
   const current = result?.days === days && result.revision === revision ? result : undefined;
-  const data = current?.data;
+  const data = current?.data ?? (!current ? result?.data : undefined);
   const topHourCount = Math.max(0, ...(data?.hours ?? []));
   const peakHours = data?.hours.flatMap((opens, hour) => opens === topHourCount ? [hour] : []) ?? [];
   const dailyMax = Math.max(1, ...(data?.days.map((day) => day.opens) ?? []));
@@ -57,7 +57,7 @@ function LiveUsage() {
         </div>
       </div>
 
-      {!current && <p role="status" className={panel}>กำลังโหลดข้อมูลการใช้งาน…</p>}
+      {!current && <p role="status" className="text-sm text-text-muted">{data ? "กำลังอัปเดตข้อมูล · กราฟยังแสดงช่วงก่อนหน้า" : "กำลังโหลดข้อมูลการใช้งาน…"}</p>}
       {current && !data && <p role="alert" className={panel}>โหลดข้อมูลการใช้งานไม่ได้ ลองโหลดใหม่หรือตรวจสอบว่าฐานข้อมูลอัปเดตแล้ว</p>}
       {data && (
         <>
@@ -65,11 +65,10 @@ function LiveUsage() {
             {[
               ["บัญชีที่ใช้งาน", count.format(data.activeAccounts) + " บัญชี"],
               ["จำนวนครั้งที่เปิด", count.format(data.opens) + " ครั้ง"],
-              ["เวลาใช้งานรวม", count.format(Math.floor(data.activeSeconds / 3600)) + " ชม. " +
+              ["เวลาใช้งานรวม", data.activeSeconds < 60 ? count.format(data.activeSeconds) + " วินาที" : count.format(Math.floor(data.activeSeconds / 3600)) + " ชม. " +
                 count.format(Math.floor(data.activeSeconds / 60) % 60) + " นาที"],
               ["ช่วงที่เปิดมากที่สุด", topHourCount === 0 ? "—" :
-                peakHours.length === 1 ? hourLabel(peakHours[0]) + "–" + hourLabel((peakHours[0] + 1) % 24) :
-                  peakHours.length + " ช่วงเท่ากัน"],
+                peakHours.map((hour) => hourLabel(hour) + "–" + hourLabel((hour + 1) % 24)).join(", ")],
             ].map(([label, value]) => (
               <div key={label} className={panel}>
                 <dt className="text-xs text-text-muted">{label}</dt>
@@ -97,7 +96,7 @@ function LiveUsage() {
               <section className={panel}>
                 <h3 className="font-bold">ช่วงเวลาที่เปิดเว็บ</h3>
                 <ul className="mt-3 max-h-80 space-y-2 overflow-auto">
-                  {data.hours.map((opens, hour) => (
+                  {data.hours.map((opens, hour) => ({ opens, hour })).filter(({ opens }) => opens > 0).map(({ opens, hour }) => (
                     <li key={hour} className="grid grid-cols-[6rem_1fr_4rem] items-center gap-2 text-sm">
                       <span>{hourLabel(hour)}–{hourLabel((hour + 1) % 24)}</span>
                       <div aria-hidden="true" className="h-2 rounded-full bg-primary/10">
@@ -125,15 +124,16 @@ export default function PlatformUsage() {
   const [showDemo, setShowDemo] = useState(false);
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2" aria-label="แหล่งข้อมูลการใช้งาน" role="group">
+      <div className="inline-flex flex-wrap gap-1 rounded-xl border border-border bg-surface p-1" aria-label="แหล่งข้อมูลการใช้งาน" role="group">
         {["ข้อมูลจริง", "ตัวอย่างรายงานการฝึก"].map((label, index) => {
           const selected = showDemo === Boolean(index);
           return <button key={label} type="button" aria-pressed={selected}
-            className={"rounded-xl border border-border px-3 py-2 text-sm font-semibold " + (selected ? "bg-primary text-white" : "text-primary")}
+            className={"rounded-lg px-3 py-1.5 text-sm font-semibold " + (selected ? "bg-primary/10 text-text" : "text-text-muted hover:text-text")}
             onClick={() => setShowDemo(Boolean(index))}>{label}</button>;
         })}
       </div>
-      {showDemo ? <UsageDashboard /> : <LiveUsage />}
+      <div hidden={!showDemo}><UsageDashboard /></div>
+      <div hidden={showDemo}><LiveUsage /></div>
     </div>
   );
 }

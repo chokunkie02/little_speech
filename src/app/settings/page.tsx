@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AppShell from "@/components/layout/AppShell";
 import ThemeToggle from "@/components/ui/ThemeToggle";
+import { useTheme } from "@/components/ui/ThemeProvider";
 import CloudSyncPreview from "@/components/sync/CloudSyncPreview";
 import { useAuth, isParent } from "@/hooks/useAuth";
 import { useRepositories } from "@/lib/providers/RepositoryProvider";
@@ -175,12 +176,13 @@ function LocalModeCard() {
 // ── Appearance ────────────────────────────────────────────────────────────────
 
 function AppearanceSection() {
+  const { theme } = useTheme();
   return (
     <div className="bg-surface border border-border rounded-xl divide-y divide-border">
       <div className="flex items-center justify-between px-4 py-3.5">
         <div>
           <p className="text-sm font-medium text-text">ธีมแอป</p>
-          <p className="text-xs text-text-muted mt-0.5">เลือกโหมดสว่างหรือมืด</p>
+          <p className="text-xs text-text-muted mt-0.5">{theme === "dark" ? "กำลังใช้โหมดมืด" : "กำลังใช้โหมดสว่าง"}</p>
         </div>
         <ThemeToggle />
       </div>
@@ -230,10 +232,12 @@ function ReceivedInviteSection() {
         <input
           type="text"
           aria-label="ลิงก์หรือรหัสคำเชิญ"
+          aria-invalid={!!error}
+          aria-describedby={error ? "received-invite-error" : undefined}
           value={input}
           onChange={(e) => { setInput(e.target.value); setError(null); }}
           placeholder="https://…/invite/accept?token=… หรือรหัส"
-          className="flex-1 min-w-0 bg-bg border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
+          className="flex-1 min-w-0 bg-bg border border-border aria-invalid:border-error rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
         />
         <button
           type="submit"
@@ -244,7 +248,7 @@ function ReceivedInviteSection() {
           เปิด
         </button>
       </div>
-      {error && <p role="alert" className="text-xs text-error">{error}</p>}
+      {error && <p id="received-invite-error" role="alert" className="text-xs text-error">{error}</p>}
     </form>
   );
 }
@@ -501,7 +505,7 @@ export default function SettingsPage() {
 
   return (
     <AppShell>
-      <div className="max-w-2xl mx-auto px-4 py-5 space-y-5">
+      <div className="max-w-3xl mx-auto px-4 py-5 space-y-5">
 
         {/* Page title */}
         <div>
@@ -522,10 +526,11 @@ export default function SettingsPage() {
         </section>
 
         <section id="invitations" className="scroll-mt-14">
-          <SectionHeader title="คำเชิญที่ได้รับ" description="เปิดลิงก์คำเชิญหรือดูสิทธิ์ที่บัญชีนี้ได้รับ" />
+          <SectionHeader title="คำเชิญที่ได้รับ" description={isParentUser && user ? "เปิดกล่องข้อความเพื่อตอบรับคำเชิญจากครู" : "เปิดลิงก์คำเชิญหรือดูสิทธิ์ที่บัญชีนี้ได้รับ"} />
           <div className="space-y-4 rounded-xl border border-border bg-surface p-4">
-            <PendingReceivedInvites />
-            <ReceivedInviteSection />
+            {isParentUser && user ?
+              <Link href="/inbox" className="font-semibold text-primary">เปิดกล่องข้อความ</Link> :
+              <><PendingReceivedInvites /><ReceivedInviteSection /></>}
             <ReceivedGrantsSection />
           </div>
         </section>

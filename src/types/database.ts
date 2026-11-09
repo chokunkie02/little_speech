@@ -119,6 +119,7 @@ export type DbInvitation = {
   accepted_by: string | null;
   requires_teacher_approval: boolean;
   is_additional_guardian: boolean;
+  inbox_direct: boolean;
   requested_by: string | null;
   requested_at: string | null;
   requester_name: string | null;

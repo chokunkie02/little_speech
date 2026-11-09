@@ -21,7 +21,7 @@ function recentRange(): DateRange {
   return { from: start.toISOString().slice(0, 10), to };
 }
 
-export default function SchoolProgressReportView({ childId, backHref }: { childId: string; backHref: string }) {
+export default function SchoolProgressReportView({ childId, backHref, audience }: { childId: string; backHref: string; audience: string }) {
   const [applied, setApplied] = useState(recentRange);
   const [draft, setDraft] = useState(applied);
   const [result, setResult] = useState<{ range: DateRange; data: SchoolProgressReport | null; error: boolean }>();
@@ -60,6 +60,14 @@ export default function SchoolProgressReportView({ childId, backHref }: { childI
   return (
     <>
       <div className="mx-auto max-w-3xl space-y-4 px-4 py-5 sm:px-6 print:max-w-none print:p-0">
+        <header className="space-y-1 rounded-2xl border border-border bg-surface p-4 print:bg-white">
+          <p className="text-xs font-semibold text-primary print:text-gray-600">Speech Adventure · {audience}</p>
+          <h1 className="text-xl font-bold">รายงานความก้าวหน้า</h1>
+          {(report ?? (!current ? result?.data : null))?.child.name && <p className="text-sm font-semibold">{(report ?? result?.data)?.child.name}</p>}
+          <p className="text-sm text-text-muted print:text-gray-600">
+            {reportDate.format(new Date(applied.from))} ถึง {reportDate.format(new Date(applied.to))}
+          </p>
+        </header>
         <form className="flex flex-wrap items-end gap-3 rounded-2xl border border-border bg-surface p-4 print:hidden"
           onSubmit={(event) => {
             event.preventDefault();
@@ -76,6 +84,7 @@ export default function SchoolProgressReportView({ childId, backHref }: { childI
               value={draft.to} onChange={(event) => setDraft({ ...draft, to: event.target.value })} />
           </label>
           <button type="submit" className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white">แสดงรายงาน</button>
+          {dirty && <p className="basis-full text-sm text-text-muted">กดแสดงรายงานเพื่อใช้ช่วงวันที่ใหม่ แล้วจึงพิมพ์หรือบันทึก PDF</p>}
         </form>
 
         {!current ? (
@@ -86,14 +95,6 @@ export default function SchoolProgressReportView({ childId, backHref }: { childI
           </p>
         ) : (
           <article className="space-y-5 print:text-black">
-            <header className="space-y-1 rounded-2xl border border-border bg-surface p-4 print:bg-white">
-              <p className="text-xs font-semibold text-primary print:text-gray-600">Speech Adventure</p>
-              <h1 className="text-xl font-bold">รายงานความก้าวหน้า</h1>
-              <p className="text-sm font-semibold">{report.child.name}{report.child.nickname ? ` · ${report.child.nickname}` : ""}</p>
-              <p className="text-sm text-text-muted print:text-gray-600">
-                {reportDate.format(new Date(applied.from))} ถึง {reportDate.format(new Date(applied.to))}
-              </p>
-            </header>
             <p className="text-sm font-semibold text-text-muted">สรุปจากระบบฝึกเดิม</p>
             <div className="grid grid-cols-3 gap-2 print:break-inside-avoid">
               <ReportMetricCard label="ครั้งที่ฝึก" value={report.attempt_count} />
@@ -137,7 +138,7 @@ export default function SchoolProgressReportView({ childId, backHref }: { childI
           </article>
         )}
       </div>
-      {report && !dirty && <PrintActions backHref={backHref} onPrint={() => window.print()} />}
+      <PrintActions backHref={backHref} onPrint={report && !dirty ? () => window.print() : undefined} />
     </>
   );
 }

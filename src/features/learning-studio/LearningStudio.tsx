@@ -32,7 +32,6 @@ import {
   Music2,
   Puzzle,
   Smile,
-  Sun,
   X,
   Download,
   Printer,
@@ -449,7 +448,7 @@ export function LearningStudio({
   );
   const reviewSession = state.sessions.find((s) => s.id === reviewId);
   const nav = [
-    { id: "home", label: "บ้านการเรียน" },
+    { id: "home", label: "แผนวันนี้" },
     { id: "path", label: "เส้นทางของฉัน" },
     { id: "library", label: "คลังกิจกรรม" },
     { id: "progress", label: "ผลการฝึก" },
@@ -470,7 +469,7 @@ export function LearningStudio({
             <h1 className="text-lg font-bold text-text">ฝึกและเรียน</h1>
             <MusicRoom />
           </div>
-          <nav aria-label="เมนูห้องฝึกการพูด" className="studio-nav">
+          {route !== "practice" && <nav aria-label="เมนูห้องฝึกการพูด" className="studio-nav">
             {nav.map((item) => (
               <button key={item.id} type="button" onClick={() => go(item.id)}
                 aria-current={route === item.id ? "page" : undefined}>
@@ -478,8 +477,8 @@ export function LearningStudio({
                 {item.label}
               </button>
             ))}
-          </nav>
-          <p className="studio-storage-note" role="status">
+          </nav>}
+          {route !== "practice" && <p className="studio-storage-note" role="status">
             {syncToSchool
               ? sync.status === "saving" ? "กำลังบันทึกผลฝึกเข้าระบบ…"
                 : sync.status === "saved" ? "บันทึกผลฝึกเข้าความก้าวหน้าและรายงานแล้ว"
@@ -487,7 +486,7 @@ export function LearningStudio({
                     : "รอบที่ฝึกจบจะบันทึกเข้าความก้าวหน้าและรายงาน"
               : "โหมดนี้เก็บผลฝึกในเบราว์เซอร์ที่ใช้งาน"}
             {sync.status === "error" && <button type="button" className="ml-2 underline" onClick={sync.retry}>ลองส่งผลอีกครั้ง</button>}
-          </p>
+          </p>}
         </header>
         {child?.targetSound && !Object.keys(SOUNDS).includes(child.targetSound) && (
           <div className="studio-context-note" role="status">
@@ -501,26 +500,14 @@ export function LearningStudio({
         >
           {route === "home" && (
             <>
-              <SectionHead
-                eyebrow="A LITTLE PRACTICE, A BIG ADVENTURE"
-                title={`วันนี้ลองอะไรดี ${state.plan.childName}`}
-                body="ฟังให้คุ้น ลองพูด แล้วค่อย ๆ เล่าเรื่องไปด้วยกัน"
-                action={
-                  <span className="date-label">
-                    <Sun size={18} /> พร้อมสำหรับก้าวเล็ก ๆ วันนี้
-                  </span>
-                }
-              />
               <section className="hero">
                 <div className="hero-copy">
-                  <span className="pill warm">
-                    <Sparkles size={14} /> โลกแห่งการฝึกพูด
-                  </span>
+                  <p className="hero-learner">{state.plan.childName} · {TRACKS[state.plan.track].label} · เสียง {state.plan.sound}</p>
                   <h2>
                     ฝึกตามแผนวันนี้
                   </h2>
                   <p>
-                    ฟังตัวอย่าง แล้วลองทำกิจกรรมทีละข้อ
+                    {getLevel(state.plan.level).label} · ฟังตัวอย่าง แล้วลองทำกิจกรรมทีละข้อ
                   </p>
                   <Button onClick={continueLearning}>
                     {active ? <RefreshCw size={17} /> : <Play size={17} />}{" "}
@@ -555,9 +542,7 @@ export function LearningStudio({
                 </div>
                 <div className="hero-art">
                   <Landscape />
-                  <div className="hero-bubble">
-                    <Heart size={14} fill="currentColor" /> เก่งขึ้นทีละนิด
-                  </div>
+
                   <Art
                     kind={SOUNDS[state.plan.sound as keyof typeof SOUNDS]?.hero}
                     animate
@@ -745,6 +730,7 @@ export function LearningStudio({
               </div>
               <div className="journey">
                 {stages.map((stage, i) => {
+                  const current = stage.id === active?.stageId || (!active && stage.id === state.plan.startStage);
                   const done = completed.some(
                     (s) => s.planId === state.plan.id && s.stageId === stage.id,
                   );
@@ -760,7 +746,7 @@ export function LearningStudio({
                       >
                         {done ? <Check size={23} /> : i + 1}
                       </div>
-                      <div className="journey-card">
+                      <div className={`journey-card ${current ? "is-current" : ""}`}>
                         <div
                           className="journey-icon"
                           style={{
@@ -788,6 +774,7 @@ export function LearningStudio({
                                   : "ลองพูดและฟังตัวเอง"}
                             </span>
                             {done && <span className="green">ทำครบแล้ว</span>}
+                            {current && <span className="current-stage">{active ? "รอบที่กำลังฝึก" : "จุดเริ่มในแผน"}</span>}
                           </div>
                         </div>
                         <Button
@@ -1068,7 +1055,7 @@ export function LearningStudio({
           onClose={() => setResetOpen(false)}
         >
           <p>
-            ล้างแผนและผลในต้นแบบนี้เพื่อเริ่มทดสอบใหม่ สามารถส่งออก JSON
+            ล้างแผนและผลในต้นแบบนี้เพื่อเริ่มทดสอบใหม่ สามารถสำรองข้อมูลการฝึก
             จากหน้าผลการฝึกก่อนล้างได้
           </p>
           <div className="modal-actions">
@@ -1155,8 +1142,8 @@ function PlanPage({
   return (
     <>
       <SectionHead
-        eyebrow="MAKE IT THEIR OWN"
-        title="จัดชุดฝึกให้เหมาะกับเรา"
+        eyebrow="แผนการฝึก"
+        title={draft.track === "phonics" ? "จัดชุดฝึกเรียนเสียงไทย" : "จัดชุดฝึกให้เหมาะกับเรา"}
         body="เลือกเป้าหมายและจุดเริ่ม ผู้ใหญ่ปรับให้เหมาะกับเด็กได้เสมอ"
       />
       <form
@@ -1323,7 +1310,6 @@ function PlanPage({
           </div>
           <aside className="plan-preview panel">
             <span className="eyebrow">แผนที่กำลังจัด</span>
-            <Art kind={SOUNDS[draft.sound as keyof typeof SOUNDS].hero} />
             <h2>{draft.childName || "เพื่อนตัวน้อย"}</h2>
             <p>{TRACKS[draft.track].label}</p>
             <div className="preview-facts">
@@ -1351,18 +1337,20 @@ function PlanPage({
             <p className="footnote">
               แผนนี้ใช้บนเครื่องที่จัด ส่วนสรุปรอบที่จบจะแสดงตามสิทธิ์เมื่อบันทึกเข้าระบบ
             </p>
-            <Button type="submit">
-              บันทึกและดูเส้นทาง <ArrowRight size={16} />
-            </Button>
-            <Button type="button" variant="ghost" onClick={onCancel}>
-              กลับก่อน
-            </Button>
-            {error && (
-              <p role="alert" className="error-text">
-                {error}
-              </p>
-            )}
           </aside>
+        </div>
+        <div className="plan-actions panel">
+          <Button type="submit">
+              บันทึกและดูเส้นทาง <ArrowRight size={16} />
+          </Button>
+          <Button type="button" variant="ghost" onClick={onCancel}>
+              กลับก่อน
+          </Button>
+            {error && (
+            <p role="alert" className="error-text">
+                {error}
+            </p>
+            )}
         </div>
       </form>
     </>
@@ -1450,8 +1438,8 @@ function Library({
               </span>
             </div>
             <div className="library-info">
-              <h3>{item.title}</h3>
-              <p>{item.prompt}</p>
+              <h3>{item.prompt}</h3>
+              <p>{item.title}</p>
               <span>
                 {item.kind === "choice"
                   ? "ฟังและเลือกภาพ"
@@ -1499,6 +1487,10 @@ function Preview({
   return (
     <Modal title="ดูตัวอย่างกิจกรรม" onClose={onClose}>
       <span className="pill">{stage.label}</span>
+      <h2>{item.title}</h2>
+      <p className="preview-prompt">{item.prompt}</p>
+      <p>{item.instruction}</p>
+      <p className="footnote">{item.hint}</p>
       <div
         className={item.art === "mouth" ? "preview-mouth" : "preview-item-art"}
       >
@@ -1519,10 +1511,6 @@ function Preview({
           <Art kind={item.art} />
         )}
       </div>
-      <h2>{item.title}</h2>
-      <p className="preview-prompt">{item.prompt}</p>
-      <p>{item.instruction}</p>
-      <p className="footnote">{item.hint}</p>
       <Button variant="secondary" onClick={() => speaker.speak(item.sample)}>
         <Volume2 size={17} />
         ฟังตัวอย่าง
@@ -1890,186 +1878,193 @@ function Practice({
           </>
         ) : (
           <>
-            {item.art === "mouth" ? (
-              <MouthCoach sound={session.sound} sample={item.sample} />
-            ) : (
-              <div className="exercise-art">
-                <Art kind={item.art} />
-              </div>
-            )}
-            {item.segments && (
-              <div className="segments">
-                <span>{item.segments[0]}</span>
-                <b>+</b>
-                <span>{item.segments[1]}</span>
-                <b>=</b>
-                <span>{item.prompt}</span>
-              </div>
-            )}
-            {!["words", "story"].includes(session.stageId) &&
-              !item.hidePrompt &&
-              session.stageId !== "transfer" && (
-                <div className="exercise-prompt">{item.prompt}</div>
-              )}
-            {item.subLabel && (
-              <p className="footnote centered">{item.subLabel}</p>
-            )}
-            <div className="sample-actions">
-              <Button
-                variant="secondary"
-                onClick={read}
-                disabled={recording || requesting}
-              >
-                <Volume2 size={18} />
-                ฟังตัวอย่าง
-              </Button>
-              <button
-                className="text-button"
-                onClick={() => {
-                  setShowHelp(!showHelp);
-                  setSupport((s) => (s === "adult" ? "adult" : "modeled"));
-                }}
-              >
-                <HelpCircle size={16} />
-                {showHelp ? "ซ่อนคำใบ้" : "ขอคำใบ้"}
-              </button>
-            </div>
-            {showHelp && (
-              <div className="hint">
-                <strong>ตัวอย่างที่ผู้ใหญ่ช่วยอ่านได้ “{item.prompt}”</strong>
-                <p>{item.hint}</p>
-              </div>
-            )}
-            {item.kind === "observation" ? (
-              <div className="observation-area">
-                <span className="pill green">
-                  <Users size={15} />
-                  เล่นด้วยกันนอกจอได้
-                </span>
-                <p>เมื่อเล่นแล้ว ให้ผู้ใหญ่เลือกสิ่งที่สังเกตได้</p>
-                <div className="review-options">
-                  {(
-                    [
-                      { id: "achieved", label: "ทำได้ตามเป้าหมาย" },
-                      { id: "practice", label: "ยังต้องช่วยฝึก" },
-                      { id: "unavailable", label: "ยังประเมินไม่ได้" },
-                    ] as const
-                  ).map((r) => (
-                    <label key={r.id}>
-                      <input
-                        type="radio"
-                        name="observation"
-                        value={r.id}
-                        disabled={!!saved}
-                        checked={review === r.id}
-                        onChange={() => setReview(r.id)}
-                      />
-                      {r.label}
-                    </label>
-                  ))}
-                </div>
-                <label className="check-label">
-                  <input
-                    type="checkbox"
-                    checked={support === "adult"}
-                    disabled={!!saved}
-                    onChange={(e) =>
-                      setSupport(e.target.checked ? "adult" : "independent")
-                    }
-                  />
-                  มีผู้ใหญ่ช่วยระหว่างกิจกรรม
-                </label>
-              </div>
-            ) : (
-              <div className="record-area">
-                {!saved && (
-                  <>
-                    <button
-                      className={`record-button ${recording ? "recording" : ""}`}
-                      aria-label={recording ? "หยุดอัดเสียง" : "เริ่มอัดเสียง"}
-                      onClick={() =>
-                        recording ? mediaRef.current?.stop() : record()
-                      }
-                      disabled={requesting}
-                    >
-                      {recording ? (
-                        <Square size={25} fill="currentColor" />
-                      ) : (
-                        <Mic size={29} />
-                      )}
-                    </button>
-                    <strong>
-                      {requesting
-                        ? "กำลังขอสิทธิ์ไมค์…"
-                        : recording
-                          ? `กำลังอัด ${elapsed} วินาที · กดเพื่อหยุด`
-                          : audio
-                            ? "ลองฟังเสียงของเรา"
-                            : "กดไมค์แล้วลองพูด"}
-                    </strong>
-                    {audio && (
-                      <>
-                        <audio
-                          ref={recordedPlayer}
-                          controls
-                          src={audio}
-                          onPlay={() => speaker.stop()}
-                          aria-label="เสียงที่อัดไว้ในข้อนี้"
-                        />
-                        <button className="text-button" onClick={resetAudio}>
-                          <RotateCcw size={15} />
-                          อัดใหม่
-                        </button>
-                      </>
-                    )}
-                    {!recording && (
-                      <button
-                        className={`demo-answer ${demo ? "active" : ""}`}
-                        onClick={() => {
-                          setDemo(true);
-                          setAudio("");
-                          setMicError("");
-                        }}
-                      >
-                        <MicOff size={15} />
-                        {demo
-                          ? "เลือกทดลองโดยไม่อัดเสียงแล้ว"
-                          : "ทดลองตอบโดยไม่อัดเสียง"}
-                      </button>
-                    )}
-                    {(audio || demo) && (
-                      <label className="support-select">
-                        รอบนี้หนูลองแบบไหน
-                        <select
-                          value={support}
-                          onChange={(e) =>
-                            setSupport(e.target.value as Attempt["support"])
-                          }
-                        >
-                          <option value="independent">ลองพูดเอง</option>
-                          <option value="modeled">ฟังตัวอย่างแล้วพูดตาม</option>
-                          <option value="adult">มีผู้ใหญ่ช่วย</option>
-                        </select>
-                      </label>
-                    )}
-                  </>
-                )}
-                {saved && (
-                  <div className="feedback positive" role="status">
-                    <CheckCircle2 />
-                    <div>
-                      <strong>บันทึกความพยายามของเราแล้ว</strong>
-                      <p>
-                        {saved.mode === "demo"
-                          ? "รอบนี้เป็นการจำลองคำตอบ · "
-                          : "เสียงไม่ถูกเก็บถาวร · "}
-                        ผลการพูดยังรอผู้ใหญ่ช่วยตรวจ
-                      </p>
-                    </div>
+            <div className={item.art === "mouth" ? "speaking-layout with-mouth" : "speaking-layout"}>
+              <div className="speaking-media">
+                {item.art === "mouth" ? (
+                  <MouthCoach sound={session.sound} sample={item.sample} />
+                ) : (
+                  <div className="exercise-art">
+                    <Art kind={item.art} />
                   </div>
                 )}
               </div>
-            )}
+              <div className="speaking-controls">
+                {item.segments && (
+                  <div className="segments">
+                    <span>{item.segments[0]}</span>
+                    <b>+</b>
+                    <span>{item.segments[1]}</span>
+                    <b>=</b>
+                    <span>{item.prompt}</span>
+                  </div>
+                )}
+                {!["words", "story"].includes(session.stageId) &&
+                  !item.hidePrompt &&
+                  session.stageId !== "transfer" && (
+                    <div className="exercise-prompt">{item.prompt}</div>
+                  )}
+                {item.subLabel && (
+                  <p className="footnote centered">{item.subLabel}</p>
+                )}
+                <div className="sample-actions">
+                  <Button
+                    variant="secondary"
+                    onClick={read}
+                    disabled={recording || requesting}
+                  >
+                    <Volume2 size={18} />
+                    ฟังตัวอย่าง
+                  </Button>
+                  <button
+                    className="text-button"
+                    onClick={() => {
+                      setShowHelp(!showHelp);
+                      setSupport((s) => (s === "adult" ? "adult" : "modeled"));
+                    }}
+                  >
+                    <HelpCircle size={16} />
+                    {showHelp ? "ซ่อนคำใบ้" : "ขอคำใบ้"}
+                  </button>
+                </div>
+                {showHelp && (
+                  <div className="hint">
+                    <strong>ตัวอย่างที่ผู้ใหญ่ช่วยอ่านได้ “{item.prompt}”</strong>
+                    <p>{item.hint}</p>
+                  </div>
+                )}
+                {item.kind === "observation" ? (
+                  <div className="observation-area">
+                    <span className="pill green">
+                      <Users size={15} />
+                      เล่นด้วยกันนอกจอได้
+                    </span>
+                    <p>เมื่อเล่นแล้ว ให้ผู้ใหญ่เลือกสิ่งที่สังเกตได้</p>
+                    <div className="review-options">
+                      {(
+                        [
+                          { id: "achieved", label: "ทำได้ตามเป้าหมาย" },
+                          { id: "practice", label: "ยังต้องช่วยฝึก" },
+                          { id: "unavailable", label: "ยังประเมินไม่ได้" },
+                        ] as const
+                      ).map((r) => (
+                        <label key={r.id}>
+                          <input
+                            type="radio"
+                            name="observation"
+                            value={r.id}
+                            disabled={!!saved}
+                            checked={review === r.id}
+                            onChange={() => setReview(r.id)}
+                          />
+                          {r.label}
+                        </label>
+                      ))}
+                    </div>
+                    <label className="check-label">
+                      <input
+                        type="checkbox"
+                        checked={support === "adult"}
+                        disabled={!!saved}
+                        onChange={(e) =>
+                          setSupport(e.target.checked ? "adult" : "independent")
+                        }
+                      />
+                      มีผู้ใหญ่ช่วยระหว่างกิจกรรม
+                    </label>
+                  </div>
+                ) : (
+                  <div className="record-area">
+                    {!saved && (
+                      <>
+                        <button
+                          className={`record-button ${recording ? "recording" : ""}`}
+                          aria-label={recording ? "หยุดอัดเสียง" : "เริ่มอัดเสียง"}
+                          onClick={() =>
+                            recording ? mediaRef.current?.stop() : record()
+                          }
+                          disabled={requesting}
+                        >
+                          {recording ? (
+                            <Square size={25} fill="currentColor" />
+                          ) : (
+                            <Mic size={29} />
+                          )}
+                        </button>
+                        <strong>
+                          {requesting
+                            ? "กำลังขอสิทธิ์ไมค์…"
+                            : recording
+                              ? `กำลังอัด ${elapsed} วินาที · กดเพื่อหยุด`
+                              : audio
+                                ? "อัดเสียงแล้ว · กดเล่นเพื่อฟัง"
+                                : "กดไมค์แล้วลองพูด"}
+                        </strong>
+                        {audio && (
+                          <>
+                            <audio
+                              ref={recordedPlayer}
+                              controls
+                              preload="auto"
+                              src={audio}
+                              onPlay={() => speaker.stop()}
+                              aria-label="เสียงที่อัดไว้ในข้อนี้"
+                            />
+                            <button className="text-button" onClick={resetAudio}>
+                              <RotateCcw size={15} />
+                              อัดใหม่
+                            </button>
+                          </>
+                        )}
+                        {!recording && (
+                          <button
+                            className={`demo-answer ${demo ? "active" : ""}`}
+                            onClick={() => {
+                              setDemo(true);
+                              setAudio("");
+                              setMicError("");
+                            }}
+                          >
+                            <MicOff size={15} />
+                            {demo
+                              ? "เลือกทดลองโดยไม่อัดเสียงแล้ว"
+                              : "ทดลองตอบโดยไม่อัดเสียง"}
+                          </button>
+                        )}
+                        {(audio || demo) && (
+                          <label className="support-select">
+                            รอบนี้หนูลองแบบไหน
+                            <select
+                              value={support}
+                              onChange={(e) =>
+                                setSupport(e.target.value as Attempt["support"])
+                              }
+                            >
+                              <option value="independent">ลองพูดเอง</option>
+                              <option value="modeled">ฟังตัวอย่างแล้วพูดตาม</option>
+                              <option value="adult">มีผู้ใหญ่ช่วย</option>
+                            </select>
+                          </label>
+                        )}
+                      </>
+                    )}
+                    {saved && (
+                      <div className="feedback positive" role="status">
+                        <CheckCircle2 />
+                        <div>
+                          <strong>บันทึกความพยายามของเราแล้ว</strong>
+                          <p>
+                            {saved.mode === "demo"
+                              ? "รอบนี้เป็นการจำลองคำตอบ · "
+                              : "เสียงไม่ถูกเก็บถาวร · "}
+                            ผลการพูดยังรอผู้ใหญ่ช่วยตรวจ
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
           </>
         )}
         {speaker.message && (
@@ -2150,7 +2145,7 @@ function Summary({
   }, []);
   return (
     <div className="summary-page">
-      <div className="celebration-art">
+      <div className="celebration-art" aria-hidden="true">
         <Art
           kind={SOUNDS[session.sound as keyof typeof SOUNDS]?.hero}
           animate
@@ -2199,10 +2194,10 @@ function Summary({
           <strong>
             {m.listeningTotal
               ? `${m.listeningCorrect}/${m.listeningTotal}`
-              : "—"}
+              : "ไม่มีข้อเลือกภาพ"}
           </strong>
           <small>
-            {m.listeningTotal ? "ฟังและเลือกถูก" : "รอบนี้ไม่มีกิจกรรมเลือกภาพ"}
+            {m.listeningTotal ? "ฟังและเลือกถูก" : "กิจกรรมในรอบนี้"}
           </small>
         </div>
       </div>
@@ -2322,7 +2317,7 @@ function Progress({
               onClick={onExport}
             >
               <Download size={16} />
-              ส่งออก JSON
+              สำรองข้อมูลการฝึก
             </Button>
             <Button
               variant="secondary"
@@ -2388,7 +2383,11 @@ function Progress({
             <h2>ก้าวเล็ก ๆ ใน 7 วันที่ผ่านมา</h2>
             <span className="small-tag">รอบที่ทำครบ</span>
           </div>
-          <div
+          {days.filter((day) => day.count > 0).length <= 1 ? (
+            <p className="footnote">{days.find((day) => day.count > 0)
+              ? days.filter((day) => day.count > 0).map((day) => `${day.label} · ทำครบ ${day.count} รอบ`).join("")
+              : "ยังไม่มีรอบฝึกที่ทำครบในช่วงนี้"}</p>
+          ) : <div
             className="bar-chart"
             role="img"
             aria-label={days.map((d) => `${d.label} ${d.count} รอบ`).join(", ")}
@@ -2402,7 +2401,7 @@ function Progress({
                 <small>{d.label}</small>
               </div>
             ))}
-          </div>
+          </div>}
           <p className="footnote">
             แสดงจากรอบที่บันทึกจริงในต้นแบบ ไม่ได้เติมข้อมูลตัวอย่าง
           </p>
@@ -2656,6 +2655,8 @@ function Guide({
             <li>บันทึกทุกข้อและกดดูสรุปรอบ ผลการพูดจะรอผู้ใหญ่ตรวจ</li>
             <li>เปิดผลการฝึกเพื่อตรวจรายข้อ พิมพ์ หรือส่งออกข้อมูล JSON</li>
           </ol>
+          <details>
+            <summary>รายละเอียดระดับ เสียง และการเก็บข้อมูล</summary>
           <h2>สิ่งที่ต้นแบบทำได้</h2>
           <p>
             สามเป้าหมายการเรียน 4 ระดับเนื้อหา เส้นทางออกเสียง 6 ช่วง กลุ่มคำ ป
@@ -2683,7 +2684,7 @@ function Guide({
             เสียงไมค์ไม่ถูกส่งไปเซิร์ฟเวอร์
             ใช้ฟังซ้ำได้ในข้อนั้นและหายเมื่อเปลี่ยนข้อ
             แผนและรายละเอียดกิจกรรมเก็บในเบราว์เซอร์เครื่องนี้
-            ล้างข้อมูลเบราว์เซอร์แล้วอาจหาย จึงมีปุ่มส่งออก JSON
+            ล้างข้อมูลเบราว์เซอร์แล้วอาจหาย จึงมีปุ่มสำรองข้อมูลการฝึก
           </p>
           <h2>ผลแบบไหนเชื่อมกับการฝึกอะไร</h2>
           <p>
@@ -2704,6 +2705,7 @@ function Guide({
             งานที่ครูมอบหมาย การแจ้งเตือน อีเมล และการประเมินเสียงจริง
             เป็นส่วนที่ทีมจะเชื่อมต่อภายหลัง
           </p>
+          </details>
         </section>
         <aside>
           <section className="panel guide-download">
@@ -2729,14 +2731,14 @@ function Guide({
               ภาพ เสียง และเพลงที่ปรับ
             </a>
           </section>
-          <section className="panel reset-card">
-            <h3>เริ่มทดสอบรอบใหม่</h3>
+          <details className="panel reset-card">
+            <summary>จัดการข้อมูลในเครื่อง</summary>
             <p>ล้างเฉพาะข้อมูลของโมดูลต้นแบบนี้ในเครื่อง</p>
             <Button variant="ghost" onClick={onReset}>
               <RotateCcw size={15} />
               ล้างข้อมูลต้นแบบ
             </Button>
-          </section>
+          </details>
         </aside>
       </div>
       <div className="research-links">

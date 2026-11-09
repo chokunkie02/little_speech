@@ -223,13 +223,13 @@ function AcceptInviteContent() {
   const redirectParam = encodeURIComponent(`/invite/accept?token=${token}`);
 
   return (
-    <main className="min-h-screen bg-bg flex items-center justify-center px-4 py-6">
-      <div className="w-full max-w-md space-y-4">
+    <main className="min-h-screen bg-bg flex items-start justify-center px-4 py-9 sm:py-14">
+      <div className="w-full max-w-lg space-y-4">
 
         {/* Header */}
-        <div className="text-center space-y-3">
-          <div className="flex justify-center"><MailIcon /></div>
-          <h1 className="text-2xl font-bold text-text">คำเชิญเข้าร่วม</h1>
+        <div className="space-y-2">
+          <div className="flex"><MailIcon /></div>
+          <h1 className="text-2xl font-bold text-text">{awaitingReview ? "ส่งคำขอแล้ว · รออนุมัติ" : isAlreadyAccepted ? "เชื่อมบัญชีแล้ว" : guardianRequest ? "ขอเชื่อมบัญชีผู้ปกครอง" : "คำเชิญเข้าร่วม"}</h1>
           <p className="text-text-muted text-sm">Speech Adventure</p>
         </div>
 
@@ -340,7 +340,7 @@ function AcceptInviteContent() {
             <p>{invitation.isAdditionalGuardian
               ? "ส่งคำขอแล้ว คุณจะเปิดข้อมูลเด็กได้เมื่อครูประจำห้องหรือผู้ปกครองที่เชื่อมอยู่อนุมัติ"
               : "ส่งคำขอแล้ว คุณจะเปิดข้อมูลเด็กได้เมื่อครูประจำห้องอนุมัติ"}</p>
-            <button type="button" className="font-semibold text-primary" onClick={() => setRefresh((value) => value + 1)}>
+            <button type="button" className="rounded-lg border border-border bg-surface px-3 py-2 font-semibold text-primary" onClick={() => setRefresh((value) => value + 1)}>
               ตรวจสถานะล่าสุด
             </button>
           </div>
@@ -359,10 +359,7 @@ function AcceptInviteContent() {
                 required maxLength={60} placeholder="เช่น แม่ พ่อ หรือผู้ดูแล" value={relationship}
                 onChange={(event) => setRelationship(event.target.value)} />
             </label>
-            <label className="block space-y-1.5 text-sm font-semibold">
-              <span>อีเมลจากบัญชี</span>
-              <input className="w-full bg-bg border border-border rounded-lg px-3 py-2 text-text-muted" value={user.email} readOnly />
-            </label>
+            <p className="break-all text-sm text-text-muted">ส่งจากบัญชี <strong className="text-text">{user.email}</strong></p>
             <button className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-white disabled:opacity-40"
               disabled={accepting || !name.trim() || !relationship.trim()}>
               {accepting ? "กำลังส่ง…" : "ส่งคำขอเชื่อม"}

@@ -84,6 +84,8 @@ export default function SchoolChildProgressView({
           onClick={() => { setAudioAttemptId(null); setResult(undefined); setRevision((value) => value + 1); }}>
           โหลดผลล่าสุด
         </button>
+        {teacher && data && <a href="#progress-history" className="rounded-xl border border-border bg-surface px-3 py-2 text-sm font-semibold text-primary"
+          onClick={() => { setAudioAttemptId(null); setTab("notes"); }}>เปิดข้อสังเกต</a>}
       </header>
 
       {!result ? (
@@ -94,7 +96,9 @@ export default function SchoolChildProgressView({
         </p>
       ) : (
         <>
-          <p className="text-sm font-semibold text-text-muted">สรุปจากระบบฝึกเดิม</p>
+          <LearningResults childId={childId} revision={revision} />
+          <h2 className="font-semibold text-text">ประวัติแบบฝึกเดิม</h2>
+          <p className="text-sm text-text-muted">ตัวเลขด้านล่างมาจากแบบฝึกเดิมของนักเรียน</p>
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <DetailMetricCard label="ครั้งที่ฝึก" value={attempts.length} />
             <DetailMetricCard label="คะแนนเฉลี่ย" value={average} valueColor="var(--color-primary)" />
@@ -104,11 +108,10 @@ export default function SchoolChildProgressView({
             href={teacher ? `/report?child=${encodeURIComponent(childId)}` : "/report"}>
             เปิดรายงานความก้าวหน้า
           </Link>
-          <LearningResults childId={childId} revision={revision} />
-          {!teacher && <p className="text-xs text-text-muted">
+          {!teacher && <p className="rounded-xl border border-border bg-surface p-3 text-sm text-text-muted">
             ครูประจำห้องสามารถฟังเสียงการฝึกที่บันทึกไว้ของนักเรียนคนนี้ได้
           </p>}
-          <section className="space-y-4 rounded-2xl border border-border bg-surface p-4 sm:p-5">
+          <section id="progress-history" className="space-y-4 rounded-2xl border border-border bg-surface p-4 sm:p-5">
             <div className="flex flex-wrap gap-2" aria-label="เลือกประวัติการฝึก">
               {(["attempts", "sessions", "notes"] as const).map((choice) => (
                 <button key={choice} type="button" aria-pressed={tab === choice}

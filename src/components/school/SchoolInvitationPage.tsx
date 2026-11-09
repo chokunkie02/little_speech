@@ -11,7 +11,7 @@ type Invitation = { school_name: string; status: SchoolTeacherInvitationStatus }
 const buttonClass = "rounded-xl bg-primary px-4 py-2 text-center text-sm font-semibold text-white disabled:opacity-50";
 
 const inviteSettings = {
-  teacher: { path: "/invite/school-teacher", dashboard: "/teacher", name: "ครู", title: "คำเชิญเข้าร่วมโรงเรียน" },
+  teacher: { path: "/invite/school-teacher", dashboard: "/teacher", name: "ครู", title: "คำเชิญเข้าร่วมโรงเรียนในบทบาทครู" },
   school_admin: { path: "/invite/school-admin", dashboard: "/school", name: "แอดมินโรงเรียน", title: "คำเชิญดูแลโรงเรียน" },
 } as const;
 
@@ -68,11 +68,14 @@ function SchoolInvitation({ role }: { role: InviteRole }) {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center bg-bg px-4 py-8">
-      <section className="w-full max-w-md space-y-3 rounded-2xl border border-border bg-surface p-4 sm:p-5">
+    <main className="grid min-h-screen place-items-start justify-items-center bg-bg px-4 py-10 sm:py-16">
+      <section className="w-full max-w-lg space-y-4 rounded-2xl border border-border bg-surface p-5 sm:p-7">
         <p className="text-xs font-semibold text-primary">Speech Adventure</p>
         <h1 className="text-xl font-bold">{settings.title}</h1>
-        {invitation && <p className="text-sm font-semibold">{invitation.school_name}</p>}
+        {invitation && <dl className="grid gap-3 rounded-xl border border-border bg-bg p-4 sm:grid-cols-2">
+          <div><dt className="text-xs text-text-muted">โรงเรียน</dt><dd className="mt-1 break-words font-semibold">{invitation.school_name}</dd></div>
+          <div><dt className="text-xs text-text-muted">บทบาทที่ได้รับเชิญ</dt><dd className="mt-1 font-semibold">{settings.name}</dd></div>
+        </dl>}
 
         {!valid ? <p role="alert" className="text-sm text-error">ลิงก์คำเชิญไม่ถูกต้อง</p>
           : !current || isLoading ? <p role="status" className="text-sm text-text-muted">กำลังโหลดคำเชิญ…</p>
@@ -98,8 +101,10 @@ function SchoolInvitation({ role }: { role: InviteRole }) {
             </div>
           ) : user.role === role && !user.isPlatformAdmin ? (
             <div className="space-y-3">
-              <p className="break-all text-sm text-text-muted">บัญชี{settings.name} {user.email}</p>
-              {role === "school_admin" && <p className="text-sm text-text-muted">จัดการครู ห้องเรียน และผู้ปกครอง พร้อมดูรายงานภายในโรงเรียนนี้ได้</p>}
+              <p className="break-all text-sm text-text-muted">บัญชีที่ใช้ตอบรับ <strong className="block text-text">{user.email}</strong></p>
+              <p className="text-sm text-text-muted">{role === "school_admin"
+                ? "เมื่อเข้าร่วมแล้ว คุณจะจัดการครู ห้องเรียน และดูรายงานภายในโรงเรียนนี้ได้"
+                : "เมื่อผู้ดูแลจัดคุณเข้าห้องเรียนแล้ว คุณจะเห็นนักเรียนในห้องและส่งคำเชิญผู้ปกครองได้"}</p>
               <button type="button" className={buttonClass} disabled={busy} onClick={() => void accept()}>
                 {busy ? "กำลังตอบรับ…" : "ตอบรับคำเชิญ"}
               </button>

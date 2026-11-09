@@ -26,13 +26,18 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
   private _received: ChildAccess[] = SERVER_GRANTS;
   private _issued: ChildAccess[] = SERVER_GRANTS;
   private readonly _listeners = new Set<() => void>();
-  private _hydrated = false;
+  private _scopeUserId: string | null = null;
+  private _receivedStatus: { userId: string; state: "ready" | "error" } | null = null;
   private _hydratePromise: Promise<void> | null = null;
   private _hydrateGen = 0;
 
   constructor(private readonly client: SupabaseClient<Database>) {}
 
   // ── useSyncExternalStore plumbing ──────────────────────────────────────────
+
+  getReceivedStatus(userId: string) {
+    return this._receivedStatus?.userId === userId ? this._receivedStatus.state : "loading";
+  }
 
   listReceivedGrants(): ChildAccess[] {
     return this._received;
@@ -155,7 +160,7 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
 
   public reset(): void {
     this._hydrateGen++;
-    this._hydrated = false;
+    this._receivedStatus = null;
     this._hydratePromise = null;
     this._received = SERVER_GRANTS;
     this._issued = SERVER_GRANTS;
@@ -163,14 +168,17 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
   }
 
   public rehydrate(): Promise<void> {
-    this._hydrated = false;
+    if (this._receivedStatus?.state === "error") {
+      this._receivedStatus = null;
+      this._notify();
+    }
     this._hydratePromise = null;
     this._hydrateGen++;
     return this._triggerHydrate();
   }
 
-  public setScope(_userId: string | null): void {
-    // Scope handled via RLS
+  public setScope(userId: string | null): void {
+    this._scopeUserId = userId;
   }
 
   // ── Private helpers ───────────────────────────────────────────────────────────
@@ -181,8 +189,14 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
 
   private _triggerHydrate(): Promise<void> {
     if (this._hydratePromise) return this._hydratePromise;
+    const generation = this._hydrateGen;
+    const userId = this._scopeUserId;
     this._hydratePromise = this._hydrate().catch((err) => {
       warnRepo("SupabaseChildAccessRepository._hydrate", err);
+      if (userId && generation === this._hydrateGen) {
+        this._receivedStatus = { userId, state: "error" };
+        this._notify();
+      }
     });
     return this._hydratePromise;
   }
@@ -190,7 +204,8 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
   private async _hydrate(): Promise<void> {
     const myGen = this._hydrateGen;
 
-    const { data: { user } } = await this.client.auth.getUser();
+    const { data: { user }, error: authError } = await this.client.auth.getUser();
+    if (authError && this._scopeUserId) throw authError;
     if (!user || this._hydrateGen !== myGen) return;
 
     // Fetch grants received by current user (active only)
@@ -208,7 +223,7 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
 
     if (this._hydrateGen !== myGen) return;
 
-    if (recErr) warnRepo("SupabaseChildAccessRepository._hydrate:received", new QueryError("child_access", "select", recErr));
+    if (recErr) throw new QueryError("child_access", "select", recErr);
     if (issErr) warnRepo("SupabaseChildAccessRepository._hydrate:issued",   new QueryError("child_access", "select", issErr));
 
     const receivedBase = (received ?? []).map((row) => ({
@@ -239,17 +254,14 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
 
       if (this._hydrateGen !== myGen) return;
 
-      if (profErr) {
-        warnRepo("SupabaseChildAccessRepository._hydrate:childProfiles",
-          new QueryError("child_profiles", "select", profErr));
-      } else {
-        const snapshots = new Map(
-          (profileRows ?? []).map((row) => [row.id, dbToDomainProfile(row)]),
-        );
-        for (let i = 0; i < receivedBase.length; i++) {
-          const snap = snapshots.get(receivedBase[i].childId);
-          if (snap) receivedBase[i] = { ...receivedBase[i], childSnapshot: snap };
-        }
+      if (profErr) throw new QueryError("child_profiles", "select", profErr);
+
+      const snapshots = new Map(
+        (profileRows ?? []).map((row) => [row.id, dbToDomainProfile(row)]),
+      );
+      for (let i = 0; i < receivedBase.length; i++) {
+        const snap = snapshots.get(receivedBase[i].childId);
+        if (snap) receivedBase[i] = { ...receivedBase[i], childSnapshot: snap };
       }
     }
 
@@ -263,7 +275,7 @@ export class SupabaseChildAccessRepository implements IChildAccessRepository {
 
     this._received = receivedBase;
     this._issued = issuedBase;
-    this._hydrated = true;
+    this._receivedStatus = { userId: user.id, state: "ready" };
     this._notify();
   }
 }

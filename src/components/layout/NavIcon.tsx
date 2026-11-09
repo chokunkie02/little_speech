@@ -1,4 +1,5 @@
 export type NavIconName =
+  | "inbox"
   | "home"
   | "training"
   | "progress"
@@ -30,6 +31,10 @@ export default function NavIcon({ name, active = false, size = 17 }: Props) {
     strokeLinejoin: "round" as const,
     "aria-hidden": true as const,
   };
+
+  if (name === "inbox") {
+    return <svg {...shared}><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></svg>;
+  }
 
   if (name === "home") {
     return (

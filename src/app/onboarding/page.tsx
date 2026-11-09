@@ -2,10 +2,11 @@
 
 import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useState, useEffect, useRef, Suspense } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useChildProfile } from "@/hooks/useChildProfile";
 import { useSpeechProgress } from "@/hooks/useSpeechProgress";
-import { useAuth, getUserRole } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { mockTargetSounds } from "@/data/speechAdventureMockData";
 import type { TrainingMode } from "@/lib/child-profile/childProfileStorage";
 
@@ -24,12 +25,6 @@ const GOAL_LABELS: Record<string, string> = {
   casual: "เมื่อมีเวลา",
 };
 
-const ROLE_LABELS: Record<string, string> = {
-  parent: "ผู้ปกครอง",
-  teacher: "ครู",
-  therapist: "นักบำบัด",
-  school_admin: "ผู้ดูแลโรงเรียน",
-};
 
 const MODE_LABELS: Record<TrainingMode, string> = {
   speech_clarity: "ฝึกเสียงให้ชัด",
@@ -67,18 +62,22 @@ function OnboardingContent() {
 
   const { saveProfile: repoSaveProfile, profile: existingProfile, isOwner } = useChildProfile();
   const { setSelectedSound } = useSpeechProgress();
-  const { user } = useAuth();
-  const role = getUserRole(user);
+  const { user, isLoading: authLoading } = useAuth();
   const editDetectedRef = useRef(false);
 
+  const signedInCreation = !!user && editParam !== "true";
   useEffect(() => {
-    if (!existingProfile) return;
+    if (signedInCreation) router.replace("/dashboard");
+  }, [signedInCreation, router]);
+
+  useEffect(() => {
+    if (signedInCreation || !existingProfile) return;
     if (editParam === "true" && (!isOwner || existingProfile.organizationId)) {
       router.replace("/profile");
     } else if (editParam !== "true") {
       router.replace("/training");
     }
-  }, [existingProfile, editParam, isOwner, router]);
+  }, [existingProfile, editParam, isOwner, router, signedInCreation]);
 
   useEffect(() => {
     if (editDetectedRef.current || !existingProfile || editParam !== "true" || !isOwner || existingProfile.organizationId) return;
@@ -141,6 +140,17 @@ function OnboardingContent() {
   const currentDotIndex = visibleDots.indexOf(step);
   const progressStep = currentDotIndex + 1;
 
+  if (authLoading || signedInCreation) {
+    return <main className="p-6 text-sm text-text-muted" role="status">กำลังเปิดข้อมูลบัญชี…</main>;
+  }
+
+  if (user && (!isOwner || !existingProfile || existingProfile.organizationId)) {
+    return <main className="space-y-2 p-6 text-sm">
+      <p>โปรไฟล์นี้แก้ไขผ่านหน้าข้อมูลลูก</p>
+      <Link href="/profile" className="font-semibold text-primary">เปิดข้อมูลลูก</Link>
+    </main>;
+  }
+
   return (
     <main className="min-h-screen bg-bg flex flex-col">
       {/* ── Top bar (hidden on welcome step) ── */}
@@ -177,76 +187,36 @@ function OnboardingContent() {
         </nav>
       )}
 
-      <div className="flex-1 flex items-center justify-center px-4 py-6 sm:px-6 sm:py-8">
+      <div className={`flex-1 flex justify-center px-4 sm:px-6 ${step === 1 ? "items-start pt-10 sm:pt-16" : "items-center py-6 sm:py-8"}`}>
         <div className="w-full max-w-xl">
 
           {/* ── Step 1: Welcome ── */}
           {step === 1 && (
-            <div className="text-center space-y-6">
-              <div className="w-20 h-20 rounded-2xl bg-primary flex items-center justify-center mx-auto shadow-lg shadow-primary/25">
-                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                  <line x1="12" x2="12" y1="19" y2="22" />
-                </svg>
-              </div>
-
+            <section className="space-y-5 rounded-2xl border border-border bg-surface p-5 sm:p-7" aria-labelledby="start-heading">
               <div>
-                <h1 className="text-3xl font-bold text-text mb-3">
-                  ยินดีต้อนรับสู่<br />
-                  <span className="text-primary">Speech Adventure</span>
-                </h1>
-                <p className="text-text-muted text-base leading-relaxed max-w-sm mx-auto">
-                  ระบบฝึกพูดสำหรับเด็กไทย ออกแบบโดยผู้เชี่ยวชาญด้านนักบำบัดการพูด
-                  ใช้เวลาเพียง 2 นาทีในการตั้งค่าเริ่มต้น
+                <p className="text-sm font-semibold text-primary">Speech Adventure · ทดลองฝึก</p>
+                <h1 id="start-heading" className="mt-2 text-2xl font-bold text-text sm:text-3xl">ตั้งค่าก่อนเริ่มฝึก</h1>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted">
+                  ใส่ชื่อและอายุ แล้วเลือกเป้าหมายกับเสียงที่อยากฝึก ข้อมูลการทดลองจะเก็บในอุปกรณ์นี้
                 </p>
               </div>
-
-              <div className="grid grid-cols-3 gap-3 text-sm">
-                {[
-                  { icon: "target", label: "7 ระดับการฝึก" },
-                  { icon: "mic", label: "อัดเสียงได้" },
-                  { icon: "chart", label: "ติดตามผล" },
-                ].map((f) => (
-                  <div key={f.label} className="bg-surface border border-border rounded-xl px-3 py-3 text-center">
-                    <div className="text-xl mb-1"><DisplayIcon name={f.icon} /></div>
-                    <p className="text-xs text-text-muted">{f.label}</p>
-                  </div>
-                ))}
+              <div className="flex flex-wrap items-center gap-3">
+                <button type="button" onClick={() => setStep(2)} className="rounded-xl bg-primary px-5 py-2.5 font-semibold text-white">
+                  เริ่มตั้งค่า
+                </button>
+                <Link href="/" className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-text">กลับหน้าแรก</Link>
               </div>
-
-              {user ? (
-                <div className="flex items-center justify-center gap-2 text-sm">
-                  <span className="px-2.5 py-1 bg-primary/10 text-primary rounded-full text-xs font-semibold">
-                    {ROLE_LABELS[role] ?? "ผู้ปกครอง"}
-                  </span>
-                  <span className="text-text-muted truncate max-w-[200px]">{user.email}</span>
-                </div>
-              ) : (
-                <p className="text-xs text-text-muted">ไม่ต้องล็อกอินก็ใช้งานได้</p>
-              )}
-
-              <button
-                onClick={() => setStep(2)}
-                className="w-full bg-primary text-white font-semibold px-8 py-4 rounded-xl text-base hover:bg-primary/90 transition-all hover:scale-[1.01] active:scale-[0.99] shadow-md shadow-primary/25"
-              >
-                เริ่มตั้งค่าเลย →
-              </button>
-
-              <button
-                onClick={() => router.push("/")}
-                className="text-sm text-text-muted hover:text-text transition-colors"
-              >
-                ข้ามและไปหน้าแรก
-              </button>
-            </div>
+              <p className="border-t border-border pt-4 text-sm text-text-muted">
+                ได้รับบัญชีจากโรงเรียนแล้ว? <Link href="/auth/signin" className="font-semibold text-primary">เข้าสู่ระบบ</Link>
+              </p>
+            </section>
           )}
 
           {/* ── Step 2: Name + Age ── */}
           {step === 2 && (
             <div className="space-y-6">
               <div>
-                <h2 className="text-2xl font-bold text-text mb-1">ชื่อน้องคืออะไร?</h2>
+                <h2 className="text-2xl font-bold text-text mb-1">{isEdit ? "แก้ไขข้อมูลลูก" : "ชื่อน้องคืออะไร?"}</h2>
                 <p className="text-text-muted">เราจะใช้ชื่อนี้ในการฝึกค่ะ</p>
               </div>
 
@@ -265,38 +235,13 @@ function OnboardingContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-text mb-2">
-                    อายุ: <span className="text-primary font-bold">{age} ปี</span>
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => setAge((a) => Math.max(3, a - 1))}
-                      className="w-11 h-11 rounded-xl border border-border bg-surface hover:bg-gray-100 dark:hover:bg-white/8 flex items-center justify-center text-text font-bold text-lg transition-all active:scale-95"
-                    >
-                      –
-                    </button>
-                    <div className="flex-1 flex gap-1.5 flex-wrap justify-center">
-                      {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((y) => (
-                        <button
-                          key={y}
-                          onClick={() => setAge(y)}
-                          className={`w-9 h-9 rounded-lg text-sm font-semibold transition-all active:scale-95 ${
-                            age === y
-                              ? "bg-primary text-white shadow-sm shadow-primary/25"
-                              : "bg-surface border border-border text-text-muted hover:border-primary/40 hover:text-primary"
-                          }`}
-                        >
-                          {y}
-                        </button>
-                      ))}
-                    </div>
-                    <button
-                      onClick={() => setAge((a) => Math.min(12, a + 1))}
-                      className="w-11 h-11 rounded-xl border border-border bg-surface hover:bg-gray-100 dark:hover:bg-white/8 flex items-center justify-center text-text font-bold text-lg transition-all active:scale-95"
-                    >
-                      +
-                    </button>
-                  </div>
+                  <label htmlFor="profile-age" className="mb-2 block text-sm font-semibold text-text">อายุ</label>
+                  <select id="profile-age" value={age} onChange={(event) => setAge(Number(event.target.value))}
+                    className="w-full rounded-xl border border-border bg-surface px-4 py-3 text-text">
+                    {Array.from(new Set([3, 4, 5, 6, 7, 8, 9, 10, 11, 12, age])).sort((a, b) => a - b).map((value) =>
+                      <option key={value} value={value}>{value} ปี</option>,
+                    )}
+                  </select>
                 </div>
 
                 <div>
@@ -308,6 +253,7 @@ function OnboardingContent() {
                       <button
                         key={goal.id}
                         type="button"
+                        aria-pressed={trainingGoal === goal.id}
                         onClick={() => setTrainingGoal(goal.id)}
                         className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border-2 transition-all text-left active:scale-[0.99] ${
                           trainingGoal === goal.id

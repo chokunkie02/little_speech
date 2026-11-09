@@ -6,10 +6,10 @@
 
 @theme inline {
   /* Core semantic colors (light mode defaults) */
-  --color-primary: #6C63FF;
+  --color-primary: #5548D4;
   --color-secondary: #FFB347;
   --color-success: #4CAF82;
-  --color-error: #FF6B6B;
+  --color-error: #B42335;
   --color-info: #5BC0EB;
   --color-bg: #F8FAFC;
   --color-surface: #FFFFFF;
@@ -33,6 +33,7 @@
 
 /* ── Dark Mode — override CSS custom properties, Tailwind utilities pick these up automatically ── */
 .dark {
+  --color-error: #FF939E;
   --color-bg: #0B1829;
   --color-surface: #111E33;
   --color-text: #E1E8F0;
@@ -40,6 +41,8 @@
   --color-disabled: #2A3F58;
   --color-border: #1E3050;
 }
+
+.dark .text-primary { color: #B8AEFF; }
 
 body {
   background: var(--color-bg);

@@ -109,12 +109,12 @@ export default function SchoolObservations({
                 <div className="flex flex-wrap items-center gap-2 text-xs text-text-muted">
                   <span>{CATEGORY_META[note.category].label}</span>
                   <span>· {noteDate.format(new Date(note.created_at))}</span>
-                  {teacher && <span className="rounded-full bg-bg px-2 py-0.5">{shared ? "แชร์แล้ว" : "ส่วนตัว"}</span>}
+                  {teacher && <span className={`rounded-full border px-2 py-0.5 font-semibold text-text ${shared ? "border-success/30 bg-success/10" : "border-border bg-bg"}`}>{shared ? "แชร์แล้ว" : "ส่วนตัว"}</span>}
                 </div>
                 <p className="break-words text-sm font-semibold">{note.title}</p>
                 <p className="whitespace-pre-wrap break-words text-sm text-text-muted">{note.content}</p>
                 {teacher && note.author_id === viewerId && (
-                  <button type="button" disabled={busy} className="text-sm font-semibold text-primary disabled:opacity-50"
+                  <button type="button" disabled={busy} className="rounded-lg border border-border px-3 py-1.5 text-sm font-semibold text-primary disabled:opacity-50"
                     onClick={() => void save(async () => {
                       const client = getSupabaseClient();
                       if (!client) throw new Error("เชื่อมต่อระบบไม่สำเร็จ");

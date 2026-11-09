@@ -18,7 +18,7 @@ export default function SchoolTeacherInvitations({ organizationId }: { organizat
   return (
     <section className="space-y-4 rounded-2xl border border-border bg-surface p-4 sm:p-5">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="font-bold">ครูในโรงเรียน</h2>
+        <div><h2 className="font-bold">เชิญครูเข้าโรงเรียน</h2><p className="mt-1 text-sm text-text-muted">เมื่อครูตอบรับแล้ว จึงเลือกครูไปประจำห้องได้</p></div>
         <button type="button" className="text-xs font-semibold text-primary" onClick={reload}>โหลดสถานะล่าสุด</button>
       </div>
       <form className="flex flex-wrap items-end gap-2" onSubmit={async (event) => {
@@ -42,7 +42,7 @@ export default function SchoolTeacherInvitations({ organizationId }: { organizat
           setBusy(false);
         }
       }}>
-        <label className="min-w-48 flex-1 text-sm font-semibold">อีเมลครู
+        <label className="w-full min-w-0 max-w-sm text-sm font-semibold">อีเมลครู
           <input type="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)}
             className="block w-full rounded-xl border border-border bg-bg px-3 py-2 font-normal" />
         </label>
@@ -54,7 +54,7 @@ export default function SchoolTeacherInvitations({ organizationId }: { organizat
       {error && <p role="alert" className="text-xs text-error">{error}</p>}
       {!current ? <p role="status" className="text-xs text-text-muted">กำลังโหลดคำเชิญ…</p>
         : current.failed ? <p role="alert" className="text-xs text-error">โหลดคำเชิญไม่สำเร็จ</p>
-        : current.rows.length === 0 ? <p className="text-xs text-text-muted">ยังไม่มีคำเชิญครู</p>
+        : current.rows.length === 0 ? <p className="rounded-xl border border-dashed border-border bg-bg p-3 text-sm text-text-muted">ยังไม่มีคำเชิญครู</p>
         : (
           <ul className="space-y-2">
             {current.rows.map((invitation) => (
