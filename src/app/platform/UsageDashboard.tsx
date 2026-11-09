@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Activity, AudioLines, CheckCircle2, Repeat2, Users } from "lucide-react";
-import { activityLabels, count, demoPeriods, demoSchools, demoTotals, demoUsage, rate, totalRounds, type DemoPeriod } from "./usageDemoData";
+import { activityLabels, count, demoEngagement, demoPeriods, demoSchools, demoTotals, demoUsage, openingTimeLabels, rate, totalRounds, type DemoPeriod } from "./usageDemoData";
 
 const panel = "min-w-0 rounded-2xl border border-border bg-surface p-3.5 sm:p-4";
 const control = "w-full rounded-xl border border-border bg-surface px-3 py-2 text-sm text-text sm:w-auto";
@@ -23,6 +23,15 @@ export default function UsageDashboard() {
   const selectedIndex = demoSchools.findIndex(({ id }) => id === school);
   const rows = demoUsage[period];
   const inScope = (dataset: typeof rows) => selectedIndex < 0 ? dataset : [dataset[selectedIndex]];
+  const engagement = demoEngagement[period].filter((_, index) => selectedIndex < 0 || selectedIndex === index);
+  const openingTimes = openingTimeLabels.map((label, index) => ({
+    label,
+    opens: engagement.reduce((sum, row) => sum + row.opens[index], 0),
+  }));
+  const openCount = openingTimes.reduce((sum, time) => sum + time.opens, 0);
+  const activeAccounts = engagement.reduce((sum, row) => sum + row.users, 0);
+  const activeMinutes = engagement.reduce((sum, row) => sum + row.minutes, 0);
+  const peakTime = openingTimes.reduce((peak, time) => time.opens > peak.opens ? time : peak);
   const data = demoTotals(inScope(rows));
   const previous = demoTotals(inScope(demoUsage.previous));
   const rounds = totalRounds(data.dailyStarts);
@@ -73,6 +82,32 @@ export default function UsageDashboard() {
         </div>
         <p role="status" className="mt-3 text-xs text-text-muted">{scopeLabel} · {demoPeriods[period].label} · เวลาไทย</p>
       </div>
+
+      <section className={panel} aria-labelledby="engagement-heading">
+        <h3 id="engagement-heading" className="font-bold">การเปิดเว็บและเวลาใช้งาน</h3>
+        <p className="mt-1 text-xs text-text-muted">ตัวอย่างการนับบัญชีที่เปิดเว็บและช่วงเวลาที่กลับมาใช้งาน ตามเวลาไทย</p>
+        <dl className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-4">
+          {[
+            ["บัญชีที่เปิดเว็บ", count(activeAccounts) + " บัญชี"],
+            ["จำนวนครั้งที่เปิด", count(openCount) + " ครั้ง"],
+            ["เวลาใช้งานรวม", (activeMinutes / 60).toLocaleString("th-TH", { maximumFractionDigits: 1 }) + " ชม."],
+            ["ช่วงที่เปิดมากที่สุด", peakTime.label + " น."],
+          ].map(([label, value]) => (
+            <div key={label} className="rounded-xl bg-primary/8 px-3 py-2">
+              <dt className="text-xs text-text-muted">{label}</dt>
+              <dd className="mt-1 font-bold tabular-nums">{value}</dd>
+            </div>
+          ))}
+        </dl>
+        <ul className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+          {openingTimes.map(({ label, opens }) => (
+            <li key={label} className="space-y-1 rounded-lg border border-border px-2.5 py-2">
+              <p className="flex justify-between gap-2 text-xs"><span>{label}</span><strong>{count(opens)} ครั้ง</strong></p>
+              <Bar percent={rate(opens, openCount)} />
+            </li>
+          ))}
+        </ul>
+      </section>
 
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         {metrics.map(({ label, value, detail, icon: Icon }) => (
@@ -206,7 +241,7 @@ export default function UsageDashboard() {
           <li>จำนวนบัญชีนับผู้ปกครองแต่ละบัญชีครั้งเดียว จำนวนรอบนับทุกครั้งที่เริ่มหรือฝึกจบ ชุดจำลองกำหนดให้แต่ละบัญชีอยู่ในโรงเรียนเดียว</li>
           <li>เส้นทางฝึกนับบัญชีที่ทำครบตามลำดับในช่วงที่เลือก อัตราฝึกจบใช้บัญชีที่เริ่มฝึกเป็นฐาน ส่วนกราฟรายวันจัดตามวันที่เกิดเหตุการณ์แต่ละประเภท</li>
           <li>การกลับมาฝึกนับเฉพาะกลุ่มที่มีเวลาสังเกตครบ และใช้วันที่ 1 กับวันที่ 7 ตามปฏิทินไทย</li>
-          <li>ตัวอย่างใช้ตัวเลขรวมระดับโรงเรียนและชื่อโรงเรียนสมมติ</li>
+          <li>เวลาใช้งานในชุดตัวอย่างหมายถึงช่วงที่หน้าเว็บแสดงอยู่และผู้ใช้ยังมีการโต้ตอบ ตัวเลขและชื่อโรงเรียนในแท็บนี้เป็นข้อมูลสมมติ</li>
         </ul>
         <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs font-semibold text-primary">
           <a href="https://support.google.com/analytics/answer/9327974" target="_blank" rel="noreferrer" className="underline">Google Analytics · เส้นทางผู้ใช้</a>

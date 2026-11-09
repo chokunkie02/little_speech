@@ -241,7 +241,7 @@ function NextActionCard({
             ทบทวน Review
           </Link>
           <Link
-            href="/onboarding?edit=true"
+            href="/profile"
             className="flex-1 flex items-center justify-center gap-2 border border-primary/30 text-primary font-semibold py-2.5 rounded-xl text-sm hover:bg-primary/8 transition-all active:scale-[0.98]"
           >
             เปลี่ยนเสียงเป้าหมาย

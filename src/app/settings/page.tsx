@@ -3,17 +3,10 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import SharedGuardianSettings from "@/components/layout/SharedGuardianSettings";
-import { useChildProfile } from "@/hooks/useChildProfile";
 import AppShell from "@/components/layout/AppShell";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import CloudSyncPreview from "@/components/sync/CloudSyncPreview";
-import {
-  InviteNewMemberSection,
-  SentInvitesSection,
-  ChildAccessSection,
-} from "@/components/layout/InviteSection";
-import { useAuth, isParent, isTeacher, isSchoolAdmin } from "@/hooks/useAuth";
+import { useAuth, isParent } from "@/hooks/useAuth";
 import { useRepositories } from "@/lib/providers/RepositoryProvider";
 import {
   exportData,
@@ -29,7 +22,6 @@ import type { ObservationNote } from "@/types/observations";
 import type { ChildProfileData } from "@/lib/child-profile/childProfileStorage";
 import { useChildAccess } from "@/hooks/useChildAccess";
 import { useInvitations } from "@/hooks/useInvitations";
-import { useCurrentChildAccess } from "@/hooks/useCurrentChildAccess";
 import { ACCESS_ROLE_LABELS } from "@/types/childAccess";
 import { INVITATION_ROLE_LABELS } from "@/types/invitations";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
@@ -70,24 +62,6 @@ function LogOutIcon() {
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" y1="12" x2="9" y2="12" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M9 18l6-6-6-6" />
-    </svg>
-  );
-}
-
-function BuildingIcon({ size = 16 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-      <rect x="9" y="13" width="6" height="9" />
-      <path d="M9 9h.01M15 9h.01" />
     </svg>
   );
 }
@@ -214,79 +188,55 @@ function AppearanceSection() {
   );
 }
 
-// ── School admin shortcut ─────────────────────────────────────────────────────
-
-function SchoolManagementCard() {
-  return (
-    <div className="bg-surface border border-border rounded-xl overflow-hidden">
-      <Link
-        href="/school"
-        className="flex items-center justify-between px-4 py-4 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors group"
-      >
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-700 dark:text-amber-300 flex-shrink-0">
-            <BuildingIcon size={17} />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-text">จัดการโรงเรียน</p>
-            <p className="text-xs text-text-muted mt-0.5">ดูและจัดการองค์กร ห้องเรียน และครู</p>
-          </div>
-        </div>
-        <span className="text-text-muted group-hover:text-text transition-colors flex-shrink-0">
-          <ChevronRightIcon />
-        </span>
-      </Link>
-    </div>
-  );
-}
-
-// ── Received invite lookup ────────────────────────────────────────────────────
-
 function ReceivedInviteSection() {
   const router = useRouter();
   const [input, setInput] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const extractToken = useCallback((raw: string): string | null => {
-    const trimmed = raw.trim();
-    try {
-      const url = new URL(trimmed);
-      const t = url.searchParams.get("token");
-      if (t) return t;
-      const parts = url.pathname.split("/").filter(Boolean);
-      const last = parts[parts.length - 1];
-      return last && last !== "accept" ? last : null;
-    } catch {
-      if (/^[a-z0-9-]{8,}$/i.test(trimmed)) return trimmed;
-    }
-    return null;
-  }, []);
-
-  function handleOpen() {
+  function handleOpen(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
     setError(null);
-    const token = extractToken(input);
+    const value = input.trim();
+    let path = "/invite/accept";
+    let token = /^[a-z0-9-]{8,}$/i.test(value) ? value : null;
     if (!token) {
-      setError("กรุณาวางลิงก์คำเชิญหรือ token ที่ถูกต้อง");
+      try {
+        const url = new URL(value, window.location.origin);
+        if (url.protocol === "https:" || url.protocol === "http:") {
+          if (["/invite/school-admin", "/invite/school-teacher", "/invite/accept"].includes(url.pathname)) {
+            path = url.pathname;
+            token = url.searchParams.get("token");
+          } else {
+            token = url.pathname.match(/^\/invite\/([a-z0-9-]{8,})\/?$/i)?.[1] ?? null;
+          }
+        }
+      } catch {
+        // Invalid input is reported below.
+      }
+    }
+    if (!token || !/^[a-z0-9-]{8,}$/i.test(token)) {
+      setError("กรุณาวางลิงก์หรือรหัสคำเชิญที่ถูกต้อง");
       return;
     }
-    router.push(`/invite/accept?token=${encodeURIComponent(token)}`);
+    router.push(path + "?token=" + encodeURIComponent(token));
   }
 
   return (
-    <div className="space-y-3">
+    <form className="space-y-3" onSubmit={handleOpen}>
       <p className="text-sm text-text-muted">
         วางลิงก์หรือรหัสคำเชิญที่ได้รับเพื่อเปิดคำเชิญ
       </p>
       <div className="flex gap-2">
         <input
           type="text"
+          aria-label="ลิงก์หรือรหัสคำเชิญ"
           value={input}
           onChange={(e) => { setInput(e.target.value); setError(null); }}
           placeholder="https://…/invite/accept?token=… หรือรหัส"
           className="flex-1 min-w-0 bg-bg border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
         />
         <button
-          onClick={handleOpen}
+          type="submit"
           disabled={!input.trim()}
           className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0"
         >
@@ -294,8 +244,8 @@ function ReceivedInviteSection() {
           เปิด
         </button>
       </div>
-      {error && <p className="text-xs text-error">{error}</p>}
-    </div>
+      {error && <p role="alert" className="text-xs text-error">{error}</p>}
+    </form>
   );
 }
 
@@ -547,17 +497,7 @@ function DataManagerSection() {
 
 export default function SettingsPage() {
   const { user } = useAuth();
-  const { isOwner, isSharedChild } = useCurrentChildAccess();
-  const { profile } = useChildProfile();
-  const { receivedGrants } = useChildAccess();
-  const isSchoolGuardian = !!profile?.organizationId && receivedGrants.some(
-    (grant) => grant.childId === profile.id && grant.role === "guardian" && !grant.revokedAt,
-  );
-
-  // Anonymous (local mode) defaults to parent flow
-  const isParentUser = !user || isParent(user);
-  const isTeacherUser = !!user && isTeacher(user);
-  const isAdminUser   = !!user && isSchoolAdmin(user);
+  const isParentUser = !user || (isParent(user) && !user.isPlatformAdmin);
 
   return (
     <AppShell>
@@ -581,137 +521,31 @@ export default function SettingsPage() {
           <AppearanceSection />
         </section>
 
-        {/* ── School admin sections ─────────────────────────────────────── */}
-        {isAdminUser && (
-          <>
-            <section>
-              <SectionHeader title="การจัดการโรงเรียน" />
-              <SchoolManagementCard />
-            </section>
-            <section>
-              <SectionHeader
-                title="คำเชิญและสิทธิ์ที่ได้รับ"
-                description="ตอบรับคำเชิญเข้าร่วมองค์กรหรือห้องเรียน"
-              />
-              <div className="bg-surface border border-border rounded-xl p-5 space-y-4">
-                <PendingReceivedInvites />
-                <ReceivedInviteSection />
-              </div>
-            </section>
-          </>
-        )}
+        <section id="invitations" className="scroll-mt-14">
+          <SectionHeader title="คำเชิญที่ได้รับ" description="เปิดลิงก์คำเชิญหรือดูสิทธิ์ที่บัญชีนี้ได้รับ" />
+          <div className="space-y-4 rounded-xl border border-border bg-surface p-4">
+            <PendingReceivedInvites />
+            <ReceivedInviteSection />
+            <ReceivedGrantsSection />
+          </div>
+        </section>
 
-        {/* ── Teacher sections ──────────────────────────────────────────── */}
-        {isTeacherUser && (
-          <section>
-            <SectionHeader
-              title="คำเชิญและสิทธิ์ที่ได้รับ"
-              description="ตอบรับคำเชิญและดูสิทธิ์การเข้าถึงเด็กที่ได้รับ"
-            />
-            <div className="bg-surface border border-border rounded-xl p-5 space-y-4">
-              <PendingReceivedInvites />
-              <ReceivedInviteSection />
-              <ReceivedGrantsSection />
-            </div>
-          </section>
-        )}
-
-        {/* ── Parent sections ───────────────────────────────────────────── */}
         {isParentUser && (
           <>
-            {/* Cloud sync */}
-            <section>
-              <SectionHeader
-                title="ซิงค์ข้อมูลไปยัง Cloud"
-                description="ย้ายข้อมูลจากอุปกรณ์นี้ไปยัง Supabase — ยังไม่มีการเปลี่ยนแปลงข้อมูลจริง"
-              />
-              <div className="bg-surface border border-border rounded-xl p-5">
-                <CloudSyncPreview />
-              </div>
-            </section>
-
-            {/* Owner: invite management */}
-            {isOwner ? (
-              <>
-                <section>
-                  <SectionHeader
-                    title="เชิญสมาชิกใหม่"
-                    description="เชิญผู้ปกครอง ครู หรือนักบำบัดเข้ามาดูพัฒนาการของเด็ก"
-                  />
-                  <div className="bg-surface border border-border rounded-xl p-5">
-                    <InviteNewMemberSection />
-                  </div>
-                </section>
-
-                <section>
-                  <SectionHeader
-                    title="สมาชิกที่เข้าถึงเด็กได้"
-                    description="จัดการสิทธิ์การเข้าถึงของสมาชิกแต่ละคน"
-                  />
-                  <div className="bg-surface border border-border rounded-xl p-5">
-                    <ChildAccessSection />
-                  </div>
-                </section>
-
-                <section>
-                  <SectionHeader
-                    title="คำเชิญที่ส่งแล้ว"
-                    description="ประวัติคำเชิญและสถานะการตอบรับ"
-                  />
-                  <div className="bg-surface border border-border rounded-xl p-5">
-                    <SentInvitesSection />
-                  </div>
-                </section>
-              </>
-            ) : isSchoolGuardian && profile ? (
-              <section>
-                <SectionHeader title="ผู้ปกครองร่วม" description="จัดการการเชื่อมของเด็กที่เลือก" />
-                <SharedGuardianSettings key={`${user?.id}:${profile.id}`} child={profile} />
-              </section>
-            ) : isSharedChild ? (
-              <section>
-                <SectionHeader title="การจัดการสิทธิ์" />
-                <div className="bg-surface border border-border rounded-xl px-4 py-5 flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-lg bg-info/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5BA4CF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="12" y1="8" x2="12" y2="12" />
-                      <line x1="12" y1="16" x2="12.01" y2="16" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-text">คุณมีสิทธิ์ดูเท่านั้น</p>
-                    <p className="text-xs text-text-muted mt-0.5">
-                      การเชิญสมาชิกและจัดการสิทธิ์ทำได้เฉพาะเจ้าของโปรไฟล์เด็ก
-                    </p>
-                  </div>
-                </div>
-              </section>
-            ) : null}
-
-            {/* Received invitations */}
-            <section>
-              <SectionHeader
-                title="คำเชิญที่ได้รับ"
-                description="ตอบรับคำเชิญจากผู้ปกครอง ครู หรือนักบำบัดท่านอื่น"
-              />
-              <div className="bg-surface border border-border rounded-xl p-5 space-y-4">
-                <PendingReceivedInvites />
-                <ReceivedInviteSection />
-                <ReceivedGrantsSection />
-              </div>
-            </section>
-
-            {/* Data management */}
-            <section>
-              <SectionHeader
-                title="จัดการข้อมูล"
-                description="ส่งออก นำเข้า หรือล้างข้อมูลที่บันทึกไว้ในอุปกรณ์นี้"
-              />
-              <div className="bg-surface border border-border rounded-xl p-5">
+            <Link href="/profile" className="block rounded-xl border border-border bg-surface p-4 text-sm hover:border-primary">
+              <span className="block font-semibold text-primary">ข้อมูลลูกและผู้ปกครองร่วม →</span>
+              <span className="mt-1 block text-xs text-text-muted">ดูข้อมูลเด็ก เชิญผู้ปกครองร่วม และจัดการการเชื่อม</span>
+            </Link>
+            <details className="rounded-xl border border-border bg-surface p-4">
+              <summary className="cursor-pointer text-sm font-semibold text-text">สำรองและจัดการข้อมูลในอุปกรณ์</summary>
+              <div className="mt-4 space-y-4">
                 <DataManagerSection />
+                <details className="border-t border-border pt-3">
+                  <summary className="cursor-pointer text-sm text-text-muted">ตัวช่วยตรวจสอบข้อมูลก่อนซิงก์</summary>
+                  <div className="mt-3"><CloudSyncPreview /></div>
+                </details>
               </div>
-            </section>
+            </details>
           </>
         )}
 
@@ -721,18 +555,12 @@ export default function SettingsPage() {
           <div className="bg-surface border border-border rounded-xl divide-y divide-border">
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-sm text-text-muted">เวอร์ชัน</span>
-              <span className="text-sm font-medium text-text">0.1.0 · Prototype</span>
+              <span className="text-sm font-medium text-text">0.1.0</span>
             </div>
             <div className="flex items-center justify-between px-4 py-3">
               <span className="text-sm text-text-muted">ข้อมูลจัดเก็บที่</span>
               <span className="text-sm font-medium text-text">
                 {isSupabaseConfigured() ? "Supabase Cloud" : "localStorage"}
-              </span>
-            </div>
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-text-muted">Storage Provider</span>
-              <span className="text-sm font-mono text-text-muted bg-border/40 px-2 py-0.5 rounded">
-                {process.env.NEXT_PUBLIC_STORAGE_PROVIDER ?? "local"}
               </span>
             </div>
           </div>

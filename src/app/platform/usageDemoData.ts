@@ -11,6 +11,21 @@ export const demoPeriods = {
 
 export type DemoPeriod = keyof typeof demoPeriods;
 
+export const openingTimeLabels = ["00:00–05:59", "06:00–11:59", "12:00–17:59", "18:00–23:59"];
+
+export const demoEngagement = {
+  current: [
+    { users: 148, minutes: 2050, opens: [5, 76, 92, 157] },
+    { users: 106, minutes: 1380, opens: [3, 62, 75, 100] },
+    { users: 65, minutes: 780, opens: [2, 31, 39, 58] },
+  ],
+  previous: [
+    { users: 122, minutes: 1700, opens: [4, 64, 81, 121] },
+    { users: 93, minutes: 1130, opens: [2, 51, 68, 79] },
+    { users: 54, minutes: 635, opens: [1, 26, 34, 49] },
+  ],
+};
+
 type SchoolUsage = {
   opened: number;
   started: number;

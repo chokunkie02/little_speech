@@ -4,10 +4,9 @@ Backend foundation for migrating from localStorage to Supabase PostgreSQL.
 
 ## Current Status
 
-**localStorage is the active storage provider.**  
-Supabase is wired up at the type, infrastructure, and database-schema level — no application data flows through it yet.  
-Auth foundation is in place (Phase 24). Storage schema is ready (Phase 25).  
-See the migration plan below to activate data sync (Phase 3 / Phase 26+).
+The app defaults to localStorage. A configured Supabase project provides sign-in,
+school and guardian access, shared progress, and platform usage reporting.
+The school and shared progress flows also require the Supabase storage provider.
 
 ---
 
@@ -50,6 +49,12 @@ Migrations **must** be applied in numeric order:
 
 ## Setup
 
+The platform usage dashboard needs the migrations through
+`20261109000200_platform_usage.sql`. Apply pending migrations to the same Supabase
+project configured for the app. The existing URL and public key are sufficient
+for the web app. Run the database update using an account with project access.
+Usage starts accumulating after the migration and app release.
+
 ### 1. Create a Supabase project
 
 Go to [https://supabase.com](https://supabase.com) and create a new project.
@@ -79,7 +84,7 @@ npx supabase db reset
 
 **Option B — Supabase Dashboard SQL Editor**
 
-Paste each file in order (001 → 002 → ... → 006) into the SQL editor at
+Paste each pending file in filename order into the SQL editor at
 `https://supabase.com/dashboard/project/<ref>/sql`.
 
 ### 4. Regenerate TypeScript types (after schema changes)

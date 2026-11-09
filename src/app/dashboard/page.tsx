@@ -153,12 +153,6 @@ export default function ParentDashboardPage() {
     if (!isAuthenticated) router.replace("/auth/signin");
   }, [isHydrated, isAuthLoading, isAuthenticated, router]);
 
-  // Redirect authenticated parents with no child profile
-  useEffect(() => {
-    if (!isHydrated || isAuthLoading || !isAuthenticated) return;
-    if (!hasProfile) router.replace("/onboarding");
-  }, [isHydrated, isAuthLoading, isAuthenticated, hasProfile, router]);
-
   // ── Recommendations ───────────────────────────────────────────────────────
 
 
@@ -200,15 +194,15 @@ export default function ParentDashboardPage() {
     );
   }
 
-  // ── No profile guard ──────────────────────────────────────────────────────
+  // Keep the dashboard open while school and family profiles load.
   if (!hasProfile || !profile) {
     return (
       <AppShell>
         <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
           <EmptyState
             message="ยังไม่มีโปรไฟล์เด็ก — ตั้งค่าก่อนเพื่อเริ่มฝึก"
-            cta="ตั้งค่าโปรไฟล์เด็ก"
-            href="/onboarding"
+            cta="เปิดข้อมูลลูก"
+            href="/profile"
           />
         </div>
       </AppShell>
@@ -283,7 +277,7 @@ export default function ParentDashboardPage() {
           </div>
           {/* Edit link */}
           <Link
-            href="/onboarding?edit=true"
+            href="/profile"
             className="text-xs text-text-muted hover:text-primary transition-colors px-2 py-1 rounded-lg hover:bg-primary/8 flex-shrink-0"
           >
             แก้ไข

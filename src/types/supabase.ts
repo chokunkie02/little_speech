@@ -164,6 +164,20 @@ export interface Database {
     };
     Views: { [_ in never]: never };
     Functions: {
+      record_web_usage: {
+        Args: { p_visit_id: string; p_active: boolean };
+        Returns: void;
+      };
+      get_platform_web_usage: {
+        Args: { p_days: number };
+        Returns: {
+          activeAccounts: number;
+          opens: number;
+          activeSeconds: number;
+          days: { date: string; opens: number }[];
+          hours: number[];
+        };
+      };
       create_platform_school: {
         Args: { p_name: string; p_admin_email: string };
         Returns: string;

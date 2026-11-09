@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
-import UsageDashboard from "./UsageDashboard";
+import PlatformUsage from "./PlatformUsage";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { getSupabaseClient } from "@/lib/supabase/client";
@@ -361,7 +361,7 @@ export default function PlatformAdminPage() {
               <div hidden={view !== "schools"} className="space-y-5">
                 <PlatformOverview key={user.id} />
               </div>
-              {view === "usage" && <UsageDashboard />}
+              {view === "usage" && <PlatformUsage />}
             </>}
       </div>
     </main>

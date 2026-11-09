@@ -65,7 +65,7 @@ function OnboardingContent() {
   const [trainingMode, setTrainingMode] = useState<TrainingMode>("speech_clarity");
   const [isEdit, setIsEdit] = useState(false);
 
-  const { saveProfile: repoSaveProfile, profile: existingProfile } = useChildProfile();
+  const { saveProfile: repoSaveProfile, profile: existingProfile, isOwner } = useChildProfile();
   const { setSelectedSound } = useSpeechProgress();
   const { user } = useAuth();
   const role = getUserRole(user);
@@ -73,13 +73,15 @@ function OnboardingContent() {
 
   useEffect(() => {
     if (!existingProfile) return;
-    if (editParam !== "true") {
+    if (editParam === "true" && (!isOwner || existingProfile.organizationId)) {
+      router.replace("/profile");
+    } else if (editParam !== "true") {
       router.replace("/training");
     }
-  }, [existingProfile, editParam, router]);
+  }, [existingProfile, editParam, isOwner, router]);
 
   useEffect(() => {
-    if (editDetectedRef.current || !existingProfile || editParam !== "true") return;
+    if (editDetectedRef.current || !existingProfile || editParam !== "true" || !isOwner || existingProfile.organizationId) return;
     editDetectedRef.current = true;
     setName(existingProfile.name);
     setAge(existingProfile.age);
@@ -88,7 +90,7 @@ function OnboardingContent() {
     setTrainingMode(existingProfile.trainingMode ?? "speech_clarity");
     setIsEdit(true);
     setStep(2);
-  }, [existingProfile, editParam]);
+  }, [existingProfile, editParam, isOwner]);
 
   const advanceFromStep3 = () => {
     // Skip target-sound step when kindergarten mode selected
@@ -110,6 +112,7 @@ function OnboardingContent() {
   const buildProfile = () => {
     const now = new Date().toISOString();
     return {
+      ...existingProfile,
       id: existingProfile?.id ?? `child-${Date.now()}`,
       name: name.trim(),
       age,
@@ -122,18 +125,11 @@ function OnboardingContent() {
   };
 
   const handleFinish = () => {
+    if (editParam === "true" && existingProfile && (!isOwner || existingProfile.organizationId)) return;
     const p = buildProfile();
     void repoSaveProfile(p);
-    if (trainingMode === "speech_clarity") {
-      setSelectedSound(p.targetSound);
-    }
-    if (isEdit) {
-      router.push("/training");
-    } else if (trainingMode === "speech_clarity") {
-      router.push("/training");
-    } else {
-      router.push("/training");
-    }
+    if (trainingMode === "speech_clarity") setSelectedSound(p.targetSound);
+    router.push(isEdit ? "/profile" : "/training");
   };
 
   // Progress dots shown after welcome step
@@ -534,34 +530,12 @@ function OnboardingContent() {
                 className="w-full bg-primary text-white font-semibold px-8 py-4 rounded-xl text-base hover:bg-primary/90 transition-all hover:scale-[1.01] active:scale-[0.99] shadow-md shadow-primary/25"
               >
                 {isEdit
-                  ? "บันทึกและกลับไปฝึก"
+                  ? "บันทึกข้อมูลลูก"
                   : trainingMode === "speech_clarity"
                   ? "ไปหน้าฝึกและเรียน →"
                   : "เริ่มต้น →"}
               </button>
 
-              {!isEdit && trainingMode === "speech_clarity" && (
-                <button
-                  onClick={() => {
-                    const p = buildProfile();
-                    void repoSaveProfile(p);
-                    setSelectedSound(p.targetSound);
-                    router.push("/training");
-                  }}
-                  className="w-full border border-border text-text-muted hover:text-text hover:border-primary/40 font-medium px-8 py-3 rounded-xl text-sm transition-all active:scale-[0.99]"
-                >
-                  ข้าม Pre-test ไปที่แผนที่การฝึกก่อน
-                </button>
-              )}
-
-              {isEdit && (
-                <p className="text-center text-xs text-text-muted">
-                  ต้องการส่งออก / นำเข้า / ล้างข้อมูล?{" "}
-                  <a href="/settings" className="text-primary hover:text-primary/80 font-medium transition-colors">
-                    ไปที่ตั้งค่า →
-                  </a>
-                </p>
-              )}
             </div>
           )}
 

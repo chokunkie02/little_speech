@@ -67,30 +67,14 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
     setOpen(false);
   }
 
-  if (collapsed) {
-    return (
-      <>
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="w-8 h-8 rounded-full bg-primary/12 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0 hover:bg-primary/20 transition-colors cursor-pointer"
-          title={childName}
-          aria-haspopup="listbox"
-          aria-expanded={open}
-          aria-label={`เปลี่ยนเด็ก — กำลังเลือก ${childName}`}
-        >
-          <ProfileMark name={childName} avatar={profile.avatarEmoji} />
-        </button>
-        <AddChildModal open={addingChild} onClose={() => setAddingChild(false)} />
-      </>
-    );
-  }
-
   return (
     <>
       <div ref={wrapperRef} className="relative">
         <button
           onClick={() => setOpen((v) => !v)}
-          className="w-full flex items-center gap-2 min-w-0 rounded-xl px-2 py-1.5 transition-all hover:bg-gray-100 dark:hover:bg-white/8 cursor-pointer"
+          className={collapsed
+            ? "grid size-8 place-items-center rounded-full bg-primary/10 text-primary hover:bg-primary/20"
+            : "w-full flex items-center gap-2 min-w-0 rounded-xl px-2 py-1.5 transition-all hover:bg-gray-100 dark:hover:bg-white/8 cursor-pointer"}
           aria-haspopup="listbox"
           aria-expanded={open}
           aria-label={`เปลี่ยนเด็ก — กำลังเลือก ${childName}`}
@@ -98,12 +82,12 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
           <div className="w-7 h-7 rounded-full bg-primary/12 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
             <ProfileMark name={childName} avatar={profile.avatarEmoji} />
           </div>
-          <span className="text-sm font-semibold text-text truncate flex-1 text-left">
+          {!collapsed && <><span className="text-sm font-semibold text-text truncate flex-1 text-left">
             {childName}
           </span>
           <span className={`text-text-muted flex-shrink-0 transition-transform duration-150 ${open ? "rotate-180" : ""}`}>
             <ChevronDownIcon />
-          </span>
+          </span></>}
         </button>
 
         {/* Dropdown */}
@@ -111,7 +95,7 @@ export default function ChildSelector({ collapsed = false }: ChildSelectorProps)
           <div
             role="listbox"
             aria-label="เลือกเด็ก"
-            className="absolute top-full left-0 right-0 mt-1 z-50 bg-surface border border-border rounded-xl shadow-lg overflow-hidden"
+            className={"absolute top-full left-0 mt-1 z-50 max-h-72 overflow-y-auto rounded-xl border border-border bg-surface shadow-lg " + (collapsed ? "w-56" : "right-0")}
           >
             {profiles.map((child) => {
               const isSelected = child.id === selectedChildId;

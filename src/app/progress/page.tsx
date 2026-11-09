@@ -345,7 +345,7 @@ function ProgressDashboardPage() {
                 </div>
                 {isHydrated && (!isSharedChild || canEditChild) && (
                   <Link
-                    href={hasProfile ? "/onboarding?edit=true" : "/onboarding"}
+                    href={hasProfile ? "/profile" : "/onboarding"}
                     className="flex-shrink-0 text-sm font-medium text-primary hover:text-primary/80 px-3 py-1.5 rounded-xl hover:bg-primary/8 transition-all border border-primary/20"
                   >
                     {hasProfile ? "แก้ไขโปรไฟล์" : "ตั้งค่าโปรไฟล์"}
