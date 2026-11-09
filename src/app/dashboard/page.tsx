@@ -11,10 +11,6 @@ import { useSpeechProgress } from "@/hooks/useSpeechProgress";
 import { usePhonicsProgress } from "@/hooks/usePhonicsProgress";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentChildAccess } from "@/hooks/useCurrentChildAccess";
-import {
-  getSpeechClarityHomeRecommendation,
-  getPhonicsHomeRecommendation,
-} from "@/lib/homeRecommendations";
 import type { TrainingMode } from "@/lib/child-profile/childProfileStorage";
 import type { PracticeAttempt } from "@/types/speechAdventure";
 import type { PhonicsAttempt } from "@/types/phonics";
@@ -144,7 +140,6 @@ export default function ParentDashboardPage() {
   const { summary, isHydrated: spHydrated, selectedSoundId } = useSpeechProgress();
   const {
     summary: phonicsSummary,
-    completedLessonIds,
     progress: phonicsProgress,
     isHydrated: phHydrated,
   } = usePhonicsProgress();
@@ -166,15 +161,7 @@ export default function ParentDashboardPage() {
 
   // ── Recommendations ───────────────────────────────────────────────────────
 
-  const speechRec =
-    trainingMode === "speech_clarity" && spHydrated
-      ? getSpeechClarityHomeRecommendation(summary)
-      : null;
 
-  const phonicsRec =
-    trainingMode === "kindergarten_phonics" && phHydrated
-      ? getPhonicsHomeRecommendation(completedLessonIds)
-      : null;
 
   // ── Latest attempt ────────────────────────────────────────────────────────
 
@@ -190,12 +177,7 @@ export default function ParentDashboardPage() {
 
   // ── CTAs ──────────────────────────────────────────────────────────────────
 
-  const practiceHref =
-    trainingMode === "kindergarten_phonics" && phonicsRec
-      ? `/training/phonics/${phonicsRec.unitId}/${phonicsRec.lessonId}`
-      : speechRec
-      ? `/training/${speechRec.stageSlug}`
-      : "/training";
+  const practiceHref = "/training";
 
   const progressHref = "/progress";
   const contentHref = "/library";
@@ -242,7 +224,7 @@ export default function ParentDashboardPage() {
 
   return (
     <AppShell>
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-5 space-y-4">
 
         {/* ── Page header ── */}
         <header>
@@ -334,118 +316,22 @@ export default function ParentDashboardPage() {
             วันนี้ควรฝึกอะไรต่อดี
           </h2>
 
-          {/* Speech Clarity recommendation */}
-          {trainingMode === "speech_clarity" && spHydrated && (
-            speechRec ? (
-              <div
-                className="rounded-2xl border px-5 py-4 space-y-3"
-                style={{
-                  backgroundColor: `${speechRec.accentColor}09`,
-                  borderColor: `${speechRec.accentColor}28`,
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0 mt-0.5" aria-hidden="true">
-                    <DisplayIcon name={speechRec.stageIcon} />
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">
-                      {speechRec.action === "pre-test"
-                        ? "เริ่มต้น — ทำแบบทดสอบก่อน"
-                        : speechRec.action === "review"
-                        ? "ทบทวนทักษะ"
-                        : "ฝึกต่อจากที่ค้างไว้"}
-                    </p>
-                    <p className="font-bold text-text text-base leading-tight mt-0.5">
-                      {speechRec.stageName}
-                    </p>
-                    <p className="text-xs text-text-muted mt-1">
-                      {speechRec.action === "pre-test"
-                        ? "ประเมินระดับเสียงก่อนเริ่มฝึก ใช้เวลาประมาณ 3–5 นาที"
-                        : speechRec.action === "review"
-                        ? `ทบทวนเสียง /${targetSoundLabel}/ ที่ฝึกมาแล้ว`
-                        : `ฝึกเสียง /${targetSoundLabel}/ ต่อ — ระดับที่แนะนำสำหรับวันนี้`}
-                    </p>
-                  </div>
-                </div>
-                {canStartPractice ? (
-                  <Link
-                    href={practiceHref}
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold text-white transition-all hover:scale-[1.01] active:scale-[0.98] shadow-sm"
-                    style={{ backgroundColor: speechRec.accentColor }}
-                  >
-                    ฝึกต่อ →
-                  </Link>
-                ) : (
-                  <div className="flex items-center justify-center w-full py-3 rounded-xl text-sm font-medium text-text-muted bg-border/30 cursor-not-allowed select-none">
-                    ดูเท่านั้น
-                  </div>
-                )}
+          <div className="space-y-3 rounded-2xl border border-border bg-surface px-5 py-4">
+            <div className="flex items-start gap-3">
+              <span className="text-primary" aria-hidden="true"><DisplayIcon name="star" /></span>
+              <div>
+                <p className="font-bold text-text">แผนฝึกของวันนี้</p>
+                <p className="mt-1 text-xs text-text-muted">เปิดแผนฝึกเพื่อเลือกกิจกรรมหรือกลับไปทำรอบที่ค้างไว้</p>
               </div>
+            </div>
+            {canStartPractice ? (
+              <Link href={practiceHref} className="flex justify-center rounded-xl bg-primary py-3 text-sm font-bold text-white hover:bg-primary/90">
+                ไปหน้าฝึกและเรียน →
+              </Link>
             ) : (
-              <div className="bg-surface border border-border rounded-2xl px-5 py-4">
-                <EmptyState
-                  message="ยังไม่มีข้อมูลการฝึก — เริ่ม Pre-test เพื่อประเมินระดับ"
-                  cta="เริ่ม Pre-test"
-                  href="/training/pretest"
-                />
-              </div>
-            )
-          )}
-
-          {/* Phonics recommendation */}
-          {trainingMode === "kindergarten_phonics" && phHydrated && (
-            phonicsRec ? (
-              <div className="rounded-2xl border border-amber-200 dark:border-amber-800/40 bg-amber-50/50 dark:bg-amber-900/10 px-5 py-4 space-y-3">
-                <div className="flex items-start gap-3">
-                  <span className="text-2xl flex-shrink-0 mt-0.5" aria-hidden="true"><DisplayIcon name="star" /></span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
-                      {phonicsRec.action === "start"
-                        ? "เริ่มต้น — บทเรียนแรก"
-                        : phonicsRec.action === "next"
-                        ? "ทำครบแล้ว — ทบทวนอีกครั้ง"
-                        : `${phonicsRec.unitId} · ฝึกต่อ`}
-                    </p>
-                    <p className="font-bold text-text text-base leading-tight mt-0.5">
-                      {phonicsRec.lessonTitle}
-                    </p>
-                    <p className="text-xs text-text-muted mt-1">
-                      {phonicsRec.unitTitle}
-                    </p>
-                  </div>
-                </div>
-                {canStartPractice ? (
-                  <Link
-                    href={practiceHref}
-                    className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold text-white bg-amber-500 hover:bg-amber-600 transition-all hover:scale-[1.01] active:scale-[0.98] shadow-sm shadow-amber-500/20"
-                  >
-                    {phonicsRec.action === "start" ? "เริ่มเรียน →" : "เรียนต่อ →"}
-                  </Link>
-                ) : (
-                  <div className="flex items-center justify-center w-full py-3 rounded-xl text-sm font-medium text-text-muted bg-border/30 cursor-not-allowed select-none">
-                    ดูเท่านั้น
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="bg-surface border border-border rounded-2xl px-5 py-4">
-                <EmptyState
-                  message="ยังไม่มีข้อมูลการฝึก — เริ่มบทเรียนแรกได้เลย"
-                  cta="เริ่มบทเรียน K1"
-                  href="/training/phonics/K1/K1-L1"
-                />
-              </div>
-            )
-          )}
-
-          {/* Hydrating state */}
-          {trainingMode === "speech_clarity" && !spHydrated && (
-            <Skeleton className="h-36 w-full" />
-          )}
-          {trainingMode === "kindergarten_phonics" && !phHydrated && (
-            <Skeleton className="h-36 w-full" />
-          )}
+              <p className="rounded-xl bg-bg py-3 text-center text-sm text-text-muted">บัญชีนี้มีสิทธิ์ดูผลฝึก</p>
+            )}
+          </div>
         </section>
 
         {/* ── Latest result ── */}

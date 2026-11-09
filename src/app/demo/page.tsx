@@ -139,7 +139,7 @@ function PhonicsShowcase() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-12">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-8">
       {/* ── Hero ── */}
       <div className="text-center space-y-4">
         <div className="w-16 h-16 rounded-2xl bg-amber-500 flex items-center justify-center mx-auto shadow-lg shadow-amber-300/30">
@@ -294,7 +294,7 @@ function SpeechClarityShowcase() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 space-y-12">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-8">
       {/* ── Hero ── */}
       <div className="text-center space-y-4">
         <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mx-auto shadow-lg shadow-primary/20">

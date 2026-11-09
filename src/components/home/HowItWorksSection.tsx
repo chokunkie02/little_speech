@@ -38,8 +38,8 @@ const steps = [
         <line x1="12" x2="12" y1="19" y2="22" />
       </svg>
     ),
-    title: "AI ช่วยประเมินผล",
-    desc: "อัดเสียงของเด็ก ระบบจะวิเคราะห์และให้คะแนน พร้อม Feedback เพื่อปรับปรุงการออกเสียง",
+    title: "อัดเสียงและฟังทบทวน",
+    desc: "เด็กลองพูดตามตัวอย่าง แล้วเปิดฟังเสียงที่อัดเพื่อทบทวนพร้อมผู้ใหญ่",
     accent: "text-primary bg-primary/10 border-primary/20",
     connector: true,
   },
@@ -53,7 +53,7 @@ const steps = [
       </svg>
     ),
     title: "ติดตามพัฒนาการ",
-    desc: "ผู้ปกครองและครูดูรายงานความก้าวหน้า ประวัติการบันทึกเสียง และสถิติการฝึกแบบละเอียด",
+    desc: "ผู้ปกครองและครูดูรายงานความก้าวหน้า และสรุปกิจกรรมที่ทำในแต่ละรอบ",
     accent: "text-success bg-success/10 border-success/20",
     connector: false,
   },
@@ -61,7 +61,7 @@ const steps = [
 
 export default function HowItWorksSection() {
   return (
-    <section className="mt-24" aria-labelledby="how-it-works-heading">
+    <section className="mt-14 sm:mt-18" aria-labelledby="how-it-works-heading">
       {/* Section header */}
       <div className="text-center mb-12">
         <div className="inline-flex items-center gap-2 bg-primary/8 border border-primary/15 rounded-full px-4 py-1.5 mb-4 text-sm font-medium text-primary">

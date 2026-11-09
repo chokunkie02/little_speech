@@ -1,6 +1,8 @@
 "use client";
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
+import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { useTheme } from "@/components/ui/ThemeProvider";
 import { useStudioContext } from "./useStudioContext";
 
@@ -39,19 +41,28 @@ export function LearningStudioClient() {
         </p>
         <Link
           className="text-primary underline"
-          href={context.staffHome ?? "/training"}
+          href={context.staffHome ?? "/settings"}
         >
           กลับระบบหลัก
         </Link>
       </section>
     );
   const child = context.profile;
+  if (context.user && !child)
+    return (
+      <section className="mx-auto max-w-xl space-y-4 p-8">
+        <h1 className="text-2xl font-bold">เลือกโปรไฟล์เด็กก่อนเริ่มฝึก</h1>
+        <p>เลือกเด็กที่เชื่อมอยู่จากเมนูซ้าย หรือสร้างโปรไฟล์สำหรับฝึกที่บ้าน</p>
+        <Link className="text-primary underline" href="/onboarding">สร้างโปรไฟล์เด็ก</Link>
+      </section>
+    );
   return (
     <div className={`learning-studio-scope ${theme === "dark" ? "dark" : ""}`}>
       <Studio
         key={`${context.user?.id || "anonymous"}:${child?.id || "demo"}`}
         accountId={context.user?.id}
         allowExport={context.canExport}
+        syncToSchool={!!context.user && !!child && isSupabaseProviderRequested() && isSupabaseConfigured()}
         child={
           child
             ? {

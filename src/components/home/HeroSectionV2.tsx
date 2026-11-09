@@ -50,18 +50,8 @@ function MockPracticeCard() {
         </button>
       </div>
 
-      {/* AI evaluation mock */}
-      <div className="border-t border-border px-4 py-3 bg-success/5">
-        <div className="flex items-center justify-between">
-          <span className="text-xs text-text-muted">AI ประเมินล่าสุด</span>
-          <div className="flex items-center gap-1.5">
-            <div className="w-1.5 h-1.5 rounded-full bg-success" />
-            <span className="text-xs font-semibold text-success">92 / 100</span>
-          </div>
-        </div>
-        <div className="mt-1.5 h-1.5 bg-border rounded-full overflow-hidden">
-          <div className="h-full w-[92%] bg-gradient-to-r from-success to-emerald-400 rounded-full" />
-        </div>
+      <div className="border-t border-border px-4 py-2.5 text-xs text-text-muted">
+        อัดเสียงแล้วเปิดฟังทบทวน
       </div>
     </div>
   );
@@ -70,12 +60,10 @@ function MockPracticeCard() {
 /** Mini progress widget mock */
 function MockProgressWidget() {
   const stages = [
-    { name: "Pre-test", done: true, color: "bg-level-pretest" },
-    { name: "Oral Motor", done: true, color: "bg-level-oral" },
-    { name: "Sound Fam.", done: true, color: "bg-level-sound-fam" },
-    { name: "Sound Prod.", done: false, color: "bg-level-sound-prod", active: true },
-    { name: "Word", done: false, color: "bg-border" },
-    { name: "Sentence", done: false, color: "bg-border" },
+    { name: "เตรียมท่าปาก", done: true, color: "bg-level-oral" },
+    { name: "พยางค์", done: false, color: "bg-primary", active: true },
+    { name: "คำ", done: false, color: "bg-border" },
+    { name: "ประโยค", done: false, color: "bg-border" },
   ];
 
   return (
@@ -143,7 +131,7 @@ export default function HeroSectionV2() {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 mb-8 text-sm font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-gentle flex-shrink-0" />
-            ระบบฝึกพูดสำหรับเด็กไทย · AI-Assisted
+            ระบบฝึกพูดสำหรับเด็กไทย
           </div>
 
           {/* Headline */}
@@ -159,7 +147,7 @@ export default function HeroSectionV2() {
             จนถึงการสื่อสารในประโยค ผ่านเส้นทาง 7 ระดับที่ออกแบบโดยผู้เชี่ยวชาญ
           </p>
           <p className="text-sm text-white/60 mb-8">
-            พร้อมระบบบันทึกเสียง · AI ช่วยประเมิน · Dashboard สำหรับผู้ปกครอง
+            พร้อมภาพท่าปาก เสียงตัวอย่าง และรายงานสำหรับผู้ปกครองและครู
           </p>
 
           {/* CTA Buttons */}

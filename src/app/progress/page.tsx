@@ -12,6 +12,7 @@ import ChildProfileCard from "@/components/speech-adventure/ChildProfileCard";
 import StageProgressCard from "@/components/speech-adventure/StageProgressCard";
 import PermissionBanner from "@/components/ui/PermissionBanner";
 import ObservationNoteList from "@/components/observations/ObservationNoteList";
+import LearningResults from "@/components/speech-adventure/LearningResults";
 import AppShell from "@/components/layout/AppShell";
 import SessionDetailDrawer from "@/components/details/SessionDetailDrawer";
 import AttemptDetailDrawer from "@/components/details/AttemptDetailDrawer";
@@ -296,6 +297,7 @@ function ProgressDashboardPage() {
   if (profile?.trainingMode === "kindergarten_phonics") {
     return (
       <AppShell>
+        <div className="mx-auto max-w-5xl px-4 pt-5 sm:px-6"><LearningResults key={profile?.id} childId={profile?.id} /></div>
         <PhonicsProgressDashboard />
       </AppShell>
     );
@@ -305,8 +307,9 @@ function ProgressDashboardPage() {
 
   return (
     <AppShell>
+      <div className="mx-auto max-w-5xl px-4 pt-5 sm:px-6"><LearningResults key={profile?.id} childId={profile?.id} /></div>
       {/* ── Sticky tab bar ── */}
-      <div className="sticky top-0 lg:top-0 z-20 bg-surface/95 backdrop-blur-md border-b border-border">
+      <div className="sticky top-11 lg:top-0 z-20 bg-surface/95 backdrop-blur-md border-b border-border">
         <div className="flex overflow-x-auto gap-1 px-4 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {TABS.map((tab) => (
             <button
@@ -772,7 +775,7 @@ function ProgressDashboardPage() {
 
       {/* ══════════════ SESSIONS TAB ══════════════ */}
       {activeTab === "sessions" && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 space-y-4">
           <div>
             <h2 className="text-xl font-bold text-text">ประวัติเซสชัน</h2>
             <p className="text-sm text-text-muted mt-0.5">คลิกที่แถวเพื่อดูรายละเอียด</p>
@@ -861,7 +864,7 @@ function ProgressDashboardPage() {
 
       {/* ══════════════ ATTEMPTS TAB ══════════════ */}
       {activeTab === "attempts" && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 space-y-4">
           <div>
             <h2 className="text-xl font-bold text-text">ประวัติการฝึก</h2>
             <p className="text-sm text-text-muted mt-0.5">
@@ -1061,7 +1064,7 @@ function ProgressDashboardPage() {
 
       {/* ══════════════ NOTES TAB ══════════════ */}
       {activeTab === "notes" && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 space-y-4">
           <div>
             <h2 className="text-xl font-bold text-text">บันทึกจากผู้ปกครอง / ครู</h2>
             <p className="text-sm text-text-muted mt-0.5">บันทึกสิ่งที่สังเกตเห็นระหว่างการฝึก</p>
@@ -1080,7 +1083,7 @@ function ProgressDashboardPage() {
 
       {/* ══════════════ REPORT TAB ══════════════ */}
       {activeTab === "report" && (
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-6 space-y-5">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-5 space-y-4">
           <div className="flex items-start justify-between gap-4">
             <div>
               <h2 className="text-xl font-bold text-text">รายงานสำหรับผู้ปกครอง</h2>

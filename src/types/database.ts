@@ -234,3 +234,17 @@ export type DbObservationNote = {
   created_at: string;
   updated_at: string;
 };
+
+export type DbLearningSessionResult = {
+  child_id: string;
+  recorded_by: string;
+  session_id: string;
+  track: "speech" | "phonics" | "communication";
+  stage_label: string;
+  sound: string;
+  started_at: string;
+  completed_at: string;
+  activities: number;
+  choice_count: number;
+  correct_choices: number;
+};

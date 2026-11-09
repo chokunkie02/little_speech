@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import SchoolProgressReportView from "@/components/report/SchoolProgressReportView";
+import LearningResults from "@/components/speech-adventure/LearningResults";
 import AppShell from "@/components/layout/AppShell";
 import ReportHeader from "@/components/report/ReportHeader";
 import ReportMetricCard from "@/components/report/ReportMetricCard";
@@ -211,7 +212,7 @@ function PersonalReportPage() {
 
     return (
       <AppShell>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6 print:px-0">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5 space-y-4 print:px-0">
           {/* ── Header ── */}
           <header className="flex items-start justify-between gap-4 print:hidden">
             <div>
@@ -230,6 +231,7 @@ function PersonalReportPage() {
             </div>
           </header>
 
+          <LearningResults key={profile?.id} childId={profile?.id} />
           {/* ── Development notice ── */}
           <div className="flex items-start gap-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/40 rounded-xl px-4 py-3 print:hidden">
             <span className="text-amber-500 flex-shrink-0 mt-0.5" aria-hidden="true"><DisplayIcon name="checklist" /></span>
@@ -466,7 +468,8 @@ function PersonalReportPage() {
   if (isHydrated && !hasData) {
     return (
       <AppShell>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 text-center">
+        <div className="max-w-3xl mx-auto space-y-4 px-4 sm:px-6 py-16 text-center">
+          <LearningResults key={profile?.id} childId={profile?.id} />
           <div className="w-16 h-16 rounded-2xl bg-primary/8 flex items-center justify-center mx-auto mb-4">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6C63FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -475,10 +478,9 @@ function PersonalReportPage() {
               <line x1="16" y1="17" x2="8" y2="17" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-text mb-2">ยังไม่มีข้อมูลการฝึก</h2>
+          <h2 className="text-xl font-bold text-text mb-2">ยังไม่มีประวัติจากระบบฝึกเดิม</h2>
           <p className="text-sm text-text-muted mb-8 max-w-sm mx-auto">
-            รายงานจะสร้างขึ้นโดยอัตโนมัติหลังจากที่เด็กเริ่มฝึก
-            หรือโหลดข้อมูลสาธิตเพื่อดูตัวอย่างรายงาน
+            รอบที่ฝึกจบจากระบบใหม่จะแสดงในส่วนผลจากระบบฝึกใหม่ หรือโหลดข้อมูลสาธิตเพื่อดูตัวอย่างรายงานเดิม
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
@@ -515,7 +517,7 @@ function PersonalReportPage() {
   return (
     <AppShell>
       {/* ── Sticky section navigation (hidden on print) ── */}
-      <div className="sticky top-0 lg:top-0 z-20 bg-surface/95 backdrop-blur-md border-b border-border print:hidden">
+      <div className="sticky top-11 lg:top-0 z-20 bg-surface/95 backdrop-blur-md border-b border-border print:hidden">
         <div className="flex overflow-x-auto gap-1 px-4 py-2 max-w-3xl mx-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {SECTION_NAV.map((item) => (
             <a key={item.href} href={item.href} className={anchorLinkCls}>
@@ -526,8 +528,9 @@ function PersonalReportPage() {
       </div>
 
       {/* ── Report Content ── */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-5 print:px-6 print:py-4 print:space-y-4">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5 space-y-4 print:px-6 print:py-4 print:space-y-4">
 
+        <LearningResults key={profile?.id} childId={profile?.id} />
         {/* 1. Header — anchor: summary */}
         <div id="summary" className="scroll-mt-20">
         <ReportHeader

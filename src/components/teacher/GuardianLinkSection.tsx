@@ -104,7 +104,7 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
   ) ?? [];
 
   return (
-    <section aria-label="เชื่อมผู้ปกครอง" className="space-y-4 border-t border-border pt-4">
+    <section aria-label="เชื่อมผู้ปกครอง" className="space-y-3 border-t border-border pt-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-bold">เชื่อมผู้ปกครอง</h3>
         <div className="flex gap-2">
@@ -112,7 +112,7 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
             setError("");
             setRefresh((value) => value + 1);
           }}>โหลดล่าสุด</button>
-          <button className={secondaryClass} disabled={busy} onClick={() => setAddingStudent(!addingStudent)}>
+          <button className={addingStudent ? secondaryClass : primaryClass} disabled={busy} onClick={() => setAddingStudent(!addingStudent)}>
             {addingStudent ? "ปิดฟอร์ม" : "เพิ่มนักเรียน"}
           </button>
         </div>
@@ -142,7 +142,7 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
           <label className="text-sm">ชื่อเล่น<input maxLength={60} name="nickname" className={inputClass} /></label>
           <label className="text-sm">รหัสนักเรียน<input required maxLength={40} name="studentCode" className={inputClass} /></label>
           <label className="text-sm">อายุ<input required type="number" min={1} max={18} name="age" className={inputClass} /></label>
-          <button className={primaryClass} disabled={busy}>บันทึกนักเรียน</button>
+          <div className="sm:col-span-2"><button className={primaryClass} disabled={busy}>บันทึกนักเรียน</button></div>
         </form>
       )}
 
@@ -173,7 +173,7 @@ export default function GuardianLinkSection({ classroomId }: { classroomId: stri
               if (error) throw new Error(error.message);
             }, "ลิงก์เชิญพร้อมใช้งาน");
           }}>
-            <label className="min-w-52 flex-1 text-sm">อีเมลผู้ปกครอง (ไม่บังคับ)
+            <label className="min-w-0 flex-[1_1_13rem] text-sm">อีเมลผู้ปกครอง (ไม่บังคับ)
               <input className={inputClass} type="email" maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)} />
             </label>
             <button className={primaryClass} disabled={busy}>{linked ? "เชิญผู้ปกครองร่วม" : "สร้างลิงก์เชิญ"}</button>

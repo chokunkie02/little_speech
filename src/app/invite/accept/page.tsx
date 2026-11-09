@@ -223,8 +223,8 @@ function AcceptInviteContent() {
   const redirectParam = encodeURIComponent(`/invite/accept?token=${token}`);
 
   return (
-    <main className="min-h-screen bg-bg flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-md space-y-6">
+    <main className="min-h-screen bg-bg flex items-center justify-center px-4 py-6">
+      <div className="w-full max-w-md space-y-4">
 
         {/* Header */}
         <div className="text-center space-y-3">
@@ -236,18 +236,18 @@ function AcceptInviteContent() {
         {/* Invite details card */}
         <div className="bg-surface border border-border rounded-xl divide-y divide-border overflow-hidden">
           {invitation.inviterEmail && (
-            <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 px-4 py-2.5">
               <span className="text-sm text-text-muted">ผู้เชิญ</span>
-              <span className="font-semibold text-text truncate max-w-[200px]">{invitation.inviterEmail}</span>
+              <span className="font-semibold text-text min-w-0 break-all text-right">{invitation.inviterEmail}</span>
             </div>
           )}
           {!guardianRequest && invitation.childSnapshot && (
-            <div className="flex items-center justify-between px-5 py-3.5">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 px-4 py-2.5">
               <span className="text-sm text-text-muted">เด็ก</span>
               <span className="font-semibold text-text">{invitation.childSnapshot.name}</span>
             </div>
           )}
-          <div className="flex items-center justify-between px-5 py-3.5">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 px-4 py-2.5">
             <span className="text-sm text-text-muted">บทบาท</span>
             <span className="font-semibold text-text">
               {INVITATION_ROLE_LABELS[invitation.role]}
@@ -255,11 +255,11 @@ function AcceptInviteContent() {
               <span className="text-xs font-normal text-text-muted">({ACCESS_ROLE_LABELS[accessRole]})</span>
             </span>
           </div>
-          {invitation.email && <div className="flex items-center justify-between px-5 py-3.5">
+          {invitation.email && <div className="flex flex-wrap items-baseline justify-between gap-x-3 px-4 py-2.5">
             <span className="text-sm text-text-muted">อีเมลที่ได้รับเชิญ</span>
-            <span className="font-semibold text-text truncate max-w-[200px]">{invitation.email}</span>
+            <span className="font-semibold text-text min-w-0 break-all text-right">{invitation.email}</span>
           </div>}
-          <div className="flex items-center justify-between px-5 py-3.5">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 px-4 py-2.5">
             <span className="text-sm text-text-muted">สถานะ</span>
             <span className={`text-sm font-semibold ${
               invitation.status === "pending"  ? "text-warning"
@@ -269,7 +269,7 @@ function AcceptInviteContent() {
               {statusLabel}
             </span>
           </div>
-          {!invitation.requestedAt && <div className="flex items-center justify-between px-5 py-3.5">
+          {!invitation.requestedAt && <div className="flex flex-wrap items-baseline justify-between gap-x-3 px-4 py-2.5">
             <span className="text-sm text-text-muted">หมดอายุ</span>
             <span className="text-sm font-medium text-text">
               {new Date(invitation.expiresAt).toLocaleDateString("th-TH", {

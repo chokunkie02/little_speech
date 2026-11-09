@@ -16,6 +16,7 @@ import type { PlatformSchool, PlatformSchoolAdmins, SchoolTeacherInvitation, Sch
 
 import type {
   DbChildProfile,
+  DbLearningSessionResult,
   DbPracticeSession,
   SchoolChildProgress,
   SchoolProgressReport,
@@ -82,6 +83,12 @@ export type UpdateInvitation = Partial<Omit<DbInvitation, "id" | "created_at">>;
 export interface Database {
   public: {
     Tables: {
+      learning_session_results: {
+        Row: DbLearningSessionResult;
+        Insert: DbLearningSessionResult;
+        Update: never;
+        Relationships: [];
+      };
       child_profiles: {
         Row: DbChildProfile;
         Insert: InsertChildProfile;
@@ -157,6 +164,10 @@ export interface Database {
     };
     Views: { [_ in never]: never };
     Functions: {
+      create_platform_school: {
+        Args: { p_name: string; p_admin_email: string };
+        Returns: string;
+      };
       list_platform_schools: {
         Args: Record<string, never>;
         Returns: PlatformSchool[];

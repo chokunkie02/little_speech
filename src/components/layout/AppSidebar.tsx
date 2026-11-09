@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { LogOut, Menu } from "lucide-react";
 import NavIcon, { type NavIconName } from "./NavIcon";
 import { useSidebar } from "./SidebarContext";
 import ChildSelector from "./ChildSelector";
@@ -48,14 +49,6 @@ function MicLogoIcon({ size = 16 }: { size?: number }) {
   );
 }
 
-function ChevronLeftIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M15 18l-6-6 6-6" />
-    </svg>
-  );
-}
-
 function StarFilledIcon({ size = 13 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="#FFB347" stroke="#FFB347" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -78,7 +71,8 @@ export default function AppSidebar() {
   const { collapsed, toggle, mounted, mobileOpen, setMobileOpen } = useSidebar();
   const { summary, isHydrated, selectedSoundId } = useSpeechProgress();
   const { profile } = useChildProfile();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
+  const [signingOut, setSigningOut] = useState(false);
 
   const isSpeechMode = !isHydrated || profile?.trainingMode !== "kindergarten_phonics";
 
@@ -117,21 +111,13 @@ export default function AppSidebar() {
     : "w-auto opacity-100";
 
   // ── Context section (role-aware) ──
-  const isProfRole = isSchoolAdmin(user) || isTeacher(user);
-  const contextSection = isProfRole ? (
-    // Teacher / school_admin: minimal context (no child selector)
-    <div className={`px-3 py-3 border-b border-border flex-shrink-0 ${isCollapsed ? "" : ""}`}>
-      {!isCollapsed && (
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-medium text-text-muted">
-            {isSchoolAdmin(user) ? "ผู้ดูแลโรงเรียน" : "ครูผู้สอน"}
-          </span>
-          <ThemeToggle />
-        </div>
-      )}
-    </div>
-  ) : (
-    // Parent / default: full child context
+  const staffRole = isSchoolAdmin(user) ? "ผู้ดูแลโรงเรียน" : isTeacher(user) ? "ครู" : null;
+  const roleBadge = staffRole && (
+    <p className="mx-3 mb-2 mt-1 w-fit rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+      {staffRole}
+    </p>
+  );
+  const contextSection = !staffRole && (
     <div className={`px-3 py-3 border-b border-border flex-shrink-0 ${isCollapsed ? "flex items-center justify-center" : "space-y-2.5"}`}>
       {isCollapsed ? (
         <ChildSelector collapsed />
@@ -157,7 +143,7 @@ export default function AppSidebar() {
           {/* Continue Training CTA — mode-aware */}
           {isHydrated && isSpeechMode && currentStage && (
             <Link
-              href={`/training/${currentStage.slug}`}
+              href="/training"
               className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-all active:scale-[0.97]"
             >
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -188,25 +174,67 @@ export default function AppSidebar() {
     </div>
   );
 
+  async function handleSignOut() {
+    setSigningOut(true);
+    try {
+      await signOut();
+      setMobileOpen(false);
+      window.location.replace("/auth/signin");
+    } finally {
+      setSigningOut(false);
+    }
+  }
+
+  const signOutButton = user && (
+    <button
+      type="button"
+      onClick={() => void handleSignOut()}
+      disabled={signingOut}
+      aria-label="ออกจากระบบ"
+      title="ออกจากระบบ"
+      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-text-muted hover:bg-error/10 hover:text-error focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50"
+    >
+      <LogOut size={17} className="shrink-0" aria-hidden="true" />
+      <span className={isCollapsed ? "lg:sr-only" : ""}>
+        {signingOut ? "กำลังออกจากระบบ…" : "ออกจากระบบ"}
+      </span>
+    </button>
+  );
+
   // ── Desktop sidebar content ──
   const desktopSidebar = (
     <>
-      {/* Logo / Brand */}
-      <div className="flex items-center gap-3 px-4 h-14 border-b border-border flex-shrink-0">
-        <Link href="/" className="w-8 h-8 rounded-xl bg-primary flex items-center justify-center flex-shrink-0 hover:bg-primary/90 transition-colors" aria-label="หน้าแรก">
-          <MicLogoIcon size={16} />
-        </Link>
-        <div className={`min-w-0 overflow-hidden transition-all duration-200 ${labelCls}`}>
-          <p className="text-sm font-bold text-text leading-tight whitespace-nowrap">Speech</p>
-          <p className="text-xs font-semibold text-primary leading-tight whitespace-nowrap">Adventure</p>
-        </div>
+      <div className="flex h-14 shrink-0 items-center gap-3 border-b border-border px-3">
+        <button
+          type="button"
+          onClick={toggle}
+          aria-label={isCollapsed ? "ขยายเมนู" : "ย่อเมนู"}
+          aria-expanded={!isCollapsed}
+          aria-controls="desktop-sidebar-navigation"
+          title={isCollapsed ? "ขยายเมนู" : "ย่อเมนู"}
+          className="grid size-10 shrink-0 place-items-center rounded-xl border border-border bg-bg text-text hover:border-primary hover:text-primary focus-visible:ring-2 focus-visible:ring-primary"
+        >
+          <Menu size={20} aria-hidden="true" />
+        </button>
+        {!isCollapsed && (
+          <Link href="/" className="flex min-w-0 items-center gap-2" aria-label="หน้าแรก Speech Adventure">
+            <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary">
+              <MicLogoIcon size={16} />
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-bold leading-tight text-text">Speech</span>
+              <span className="block text-xs font-semibold leading-tight text-primary">Adventure</span>
+            </span>
+          </Link>
+        )}
       </div>
 
       {/* Context (child info, actions) */}
       {contextSection}
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto overflow-x-hidden">
+      <nav id="desktop-sidebar-navigation" className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto overflow-x-hidden">
+        {!isCollapsed && roleBadge}
         {NAV_ITEMS.map((item) => {
           const active = isActive(item);
           return (
@@ -232,36 +260,17 @@ export default function AppSidebar() {
         })}
       </nav>
 
-      {/* Footer: Prototype badge */}
-      <div className="px-3 py-3 border-t border-border flex-shrink-0">
-        <div className={`rounded-xl bg-primary/6 border border-primary/12 px-3 py-2.5 transition-all duration-200 ${isCollapsed ? "flex items-center justify-center" : ""}`}>
-          <div className={`flex items-center gap-2 ${isCollapsed ? "" : "mb-1"}`}>
-            <div className="w-2 h-2 rounded-full bg-primary/60 flex-shrink-0" aria-hidden="true" />
-            <span className={`text-xs font-semibold text-primary whitespace-nowrap transition-all duration-200 ${isCollapsed ? "sr-only" : ""}`}>
-              Prototype
-            </span>
-          </div>
-          <p className={`text-xs text-text-muted/60 transition-all duration-200 ${isCollapsed ? "hidden" : ""}`}>
-            v0.1 · Demo Mode
-          </p>
+      {(staffRole || user) && (
+        <div className="shrink-0 space-y-2 border-t border-border px-3 py-3">
+          {staffRole && (
+            <div className={isCollapsed ? "flex justify-center" : "flex items-center justify-between px-1"}>
+              {!isCollapsed && <span className="text-xs text-text-muted">ธีม</span>}
+              <ThemeToggle />
+            </div>
+          )}
+          {signOutButton}
         </div>
-      </div>
-
-      {/* Collapse toggle */}
-      <div className="px-3 pb-3 flex-shrink-0 hidden lg:block">
-        <button
-          onClick={toggle}
-          aria-label={isCollapsed ? "ขยายเมนู" : "ย่อเมนู"}
-          className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-text-muted hover:text-text hover:bg-gray-50 dark:hover:bg-white/5 transition-all"
-        >
-          <span className={`transition-transform duration-200 ${isCollapsed ? "rotate-180" : ""}`}>
-            <ChevronLeftIcon />
-          </span>
-          <span className={`text-xs font-medium whitespace-nowrap transition-all duration-200 ${labelCls}`}>
-            ย่อเมนู
-          </span>
-        </button>
-      </div>
+      )}
     </>
   );
 
@@ -279,7 +288,7 @@ export default function AppSidebar() {
       {/* Mobile overlay */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden print:hidden"
+          className="fixed inset-x-0 top-0 bottom-16 z-40 bg-black/40 backdrop-blur-sm lg:hidden print:hidden"
           onClick={() => setMobileOpen(false)}
           aria-hidden="true"
         />
@@ -287,11 +296,13 @@ export default function AppSidebar() {
 
       {/* Mobile drawer */}
       <aside
-        className={`fixed top-0 left-0 bottom-0 z-50 w-[280px] bg-surface border-r border-border flex flex-col transition-transform duration-200 ease-in-out lg:hidden print:hidden ${
+        className={`fixed top-0 left-0 bottom-16 z-50 w-[280px] bg-surface border-r border-border flex flex-col transition-transform duration-200 ease-in-out lg:hidden print:hidden ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
         aria-label="เมนูหลัก"
+        id="mobile-sidebar"
         aria-hidden={!mobileOpen}
+        inert={!mobileOpen}
       >
         {/* Drawer header */}
         <div className="flex items-center justify-between px-4 h-14 border-b border-border flex-shrink-0">
@@ -310,55 +321,46 @@ export default function AppSidebar() {
           </button>
         </div>
 
-        {/* Mobile context */}
-        <div className="px-4 py-3 border-b border-border flex-shrink-0 space-y-2.5">
-          {isProfRole ? (
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-text-muted">
-                {isSchoolAdmin(user) ? "ผู้ดูแลโรงเรียน" : "ครูผู้สอน"}
-              </span>
-              <ThemeToggle />
+        {!staffRole && (
+          <div className="shrink-0 space-y-2.5 border-b border-border px-4 py-3">
+            <ChildSelector />
+            <div className="flex items-center gap-2 flex-wrap">
+              {isHydrated && isSpeechMode && selectedSoundId && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
+                  เสียง {selectedSoundId}
+                </span>
+              )}
+              {isHydrated && isSpeechMode && stars > 0 && (
+                <Link href="/rewards" className="flex items-center gap-1 text-xs font-bold text-secondary hover:text-secondary/80 transition-colors" aria-label={`ดาวสะสม ${stars} ดาว`}>
+                  <StarFilledIcon size={12} />
+                  <span>{stars}</span>
+                </Link>
+              )}
             </div>
-          ) : (
-            <>
-              <ChildSelector />
-              <div className="flex items-center gap-2 flex-wrap">
-                {isHydrated && isSpeechMode && selectedSoundId && (
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-bold">
-                    เสียง {selectedSoundId}
-                  </span>
-                )}
-                {isHydrated && isSpeechMode && stars > 0 && (
-                  <Link href="/rewards" className="flex items-center gap-1 text-xs font-bold text-secondary hover:text-secondary/80 transition-colors" aria-label={`ดาวสะสม ${stars} ดาว`}>
-                    <StarFilledIcon size={12} />
-                    <span>{stars}</span>
-                  </Link>
-                )}
-              </div>
-              {isHydrated && isSpeechMode && currentStage && (
-                <Link
-                  href={`/training/${currentStage.slug}`}
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-all active:scale-[0.97]"
-                >
-                  ฝึกต่อ
-                </Link>
-              )}
-              {isHydrated && !isSpeechMode && (
-                <Link
-                  href="/training"
-                  onClick={() => setMobileOpen(false)}
-                  className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-xl bg-amber-500 text-white text-xs font-semibold hover:bg-amber-600 transition-all active:scale-[0.97]"
-                >
-                  เรียนต่อ
-                </Link>
-              )}
-            </>
-          )}
-        </div>
+            {isHydrated && isSpeechMode && currentStage && (
+              <Link
+                href="/training"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-all active:scale-[0.97]"
+              >
+                ฝึกต่อ
+              </Link>
+            )}
+            {isHydrated && !isSpeechMode && (
+              <Link
+                href="/training"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-1.5 w-full px-3 py-2 rounded-xl bg-amber-500 text-white text-xs font-semibold hover:bg-amber-600 transition-all active:scale-[0.97]"
+              >
+                เรียนต่อ
+              </Link>
+            )}
+          </div>
+        )}
 
         {/* Mobile nav items */}
         <nav className="flex-1 px-3 py-3 space-y-0.5 overflow-y-auto">
+          {roleBadge}
           {NAV_ITEMS.map((item) => {
             const active = isActive(item);
             return (
@@ -366,6 +368,7 @@ export default function AppSidebar() {
                 key={item.href}
                 href={item.href}
                 aria-current={active ? "page" : undefined}
+                onClick={() => setMobileOpen(false)}
                 className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
                   active
                     ? "bg-primary/10 text-primary"
@@ -387,13 +390,7 @@ export default function AppSidebar() {
             <span className="text-xs text-text-muted">ธีม</span>
             <ThemeToggle />
           </div>
-          <div className="rounded-xl bg-primary/6 border border-primary/12 px-3 py-2.5">
-            <div className="flex items-center gap-2 mb-1">
-              <div className="w-2 h-2 rounded-full bg-primary/60 flex-shrink-0" aria-hidden="true" />
-              <span className="text-xs font-semibold text-primary">Prototype</span>
-            </div>
-            <p className="text-xs text-text-muted/60">v0.1 · Demo Mode</p>
-          </div>
+          {signOutButton}
         </div>
       </aside>
     </>

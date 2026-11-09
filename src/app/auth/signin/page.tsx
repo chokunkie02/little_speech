@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { safeAuthRedirect } from "@/lib/auth/safeRedirect";
 import { useAuth } from "@/hooks/useAuth";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
+import type { AuthUser } from "@/types/auth";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 
 function MicIcon() {
@@ -33,40 +34,65 @@ function EyeIcon({ show }: { show: boolean }) {
   );
 }
 
+const SIGN_IN_ROLES = {
+  parent: { label: "ผู้ปกครอง", home: "/training" },
+  teacher: { label: "ครู", home: "/teacher" },
+  school_admin: { label: "ผู้ดูแลโรงเรียน", home: "/school" },
+  platform_admin: { label: "แอดมินระบบ", home: "/platform" },
+} as const;
+
+type SignInRole = keyof typeof SIGN_IN_ROLES;
+const roleOptions = Object.keys(SIGN_IN_ROLES) as SignInRole[];
+
+function roleFromRedirect(redirect: string | null): SignInRole | undefined {
+  const path = redirect?.split(/[?#]/, 1)[0];
+  if (path === "/invite/school-admin") return "school_admin";
+  if (path === "/invite/school-teacher") return "teacher";
+  if (path === "/invite/accept") return "parent";
+  return roleOptions.find((role) => role !== "parent" && SIGN_IN_ROLES[role].home === path);
+}
+
+function getSignInRole(user: AuthUser): SignInRole | undefined {
+  if (user.isPlatformAdmin) return "platform_admin";
+  if (user.role !== "therapist") return user.role;
+}
+
 function SignInContent() {
-  const { signIn, isAuthenticated, isLoading, user } = useAuth();
+  const { signIn, signOut, isLoading, user } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const explicitRedirect = safeAuthRedirect(searchParams.get("redirect"));
+  const redirectRole = roleFromRedirect(explicitRedirect);
+  const accountRole = user ? getSignInRole(user) : undefined;
+  const accountHome = accountRole ? SIGN_IN_ROLES[accountRole].home : "/training";
+  const destination = explicitRedirect && (!redirectRole || redirectRole === accountRole)
+    ? explicitRedirect : accountHome;
+  const [roleChoice, setRoleChoice] = useState<SignInRole>();
+  const selectedRole = roleChoice ?? redirectRole;
+  const roleMismatch = !!user && !!selectedRole && selectedRole !== accountRole;
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
-    if (mounted && !isLoading && isAuthenticated) {
-      if (explicitRedirect) {
-        router.replace(explicitRedirect);
-      } else if (user?.isPlatformAdmin) {
-        router.replace("/platform");
-      } else if (user?.role === "school_admin") {
-        router.replace("/school");
-      } else if (user?.role === "teacher") {
-        router.replace("/teacher");
-      } else {
-        router.replace("/training");
-      }
+    if (!isLoading && user && !roleMismatch) {
+      router.replace(destination);
     }
-  }, [mounted, isLoading, isAuthenticated, router, explicitRedirect, user?.role, user?.isPlatformAdmin]);
+  }, [isLoading, user, roleMismatch, router, destination]);
+
+  async function switchAccount() {
+    await signOut();
+    setPassword("");
+    setError("");
+    setSubmitting(false);
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!email.trim() || !password) return;
+    if (user || isLoading || !email.trim() || !password) return;
 
     setError("");
     setSubmitting(true);
@@ -79,15 +105,6 @@ function SignInContent() {
     }
     // On success: subscribeToAuthChanges updates the session, then the
     // useEffect above redirects based on user.role.
-  }
-
-  // Render a minimal skeleton until client hydrates
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-bg flex items-center justify-center">
-        <div className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-      </div>
-    );
   }
 
   return (
@@ -104,11 +121,11 @@ function SignInContent() {
       </nav>
 
       {/* Form area */}
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
+      <div className="flex-1 flex items-center justify-center px-4 py-6 sm:py-9">
         <div className="w-full max-w-sm">
-          <div className="text-center mb-8">
+          <div className="text-center mb-5">
             <h1 className="text-2xl font-bold text-text mb-1.5">ยินดีต้อนรับกลับ</h1>
-            <p className="text-sm text-text-muted">เข้าสู่ระบบเพื่อดูความก้าวหน้าของคุณ</p>
+            <p className="text-sm text-text-muted">กรอกอีเมลและรหัสผ่าน แล้วเลือกบทบาทของบัญชี</p>
           </div>
 
           {/* Supabase not configured notice */}
@@ -121,75 +138,104 @@ function SignInContent() {
             </div>
           )}
 
-          <form
-            onSubmit={handleSubmit}
-            noValidate
-            className="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4"
-          >
-            {/* Email */}
-            <div className="space-y-1.5">
-              <label htmlFor="email" className="block text-sm font-semibold text-text">
-                อีเมล
-              </label>
-              <input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full bg-bg border border-border rounded-xl px-4 py-3 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
-              />
-            </div>
-
-            {/* Password */}
-            <div className="space-y-1.5">
-              <label htmlFor="password" className="block text-sm font-semibold text-text">
-                รหัสผ่าน
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full bg-bg border border-border rounded-xl px-4 py-3 pr-11 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors p-1"
-                  aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
-                >
-                  <EyeIcon show={showPassword} />
-                </button>
+          {roleMismatch ? (
+            <div className="space-y-4 rounded-2xl border border-border bg-surface p-6 shadow-sm">
+              <p role="alert" className="text-sm text-error">
+                {user.email} ใช้บทบาท {accountRole ? SIGN_IN_ROLES[accountRole].label : "นักบำบัด"}
+                {" "}คุณเลือกเข้าสู่ระบบในบทบาท {SIGN_IN_ROLES[selectedRole].label}
+              </p>
+              <div className="flex flex-wrap gap-3 text-sm font-semibold text-primary">
+                <Link href={destination}>ไปหน้าของบัญชีนี้</Link>
+                <button type="button" onClick={() => void switchAccount()}>ออกและเปลี่ยนบัญชี</button>
               </div>
             </div>
-
-            {/* Error */}
-            {error && (
-              <p role="alert" className="text-xs text-error bg-error/8 border border-error/20 rounded-lg px-3 py-2">
-                {error}
-              </p>
-            )}
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={submitting || !email.trim() || !password}
-              className="w-full bg-primary text-white font-semibold rounded-xl py-3 text-sm hover:bg-primary/90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+          ) : (
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+              className="bg-surface border border-border rounded-2xl p-4 shadow-sm sm:p-5 space-y-4"
             >
-              {submitting ? "กำลังเข้าสู่ระบบ…" : "เข้าสู่ระบบ"}
-            </button>
-          </form>
+              {/* Email */}
+              <div className="space-y-1.5">
+                <label htmlFor="email" className="block text-sm font-semibold text-text">
+                  อีเมล
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                />
+              </div>
+
+              {/* Password */}
+              <div className="space-y-1.5">
+                <label htmlFor="password" className="block text-sm font-semibold text-text">
+                  รหัสผ่าน
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 pr-11 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text transition-colors p-1"
+                    aria-label={showPassword ? "ซ่อนรหัสผ่าน" : "แสดงรหัสผ่าน"}
+                  >
+                    <EyeIcon show={showPassword} />
+                  </button>
+                </div>
+              </div>
+
+              <fieldset className="space-y-2" disabled={submitting || !!user}>
+                <legend className="text-sm font-semibold text-text">เข้าสู่ระบบในบทบาท</legend>
+                <div className="grid grid-cols-2 gap-2">
+                  {roleOptions.map((role) => (
+                    <label key={role} className="cursor-pointer">
+                      <input type="radio" name="role" value={role} checked={selectedRole === role}
+                        onChange={() => setRoleChoice(role)} className="peer sr-only" />
+                      <span className="block rounded-xl border border-border px-3 py-2.5 text-center text-sm font-medium text-text peer-checked:border-primary peer-checked:bg-primary/10 peer-checked:text-primary peer-focus-visible:ring-2 peer-focus-visible:ring-primary">
+                        {SIGN_IN_ROLES[role].label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+                {!selectedRole && <p className="text-xs text-text-muted">หากข้ามการเลือก ระบบจะเปิดหน้าตามบทบาทของบัญชี</p>}
+              </fieldset>
+
+              {/* Error */}
+              {error && (
+                <p role="alert" className="text-xs text-error bg-error/8 border border-error/20 rounded-lg px-3 py-2">
+                  {error}
+                </p>
+              )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={submitting || isLoading || !!user || !email.trim() || !password}
+                className="w-full bg-primary text-white font-semibold rounded-xl py-3 text-sm hover:bg-primary/90 active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                {submitting ? "กำลังเข้าสู่ระบบ…" : "เข้าสู่ระบบ"}
+              </button>
+            </form>
+          )}
 
           <p className="text-center text-xs text-text-muted mt-5">
             ยังไม่มีบัญชี?{" "}
-            <Link href="/auth/signup" className="text-primary font-semibold hover:underline">
+            <Link href={explicitRedirect ? `/auth/signup?redirect=${encodeURIComponent(explicitRedirect)}` : "/auth/signup"} className="text-primary font-semibold hover:underline">
               สมัครสมาชิก
             </Link>
           </p>

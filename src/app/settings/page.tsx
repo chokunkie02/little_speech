@@ -561,7 +561,7 @@ export default function SettingsPage() {
 
   return (
     <AppShell>
-      <div className="max-w-2xl mx-auto px-4 py-6 space-y-8">
+      <div className="max-w-2xl mx-auto px-4 py-5 space-y-5">
 
         {/* Page title */}
         <div>

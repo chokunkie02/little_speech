@@ -69,7 +69,7 @@ function SchoolInvitation({ role }: { role: InviteRole }) {
 
   return (
     <main className="grid min-h-screen place-items-center bg-bg px-4 py-8">
-      <section className="w-full max-w-md space-y-4 rounded-2xl border border-border bg-surface p-6">
+      <section className="w-full max-w-md space-y-3 rounded-2xl border border-border bg-surface p-4 sm:p-5">
         <p className="text-xs font-semibold text-primary">Speech Adventure</p>
         <h1 className="text-xl font-bold">{settings.title}</h1>
         {invitation && <p className="text-sm font-semibold">{invitation.school_name}</p>}

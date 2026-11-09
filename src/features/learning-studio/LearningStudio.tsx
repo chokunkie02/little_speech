@@ -1,7 +1,7 @@
 "use client";
 import "./studio.generated.css";
 import "./host-theme.css";
-import Link from "next/link";
+import { useStudioResultSync } from "./useStudioResultSync";
 import {
   createStudioState,
   studioStorageKey,
@@ -279,12 +279,14 @@ export interface LearningStudioProps {
   child?: StudioChild;
   accountId?: string;
   allowExport?: boolean;
+  syncToSchool?: boolean;
 }
 export function LearningStudio({
   onEvent,
   child,
   accountId,
   allowExport = true,
+  syncToSchool = false,
 }: LearningStudioProps) {
   const homeSpeaker = useSpeaker();
   const stopHomeSpeaker = homeSpeaker.stop;
@@ -296,6 +298,7 @@ export function LearningStudio({
       return createStudioState(null, child);
     }
   });
+  const sync = useStudioResultSync(syncToSchool ? child?.id : undefined, accountId, state.sessions);
   const stateRef = useRef(state);
   const [route, setRoute] = useState<Route>(routeFromHash);
   const [toast, setToast] = useState("");
@@ -464,9 +467,7 @@ export function LearningStudio({
       <div className="main-shell">
         <header className="studio-header print:hidden">
           <div className="studio-header-row">
-            <Link href="/training" className="studio-back">
-              <ArrowLeft size={17} /> กลับหน้าแผนฝึก
-            </Link>
+            <h1 className="text-lg font-bold text-text">ฝึกและเรียน</h1>
             <MusicRoom />
           </div>
           <nav aria-label="เมนูห้องฝึกการพูด" className="studio-nav">
@@ -478,7 +479,15 @@ export function LearningStudio({
               </button>
             ))}
           </nav>
-          <p className="studio-storage-note">ผลฝึกจากห้องนี้บันทึกในเบราว์เซอร์ของบัญชีที่ใช้งาน</p>
+          <p className="studio-storage-note" role="status">
+            {syncToSchool
+              ? sync.status === "saving" ? "กำลังบันทึกผลฝึกเข้าระบบ…"
+                : sync.status === "saved" ? "บันทึกผลฝึกเข้าความก้าวหน้าและรายงานแล้ว"
+                  : sync.status === "error" ? "ผลอยู่ในเครื่องนี้ ยังส่งเข้าระบบไม่สำเร็จ"
+                    : "รอบที่ฝึกจบจะบันทึกเข้าความก้าวหน้าและรายงาน"
+              : "โหมดนี้เก็บผลฝึกในเบราว์เซอร์ที่ใช้งาน"}
+            {sync.status === "error" && <button type="button" className="ml-2 underline" onClick={sync.retry}>ลองส่งผลอีกครั้ง</button>}
+          </p>
         </header>
         {child?.targetSound && !Object.keys(SOUNDS).includes(child.targetSound) && (
           <div className="studio-context-note" role="status">
@@ -502,24 +511,16 @@ export function LearningStudio({
                   </span>
                 }
               />
-              <LevelPicker
-                value={state.plan.level}
-                onChange={chooseLevel}
-                compact
-              />
               <section className="hero">
                 <div className="hero-copy">
                   <span className="pill warm">
                     <Sparkles size={14} /> โลกแห่งการฝึกพูด
                   </span>
                   <h2>
-                    ทุกเสียงเล็ก ๆ<br />
-                    มีเรื่องราวให้ค้นพบ<span>.</span>
+                    ฝึกตามแผนวันนี้
                   </h2>
                   <p>
-                    มาเล่นกับเพื่อนตัวน้อย ฟังเสียงที่คุ้นเคย
-                    <br />
-                    แล้วลองเล่าเรื่องในแบบของเรา
+                    ฟังตัวอย่าง แล้วลองทำกิจกรรมทีละข้อ
                   </p>
                   <Button onClick={continueLearning}>
                     {active ? <RefreshCw size={17} /> : <Play size={17} />}{" "}
@@ -565,6 +566,11 @@ export function LearningStudio({
                   <div className="hero-star two">✧</div>
                 </div>
               </section>
+              <LevelPicker
+                value={state.plan.level}
+                onChange={chooseLevel}
+                compact
+              />
               <div className="stats-grid">
                 <Stat
                   icon={<Flag />}
@@ -1014,7 +1020,7 @@ export function LearningStudio({
           </div>
           <p className="footnote">
             เสียงที่อัดหายเมื่อเปลี่ยนข้อหรือปิดหน้า
-            ส่วนผลการทำกิจกรรมเก็บเฉพาะเครื่องนี้
+            แผนฝึกและรายละเอียดกิจกรรมอยู่ในเครื่องที่ใช้ฝึก
           </p>
           <div className="modal-actions">
             <Button variant="secondary" onClick={() => setStartRequest(null)}>
@@ -1343,7 +1349,7 @@ function PlanPage({
               </span>
             </div>
             <p className="footnote">
-              แผนนี้ใช้ในต้นแบบเท่านั้น ยังไม่ได้ส่งงานให้ครูหรือระบบโรงเรียน
+              แผนนี้ใช้บนเครื่องที่จัด ส่วนสรุปรอบที่จบจะแสดงตามสิทธิ์เมื่อบันทึกเข้าระบบ
             </p>
             <Button type="submit">
               บันทึกและดูเส้นทาง <ArrowRight size={16} />
@@ -2252,7 +2258,7 @@ function Summary({
         </Button>
       </div>
       <p className="footnote">
-        ครูและผู้ปกครองในระบบหลักยังไม่ได้รับผลจากต้นแบบนี้
+        เมื่อเข้าสู่ระบบและเลือกโปรไฟล์เด็ก รอบที่ฝึกจบจะแสดงในความก้าวหน้าและรายงานตามสิทธิ์
       </p>
     </div>
   );
@@ -2307,7 +2313,7 @@ function Progress({
       <SectionHead
         eyebrow="EVERY LITTLE STEP COUNTS"
         title="มองเห็นทุกความพยายาม"
-        body={`ผลการฝึกของ ${childName} · ข้อมูลต้นแบบในเครื่องนี้`}
+        body={`ผลการฝึกของ ${childName} · รายละเอียดที่บันทึกบนเครื่องนี้`}
         action={
           <div className="action-group">
             <Button
@@ -2676,7 +2682,7 @@ function Guide({
           <p>
             เสียงไมค์ไม่ถูกส่งไปเซิร์ฟเวอร์
             ใช้ฟังซ้ำได้ในข้อนั้นและหายเมื่อเปลี่ยนข้อ
-            ผลกิจกรรมและแผนเก็บในเบราว์เซอร์เครื่องนี้
+            แผนและรายละเอียดกิจกรรมเก็บในเบราว์เซอร์เครื่องนี้
             ล้างข้อมูลเบราว์เซอร์แล้วอาจหาย จึงมีปุ่มส่งออก JSON
           </p>
           <h2>ผลแบบไหนเชื่อมกับการฝึกอะไร</h2>
@@ -2694,7 +2700,7 @@ function Guide({
           <h2>การเชื่อมต่อกับระบบหลัก</h2>
           <p>
             ห้องนี้รับโปรไฟล์ที่เลือกและสิทธิ์เริ่มฝึกจากระบบหลักแล้ว
-            มีสรุปจำนวนรอบในหน้าฝึก ผลชุดใหม่ยังไม่ซิงก์ข้ามเครื่อง
+            เมื่อเชื่อมโปรไฟล์เด็กแล้ว ระบบส่งสรุปรอบที่จบไปยังความก้าวหน้าและรายงาน
             งานที่ครูมอบหมาย การแจ้งเตือน อีเมล และการประเมินเสียงจริง
             เป็นส่วนที่ทีมจะเชื่อมต่อภายหลัง
           </p>

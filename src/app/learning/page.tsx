@@ -1,10 +1,5 @@
-import AppShell from "@/components/layout/AppShell";
-import type { Metadata } from "next";
-import { LearningStudioClient } from "@/features/learning-studio/LearningStudioClient";
-export const metadata: Metadata = {
-  title: "ห้องผจญภัยฝึกพูด | Speech Adventure",
-  description: "ฝึกฟัง พูด และสื่อสาร พร้อมเสียงตัวอย่างและภาพสาธิตรูปปาก",
-};
+import { redirect } from "next/navigation";
+
 export default function LearningPage() {
-  return <AppShell><LearningStudioClient /></AppShell>;
+  redirect("/training");
 }

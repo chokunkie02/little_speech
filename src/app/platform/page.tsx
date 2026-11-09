@@ -2,14 +2,16 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import Link from "next/link";
+import UsageDashboard from "./UsageDashboard";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import type { PlatformSchool, PlatformSchoolAdmins, SchoolTeacherInvitationStatus } from "@/types/school";
 
-const panel = "rounded-2xl border border-border bg-surface p-5";
+const panel = "rounded-2xl border border-border bg-surface p-4";
 const button = "rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50";
 const secondary = "rounded-xl border border-border px-4 py-2 text-sm font-semibold text-primary disabled:opacity-50";
+const schoolsPerPage = 6;
 const input = "mt-1 block w-full rounded-xl border border-border bg-bg px-3 py-2 font-normal";
 const statusLabels: Record<SchoolTeacherInvitationStatus, string> = {
   pending: "รอตอบรับ",
@@ -122,7 +124,7 @@ function SchoolDetails({ school, onChange }: { school: PlatformSchool; onChange:
       </div>
 
       <div className="space-y-3 border-t border-border pt-5">
-        <h3 className="font-bold">เชิญแอดมินโรงเรียนเพิ่ม</h3>
+        <h3 className="font-bold">เชิญแอดมินโรงเรียน</h3>
         <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => void submit(event, "invite")}>
           <label className="min-w-48 flex-1 text-sm font-semibold">อีเมลผู้รับคำเชิญ
             <input type="email" className={input} value={email} onChange={(event) => setEmail(event.target.value)} required maxLength={254} />
@@ -161,6 +163,14 @@ function PlatformOverview() {
   const [schools, setSchools] = useState<PlatformSchool[]>();
   const [error, setError] = useState("");
   const [revision, setRevision] = useState(0);
+  const [showCreate, setShowCreate] = useState(false);
+  const [schoolName, setSchoolName] = useState("");
+  const [adminEmail, setAdminEmail] = useState("");
+  const [creating, setCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
+  const [createdNotice, setCreatedNotice] = useState("");
+  const [query, setQuery] = useState("");
+  const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string>();
   const selected = schools?.find((school) => school.id === selectedId);
 
@@ -186,11 +196,49 @@ function PlatformOverview() {
   }, [revision]);
 
   const reload = () => setRevision((value) => value + 1);
+  async function createSchool(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const client = getSupabaseClient();
+    const name = schoolName.trim();
+    if (!client || creating || !name) return;
+
+    setCreating(true);
+    setCreateError("");
+    setCreatedNotice("");
+    try {
+      const { data, error } = await client.rpc("create_platform_school", {
+        p_name: name,
+        p_admin_email: adminEmail.trim(),
+      });
+      if (error || !data) throw new Error(error?.message ?? "สร้างโรงเรียนไม่สำเร็จ");
+      setSelectedId(data);
+      setQuery("");
+      setPage(1);
+      setSchoolName("");
+      setAdminEmail("");
+      setShowCreate(false);
+      setCreatedNotice("สร้างโรงเรียนแล้ว คัดลอกลิงก์ให้ผู้ดูแลคนแรกจากรายการคำเชิญในรายละเอียดโรงเรียน");
+      reload();
+    } catch (cause) {
+      setCreateError(cause instanceof Error ? cause.message : "สร้างโรงเรียนไม่สำเร็จ");
+    } finally {
+      setCreating(false);
+    }
+  }
+
   if (!schools) {
     return error
       ? <div className={panel}><p role="alert" className="mb-3 text-sm text-error">{error}</p><button className={secondary} onClick={reload}>ลองอีกครั้ง</button></div>
       : <p role="status" className="text-text-muted">กำลังโหลดโรงเรียน…</p>;
   }
+  const search = query.trim().normalize("NFC").toLocaleLowerCase("th");
+  const matches = schools.filter((school) => school.name.normalize("NFC").toLocaleLowerCase("th").includes(search));
+  matches.sort((first, second) => Date.parse(second.created_at) - Date.parse(first.created_at));
+  const pageCount = Math.max(1, Math.ceil(matches.length / schoolsPerPage));
+  const currentPage = Math.min(page, pageCount);
+  const start = (currentPage - 1) * schoolsPerPage;
+  const visibleSchools = matches.slice(start, start + schoolsPerPage);
+
   const total = (key: "admin_count" | "teacher_count" | "student_count" | "recent_sessions") =>
     schools.reduce((sum, school) => sum + school[key], 0);
   const stats = [
@@ -203,6 +251,34 @@ function PlatformOverview() {
 
   return (
     <>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="font-bold">โรงเรียนและผู้ดูแล</h2>
+        <button type="button" className={button} aria-expanded={showCreate} aria-controls="create-school"
+          onClick={() => setShowCreate((open) => !open)}>
+          เพิ่มโรงเรียน
+        </button>
+      </div>
+      <section id="create-school" hidden={!showCreate} className={panel + " space-y-3"} aria-labelledby="create-school-heading">
+        <h2 id="create-school-heading" className="font-bold">สร้างโรงเรียนใหม่</h2>
+        <form className="flex flex-wrap items-end gap-3" onSubmit={(event) => void createSchool(event)}>
+          <label className="min-w-48 flex-1 text-sm font-semibold">
+            ชื่อโรงเรียนใหม่
+            <input className={input} value={schoolName} onChange={(event) => setSchoolName(event.target.value)}
+              required maxLength={120} disabled={creating} />
+          </label>
+          <label className="min-w-48 flex-1 text-sm font-semibold">
+            อีเมลผู้ดูแลคนแรก
+            <input type="email" className={input} value={adminEmail} onChange={(event) => setAdminEmail(event.target.value)}
+              required maxLength={254} disabled={creating} />
+          </label>
+          <button className={button} disabled={creating || !schoolName.trim()}>
+            {creating ? "กำลังสร้าง…" : "สร้างโรงเรียน"}
+          </button>
+        </form>
+        <p className="text-xs text-text-muted">ระบบสร้างลิงก์คำเชิญพร้อมโรงเรียน ผู้ดูแลตอบรับด้วยบัญชีผู้ดูแลโรงเรียนที่ยืนยันอีเมลนี้แล้ว</p>
+        {createError && <p role="alert" className="text-sm text-error">{createError}</p>}
+      </section>
+      {createdNotice && <p role="status" className={panel + " text-sm text-success"}>{createdNotice}</p>}
       <dl className="grid grid-cols-2 gap-3 lg:grid-cols-5">
         {stats.map(({ label, value }) => <div key={label} className={panel}>
           <dt className="text-xs font-medium text-text-muted">{label}</dt>
@@ -215,18 +291,34 @@ function PlatformOverview() {
             <h2 className="font-bold">โรงเรียนในระบบ</h2>
             <button type="button" onClick={reload} className="text-xs font-semibold text-primary">โหลดรายการล่าสุด</button>
           </div>
-          {schools.length === 0 && <p className="text-sm text-text-muted">ยังไม่มีโรงเรียนสมัครใช้งาน</p>}
-          <ul className="space-y-2">
-            {schools.map((school) => <li key={school.id}>
+          <label className="block text-sm font-semibold">
+            ค้นหาชื่อโรงเรียน
+            <input type="search" className={input} placeholder="พิมพ์ชื่อโรงเรียน" value={query} onChange={(event) => {
+              setQuery(event.target.value);
+              setPage(1);
+            }} />
+          </label>
+          <p role="status" className="text-xs text-text-muted">
+            {matches.length > 0
+              ? `แสดง ${start + 1}–${start + visibleSchools.length} จาก ${matches.length} โรงเรียน · ใหม่ล่าสุดก่อน`
+              : schools.length === 0 ? "ยังไม่มีโรงเรียนสมัครใช้งาน" : "ไม่พบโรงเรียนที่ตรงกับคำค้น"}
+          </p>
+          {visibleSchools.length > 0 && <ul className="space-y-2">
+            {visibleSchools.map((school) => <li key={school.id}>
               <button type="button" aria-pressed={selectedId === school.id} onClick={() => setSelectedId(school.id)}
-                className="w-full rounded-xl border border-border p-3 text-left text-sm aria-pressed:border-primary aria-pressed:bg-primary/10">
+                className="w-full rounded-xl border border-border px-3 py-2.5 text-left text-sm aria-pressed:border-primary aria-pressed:bg-primary/10">
                 <span className="block break-words font-semibold">{school.name}</span>
                 <span className="block text-xs text-text-muted">
                   {school.classroom_count} ห้อง · {school.teacher_count} ครู · {school.student_count} นักเรียน · {school.admin_count} ผู้ดูแล
                 </span>
               </button>
             </li>)}
-          </ul>
+          </ul>}
+          {pageCount > 1 && <nav aria-label="หน้ารายการโรงเรียน" className="flex flex-wrap items-center justify-between gap-2">
+            <button type="button" className={secondary} disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>ก่อนหน้า</button>
+            <span className="text-sm text-text-muted">หน้า {currentPage} / {pageCount}</span>
+            <button type="button" className={secondary} disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}>ถัดไป</button>
+          </nav>}
         </section>
         {selected
           ? <SchoolDetails key={selected.id} school={selected} onChange={reload} />
@@ -238,6 +330,7 @@ function PlatformOverview() {
 
 export default function PlatformAdminPage() {
   const { user, isLoading, signOut } = useAuth();
+  const [view, setView] = useState<"schools" | "usage">("schools");
 
   return (
     <main className="min-h-screen bg-bg">
@@ -250,7 +343,7 @@ export default function PlatformAdminPage() {
           </div>
         </div>
       </header>
-      <div className="mx-auto max-w-6xl space-y-5 px-5 py-6">
+      <div className="mx-auto max-w-6xl space-y-4 px-4 py-5 sm:px-5">
         <div>
           <h1 className="text-2xl font-bold">ภาพรวมระบบ</h1>
           <p className="mt-1 text-sm text-text-muted">ดูสถิติรวม จัดการข้อมูลโรงเรียน และเชิญผู้ดูแลโรงเรียน</p>
@@ -258,7 +351,18 @@ export default function PlatformAdminPage() {
         {isLoading ? <p role="status" className="text-text-muted">กำลังตรวจสอบบัญชี…</p>
           : !user ? <Link href="/auth/signin?redirect=%2Fplatform" className={"inline-block " + button}>เข้าสู่ระบบ</Link>
           : !user.isPlatformAdmin ? <p role="alert" className={panel + " text-sm text-error"}>บัญชีนี้ไม่มีสิทธิ์แอดมินระบบ</p>
-          : <PlatformOverview key={user.id} />}
+          : <>
+              <div className="flex flex-wrap gap-2 border-b border-border pb-3" role="group" aria-label="มุมมองแอดมินระบบ">
+                <button type="button" aria-pressed={view === "schools"} className={view === "schools" ? button : secondary}
+                  onClick={() => setView("schools")}>จัดการโรงเรียน</button>
+                <button type="button" aria-pressed={view === "usage"} className={view === "usage" ? button : secondary}
+                  onClick={() => setView("usage")}>ข้อมูลการใช้งาน</button>
+              </div>
+              <div hidden={view !== "schools"} className="space-y-5">
+                <PlatformOverview key={user.id} />
+              </div>
+              {view === "usage" && <UsageDashboard />}
+            </>}
       </div>
     </main>
   );

@@ -124,7 +124,7 @@ function SignUpContent() {
         <ThemeToggle />
       </nav>
 
-      <div className="flex-1 flex items-center justify-center px-4 py-12">
+      <div className="flex-1 flex items-center justify-center px-4 py-6 sm:py-9">
         <div className="w-full max-w-sm">
           {success ? (
             /* Success state */
@@ -148,7 +148,7 @@ function SignUpContent() {
             </div>
           ) : (
             <>
-              <div className="text-center mb-8">
+              <div className="text-center mb-5">
                 <h1 className="text-2xl font-bold text-text mb-1.5">สร้างบัญชีใหม่</h1>
                 <p className="text-sm text-text-muted">เริ่มติดตามพัฒนาการการพูดของบุตรหลาน</p>
               </div>
@@ -164,7 +164,7 @@ function SignUpContent() {
               <form
                 onSubmit={handleSubmit}
                 noValidate
-                className="bg-surface border border-border rounded-2xl p-6 shadow-sm space-y-4"
+                className="bg-surface border border-border rounded-2xl p-4 shadow-sm sm:p-5 space-y-4"
               >
                 {/* Email */}
                 <div className="space-y-1.5">
@@ -179,7 +179,7 @@ function SignUpContent() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full bg-bg border border-border rounded-xl px-4 py-3 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                    className="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
                   />
                 </div>
 
@@ -197,7 +197,7 @@ function SignUpContent() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="••••••••"
-                      className="w-full bg-bg border border-border rounded-xl px-4 py-3 pr-11 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
+                      className="w-full bg-bg border border-border rounded-xl px-3.5 py-2.5 pr-11 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
                     />
                     <button
                       type="button"

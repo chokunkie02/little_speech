@@ -4,7 +4,6 @@ import HomeBackground from "@/components/home/HomeBackground";
 import HeroSectionV2 from "@/components/home/HeroSectionV2";
 import HowItWorksSection from "@/components/home/HowItWorksSection";
 import TrainingJourneySection from "@/components/home/TrainingJourneySection";
-import AIFeaturesSection from "@/components/home/AIFeaturesSection";
 import ParentDashboardSection from "@/components/home/ParentDashboardSection";
 import TrustSection from "@/components/home/TrustSection";
 import HomeCTASection from "@/components/home/HomeCTASection";
@@ -12,7 +11,7 @@ import HomeCTASection from "@/components/home/HomeCTASection";
 export const metadata = {
   title: "Speech Adventure — ระบบฝึกพูดสำหรับเด็กไทย",
   description:
-    "แพลตฟอร์มฝึกพูดพยัญชนะไทยสำหรับเด็ก ผ่าน 6 ระดับที่เป็นระบบ พร้อม AI ช่วยประเมิน และ Dashboard สำหรับผู้ปกครอง",
+    "แพลตฟอร์มฝึกพูดพยัญชนะไทยสำหรับเด็ก พร้อมแบบฝึกสี่ระดับ ภาพและเสียงตัวอย่าง และรายงานความก้าวหน้า",
 };
 
 /** Thin nav bar — standalone (no AppShell) */
@@ -69,17 +68,17 @@ function LandingNav() {
 /** Stats strip — quick numbers above the fold */
 function StatsStrip() {
   const stats = [
-    { label: "ระดับการฝึก", value: "6" },
-    { label: "เสียงพยัญชนะ", value: "4+" },
-    { label: "กิจกรรมต่อระดับ", value: "5–8" },
+    { label: "ระดับเนื้อหา", value: "4" },
+    { label: "กลุ่มเสียง ป ก ม", value: "3" },
+    { label: "เป้าหมายการฝึก", value: "3" },
   ];
 
   return (
-    <div className="grid grid-cols-3 gap-4 mt-6" aria-label="สถิติแพลตฟอร์ม">
+    <div className="grid grid-cols-3 gap-2.5 mt-4 sm:gap-4" aria-label="สถิติแพลตฟอร์ม">
       {stats.map((stat) => (
         <div
           key={stat.label}
-          className="bg-surface border border-border rounded-xl px-4 py-3.5 text-center"
+          className="bg-surface border border-border rounded-xl px-2 py-2.5 text-center sm:px-4"
         >
           <p className="text-xl font-bold text-primary">{stat.value}</p>
           <p className="text-xs text-text-muted mt-0.5">{stat.label}</p>
@@ -96,9 +95,9 @@ export default function LandingPage() {
       <HomeBackground />
       <LandingNav />
 
-      <div className="max-w-5xl mx-auto px-6 pb-24">
+      <div className="max-w-5xl mx-auto px-4 pb-14 sm:px-6">
         {/* ── Hero ── */}
-        <div className="pt-8 pb-4">
+        <div className="pt-5 pb-2">
           <HeroSectionV2 />
         </div>
 
@@ -110,9 +109,6 @@ export default function LandingPage() {
 
         {/* ── Training Journey ── */}
         <TrainingJourneySection />
-
-        {/* ── AI Features ── */}
-        <AIFeaturesSection />
 
         {/* ── Parent Dashboard ── */}
         <ParentDashboardSection />

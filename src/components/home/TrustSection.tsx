@@ -21,7 +21,7 @@ const trustPoints = [
       </svg>
     ),
     title: "หลักสูตรแบบก้าวหน้าอย่างเป็นระบบ",
-    desc: "6 ระดับที่ต่อยอดกัน ตั้งแต่พื้นฐาน Oral Motor จนถึงการใช้ในประโยค แนวทางได้รับแรงบันดาลใจจาก Speech Therapy",
+    desc: "เลือกกิจกรรมให้เหมาะกับความพร้อม ตั้งแต่เตรียมท่าปากจนถึงฝึกพูดเป็นประโยค",
   },
   {
     key: "research",
@@ -92,7 +92,7 @@ export default function TrustSection() {
       <div className="mt-8 bg-info/5 border border-info/15 rounded-xl px-5 py-4">
         <p className="text-sm text-info leading-relaxed">
           <strong>หมายเหตุ:</strong> Speech Adventure เป็น Prototype ที่อยู่ระหว่างการพัฒนา
-          ระบบ AI วิเคราะห์เสียงแบบ Real-time จะเพิ่มในเฟสถัดไป
+          สรุปผลข้อเลือกตอบและการฝึกพูดแสดงแยกกัน
           ปัจจุบันใช้ Mock Evaluation เพื่อสาธิต UX Flow และ Workflow การฝึก
         </p>
       </div>

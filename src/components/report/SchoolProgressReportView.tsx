@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import PrintActions from "@/components/report/PrintActions";
 import ReportMetricCard from "@/components/report/ReportMetricCard";
+import LearningResults from "@/components/speech-adventure/LearningResults";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import type { SchoolProgressReport } from "@/types/database";
 
@@ -58,7 +59,7 @@ export default function SchoolProgressReportView({ childId, backHref }: { childI
 
   return (
     <>
-      <div className="mx-auto max-w-3xl space-y-5 px-4 py-6 sm:px-6 print:max-w-none print:p-0">
+      <div className="mx-auto max-w-3xl space-y-4 px-4 py-5 sm:px-6 print:max-w-none print:p-0">
         <form className="flex flex-wrap items-end gap-3 rounded-2xl border border-border bg-surface p-4 print:hidden"
           onSubmit={(event) => {
             event.preventDefault();
@@ -85,7 +86,7 @@ export default function SchoolProgressReportView({ childId, backHref }: { childI
           </p>
         ) : (
           <article className="space-y-5 print:text-black">
-            <header className="space-y-1 rounded-2xl border border-border bg-surface p-5 print:bg-white">
+            <header className="space-y-1 rounded-2xl border border-border bg-surface p-4 print:bg-white">
               <p className="text-xs font-semibold text-primary print:text-gray-600">Speech Adventure</p>
               <h1 className="text-xl font-bold">รายงานความก้าวหน้า</h1>
               <p className="text-sm font-semibold">{report.child.name}{report.child.nickname ? ` · ${report.child.nickname}` : ""}</p>
@@ -93,11 +94,13 @@ export default function SchoolProgressReportView({ childId, backHref }: { childI
                 {reportDate.format(new Date(applied.from))} ถึง {reportDate.format(new Date(applied.to))}
               </p>
             </header>
+            <p className="text-sm font-semibold text-text-muted">สรุปจากระบบฝึกเดิม</p>
             <div className="grid grid-cols-3 gap-2 print:break-inside-avoid">
               <ReportMetricCard label="ครั้งที่ฝึก" value={report.attempt_count} />
               <ReportMetricCard label="คะแนนเฉลี่ย" value={report.average_score === null ? "—" : `${report.average_score}%`} />
               <ReportMetricCard label="เซสชันที่จบแล้ว" value={report.completed_sessions} />
             </div>
+            <LearningResults key={applied.from + ":" + applied.to} childId={childId} from={applied.from} to={applied.to} />
             <section className="rounded-xl border border-border bg-surface p-4 print:bg-white">
               <h2 className="mb-3 font-semibold">ผลฝึกแยกตามเสียง</h2>
               {report.sounds.length ? (

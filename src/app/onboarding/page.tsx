@@ -130,7 +130,7 @@ function OnboardingContent() {
     if (isEdit) {
       router.push("/training");
     } else if (trainingMode === "speech_clarity") {
-      router.push("/training/pretest");
+      router.push("/training");
     } else {
       router.push("/training");
     }
@@ -181,7 +181,7 @@ function OnboardingContent() {
         </nav>
       )}
 
-      <div className="flex-1 flex items-center justify-center px-6 py-10">
+      <div className="flex-1 flex items-center justify-center px-4 py-6 sm:px-6 sm:py-8">
         <div className="w-full max-w-xl">
 
           {/* ── Step 1: Welcome ── */}
@@ -524,8 +524,8 @@ function OnboardingContent() {
                   {isEdit
                     ? "การเปลี่ยนโหมดหรือเสียงจะไม่ลบประวัติการฝึกเดิม"
                     : trainingMode === "speech_clarity"
-                    ? "ระบบจะเริ่ม Pre-test เพื่อประเมินระดับเสียงเริ่มต้น ไม่ต้องกังวล ไม่มีผิดไม่มีถูกค่ะ"
-                    : "โหมดเรียนเสียงไทยกำลังเตรียมพร้อม จะเริ่มไปที่แผนที่การฝึกก่อนนะคะ"}
+                    ? "เลือกแผนและระดับเริ่มต้นได้ในหน้าฝึกและเรียน"
+                    : "ระบบจะเปิดแผนฝึกเรียนเสียงไทยให้เริ่มเลือกกิจกรรม"}
                 </p>
               </div>
 
@@ -536,7 +536,7 @@ function OnboardingContent() {
                 {isEdit
                   ? "บันทึกและกลับไปฝึก"
                   : trainingMode === "speech_clarity"
-                  ? "เริ่ม Pre-test เลย →"
+                  ? "ไปหน้าฝึกและเรียน →"
                   : "เริ่มต้น →"}
               </button>
 

@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Menu, X } from "lucide-react";
+import { useSidebar } from "./SidebarContext";
 import NavIcon, { type NavIconName } from "./NavIcon";
 import { useAuth, isTeacher, isSchoolAdmin } from "@/hooks/useAuth";
 
@@ -31,6 +33,7 @@ const SCHOOL_MOBILE: NavItem[] = [
 export default function MobileNav() {
   const pathname = usePathname();
   const { user } = useAuth();
+  const { mobileOpen, setMobileOpen } = useSidebar();
 
   const items = isSchoolAdmin(user)
     ? SCHOOL_MOBILE
@@ -45,7 +48,7 @@ export default function MobileNav() {
   return (
     <nav
       className="fixed bottom-0 left-0 right-0 z-30 h-16 bg-surface/97 backdrop-blur-md border-t border-border lg:hidden print:hidden"
-      aria-label="เมนูหลัก"
+      aria-label="แถบนำทางด้านล่าง"
     >
       <div className="flex h-full">
         {items.map((item) => {
@@ -54,6 +57,7 @@ export default function MobileNav() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setMobileOpen(false)}
               aria-current={active ? "page" : undefined}
               className={`flex flex-col items-center justify-center flex-1 gap-0.5 text-xs font-medium transition-colors ${
                 active ? "text-primary" : "text-text-muted hover:text-text"
@@ -64,6 +68,16 @@ export default function MobileNav() {
             </Link>
           );
         })}
+        <button
+          type="button"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          aria-controls="mobile-sidebar"
+          aria-expanded={mobileOpen}
+          className="flex flex-1 flex-col items-center justify-center gap-0.5 text-xs font-medium text-text-muted hover:text-text aria-expanded:text-primary"
+        >
+          {mobileOpen ? <X size={20} aria-hidden="true" /> : <Menu size={20} aria-hidden="true" />}
+          <span>{mobileOpen ? "ปิดเมนู" : "เมนู"}</span>
+        </button>
       </div>
     </nav>
   );

@@ -32,14 +32,6 @@
   margin-bottom: 0.75rem;
 }
 
-.learning-studio-scope .studio-back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
 .learning-studio-scope .studio-nav {
   display: flex;
   flex-wrap: wrap;
@@ -78,7 +70,7 @@
 
 .learning-studio-scope .main-shell > .content {
   max-width: 72rem;
-  padding-inline: clamp(1rem, 3vw, 2rem);
+  padding: 1rem clamp(1rem, 3vw, 2rem) 1.5rem;
 }
 
 .learning-studio-scope .main-shell .hero,
@@ -96,6 +88,19 @@
 .learning-studio-scope .main-shell .button.primary {
   background: var(--primary);
   color: white;
+}
+
+@media screen {
+  .learning-studio-scope .main-shell .section-head { margin-bottom: 1rem; }
+  .learning-studio-scope .main-shell .hero { min-height: 0; margin-bottom: 1rem; }
+  .learning-studio-scope .main-shell .hero-copy { padding: clamp(1rem, 2.4vw, 1.75rem); }
+  .learning-studio-scope .main-shell .hero-copy h2 { font-size: clamp(1.45rem, 2.6vw, 2rem); }
+  .learning-studio-scope .main-shell .hero-art > .art { max-width: min(65%, 10rem); }
+  .learning-studio-scope .main-shell .panel,
+  .learning-studio-scope .main-shell .practice-card { padding: clamp(0.875rem, 2vw, 1.25rem); box-shadow: none; }
+}
+@media screen and (max-width: 640px) {
+  .learning-studio-scope .main-shell .hero-art { display: none; }
 }
 
 @media print {

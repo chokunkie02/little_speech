@@ -648,7 +648,7 @@ export default function RewardsPage() {
   if (isPhonicsMode) {
     return (
       <AppShell>
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-5 space-y-4">
           <header>
             <nav className="text-xs text-text-muted mb-2" aria-label="Breadcrumb">
               <Link href="/dashboard" className="hover:text-primary transition-colors">หน้าหลัก</Link>
@@ -667,7 +667,7 @@ export default function RewardsPage() {
 
   return (
     <AppShell>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5 space-y-4">
 
         {/* ── Page Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">

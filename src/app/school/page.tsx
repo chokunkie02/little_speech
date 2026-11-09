@@ -139,9 +139,9 @@ export default function SchoolAdminPage() {
       />
     )}
     <AppShell>
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-5 space-y-4">
         {/* Page header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0 text-primary">
               <BuildingIcon size={20} />
@@ -253,20 +253,16 @@ export default function SchoolAdminPage() {
               </div>
             )}
 
-            {/* Selected org detail */}
-            {selectedOrg?.type === "school" && isSupabaseProviderRequested() && isSupabaseConfigured() && (
-              <SchoolTeacherInvitations key={selectedOrg.id} organizationId={selectedOrg.id} />
-            )}
             {selectedOrg && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="text-base font-semibold text-text">{selectedOrg.name}</h2>
                     <p className="text-xs text-text-muted mt-0.5">
                       {ORG_TYPE_LABELS[selectedOrg.type]}
                     </p>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={() => setShowImportWizard(true)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-border text-sm text-text-muted hover:text-text hover:bg-gray-50 dark:hover:bg-white/5 transition-all"
@@ -374,6 +370,9 @@ export default function SchoolAdminPage() {
                   </div>
                 )}
 
+                {selectedOrg?.type === "school" && isSupabaseProviderRequested() && isSupabaseConfigured() && (
+                  <SchoolTeacherInvitations key={selectedOrg.id} organizationId={selectedOrg.id} />
+                )}
                 {/* Classroom panel is rendered as a modal overlay at the page root */}
               </div>
             )}

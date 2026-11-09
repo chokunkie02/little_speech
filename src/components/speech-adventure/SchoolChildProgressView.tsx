@@ -6,6 +6,7 @@ import Link from "next/link";
 import DetailMetricCard from "@/components/details/DetailMetricCard";
 import SchoolObservations from "@/components/observations/SchoolObservations";
 import SchoolAttemptAudio from "@/components/details/SchoolAttemptAudio";
+import LearningResults from "@/components/speech-adventure/LearningResults";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import type { SchoolChildProgress } from "@/types/database";
 
@@ -70,7 +71,7 @@ export default function SchoolChildProgressView({
     : "—";
 
   return (
-    <div className="mx-auto max-w-5xl space-y-5 px-4 py-6 sm:px-6">
+    <div className="mx-auto max-w-5xl space-y-4 px-4 py-5 sm:px-6">
       {teacher && <Link className="text-sm font-semibold text-primary" href="/teacher">← กลับแดชบอร์ดครู</Link>}
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -93,6 +94,7 @@ export default function SchoolChildProgressView({
         </p>
       ) : (
         <>
+          <p className="text-sm font-semibold text-text-muted">สรุปจากระบบฝึกเดิม</p>
           <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <DetailMetricCard label="ครั้งที่ฝึก" value={attempts.length} />
             <DetailMetricCard label="คะแนนเฉลี่ย" value={average} valueColor="var(--color-primary)" />
@@ -102,11 +104,12 @@ export default function SchoolChildProgressView({
             href={teacher ? `/report?child=${encodeURIComponent(childId)}` : "/report"}>
             เปิดรายงานความก้าวหน้า
           </Link>
+          <LearningResults childId={childId} revision={revision} />
           {!teacher && <p className="text-xs text-text-muted">
             ครูประจำห้องสามารถฟังเสียงการฝึกที่บันทึกไว้ของนักเรียนคนนี้ได้
           </p>}
           <section className="space-y-4 rounded-2xl border border-border bg-surface p-4 sm:p-5">
-            <div className="flex gap-2" aria-label="เลือกประวัติการฝึก">
+            <div className="flex flex-wrap gap-2" aria-label="เลือกประวัติการฝึก">
               {(["attempts", "sessions", "notes"] as const).map((choice) => (
                 <button key={choice} type="button" aria-pressed={tab === choice}
                   className={`rounded-full px-4 py-1.5 text-sm font-medium ${tab === choice ? "bg-primary text-white" : "text-text-muted hover:bg-bg"}`}
