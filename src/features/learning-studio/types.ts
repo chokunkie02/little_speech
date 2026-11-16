@@ -1,4 +1,5 @@
 import type { LearningLevelId } from "./learning-levels";
+import type { AssessmentResult } from "@/lib/assessment/policy";
 export type Track = "speech" | "communication" | "phonics";
 export type Route =
   | "home"
@@ -55,6 +56,7 @@ export interface Stage {
   items: Item[];
 }
 export interface Attempt {
+  assessment?: AssessmentResult;
   id: string;
   itemId: string;
   createdAt: string;

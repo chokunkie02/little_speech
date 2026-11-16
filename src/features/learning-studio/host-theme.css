@@ -145,3 +145,20 @@
   .learning-studio-scope .hero { grid-template-columns: minmax(0, 1fr); }
   .learning-studio-scope .level-picker-heading { align-items: flex-start; flex-direction: column; gap: .35rem; }
 }
+.learning-studio-scope .assessment-panel,
+.learning-studio-scope .assessment-result {
+  margin: 16px 0;
+  padding: 16px;
+  border: 1px solid var(--color-border, #e5e7eb);
+  border-radius: 16px;
+  background: var(--color-surface, #fff);
+  color: var(--color-text, #253047);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.learning-studio-scope .assessment-panel p,
+.learning-studio-scope .assessment-result p { margin: 8px 0; font-size: 14px; line-height: 1.7; }
+.learning-studio-scope .assessment-result small { display: block; margin-top: 6px; font-size: 12px; }
+.learning-studio-scope .assessment-consent { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0; font-size: 14px; }
+.learning-studio-scope .assessment-consent input { margin-top: 5px; flex-shrink: 0; }
+.learning-studio-scope .assessment-panel button { min-height: 44px; }

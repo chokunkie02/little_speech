@@ -382,6 +382,7 @@ export default function PlatformAdminPage() {
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4">
           <div><p className="text-xs font-semibold text-primary">Speech Adventure</p><p className="font-bold">แอดมินระบบ</p></div>
           <div className="flex items-center gap-3">
+            {user?.isPlatformAdmin && <Link href="/platform/assessment" className={secondary}>ศูนย์ประเมินการเรียนรู้</Link>}
             <ThemeToggle />
             {user && <button type="button" className={secondary} onClick={() => void signOut()}>ออกจากระบบ</button>}
           </div>

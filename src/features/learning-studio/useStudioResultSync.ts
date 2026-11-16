@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import type { Session } from "./types";
+import { assessmentRequest } from "@/lib/assessment/client";
 
 export function useStudioResultSync(childId: string | undefined, accountId: string | undefined, sessions: Session[]) {
   const saved = useRef(new Set<string>());
+  const savedReviews = useRef(new Map<string, string>());
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [revision, setRevision] = useState(0);
 
@@ -31,7 +33,12 @@ export function useStudioResultSync(childId: string | undefined, accountId: stri
           correct_choices: choices.filter((attempt) => attempt.choiceCorrect).length,
         }];
       });
-      if (!rows.length) return;
+      const reviews = sessions.filter((session) => session.childId === childId && session.status === "completed")
+        .flatMap((session) => session.attempts)
+        .filter((attempt) => attempt.assessment && attempt.kind !== "choice" && attempt.review !== "pending"
+          && savedReviews.current.get(attempt.assessment.id) !== attempt.review)
+        .map((attempt) => ({ id: attempt.assessment!.id, review: attempt.review }));
+      if (!rows.length && !reviews.length) return;
 
       const client = getSupabaseClient();
       setStatus("saving");
@@ -44,6 +51,14 @@ export function useStudioResultSync(childId: string | undefined, accountId: stri
           });
           if (error) throw error;
           if (active) batch.forEach(({ session_id }) => saved.current.add(session_id));
+        }
+        for (let offset = 0; offset < reviews.length && active; offset += 25) {
+          const batch = reviews.slice(offset, offset + 25);
+          await assessmentRequest("/api/assessment/review", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ childId, items: batch }),
+          });
+          if (active) batch.forEach(({ id, review }) => savedReviews.current.set(id, review));
         }
         if (active) setStatus("saved");
       } catch {

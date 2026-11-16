@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import type { DbLearningSessionResult } from "@/types/database";
+import AssessmentHistory from "@/components/assessment/AssessmentHistory";
 
 const latestLimit = 30;
 const date = new Intl.DateTimeFormat("th-TH", { dateStyle: "medium", timeStyle: "short", timeZone: "Asia/Bangkok" });
@@ -53,9 +54,11 @@ export default function LearningResults({ childId, from, to, revision }: {
     return () => { active = false; window.removeEventListener("focus", load); };
   }, [childId, from, to, revision]);
 
-  if (!childId || !isSupabaseProviderRequested() || (!rows?.length && !failed)) return null;
+  if (!childId || !isSupabaseProviderRequested()) return null;
+  if (!rows?.length && !failed) return <AssessmentHistory key={childId} childId={childId} from={from} to={to} />;
 
-  return (
+  return (<>
+    <AssessmentHistory key={childId} childId={childId} from={from} to={to} />
     <section aria-label="ผลจากระบบฝึกใหม่" className="space-y-3 rounded-2xl border border-border bg-surface p-4 text-left sm:p-5 print:bg-white">
       <h2 className="font-bold text-text">ผลจากระบบฝึกใหม่</h2>
       <p className="text-xs text-text-muted">แสดงรอบที่ฝึกจบ ผลตอบถูกใช้เฉพาะข้อเลือกตอบ</p>
@@ -75,6 +78,6 @@ export default function LearningResults({ childId, from, to, revision }: {
           ))}
         </ul>}
       {(rows?.length ?? 0) > latestLimit && <p className="text-xs text-text-muted">แสดง {latestLimit} รอบล่าสุด</p>}
-    </section>
+    </section></>
   );
 }
