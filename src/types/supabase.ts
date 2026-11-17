@@ -1,4 +1,5 @@
 import type { PlatformSchool, PlatformSchoolAdmins, SchoolTeacherInvitation, SchoolTeacherInvitationStatus } from "@/types/school";
+import type { JoinCode, JoinCodeKind, JoinCodePreview, MyInbox, RedeemResult } from "@/types/joinCodes";
 
 /**
  * Supabase Database type placeholder for Speech Adventure.
@@ -38,6 +39,7 @@ import type {
   DbClassroomTeacher,
   DbOrganizationType,
   DbUserDisplayProfile,
+  DbAccountProfile,
 } from "@/types/database";
 
 // ── Insert types (server-generated fields become optional) ────────────────────
@@ -153,6 +155,12 @@ export interface Database {
         Update: Partial<DbClassroomTeacher>;
         Relationships: [];
       };
+      account_profiles: {
+        Row: DbAccountProfile;
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       user_display_profiles: {
         Row: DbUserDisplayProfile;
         Insert: Omit<DbUserDisplayProfile, "created_at">;
@@ -162,6 +170,34 @@ export interface Database {
     };
     Views: { [_ in never]: never };
     Functions: {
+      issue_join_code: {
+        Args: { p_kind: JoinCodeKind; p_organization_id?: string | null; p_classroom_id?: string | null; p_child_id?: string | null; p_rotate?: boolean };
+        Returns: JoinCode;
+      };
+      revoke_join_code: { Args: { p_code_id: string }; Returns: void };
+      preview_join_code: { Args: { p_code: string }; Returns: JoinCodePreview };
+      redeem_join_code: {
+        Args: { p_code: string; p_relationship?: string | null; p_consent?: boolean; p_child_id?: string | null; p_display_name?: string | null };
+        Returns: RedeemResult;
+      };
+      review_join_request: { Args: { p_request_id: string; p_approve: boolean; p_classroom_id?: string | null }; Returns: void };
+      cancel_join_request: { Args: { p_request_id: string }; Returns: void };
+      list_my_inbox: { Args: Record<string, never>; Returns: MyInbox };
+      mark_notifications_read: { Args: { p_ids?: string[] | null }; Returns: void };
+      create_school_by_platform: { Args: { p_name: string }; Returns: string };
+      submit_school_application: {
+        Args: { p_school_name: string; p_province: string; p_contact_name: string; p_position: string; p_phone: string; p_note?: string | null;
+          p_school_code?: string | null; p_affiliation?: string | null };
+        Returns: string;
+      };
+      review_school_application: { Args: { p_application_id: string; p_approve: boolean; p_school_name?: string | null }; Returns: string | null };
+      cancel_school_application: { Args: { p_application_id: string }; Returns: void };
+      request_data_deletion: { Args: { p_reason?: string | null }; Returns: void };
+      save_my_account_profile: {
+        Args: { p_title: string | null; p_first_name: string; p_last_name: string; p_phone?: string | null; p_accept_terms?: boolean };
+        Returns: DbAccountProfile;
+      };
+      get_join_requester_phone: { Args: { p_request_id: string }; Returns: string | null };
       lookup_parent_setup: {
         Args: { p_organization_id: string; p_email: string };
         Returns: { exists: boolean; pending_id?: string; incompatible?: boolean; pending_elsewhere?: boolean };

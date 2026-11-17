@@ -1,6 +1,7 @@
 "use client";
 import dynamic from "next/dynamic";
-import Link from "next/link";
+import { KeyRound, Lock, UserRound } from "lucide-react";
+import { ButtonLink, EmptyState, LoadingState, Page } from "@/components/ui";
 import { isSupabaseProviderRequested } from "@/lib/config/storageProvider";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { useTheme } from "@/components/ui/ThemeProvider";
@@ -8,53 +9,44 @@ import { useStudioContext } from "./useStudioContext";
 
 const Studio = dynamic(
   () => import("./LearningStudio").then((m) => m.LearningStudio),
-  {
-    ssr: false,
-    loading: () => (
-      <p role="status" className="p-8 text-center">
-        กำลังเปิดห้องผจญภัย…
-      </p>
-    ),
-  },
+  { ssr: false, loading: () => <StudioLoading label="กำลังเปิดห้องฝึก…" /> },
 );
+
+function StudioLoading({ label }: { label: string }) {
+  return (
+    <Page>
+      <span className="sr-only" role="status">{label}</span>
+      <LoadingState variant="cards" rows={2} />
+    </Page>
+  );
+}
+
 export function LearningStudioClient() {
   const context = useStudioContext();
   const { theme } = useTheme();
-  if (!context.ready)
-    return (
-      <p role="status" className="p-8 text-center">
-        กำลังเตรียมข้อมูลผู้เรียน…
-      </p>
-    );
+  if (!context.ready) return <StudioLoading label="กำลังเตรียมข้อมูลผู้เรียน…" />;
   if (!context.canPractice)
     return (
-      <section className="mx-auto max-w-xl space-y-4 p-8">
-        <h1 className="text-2xl font-bold">
-          {context.staffHome
-            ? "ห้องฝึกสำหรับบัญชีผู้ปกครอง"
-            : "ยังไม่มีสิทธิ์เริ่มฝึกสำหรับเด็กคนนี้"}
-        </h1>
-        <p>
-          {context.staffHome
-            ? "บัญชีของคุณดูข้อมูลตามสิทธิ์ได้จากหน้าหลักของบทบาท"
-            : "ให้เจ้าของโปรไฟล์เพิ่มสิทธิ์เริ่มฝึกก่อนเปิดห้องการเรียนรู้"}
-        </p>
-        <Link
-          className="text-primary underline"
-          href={context.staffHome ?? "/settings"}
-        >
-          กลับระบบหลัก
-        </Link>
-      </section>
+      <Page width="narrow">
+        <EmptyState icon={<Lock size={22} />}
+          title={context.staffHome ? "ห้องฝึกใช้กับบัญชีผู้ปกครอง" : "ยังไม่มีสิทธิ์เริ่มฝึกกับเด็กคนนี้"}
+          description={context.staffHome
+            ? "บัญชีของคุณดูผลการฝึกของนักเรียนได้จากหน้าหลักของบทบาท"
+            : "บัญชีนี้ดูผลได้อย่างเดียว ขอให้เจ้าของโปรไฟล์เปิดสิทธิ์เริ่มฝึกให้ก่อน"}
+          action={<ButtonLink href={context.staffHome ?? "/dashboard"} variant="outline">กลับหน้าหลัก</ButtonLink>} />
+      </Page>
     );
   const child = context.profile;
   if (context.user && !child)
     return (
-      <section className="mx-auto max-w-xl space-y-4 p-8">
-        <h1 className="text-2xl font-bold">เลือกโปรไฟล์เด็กก่อนเริ่มฝึก</h1>
-        <p>เลือกเด็กที่เชื่อมอยู่จากเมนูซ้าย หรือสร้างโปรไฟล์สำหรับฝึกที่บ้าน</p>
-        <Link className="text-primary underline" href="/onboarding">สร้างโปรไฟล์เด็ก</Link>
-      </section>
+      <Page width="narrow">
+        <EmptyState icon={<UserRound size={22} />} title="เลือกเด็กก่อนเริ่มฝึก"
+          description="เลือกเด็กจากเมนูด้านซ้าย หรือใช้รหัสจากใบเชิญของโรงเรียนเพื่อเชื่อมกับบุตรหลาน"
+          action={<>
+            <ButtonLink href="/join" icon={<KeyRound size={16} aria-hidden="true" />}>ใช้รหัสเข้าร่วม</ButtonLink>
+            <ButtonLink href="/profile" variant="outline">เปิดข้อมูลลูก</ButtonLink>
+          </>} />
+      </Page>
     );
   return (
     <div className={`learning-studio-scope ${theme === "dark" ? "dark" : ""}`}>
@@ -70,10 +62,7 @@ export function LearningStudioClient() {
                 name: child.name,
                 age: child.age,
                 targetSound: child.targetSound,
-                initialTrack:
-                  child.trainingMode === "kindergarten_phonics"
-                    ? "phonics"
-                    : "speech",
+                initialTrack: child.trainingMode === "kindergarten_phonics" ? "phonics" : "speech",
               }
             : undefined
         }

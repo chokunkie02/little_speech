@@ -72,7 +72,7 @@ export default function TeacherChildProgressCard({ data, onSelect }: Props) {
             <p className="text-xs text-text-muted mt-1">คะแนนเฉลี่ย</p>
           </div>
           <div className="bg-bg dark:bg-white/3 border border-border rounded-xl p-3 text-center">
-            <p className="text-lg font-bold text-info leading-none">{progressSummary.totalAttempts}</p>
+            <p className="text-lg font-bold text-info-text leading-none">{progressSummary.totalAttempts}</p>
             <p className="text-xs text-text-muted mt-1">ครั้งที่ฝึก</p>
           </div>
           <div className="bg-bg dark:bg-white/3 border border-border rounded-xl p-3 text-center">

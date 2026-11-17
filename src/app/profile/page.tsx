@@ -1,20 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
+import { ChartColumn, KeyRound, Pencil, Play, Plus, User } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import AddChildModal from "@/components/layout/AddChildModal";
-import ProfileMark from "@/components/ui/ProfileMark";
 import SharedGuardianSettings from "@/components/layout/SharedGuardianSettings";
-import { ChildAccessSection, InviteNewMemberSection, SentInvitesSection } from "@/components/layout/InviteSection";
+import { ChildAccessSection } from "@/components/layout/InviteSection";
+import { JoinCodeCard } from "@/components/join/JoinCodeCard";
+import {
+  Alert, Avatar, Badge, Button, ButtonLink, Card, CardContent, CardHeader, EmptyState, LoadingState, Page, PageHeader,
+} from "@/components/ui";
 import { useAuth, isParent } from "@/hooks/useAuth";
 import { useChildAccess } from "@/hooks/useChildAccess";
 import { useChildProfile } from "@/hooks/useChildProfile";
 
-const card = "rounded-2xl border border-border bg-surface p-4 sm:p-5";
-const secondary = "inline-flex items-center rounded-xl border border-border px-3 py-2 text-sm font-semibold text-primary hover:bg-primary/10";
-const primary = "inline-flex items-center rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary/90";
-const goals: Record<string, string> = { daily: "ทุกวัน", "3x-week": "3 วันต่อสัปดาห์", casual: "เมื่อมีเวลา" };
+const GOALS: Record<string, string> = { daily: "ทุกวัน", "3x-week": "3 วันต่อสัปดาห์", casual: "เมื่อมีเวลา" };
 
 export default function ProfilePage() {
   const { user, isLoading } = useAuth();
@@ -25,81 +25,80 @@ export default function ProfilePage() {
   const schoolGuardian = !!profile?.organizationId && receivedGrants.some(
     (grant) => grant.childId === profile.id && grant.role === "guardian" && !grant.revokedAt,
   );
+  const familyOwner = isOwner && !profile?.organizationId;
+  const source = profile?.organizationId ? "จากโรงเรียน" : isOwner ? "ครอบครัว" : "แชร์ให้คุณ";
 
   return (
     <AppShell>
-      <div className="mx-auto max-w-5xl space-y-4 px-4 py-5 sm:px-6">
-        <header className="flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h1 className="text-xl font-bold text-text">ข้อมูลลูก</h1>
-            <p className="mt-1 text-sm text-text-muted">ข้อมูลเด็กที่เลือก แผนฝึก และคนที่เชื่อมกับโปรไฟล์นี้</p>
-          </div>
-          {!user && !isLoading && parent && profile && <button type="button" className={secondary} onClick={() => setAdding(true)}>เพิ่มเด็ก</button>}
-        </header>
-        {!isHydrated || isLoading ? <p role="status" className="text-sm text-text-muted">กำลังโหลดข้อมูลลูก…</p>
-          : !parent ? <p className={card + " text-sm"}>เปิดข้อมูลนักเรียนจากหน้าจัดการของบัญชีคุณ</p>
-          : !profile ? (
-            <section className={card + " space-y-3"}>
-              <h2 className="font-semibold">ยังไม่ได้เลือกโปรไฟล์เด็ก</h2>
-              <p className="text-sm text-text-muted">สร้างโปรไฟล์สำหรับฝึกที่บ้าน หรือเปิดคำเชิญที่ได้รับจากครู</p>
-              <div className="flex flex-wrap gap-2">
-                {!user && <Link href="/onboarding" className={primary}>สร้างโปรไฟล์เด็ก</Link>}
-                <Link href={user ? "/inbox" : "/settings#invitations"} className={secondary}>เปิดคำเชิญ</Link>
-              </div>
-            </section>
-          ) : (
-            <div className={`grid items-start gap-4 ${schoolGuardian || (isOwner && !profile.organizationId) ? "lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]" : ""}`}>
-              <section className={card + " space-y-4"} aria-label="ข้อมูลเด็กที่เลือก">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary/10 font-bold text-primary">
-                    <ProfileMark name={profile.nickname || profile.name} avatar={profile.avatarEmoji} />
-                  </span>
+      <Page>
+        <PageHeader icon={<User size={20} />} title="ข้อมูลลูก" description="ข้อมูลเด็กที่เลือก แผนฝึก และคนที่ดูผลร่วมกับคุณ"
+          actions={!user && !isLoading && parent && profile && (
+            <Button variant="outline" icon={<Plus size={16} aria-hidden="true" />} onClick={() => setAdding(true)}>เพิ่มเด็ก</Button>
+          )} />
+
+        {!isHydrated || isLoading ? <LoadingState variant="cards" rows={2} /> : !parent ? (
+          <Alert tone="info">เปิดข้อมูลนักเรียนจากหน้าห้องเรียนของบัญชีคุณ</Alert>
+        ) : !profile ? (
+          <EmptyState icon={<User size={22} />} title="ยังไม่ได้เลือกเด็ก"
+            description={user ? "ใช้รหัสจากใบเชิญของโรงเรียนเพื่อเชื่อมกับบุตรหลาน" : "สร้างโปรไฟล์สำหรับฝึกที่บ้าน"}
+            action={user
+              ? <ButtonLink href="/join" icon={<KeyRound size={16} aria-hidden="true" />}>ใช้รหัสเข้าร่วม</ButtonLink>
+              : <ButtonLink href="/onboarding">สร้างโปรไฟล์เด็ก</ButtonLink>} />
+        ) : (
+          <div className={`grid items-start gap-5 ${schoolGuardian || familyOwner ? "lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]" : ""}`}>
+            <Card>
+              <CardContent className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Avatar name={profile.nickname || profile.name} size="lg" />
                   <div className="min-w-0 flex-1">
-                    <h2 className="break-words font-bold text-text">{profile.name}</h2>
-                    <p className="text-xs text-text-muted">{profile.organizationId ? "โปรไฟล์จากโรงเรียน" : isOwner ? "โปรไฟล์ครอบครัว" : "โปรไฟล์ที่แชร์ให้คุณ"}</p>
+                    <h2 className="text-section-title break-words">{profile.name}</h2>
+                    <Badge tone={profile.organizationId ? "info" : "neutral"}>{source}</Badge>
                   </div>
-                  {isOwner && !profile.organizationId && <Link href="/onboarding?edit=true" className={secondary}>แก้ไขข้อมูลลูก</Link>}
+                  {familyOwner && (
+                    <ButtonLink href="/onboarding?edit=true" variant="ghost" size="icon" aria-label="แก้ไขข้อมูลลูก"><Pencil size={16} aria-hidden="true" /></ButtonLink>
+                  )}
                 </div>
-                <dl className="grid grid-cols-2 gap-3 rounded-xl bg-bg p-3 text-sm">
+                <dl className="grid grid-cols-2 gap-3 rounded-control bg-surface-muted p-3 text-sm">
                   {[
                     ["ชื่อเล่น", profile.nickname || "ยังไม่ได้ระบุ"],
-                    ["อายุ", profile.age + " ปี"],
+                    ["อายุ", `${profile.age} ปี`],
                     ["โหมดฝึก", profile.trainingMode === "kindergarten_phonics" ? "เรียนเสียงไทย" : "ฝึกออกเสียง"],
-                    ["เป้าหมาย", goals[profile.trainingGoal] || profile.trainingGoal || "ยังไม่ได้กำหนด"],
+                    ["เป้าหมาย", GOALS[profile.trainingGoal] || profile.trainingGoal || "ยังไม่ได้กำหนด"],
                   ].map(([label, value]) => (
                     <div key={label} className="min-w-0">
-                      <dt className="text-xs text-text-muted">{label}</dt>
-                      <dd className="mt-1 break-words font-medium text-text">{value}</dd>
+                      <dt className="text-caption text-text-muted">{label}</dt>
+                      <dd className="mt-0.5 break-words font-medium text-text">{value}</dd>
                     </div>
                   ))}
                 </dl>
-                {profile.organizationId && <p className="text-xs text-text-muted">ติดต่อครูประจำห้องเมื่อต้องการแก้ชื่อจริงหรืออายุของนักเรียน</p>}
+                {profile.organizationId && <p className="text-caption text-text-muted">ต้องการแก้ชื่อจริงหรือวันเกิด ติดต่อครูประจำห้อง</p>}
                 <div className="flex flex-wrap gap-2">
-                  <Link href="/training" className={primary}>ไปหน้าฝึกและเรียน</Link>
-                  <Link href="/progress" className={secondary}>ดูความก้าวหน้า</Link>
+                  <ButtonLink href="/training" icon={<Play size={16} className="fill-current" aria-hidden="true" />}>ไปฝึก</ButtonLink>
+                  <ButtonLink href="/progress" variant="outline" icon={<ChartColumn size={16} aria-hidden="true" />}>ความก้าวหน้า</ButtonLink>
                 </div>
-              </section>
+              </CardContent>
+            </Card>
 
-              {schoolGuardian ? (
-                <section aria-labelledby="co-guardians" className="space-y-2">
-                  <h2 id="co-guardians" className="font-semibold">ผู้ปกครองร่วม</h2>
-                  <SharedGuardianSettings key={user?.id + ":" + profile.id} child={profile} />
-                </section>
-              ) : isOwner && !profile.organizationId ? (
-                <section className={card + " space-y-4"} aria-label="ผู้ที่เข้าถึงข้อมูลลูก">
-                  <h2 className="font-semibold">ผู้ที่เข้าถึงข้อมูลลูก</h2>
-                  <InviteNewMemberSection />
+            {schoolGuardian ? (
+              <Card>
+                <CardHeader title="ผู้ปกครองร่วม" description="คนในครอบครัวที่ดูผลและช่วยฝึกกับบุตรหลานได้" />
+                <CardContent><SharedGuardianSettings key={user?.id + ":" + profile.id} child={profile} /></CardContent>
+              </Card>
+            ) : familyOwner ? (
+              <Card>
+                <CardHeader title="ผู้ที่เข้าถึงข้อมูลลูก" />
+                <CardContent className="space-y-4">
+                  <JoinCodeCard key={profile.id} kind="guardian" childId={profile.id} title="ชวนผู้ปกครองร่วม"
+                    description="ให้พ่อ แม่ หรือญาติสแกน QR หรือกรอกรหัสนี้ เขาจะดูผลและช่วยฝึกได้ทันที ไม่ต้องรู้อีเมลของกันและกัน (ใช้ได้ 4 บัญชี 30 วัน)"
+                    revealLabel="แสดงรหัสชวน" />
                   <ChildAccessSection />
-                  <details className="border-t border-border pt-3 text-sm">
-                    <summary className="cursor-pointer font-medium">ประวัติคำเชิญ</summary>
-                    <div className="mt-3"><SentInvitesSection /></div>
-                  </details>
-                </section>
-              ) : null}
-            </div>
-          )}
+                </CardContent>
+              </Card>
+            ) : null}
+          </div>
+        )}
         <AddChildModal open={adding} onClose={() => setAdding(false)} />
-      </div>
+      </Page>
     </AppShell>
   );
 }

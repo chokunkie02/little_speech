@@ -48,6 +48,10 @@ import {
   Settings2,
 } from "lucide-react";
 import type { LucideProps } from "lucide-react";
+import { PageHeader } from "@/components/ui/PageLayout";
+
+/** Stage colours are bright fills; as text they are mixed with the theme text colour to stay readable (WCAG AA). */
+const stageInk = (color: string) => `color-mix(in srgb, ${color} 50%, var(--text))`;
 import type {
   AppState,
   Route,
@@ -465,10 +469,19 @@ export function LearningStudio({
       />
       <div className="main-shell">
         <header className="studio-header print:hidden">
-          <div className="studio-header-row">
-            <h1 className="text-lg font-bold text-text">ฝึกและเรียน</h1>
-            <MusicRoom />
-          </div>
+          <PageHeader className="studio-page-header" icon={<Map size={20} />} title="ฝึกและเรียน"
+            description={route !== "practice" && (
+              <span role="status">
+                {syncToSchool
+                  ? sync.status === "saving" ? "กำลังบันทึกผลฝึกเข้าระบบ…"
+                    : sync.status === "saved" ? "บันทึกผลฝึกเข้าความก้าวหน้าและรายงานแล้ว"
+                      : sync.status === "error" ? "ผลอยู่ในเครื่องนี้ ยังส่งเข้าระบบไม่สำเร็จ"
+                        : "รอบที่ฝึกจบจะบันทึกเข้าความก้าวหน้าและรายงาน"
+                  : "โหมดนี้เก็บผลฝึกในเบราว์เซอร์ที่ใช้งาน"}
+                {sync.status === "error" && <button type="button" className="ml-2 font-semibold text-primary underline" onClick={sync.retry}>ลองส่งผลอีกครั้ง</button>}
+              </span>
+            )}
+            actions={<MusicRoom />} />
           {route !== "practice" && <nav aria-label="เมนูห้องฝึกการพูด" className="studio-nav">
             {nav.map((item) => (
               <button key={item.id} type="button" onClick={() => go(item.id)}
@@ -478,15 +491,6 @@ export function LearningStudio({
               </button>
             ))}
           </nav>}
-          {route !== "practice" && <p className="studio-storage-note" role="status">
-            {syncToSchool
-              ? sync.status === "saving" ? "กำลังบันทึกผลฝึกเข้าระบบ…"
-                : sync.status === "saved" ? "บันทึกผลฝึกเข้าความก้าวหน้าและรายงานแล้ว"
-                  : sync.status === "error" ? "ผลอยู่ในเครื่องนี้ ยังส่งเข้าระบบไม่สำเร็จ"
-                    : "รอบที่ฝึกจบจะบันทึกเข้าความก้าวหน้าและรายงาน"
-              : "โหมดนี้เก็บผลฝึกในเบราว์เซอร์ที่ใช้งาน"}
-            {sync.status === "error" && <button type="button" className="ml-2 underline" onClick={sync.retry}>ลองส่งผลอีกครั้ง</button>}
-          </p>}
         </header>
         {child?.targetSound && !Object.keys(SOUNDS).includes(child.targetSound) && (
           <div className="studio-context-note" role="status">
@@ -540,7 +544,7 @@ export function LearningStudio({
                       : "รอบสั้น ๆ · มีผู้ใหญ่ช่วยได้ · ไม่ต้องรีบ"}
                   </small>
                 </div>
-                <div className="hero-art">
+                <div className="hero-art" aria-hidden="true">
                   <Landscape />
 
                   <Art
@@ -1100,7 +1104,7 @@ function StageCard({
         >
           <Icon name={stage.icon} size={24} />
         </span>
-        <span className="chapter">
+        <span className="chapter" aria-hidden="true">
           {done ? (
             <CheckCircle2 size={19} />
           ) : (
@@ -1433,7 +1437,7 @@ function Library({
               ) : (
                 <Art kind={item.art} />
               )}
-              <span className="small-tag" style={{ color: stage.color }}>
+              <span className="small-tag" style={{ color: stageInk(stage.color) }}>
                 {stage.label}
               </span>
             </div>
@@ -1750,7 +1754,7 @@ function Practice({
           <ArrowLeft size={17} />
           พักไว้ก่อน
         </button>
-        <span style={{ color: stage.color }}>
+        <span style={{ color: stageInk(stage.color) }}>
           <Icon name={stage.icon} size={18} />
           {stage.label}
         </span>

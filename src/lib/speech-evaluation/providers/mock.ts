@@ -15,7 +15,7 @@ const KINDERGARTEN_MOCK_POOL = [
 ];
 let _kgMockIdx = 0;
 
-function kindergartenMockEvaluate(input: SpeechEvaluationInput): SpeechEvaluationResult {
+function kindergartenMockEvaluate(_input: SpeechEvaluationInput): SpeechEvaluationResult {
   const entry = KINDERGARTEN_MOCK_POOL[_kgMockIdx % KINDERGARTEN_MOCK_POOL.length]!;
   _kgMockIdx++;
   return {

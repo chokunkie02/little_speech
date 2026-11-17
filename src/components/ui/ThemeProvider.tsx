@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useMemo, useSyncExternalStore } from "react";
 
 type Theme = "light" | "dark";
 
@@ -9,31 +9,29 @@ interface ThemeContextValue {
   toggle: () => void;
 }
 
+const STORAGE_KEY = "speech-adventure-theme";
 const ThemeContext = createContext<ThemeContextValue>({ theme: "light", toggle: () => {} });
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
+// The inline script in app/layout.tsx sets html.dark before first paint; the class is the source of truth.
+const listeners = new Set<() => void>();
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => { listeners.delete(listener); };
+};
+const readTheme = (): Theme => (document.documentElement.classList.contains("dark") ? "dark" : "light");
 
-  useEffect(() => {
-    const saved = localStorage.getItem("speech-adventure-theme") as Theme | null;
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initial: Theme = saved ?? (prefersDark ? "dark" : "light");
-    setTheme(initial);
-    document.documentElement.classList.toggle("dark", initial === "dark");
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const theme = useSyncExternalStore(subscribe, readTheme, () => "light" as Theme);
+
+  const toggle = useCallback(() => {
+    const next: Theme = readTheme() === "light" ? "dark" : "light";
+    document.documentElement.classList.toggle("dark", next === "dark");
+    try { localStorage.setItem(STORAGE_KEY, next); } catch { /* private mode */ }
+    listeners.forEach((listener) => listener());
   }, []);
 
-  const toggle = () => {
-    const next: Theme = theme === "light" ? "dark" : "light";
-    setTheme(next);
-    document.documentElement.classList.toggle("dark", next === "dark");
-    localStorage.setItem("speech-adventure-theme", next);
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, toggle }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  const value = useMemo(() => ({ theme, toggle }), [theme, toggle]);
+  return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 }
 
 export const useTheme = () => useContext(ThemeContext);

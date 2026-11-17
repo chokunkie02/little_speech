@@ -39,30 +39,29 @@ interface Props {
 
 export default function AttemptAudioPlayer({ audioPath, accentColor = "#6C63FF" }: Props) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [playerState, setPlayerState] = useState<PlayerState>("loading");
-  const [signedUrl, setSignedUrl] = useState<string | null>(null);
+  // Both pieces of state remember which audioPath they belong to, so a new path shows "loading"
+  // without resetting state inside the effect.
+  const [loaded, setLoaded] = useState<{ path: string; url: string | null } | null>(null);
+  const [playback, setPlayback] = useState<{ path: string; state: "ready" | "playing" | "error" } | null>(null);
+  const current = loaded?.path === audioPath ? loaded : null;
+  const signedUrl = current?.url ?? null;
+  const baseState: PlayerState = !current ? "loading" : current.url ? "ready" : "error";
+  const playerState: PlayerState = baseState === "ready" && playback?.path === audioPath ? playback.state : baseState;
+  const setPlayerState = useCallback((state: "ready" | "playing" | "error") => setPlayback({ path: audioPath, state }), [audioPath]);
 
   // Fetch signed URL when path changes (handles drawer close + reopen too,
   // because cache hit avoids a network round-trip).
   useEffect(() => {
     let cancelled = false;
-    setPlayerState("loading");
-    setSignedUrl(null);
-
     getSignedUrl(audioPath).then((url) => {
-      if (cancelled) return;
-      if (url) {
-        setSignedUrl(url);
-        setPlayerState("ready");
-      } else {
-        setPlayerState("error");
-      }
+      if (!cancelled) setLoaded({ path: audioPath, url: url ?? null });
     });
 
+    const audio = audioRef;
     return () => {
       cancelled = true;
-      // Stop playback if the component unmounts while audio is playing.
-      audioRef.current?.pause();
+      // Stop playback if the component unmounts (or the path changes) while audio is playing.
+      audio.current?.pause();
     };
   }, [audioPath]);
 
@@ -70,15 +69,15 @@ export default function AttemptAudioPlayer({ audioPath, accentColor = "#6C63FF" 
     if (!audioRef.current) return;
     audioRef.current.play().catch(() => setPlayerState("error"));
     setPlayerState("playing");
-  }, []);
+  }, [setPlayerState]);
 
   const handlePause = useCallback(() => {
     audioRef.current?.pause();
     setPlayerState("ready");
-  }, []);
+  }, [setPlayerState]);
 
-  const handleAudioEnded = useCallback(() => setPlayerState("ready"), []);
-  const handleAudioError = useCallback(() => setPlayerState("error"), []);
+  const handleAudioEnded = useCallback(() => setPlayerState("ready"), [setPlayerState]);
+  const handleAudioError = useCallback(() => setPlayerState("error"), [setPlayerState]);
 
   return (
     <div className="bg-bg dark:bg-white/5 border border-border rounded-xl p-4">

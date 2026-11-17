@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useIsClient } from "@/hooks/useIsClient";
 import { useTheme } from "./ThemeProvider";
 
 function SunIcon() {
@@ -22,9 +22,7 @@ function MoonIcon() {
 
 export default function ThemeToggle({ className = "" }: { className?: string }) {
   const { theme, toggle } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => { setMounted(true); }, []);
+  const mounted = useIsClient();
 
   if (!mounted) return <div className="w-9 h-9 flex-shrink-0" />;
 

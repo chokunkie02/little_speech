@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useMemo } from "react";
+import { useIsClient } from "@/hooks/useIsClient";
 import {
   migrateToSupabase,
   getMigrationFlag,
@@ -35,22 +36,18 @@ export function useMigration(): UseMigrationReturn {
   const { user } = useAuth();
   const [migrationState, setMigrationState] = useState<MigrationState>("idle");
   const [migrationProgress, setMigrationProgress] = useState<MigrationProgress>(INITIAL_PROGRESS);
-  const [previousMigration, setPreviousMigration] = useState<MigrationFlag | null>(null);
+  const isClient = useIsClient();
+  const finished = migrationState === "success";
 
-  // Read localStorage flag after mount (SSR-safe)
-  useEffect(() => {
-    setPreviousMigration(getMigrationFlag());
-  }, []);
-
-  // Re-read flag after a successful migration
-  useEffect(() => {
-    if (migrationState === "success") {
-      setPreviousMigration(getMigrationFlag());
-    }
-  }, [migrationState]);
+  // localStorage flag: read on the client only (SSR-safe), and again once a migration succeeds.
+  const previousMigration = useMemo<MigrationFlag | null>(
+    () => (isClient || finished ? getMigrationFlag() : null),
+    [isClient, finished],
+  );
 
   const startMigration = useCallback(async () => {
-    if (!user?.id) return;
+    const userId = user?.id;
+    if (!userId) return;
     if (migrationState !== "idle") return;
 
     const handleProgress = (p: MigrationProgress) => {
@@ -61,8 +58,8 @@ export function useMigration(): UseMigrationReturn {
     // Kick off with "checking" immediately
     handleProgress({ ...INITIAL_PROGRESS, state: "checking" });
 
-    await migrateToSupabase(user.id, handleProgress);
-  }, [user?.id, migrationState]);
+    await migrateToSupabase(userId, handleProgress);
+  }, [user, migrationState]);
 
   return { migrationState, migrationProgress, previousMigration, startMigration };
 }

@@ -1,6 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useState, useSyncExternalStore } from "react";
+import { useIsClient } from "@/hooks/useIsClient";
 
 const STORAGE_KEY = "speech-adventure-sidebar-collapsed";
 
@@ -22,24 +23,26 @@ const SidebarContext = createContext<SidebarContextValue>({
   mounted: false,
 });
 
+// Collapsed state lives in localStorage (survives reloads) and is read with useSyncExternalStore.
+const listeners = new Set<() => void>();
+const subscribe = (listener: () => void) => {
+  listeners.add(listener);
+  return () => { listeners.delete(listener); };
+};
+const readCollapsed = () => {
+  try { return localStorage.getItem(STORAGE_KEY) === "true"; } catch { return false; }
+};
+const writeCollapsed = (value: boolean) => {
+  try { localStorage.setItem(STORAGE_KEY, String(value)); } catch { /* private mode */ }
+  listeners.forEach((listener) => listener());
+};
+
 export function SidebarProvider({ children }: { children: React.ReactNode }) {
-  const [collapsed, setCollapsed] = useState(false);
+  const collapsed = useSyncExternalStore(subscribe, readCollapsed, () => false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved === "true") setCollapsed(true);
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (mounted) {
-      localStorage.setItem(STORAGE_KEY, String(collapsed));
-    }
-  }, [collapsed, mounted]);
-
-  const toggle = useCallback(() => setCollapsed((v) => !v), []);
+  const mounted = useIsClient();
+  const setCollapsed = useCallback((value: boolean) => writeCollapsed(value), []);
+  const toggle = useCallback(() => writeCollapsed(!readCollapsed()), []);
 
   // Close mobile drawer on route change handled by consumer
 

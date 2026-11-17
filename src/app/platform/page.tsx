@@ -1,413 +1,275 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import Link from "next/link";
-import PlatformUsage from "./PlatformUsage";
-import ThemeToggle from "@/components/ui/ThemeToggle";
+import { useEffect, useState, type FormEvent } from "react";
+import { Activity, GraduationCap, Plus, School, ShieldCheck, Users } from "lucide-react";
+import AppShell from "@/components/layout/AppShell";
+import { JoinCodeCard } from "@/components/join/JoinCodeCard";
+import { useInbox } from "@/components/inbox/InboxProvider";
+import {
+  Alert, Badge, Button, ButtonLink, DataLoadError, Dialog, EmptyState, FilterBar, FormField, Input, LoadingState,
+  Page, PageHeader, Pagination, ResponsiveDataView, Section, Sheet, StatCard, Tabs, toast, type DataColumn,
+} from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
+import { createSchoolByPlatform } from "@/lib/joinCodes";
 import { getSupabaseClient } from "@/lib/supabase/client";
-import type { PlatformSchool, PlatformSchoolAdmins, SchoolTeacherInvitationStatus } from "@/types/school";
+import { formatThaiDate } from "@/lib/thaiDate";
+import type { PlatformSchool, PlatformSchoolAdmins } from "@/types/school";
+import PlatformUsage from "./PlatformUsage";
 
-const panel = "rounded-2xl border border-border bg-surface p-4";
-const button = "rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50";
-const secondary = "rounded-xl border border-border px-4 py-2 text-sm font-semibold text-primary disabled:opacity-50";
-const schoolsPerPage = 6;
-const input = "mt-1 block w-full rounded-xl border border-border bg-bg px-3 py-2 font-normal";
-const statusLabels: Record<SchoolTeacherInvitationStatus, string> = {
-  pending: "รอตอบรับ",
-  accepted: "ตอบรับแล้ว",
-  expired: "หมดอายุ · สร้างลิงก์ใหม่ด้วยอีเมลเดิมได้",
-};
+const PAGE_SIZE = 10;
+const number = new Intl.NumberFormat("th-TH");
 
-function SchoolDetails({ school, onChange }: { school: PlatformSchool; onChange: () => void }) {
-  const [details, setDetails] = useState<PlatformSchoolAdmins>();
+// ── One school (side panel) ─────────────────────────────────────────────────
+
+function SchoolDetails({ school, onChanged }: { school: PlatformSchool; onChanged: () => void }) {
+  const [admins, setAdmins] = useState<{ id: string; data?: PlatformSchoolAdmins; failed?: boolean }>();
   const [revision, setRevision] = useState(0);
-  const [readError, setReadError] = useState("");
   const [name, setName] = useState(school.name);
-  const [email, setEmail] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState("");
-  const [error, setError] = useState("");
-  const schoolId = school.id;
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let active = true;
-    async function load() {
-      try {
-        const response = await getSupabaseClient()?.rpc("get_platform_school_admins", { p_organization_id: schoolId });
-        if (!response?.data || response.error) throw new Error("โหลดรายชื่อผู้ดูแลไม่สำเร็จ");
-        if (active) {
-          setDetails(response.data);
-          setReadError("");
-        }
-      } catch {
-        if (active) {
-          setDetails(undefined);
-          setReadError("โหลดรายชื่อผู้ดูแลไม่สำเร็จ");
-        }
-      }
-    }
-    void load();
+    getSupabaseClient()?.rpc("get_platform_school_admins", { p_organization_id: school.id }).then(
+      ({ data, error }) => { if (active) setAdmins({ id: school.id, data: data ?? undefined, failed: Boolean(error) || !data }); },
+      () => { if (active) setAdmins({ id: school.id, failed: true }); },
+    );
     return () => { active = false; };
-  }, [schoolId, revision]);
+  }, [school.id, revision]);
 
-  async function submit(event: FormEvent<HTMLFormElement>, action: "rename" | "invite") {
+  async function rename(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const client = getSupabaseClient();
-    if (!client || busy) return;
-    setBusy(true);
-    setNotice("");
-    setError("");
+    if (!client) return;
+    setSaving(true);
     try {
-      const result = action === "rename"
-        ? await client.rpc("rename_platform_school", { p_organization_id: schoolId, p_name: name })
-        : await client.rpc("create_school_admin_invitation", { p_organization_id: schoolId, p_email: email });
-      if (result.error) throw new Error(result.error.message);
-      if (action === "rename") {
-        setName(name.trim());
-        setNotice("บันทึกชื่อโรงเรียนแล้ว");
-      } else {
-        setEmail("");
-        setRevision((value) => value + 1);
-        setNotice("สร้างคำเชิญแล้ว เลือกเปิดแอปอีเมลหรือคัดลอกลิงก์จากรายการ");
-      }
-      onChange();
+      const { error } = await client.rpc("rename_platform_school", { p_organization_id: school.id, p_name: name });
+      if (error) throw new Error(error.message);
+      toast.success("บันทึกชื่อโรงเรียนแล้ว");
+      onChanged();
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "บันทึกไม่สำเร็จ");
+      toast.error("บันทึกไม่สำเร็จ", cause instanceof Error ? cause.message : undefined);
     } finally {
-      setBusy(false);
+      setSaving(false);
     }
   }
 
-  async function copyLink(link: string) {
-    setError("");
-    setNotice("");
-    try {
-      await navigator.clipboard.writeText(link);
-      setNotice("คัดลอกลิงก์คำเชิญแล้ว");
-    } catch {
-      setError("คัดลอกลิงก์ไม่สำเร็จ กรุณาเปิดแอปอีเมล");
-    }
-  }
-
+  const current = admins?.id === school.id ? admins : undefined;
   return (
-    <section className={panel + " space-y-5"} aria-label="รายละเอียดโรงเรียน">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h2 className="text-xl font-bold">{school.name}</h2>
-          <p className="break-all text-xs text-text-muted">รหัสโรงเรียน {school.id}</p>
-          <p className="text-xs text-text-muted">
-            วันที่สมัคร {new Date(school.created_at).toLocaleDateString("th-TH", { timeZone: "Asia/Bangkok" })}
-          </p>
-        </div>
-        <button type="button" className={secondary} onClick={() => {
-          setRevision((value) => value + 1);
-          onChange();
-        }}>โหลดสถานะล่าสุด</button>
-      </div>
-      <div className="space-y-3 border-t border-border pt-5">
-        <h3 className="font-bold">เชิญแอดมินโรงเรียน</h3>
-        <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => void submit(event, "invite")}>
-          <label className="min-w-48 flex-1 text-sm font-semibold">อีเมลผู้รับคำเชิญ
-            <input type="email" className={input} value={email} onChange={(event) => setEmail(event.target.value)} required maxLength={254} />
-          </label>
-          <button className={button} disabled={busy}>สร้างคำเชิญ</button>
-        </form>
-        <p className="text-xs text-text-muted">ผู้รับต้องตอบรับด้วยบัญชีแอดมินโรงเรียนที่ยืนยันอีเมลแล้ว ลิงก์ใช้ได้ 7 วัน</p>
-        {error && <p role="alert" className="text-sm text-error">{error}</p>}
-        {notice && <p role="status" className="text-sm text-success">{notice}</p>}
-        {details && (details.invitations.length > 0
-          ? <ul className="space-y-2">{details.invitations.map((invitation) => {
-            const link = invitation.token ? new URL("/invite/school-admin?token=" + invitation.token, window.location.origin).href : null;
-            const mailto = link
-              ? "mailto:" + encodeURIComponent(invitation.email) + "?subject=" + encodeURIComponent("คำเชิญแอดมินโรงเรียน Speech Adventure") + "&body=" + encodeURIComponent(link)
-              : undefined;
-            return (
-              <li key={invitation.email} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3 text-sm">
-                <div className="break-all">
-                  <p className="font-semibold">{invitation.email}</p>
-                  <p className="text-xs text-text-muted">{statusLabels[invitation.status]}</p>
-                </div>
-                {link && <div className="flex gap-3 text-xs font-semibold text-primary">
-                  <button type="button" onClick={() => void copyLink(link)}>คัดลอกลิงก์</button>
-                  <a href={mailto}>เปิดแอปอีเมล</a>
-                </div>}
+    <div className="space-y-6">
+      <dl className="grid grid-cols-2 gap-3 text-sm">
+        {[
+          ["ห้องเรียน", school.classroom_count], ["ครู", school.teacher_count],
+          ["นักเรียน", school.student_count], ["ฝึกเสร็จ 7 วัน", school.recent_sessions],
+        ].map(([label, value]) => (
+          <div key={label} className="rounded-control bg-surface-muted px-3 py-2">
+            <dt className="text-caption text-text-muted">{label}</dt>
+            <dd className="text-lg font-bold tabular-nums">{number.format(Number(value))}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <Section title="ผู้ดูแลโรงเรียน" description="ผู้ดูแลทุกบัญชีมีสิทธิ์เท่ากันภายในโรงเรียนนี้">
+        {!current ? <LoadingState variant="list" rows={1} /> : current.failed ? (
+          <DataLoadError message="โหลดรายชื่อผู้ดูแลไม่สำเร็จ" onRetry={() => setRevision((value) => value + 1)} />
+        ) : current.data && current.data.admins.length > 0 ? (
+          <ul className="divide-y divide-border rounded-control border border-border">
+            {current.data.admins.map(({ email }) => (
+              <li key={email} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
+                <span className="break-all">{email}</span>
+                <Badge tone="success" dot>ใช้งาน</Badge>
               </li>
-            );
-          })}</ul>
-          : <p className="text-sm text-text-muted">ยังไม่มีคำเชิญแอดมินโรงเรียน</p>)}
-      </div>
-      <div className="space-y-3 border-t border-border pt-5">
-        <h3 className="font-bold">แอดมินโรงเรียน</h3>
-        <p className="text-sm text-text-muted">ผู้ดูแลแต่ละบัญชีมีสิทธิ์เท่ากันภายในโรงเรียนนี้</p>
-        {readError && <p role="alert" className="text-sm text-error">{readError}</p>}
-        {!details && !readError && <p role="status" className="text-sm text-text-muted">กำลังโหลดรายชื่อผู้ดูแล…</p>}
-        {details && (details.admins.length > 0
-          ? <ul className="space-y-2">{details.admins.map(({ email }) => (
-            <li key={email} className="break-all rounded-xl border border-border p-3 text-sm">{email} <span className="text-success">· ใช้งาน</span></li>
-          ))}</ul>
-          : <p className="text-sm text-text-muted">ยังไม่มีแอดมินที่ใช้งาน</p>)}
-      </div>
+            ))}
+          </ul>
+        ) : <Alert tone="warning" title="ยังไม่มีผู้ดูแล">ส่งรหัสผู้ดูแลด้านล่างให้ผู้ดูแลคนแรก</Alert>}
+        <JoinCodeCard
+          kind="school_admin"
+          organizationId={school.id}
+          title="รหัสผู้ดูแลโรงเรียน (ใช้ได้ครั้งเดียว)"
+          description="ส่งทาง LINE หรือให้สแกนจากจอ ใช้แล้วเป็นผู้ดูแลทันที และคุณจะได้แจ้งเตือน (ใช้ได้ 7 วัน)"
+        />
+      </Section>
 
-      <details className="space-y-3 border-t border-border pt-4">
-        <summary className="cursor-pointer text-sm font-semibold text-primary">แก้ชื่อโรงเรียน</summary>
-      <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => void submit(event, "rename")}>
-        <label className="min-w-48 flex-1 text-sm font-semibold">ชื่อโรงเรียน
-          <input className={input} value={name} onChange={(event) => setName(event.target.value)} required maxLength={120} />
-        </label>
-        <button className={secondary} disabled={busy || !name.trim() || name.trim() === school.name}>บันทึกชื่อ</button>
-      </form>
-
-      </details>
-    </section>
+      <Section title="แก้ชื่อโรงเรียน">
+        <form className="flex flex-wrap items-end gap-2" onSubmit={rename}>
+          <FormField label="ชื่อโรงเรียน" className="min-w-0 flex-1">
+            <Input value={name} onChange={(event) => setName(event.target.value)} required maxLength={120} />
+          </FormField>
+          <Button type="submit" variant="outline" loading={saving} disabled={!name.trim() || name.trim() === school.name}>บันทึก</Button>
+        </form>
+      </Section>
+    </div>
   );
 }
 
-function PlatformOverview() {
-  const [schools, setSchools] = useState<PlatformSchool[]>();
+// ── Create school ───────────────────────────────────────────────────────────
+
+function CreateSchoolDialog({ open, onClose, onCreated }: { open: boolean; onClose: () => void; onCreated: (id: string) => void }) {
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  return (
+    <Dialog open={open} onClose={onClose} dismissible={!busy} title="เพิ่มโรงเรียน"
+      description="ใช้เมื่อเพิ่มโรงเรียนให้เอง โดยปกติโรงเรียนจะลงทะเบียนเองที่หน้า ลงทะเบียนโรงเรียน">
+      <form id="create-school" className="space-y-3" onSubmit={async (event) => {
+        event.preventDefault();
+        const name = String(new FormData(event.currentTarget).get("name"));
+        setBusy(true);
+        setError("");
+        try {
+          const id = await createSchoolByPlatform(name);
+          toast.success("เพิ่มโรงเรียนแล้ว", "ส่งรหัสผู้ดูแลให้ผู้ดูแลคนแรกจากรายละเอียดโรงเรียน");
+          onCreated(id);
+        } catch (cause) {
+          setError(cause instanceof Error ? cause.message : "เพิ่มโรงเรียนไม่สำเร็จ");
+        } finally {
+          setBusy(false);
+        }
+      }}>
+        <FormField label="ชื่อโรงเรียน" required>
+          <Input name="name" required maxLength={120} autoFocus />
+        </FormField>
+        {error && <Alert tone="error">{error}</Alert>}
+        <div className="flex justify-end gap-2 pt-1">
+          <Button variant="outline" onClick={onClose} disabled={busy}>ยกเลิก</Button>
+          <Button type="submit" loading={busy}>เพิ่มโรงเรียน</Button>
+        </div>
+      </form>
+    </Dialog>
+  );
+}
+
+// ── Schools tab ─────────────────────────────────────────────────────────────
+
+function Schools() {
+  const { inbox } = useInbox();
+  const [result, setResult] = useState<{ revision: number; schools?: PlatformSchool[]; failed?: boolean }>();
   const [revision, setRevision] = useState(0);
-  const [showCreate, setShowCreate] = useState(false);
-  const [schoolName, setSchoolName] = useState("");
-  const [adminEmail, setAdminEmail] = useState("");
-  const [creating, setCreating] = useState(false);
-  const [createError, setCreateError] = useState("");
-  const [createdNotice, setCreatedNotice] = useState("");
   const [query, setQuery] = useState("");
-  const [searchResult, setSearchResult] = useState<{ term: string; ids: string[]; error: boolean }>();
-  const search = query.trim().normalize("NFC").toLocaleLowerCase("th");
+  const [matches, setMatches] = useState<{ term: string; ids: Set<string> }>();
   const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState<string>();
-  const detailRef = useRef<HTMLDivElement>(null);
-  const createButtonRef = useRef<HTMLButtonElement>(null);
-  const schoolNameRef = useRef<HTMLInputElement>(null);
-  const restoreCreateFocus = useRef(false);
-
-  useEffect(() => {
-    if (showCreate) {
-      schoolNameRef.current?.focus({ preventScroll: true });
-    } else if (restoreCreateFocus.current) {
-      restoreCreateFocus.current = false;
-      createButtonRef.current?.focus();
-    }
-  }, [showCreate]);
-
-  function openDetails() {
-    if (!window.matchMedia("(min-width: 1024px)").matches) {
-      requestAnimationFrame(() => detailRef.current?.scrollIntoView({ block: "start" }));
-    }
-  }
-  const selected = schools?.find((school) => school.id === selectedId);
+  const [creating, setCreating] = useState(false);
+  const term = query.trim().normalize("NFC").toLocaleLowerCase("th");
 
   useEffect(() => {
     let active = true;
-    async function load() {
-      try {
-        const response = await getSupabaseClient()?.rpc("list_platform_schools");
-        if (!response?.data || response.error) throw new Error("โหลดข้อมูลโรงเรียนไม่สำเร็จ");
-        if (active) {
-          setSchools(response.data);
-          setError("");
-        }
-      } catch {
-        if (active) {
-          setSchools(undefined);
-          setError("โหลดข้อมูลโรงเรียนไม่สำเร็จ กรุณาตรวจสอบสิทธิ์แล้วลองอีกครั้ง");
-        }
-      }
-    }
-    void load();
+    getSupabaseClient()?.rpc("list_platform_schools").then(
+      ({ data, error }) => { if (active) setResult({ revision, schools: data ?? undefined, failed: Boolean(error) || !data }); },
+      () => { if (active) setResult({ revision, failed: true }); },
+    );
     return () => { active = false; };
   }, [revision]);
 
+  // Server search also matches admin emails and pending admin codes, not just names.
   useEffect(() => {
-    if (!search) return;
+    if (!term) return;
     let active = true;
-    const timer = window.setTimeout(async () => {
-      try {
-        const response = await getSupabaseClient()?.rpc("search_platform_school_ids", { p_query: search });
-        if (active) setSearchResult({ term: search, ids: response?.data ?? [], error: !response || !!response.error });
-      } catch {
-        if (active) setSearchResult({ term: search, ids: [], error: true });
-      }
+    const timer = window.setTimeout(() => {
+      getSupabaseClient()?.rpc("search_platform_school_ids", { p_query: term }).then(
+        ({ data }) => { if (active) setMatches({ term, ids: new Set(data ?? []) }); },
+        () => { if (active) setMatches({ term, ids: new Set() }); },
+      );
     }, 250);
     return () => { active = false; window.clearTimeout(timer); };
-  }, [search, revision]);
+  }, [term]);
 
   const reload = () => setRevision((value) => value + 1);
-  async function createSchool(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const client = getSupabaseClient();
-    const name = schoolName.trim();
-    if (!client || creating || !name) return;
+  const waiting = inbox?.to_review.filter((request) => request.kind === "school").length ?? 0;
+  const schools = result?.schools;
 
-    setCreating(true);
-    setCreateError("");
-    setCreatedNotice("");
-    try {
-      const { data, error } = await client.rpc("create_platform_school", {
-        p_name: name,
-        p_admin_email: adminEmail.trim(),
-      });
-      if (error || !data) throw new Error(error?.message ?? "สร้างโรงเรียนไม่สำเร็จ");
-      setSelectedId(data);
-      setQuery("");
-      setPage(1);
-      setSchoolName("");
-      setAdminEmail("");
-      setShowCreate(false);
-      setCreatedNotice("สร้างโรงเรียนแล้ว คัดลอกลิงก์ให้ผู้ดูแลคนแรกจากรายการคำเชิญในรายละเอียดโรงเรียน");
-      openDetails();
-      reload();
-    } catch (cause) {
-      setCreateError(cause instanceof Error ? cause.message : "สร้างโรงเรียนไม่สำเร็จ");
-    } finally {
-      setCreating(false);
-    }
-  }
+  if (!result) return <LoadingState variant="stats" rows={4} label="กำลังโหลดโรงเรียน…" />;
+  if (!schools) return <DataLoadError message="โหลดข้อมูลโรงเรียนไม่สำเร็จ" onRetry={reload} />;
 
-  if (!schools) {
-    return error
-      ? <div className={panel}><p role="alert" className="mb-3 text-sm text-error">{error}</p><button className={secondary} onClick={reload}>ลองอีกครั้ง</button></div>
-      : <p role="status" className="text-text-muted">กำลังโหลดโรงเรียน…</p>;
-  }
-  const searched = searchResult?.term === search ? searchResult : undefined;
-  const matchIds = new Set(searched?.ids ?? []);
-  const matches = schools.filter((school) => !search || matchIds.has(school.id));
-  const selectedMatch = selected && (!search || matchIds.has(selected.id)) ? selected : undefined;
-  matches.sort((first, second) => Date.parse(second.created_at) - Date.parse(first.created_at));
-  const pageCount = Math.max(1, Math.ceil(matches.length / schoolsPerPage));
+  const searched = term && matches?.term === term ? matches : undefined;
+  const filtered = schools
+    .filter((school) => !term || (searched ? searched.ids.has(school.id) : school.name.toLocaleLowerCase("th").includes(term)))
+    .sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+  const pageCount = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, pageCount);
-  const start = (currentPage - 1) * schoolsPerPage;
-  const visibleSchools = matches.slice(start, start + schoolsPerPage);
-
+  const visible = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
   const total = (key: "admin_count" | "teacher_count" | "student_count" | "recent_sessions") =>
     schools.reduce((sum, school) => sum + school[key], 0);
-  const stats = [
-    { label: "โรงเรียน", value: schools.length },
-    { label: "บัญชีผู้ดูแลโรงเรียน", value: total("admin_count") },
-    { label: "ครูประจำห้อง", value: total("teacher_count") },
-    { label: "นักเรียน", value: total("student_count") },
-    { label: "ฝึกเสร็จใน 7 วันที่ผ่านมา", value: total("recent_sessions") },
+  const selected = schools.find((school) => school.id === selectedId);
+
+  const columns: DataColumn<PlatformSchool>[] = [
+    { key: "name", header: "โรงเรียน", hideOnMobile: true, cell: (school) => <span className="font-semibold">{school.name}</span> },
+    { key: "classrooms", mobileStat: true, header: "ห้อง", align: "right", cell: (school) => <span className="tabular-nums">{school.classroom_count}</span> },
+    { key: "teachers", mobileStat: true, header: "ครู", align: "right", cell: (school) => <span className="tabular-nums">{school.teacher_count}</span> },
+    { key: "students", mobileStat: true, header: "นักเรียน", align: "right", cell: (school) => <span className="tabular-nums">{number.format(school.student_count)}</span> },
+    { key: "sessions", mobileStat: true, header: "ฝึก 7 วัน", align: "right", cell: (school) => <span className="tabular-nums">{number.format(school.recent_sessions)}</span> },
+    {
+      key: "admins", header: "ผู้ดูแล", cell: (school) => school.admin_count > 0
+        ? <span className="tabular-nums">{school.admin_count}</span>
+        : <Badge tone="warning">ยังไม่มีผู้ดูแล</Badge>,
+    },
+    { key: "created", header: "เพิ่มเมื่อ", cell: (school) => <span className="text-text-muted">{formatThaiDate(school.created_at)}</span> },
   ];
 
   return (
-    <>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <h2 className="font-bold">โรงเรียนและผู้ดูแล</h2>
-        <button ref={createButtonRef} type="button" className={button} aria-expanded={showCreate} aria-controls={showCreate ? "create-school" : undefined}
-          disabled={showCreate} onClick={() => { setShowCreate(true); openDetails(); }}>
-          เพิ่มโรงเรียน
-        </button>
+    <div className="space-y-5">
+      {waiting > 0 && (
+        <Alert tone="warning" title={`มีโรงเรียนขอใช้งาน ${waiting} แห่ง`} action={<ButtonLink href="/inbox" size="sm">ไปพิจารณา</ButtonLink>}>
+          ตรวจข้อมูลผู้ติดต่อ แล้วอนุมัติหรือปฏิเสธได้จากกล่องข้อความ
+        </Alert>
+      )}
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <StatCard label="โรงเรียน" value={number.format(schools.length)} icon={<School size={20} />} />
+        <StatCard label="ครู" value={number.format(total("teacher_count"))} icon={<GraduationCap size={20} />} tone="info" />
+        <StatCard label="นักเรียน" value={number.format(total("student_count"))} icon={<Users size={20} />} tone="success" />
+        <StatCard label="ฝึกเสร็จใน 7 วัน" value={number.format(total("recent_sessions"))} icon={<Activity size={20} />} tone="warning" />
       </div>
-      {createdNotice && <p role="status" className={panel + " text-sm text-success"}>{createdNotice}</p>}
-      <dl className="grid grid-cols-2 gap-2 rounded-2xl border border-border bg-surface p-2 sm:grid-cols-3 lg:grid-cols-5">
-        {stats.map(({ label, value }) => <div key={label} className="rounded-xl bg-bg px-3 py-2">
-          <dt className="text-xs font-medium text-text-muted">{label}</dt>
-          <dd className="mt-1 text-xl font-bold text-text">{value.toLocaleString("th-TH")}</dd>
-        </div>)}
-      </dl>
-      <div className={`grid items-start gap-4 ${showCreate || selectedMatch ? "lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]" : ""}`}>
-        <section className={panel + " space-y-3"}>
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h2 className="font-bold">โรงเรียนในระบบ</h2>
-            <button type="button" onClick={reload} className="text-xs font-semibold text-primary">โหลดรายการล่าสุด</button>
-          </div>
-          <label className="block text-sm font-semibold">
-            ค้นหาโรงเรียน
-            <input type="search" className={input} maxLength={254} placeholder="ชื่อ รหัสโรงเรียน หรืออีเมลผู้ดูแล" value={query} onChange={(event) => {
-              setQuery(event.target.value);
-              setPage(1);
-            }} />
-          </label>
-          <p role="status" className="text-xs text-text-muted">
-            {search && !searched ? "กำลังค้นหา…" : searched?.error ? "ค้นหาไม่สำเร็จ กรุณาลองใหม่" : matches.length > 0
-              ? `แสดง ${start + 1}–${start + visibleSchools.length} จาก ${matches.length} โรงเรียน · ใหม่ล่าสุดก่อน`
-              : schools.length === 0 ? "ยังไม่มีโรงเรียนสมัครใช้งาน" : "ไม่พบโรงเรียนที่ตรงกับคำค้น"}
-          </p>
-          {visibleSchools.length > 0 && <ul className={showCreate || selectedMatch ? "space-y-2" : "grid gap-2 sm:grid-cols-2 lg:grid-cols-3"}>
-            {visibleSchools.map((school) => <li key={school.id}>
-              <button type="button" aria-pressed={selectedId === school.id} onClick={() => { setSelectedId(school.id); setShowCreate(false); openDetails(); }}
-                className="w-full rounded-xl border border-border px-3 py-2.5 text-left text-sm aria-pressed:border-primary aria-pressed:bg-primary/10">
-                <span className="block break-words font-semibold">{school.name}</span>
-                <span className="block text-xs text-text-muted">
-                  {school.classroom_count} ห้อง · {school.teacher_count} ครู · {school.student_count} นักเรียน · {school.admin_count} ผู้ดูแล
-                </span>
-              </button>
-            </li>)}
-          </ul>}
-          {pageCount > 1 && <nav aria-label="หน้ารายการโรงเรียน" className="flex flex-wrap items-center justify-between gap-2">
-            <button type="button" className={secondary} disabled={currentPage === 1} onClick={() => setPage(currentPage - 1)}>ก่อนหน้า</button>
-            <span className="text-sm text-text-muted">หน้า {currentPage} / {pageCount}</span>
-            <button type="button" className={secondary} disabled={currentPage === pageCount} onClick={() => setPage(currentPage + 1)}>ถัดไป</button>
-          </nav>}
-        </section>
-        {(showCreate || selectedMatch) && <div ref={detailRef} className="min-w-0 scroll-mt-4">
-          {showCreate ? (
-            <section id="create-school" className={panel + " space-y-3"} aria-labelledby="create-school-heading">
-              <h2 id="create-school-heading" className="font-bold">สร้างโรงเรียนใหม่</h2>
-              <form className="flex flex-wrap items-end gap-3" onSubmit={(event) => void createSchool(event)}>
-                <label className="min-w-0 basis-full text-sm font-semibold">
-                  ชื่อโรงเรียนใหม่
-                  <input ref={schoolNameRef} className={input} value={schoolName} onChange={(event) => setSchoolName(event.target.value)}
-                    required maxLength={120} disabled={creating} />
-                </label>
-                <label className="min-w-0 basis-full text-sm font-semibold">
-                  อีเมลผู้ดูแลคนแรก
-                  <input type="email" className={input} value={adminEmail} onChange={(event) => setAdminEmail(event.target.value)}
-                    required maxLength={254} disabled={creating} />
-                </label>
-                <button className={button} disabled={creating || !schoolName.trim() || !adminEmail.trim()}>
-                  {creating ? "กำลังสร้าง…" : "สร้างโรงเรียน"}
-                </button>
-                <button type="button" className={secondary} disabled={creating} onClick={() => { restoreCreateFocus.current = true; setShowCreate(false); }}>ยกเลิก</button>
-              </form>
-              <p className="text-xs text-text-muted">ระบบสร้างลิงก์คำเชิญพร้อมโรงเรียน ผู้ดูแลตอบรับด้วยบัญชีผู้ดูแลโรงเรียนที่ยืนยันอีเมลนี้แล้ว</p>
-              {createError && <p role="alert" className="text-sm text-error">{createError}</p>}
-            </section>
-          ) : selectedMatch && <SchoolDetails key={selectedMatch.id} school={selectedMatch} onChange={reload} />}
-        </div>}
-      </div>
-    </>
+
+      <Section title="โรงเรียนในระบบ" action={<Button size="sm" icon={<Plus size={14} aria-hidden="true" />} onClick={() => setCreating(true)}>เพิ่มโรงเรียน</Button>}>
+        <FilterBar
+          search={{ value: query, onChange: (value) => { setQuery(value); setPage(1); }, placeholder: "ชื่อโรงเรียน รหัส หรืออีเมลผู้ดูแล" }}
+          onClear={() => { setQuery(""); setPage(1); }}
+          resultText={term && !searched ? "กำลังค้นหา…" : `${number.format(filtered.length)} โรงเรียน · ใหม่ล่าสุดก่อน`}
+        />
+        <ResponsiveDataView
+          caption="โรงเรียนในระบบ"
+          rows={visible}
+          columns={columns}
+          rowKey={(school) => school.id}
+          mobileTitle={(school) => school.name}
+          onRowClick={(school) => setSelectedId(school.id)}
+          empty={schools.length === 0
+            ? <EmptyState icon={<School size={22} />} title="ยังไม่มีโรงเรียน" description="เมื่อโรงเรียนลงทะเบียน คำขอจะเข้ากล่องข้อความของคุณ" />
+            : <EmptyState icon={<School size={22} />} title="ไม่พบโรงเรียนที่ตรงกับคำค้น"
+                action={<Button variant="outline" onClick={() => setQuery("")}>ล้างคำค้นหา</Button>} />}
+        />
+        <Pagination page={currentPage} pageSize={PAGE_SIZE} total={filtered.length} onPageChange={setPage} />
+      </Section>
+
+      <Sheet open={Boolean(selected)} onClose={() => setSelectedId(undefined)}
+        title={selected?.name ?? ""} description={selected ? `เพิ่มเมื่อ ${formatThaiDate(selected.created_at)}` : undefined}>
+        {selected && <SchoolDetails key={selected.id} school={selected} onChanged={reload} />}
+      </Sheet>
+      <CreateSchoolDialog open={creating} onClose={() => setCreating(false)}
+        onCreated={(id) => { setCreating(false); reload(); setSelectedId(id); }} />
+    </div>
   );
 }
 
+// ── Page ────────────────────────────────────────────────────────────────────
+
 export default function PlatformAdminPage() {
-  const { user, isLoading, signOut } = useAuth();
+  const { user, isLoading } = useAuth();
   const [view, setView] = useState<"schools" | "usage">("schools");
 
   return (
-    <main className="min-h-screen bg-bg">
-      <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4">
-          <div><p className="text-xs font-semibold text-primary">Speech Adventure</p><p className="font-bold">แอดมินระบบ</p></div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            {user && <button type="button" className={secondary} onClick={() => void signOut()}>ออกจากระบบ</button>}
-          </div>
-        </div>
-      </header>
-      <div className="mx-auto max-w-6xl space-y-4 px-4 py-5 sm:px-5">
-        <div>
-          <h1 className="text-2xl font-bold">ภาพรวมระบบ</h1>
-          <p className="mt-1 text-sm text-text-muted">ดูสถิติรวม จัดการข้อมูลโรงเรียน และเชิญผู้ดูแลโรงเรียน</p>
-        </div>
-        {isLoading ? <p role="status" className="text-text-muted">กำลังตรวจสอบบัญชี…</p>
-          : !user ? <Link href="/auth/signin?redirect=%2Fplatform" className={"inline-block " + button}>เข้าสู่ระบบ</Link>
-          : !user.isPlatformAdmin ? <p role="alert" className={panel + " text-sm text-error"}>บัญชีนี้ไม่มีสิทธิ์แอดมินระบบ</p>
-          : <>
-              <div className="flex flex-wrap gap-2 border-b border-border pb-3" role="group" aria-label="มุมมองแอดมินระบบ">
-                <button type="button" aria-pressed={view === "schools"} className={view === "schools" ? button : secondary}
-                  onClick={() => setView("schools")}>จัดการโรงเรียน</button>
-                <button type="button" aria-pressed={view === "usage"} className={view === "usage" ? button : secondary}
-                  onClick={() => setView("usage")}>ข้อมูลการใช้งาน</button>
-              </div>
-              <div hidden={view !== "schools"} className="space-y-5">
-                <PlatformOverview key={user.id} />
-              </div>
-              <div hidden={view !== "usage"}><PlatformUsage /></div>
-            </>}
-      </div>
-    </main>
+    <AppShell>
+      <Page>
+        <PageHeader icon={<ShieldCheck size={20} />} title="ภาพรวมระบบ" description="โรงเรียนทั้งหมด คำขอใช้งาน และข้อมูลการใช้งานเว็บ" />
+        {isLoading ? <LoadingState variant="stats" rows={4} /> : !user ? (
+          <EmptyState title="กรุณาเข้าสู่ระบบ" action={<ButtonLink href="/auth/signin?redirect=%2Fplatform">เข้าสู่ระบบ</ButtonLink>} />
+        ) : !user.isPlatformAdmin ? (
+          <Alert tone="error" title="บัญชีนี้ไม่มีสิทธิ์แอดมินระบบ" />
+        ) : (
+          <Tabs label="มุมมองแอดมินระบบ" value={view} onValueChange={setView}
+            items={[{ value: "schools", label: "โรงเรียน" }, { value: "usage", label: "การใช้งานเว็บ" }]}>
+            {view === "schools" ? <Schools key={user.id} /> : <PlatformUsage />}
+          </Tabs>
+        )}
+      </Page>
+    </AppShell>
   );
 }

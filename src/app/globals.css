@@ -4,19 +4,61 @@
 /* Class-based dark mode — applies when .dark is on any ancestor */
 @custom-variant dark (&:where(.dark, .dark *));
 
-@theme inline {
+/* Plain `@theme` (not `inline`): utilities such as bg-surface must read the CSS
+   variables at runtime, otherwise the `.dark` overrides below never reach them. */
+@theme {
   /* Core semantic colors (light mode defaults) */
   --color-primary: #5548D4;
+  --color-primary-foreground: #FFFFFF;
   --color-secondary: #FFB347;
+  --color-secondary-foreground: #3B2A06;
   --color-success: #4CAF82;
+  --color-warning: #F59E0B;
   --color-error: #B42335;
+  --color-error-foreground: #FFFFFF; /* text on bg-error (badges, danger buttons) */
   --color-info: #5BC0EB;
   --color-bg: #F8FAFC;
   --color-surface: #FFFFFF;
+  --color-surface-muted: #F1F5F9;
   --color-text: #1E293B;
-  --color-text-muted: #64748B;
+  --color-text-muted: #58677D; /* ≥ 4.9:1 on every light surface (WCAG AA) */
   --color-disabled: #CBD5E1;
   --color-border: #E2E8F0;
+
+  /* Status pairs for badges and alerts: tinted background + readable text */
+  --color-success-soft: #E8F6EF;
+  --color-success-text: #1F6B47;
+  --color-warning-soft: #FEF3DC;
+  --color-warning-text: #8A4B06;
+  --color-error-soft: #FBE9EB;
+  --color-error-text: #8F1C2A;
+  --color-info-soft: #E6F5FC;
+  --color-info-text: #155E80;
+  --color-primary-soft: #EEECFB;
+  --color-primary-text: #4337B8;
+
+  /* Shape: controls (buttons, inputs) vs cards vs overlays */
+  --radius-control: 0.75rem;
+  --radius-card: 1rem;
+  --radius-overlay: 1.25rem;
+
+  /* Elevation */
+  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.05);
+  --shadow-raised: 0 4px 12px -2px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.05);
+  --shadow-overlay: 0 24px 48px -12px rgb(15 23 42 / 0.25);
+
+  /* Type scale: text-page-title / text-section-title / text-card-title / text-caption */
+  --text-page-title: 1.5rem;
+  --text-page-title--line-height: 1.3;
+  --text-page-title--font-weight: 700;
+  --text-section-title: 1.125rem;
+  --text-section-title--line-height: 1.4;
+  --text-section-title--font-weight: 600;
+  --text-card-title: 1rem;
+  --text-card-title--line-height: 1.45;
+  --text-card-title--font-weight: 600;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
 
   /* Level accent colors */
   --color-level-pretest: #A29BFE;
@@ -34,15 +76,52 @@
 /* ── Dark Mode — override CSS custom properties, Tailwind utilities pick these up automatically ── */
 .dark {
   --color-error: #FF939E;
+  --color-error-foreground: #2A0A10; /* the dark-mode error fill is light pink */
+  --color-warning: #FBBF24;
   --color-bg: #0B1829;
   --color-surface: #111E33;
+  --color-surface-muted: #172840;
   --color-text: #E1E8F0;
-  --color-text-muted: #7A90A8;
+  --color-text-muted: #8A9DB3; /* ≥ 5.3:1 on every dark surface */
   --color-disabled: #2A3F58;
   --color-border: #1E3050;
+
+  --color-success-soft: #12322A;
+  --color-success-text: #7DDBB0;
+  --color-warning-soft: #3A2C0E;
+  --color-warning-text: #FCD27A;
+  --color-error-soft: #3A1820;
+  --color-error-text: #FFB3BB;
+  --color-info-soft: #0F2E40;
+  --color-info-text: #9ADCF7;
+  --color-primary-soft: #221F4A;
+  --color-primary-text: #B8AEFF;
+
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-raised: 0 6px 16px -4px rgb(0 0 0 / 0.45);
+  --shadow-overlay: 0 24px 48px -12px rgb(0 0 0 / 0.6);
 }
 
 .dark .text-primary { color: #B8AEFF; }
+
+/* One focus style for every interactive element (keyboard users). Components that
+   draw their own ring with focus-visible:ring-* keep it, because utilities beat base. */
+@layer base {
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+  .dark :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline-color: #B8AEFF;
+  }
+}
+
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+}
 
 body {
   background: var(--color-bg);
@@ -56,6 +135,32 @@ body {
     background: #ffffff !important;
     color: #1a1a1a !important;
   }
+  /* Paper is white: print with the light palette even when the app is in dark mode. */
+  .dark {
+    color-scheme: light;
+    --color-error: #B42335;
+    --color-error-foreground: #FFFFFF;
+    --color-warning: #F59E0B;
+    --color-bg: #FFFFFF;
+    --color-surface: #FFFFFF;
+    --color-surface-muted: #F1F5F9;
+    --color-text: #1E293B;
+    --color-text-muted: #475569;
+    --color-disabled: #CBD5E1;
+    --color-border: #CBD5E1;
+    --color-success-soft: #E8F6EF;
+    --color-success-text: #1F6B47;
+    --color-warning-soft: #FEF3DC;
+    --color-warning-text: #8A4B06;
+    --color-error-soft: #FBE9EB;
+    --color-error-text: #8F1C2A;
+    --color-info-soft: #E6F5FC;
+    --color-info-text: #155E80;
+    --color-primary-soft: #EEECFB;
+    --color-primary-text: #4337B8;
+    --shadow-card: none;
+  }
+  .dark .text-primary { color: var(--color-primary); }
 }
 
 /* ── Scrollbar ── */

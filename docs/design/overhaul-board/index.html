@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Speech Adventure · ก่อนและหลังปรับ UI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --primary: #5548D4; --primary-soft: #EEECFB; --primary-text: #4337B8; --secondary: #FFB347;
+    --bg: #F8FAFC; --surface: #FFFFFF; --surface-muted: #F1F5F9; --text: #1E293B; --muted: #58677D; --border: #E2E8F0;
+    --success-soft: #E8F6EF; --success-text: #1F6B47; --warning-soft: #FEF3DC; --warning-text: #8A4B06;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --primary-soft: #221F4A; --primary-text: #B8AEFF; --bg: #0B1829; --surface: #111E33; --surface-muted: #172840;
+      --text: #E1E8F0; --muted: #8A9DB3; --border: #1E3050; --success-soft: #12322A; --success-text: #7DDBB0;
+      --warning-soft: #3A2C0E; --warning-text: #FCD27A; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --primary-soft: #221F4A; --primary-text: #B8AEFF; --bg: #0B1829; --surface: #111E33; --surface-muted: #172840;
+    --text: #E1E8F0; --muted: #8A9DB3; --border: #1E3050; --success-soft: #12322A; --success-text: #7DDBB0;
+    --warning-soft: #3A2C0E; --warning-text: #FCD27A; color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: Kanit, "Noto Sans Thai", system-ui, sans-serif; line-height: 1.6; }
+  a { color: var(--primary-text); }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 32px 16px 64px; }
+  header.top { display: grid; gap: 20px; }
+  .eyebrow { font-size: 13px; font-weight: 600; color: var(--primary-text); letter-spacing: .02em; }
+  h1 { margin: 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.2; }
+  h2 { margin: 0 0 4px; font-size: 24px; }
+  h3 { margin: 0; font-size: 17px; }
+  .lead { margin: 0; color: var(--muted); max-width: 760px; }
+  .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 14px 16px; }
+  .stat b { display: block; font-size: 26px; line-height: 1.2; }
+  .stat span { font-size: 13px; color: var(--muted); }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; }
+  nav.toc a { text-decoration: none; font-size: 14px; font-weight: 600; padding: 6px 12px; border-radius: 999px; background: var(--primary-soft); }
+  section { margin-top: 56px; scroll-margin-top: 16px; }
+  .section-head { margin-bottom: 18px; }
+  .section-head p { margin: 0; color: var(--muted); }
+  .flow { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 20px; overflow-x: auto; }
+  .flow svg { display: block; min-width: 980px; width: 100%; height: auto; }
+  .pair { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 18px; margin-bottom: 18px; }
+  .pair-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; margin-bottom: 12px; }
+  .route { font-family: ui-monospace, Consolas, monospace; font-size: 13px; color: var(--muted); }
+  .shots { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  figure { margin: 0; }
+  figure a { display: block; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; background: var(--surface-muted); }
+  figure img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 2; object-fit: cover; object-position: top; }
+  figcaption { font-size: 13px; font-weight: 600; margin-top: 6px; display: flex; align-items: center; gap: 6px; }
+  .tag { font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 999px; }
+  .tag.before { background: var(--surface-muted); color: var(--muted); }
+  .tag.after { background: var(--success-soft); color: var(--success-text); }
+  .tag.new { background: var(--warning-soft); color: var(--warning-text); }
+  ul.changes { margin: 12px 0 0; padding-left: 20px; color: var(--muted); font-size: 14px; }
+  ul.changes li { margin: 2px 0; }
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .gallery .phone img { aspect-ratio: 390 / 844; }
+  .checks { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .check { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 16px; }
+  .check p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
+  .theme-btn { justify-self: start; font: inherit; font-size: 14px; font-weight: 600; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+  @media (max-width: 760px) { .shots { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="eyebrow">Speech Adventure · บอร์ดก่อนและหลัง · 17 พฤศจิกายน 2569</p>
+      <h1>ปรับ UI และโฟลว์ 4 บทบาท</h1>
+    </div>
+    <p class="lead">
+      เทียบหน้าจอเดิม (จากบอร์ด PC เดิม <code>Speech-Adventure-PC-Design-Board.html</code>) กับหน้าจอหลังปรับ ถ่ายที่ 1440 × 960 เหมือนกัน
+      สีหลักและฟอนต์เดิม (ม่วง #5548D4 · ส้ม #FFB347 · Kanit · โหมดมืด) ปรับคอมโพเนนต์ตามโครงของ lubit และเปลี่ยนการเชิญทางอีเมลทั้งหมดเป็นรหัสเข้าร่วมและ QR
+    </p>
+    <div class="stats">
+      <div class="stat"><b>4</b><span>บทบาทที่โฟลว์ต่อกัน</span></div>
+      <div class="stat"><b>0</b><span>ช่องที่ต้องพิมพ์อีเมลคนอื่น</span></div>
+      <div class="stat"><b>24</b><span>หน้าที่เทียบก่อนและหลัง</span></div>
+      <div class="stat"><b>AA</b><span>สีตัดกันผ่าน WCAG ทุกหน้าที่ตรวจ</span></div>
+    </div>
+    <nav class="toc" aria-label="ไปยังหัวข้อ">
+      <a href="#flow">โฟลว์ใหม่</a><a href="#start">เริ่มใช้งาน</a><a href="#school">โรงเรียนและครู</a>
+      <a href="#parent">ผู้ปกครอง</a><a href="#practice">ฝึกและผล</a><a href="#extra">มือถือและโหมดมืด</a><a href="#quality">ตรวจคุณภาพ</a>
+    </nav>
+    <button class="theme-btn" type="button" id="theme">สลับโหมดมืด/สว่าง</button>
+  </header>
+
+  <section id="flow">
+    <div class="section-head">
+      <h2>โฟลว์ใหม่: เข้าร่วมด้วยรหัส แล้วอนุมัติในกล่องข้อความ</h2>
+      <p>ไม่มีการคัดลอกลิงก์หรือพิมพ์อีเมลของคนอื่น ทุกคนสมัครเอง (ชื่อ-นามสกุล + ยอมรับข้อตกลง) แล้วใช้รหัสจากระดับบน คนที่ดูแลเป็นผู้อนุมัติ</p>
+    </div>
+    <div class="flow">
+      <svg viewBox="0 0 1180 300" role="img" aria-labelledby="flow-title flow-desc">
+        <title id="flow-title">โฟลว์เข้าร่วม 4 บทบาท</title>
+        <desc id="flow-desc">โรงเรียนสมัคร แอดมินแพลตฟอร์มอนุมัติ ผู้ดูแลโรงเรียนให้รหัสครู ครูเข้าร่วมและได้รับอนุมัติ ครูพิมพ์ใบเชิญ QR ผู้ปกครองสแกน สมัคร ยินยอม และครูอนุมัติ แล้วเริ่มฝึก</desc>
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker>
+        </defs>
+        <g font-family="Kanit, sans-serif">
+          <!-- lanes -->
+          <g>
+            <rect x="10" y="20" width="270" height="260" rx="18" fill="var(--surface-muted)"/>
+            <rect x="305" y="20" width="270" height="260" rx="18" fill="var(--surface-muted)"/>
+            <rect x="600" y="20" width="270" height="260" rx="18" fill="var(--surface-muted)"/>
+            <rect x="895" y="20" width="275" height="260" rx="18" fill="var(--surface-muted)"/>
+            <text x="30" y="52" font-size="16" font-weight="700" fill="var(--text)">แอดมินแพลตฟอร์ม</text>
+            <text x="325" y="52" font-size="16" font-weight="700" fill="var(--text)">ผู้ดูแลโรงเรียน</text>
+            <text x="620" y="52" font-size="16" font-weight="700" fill="var(--text)">ครู</text>
+            <text x="915" y="52" font-size="16" font-weight="700" fill="var(--text)">ผู้ปกครอง</text>
+          </g>
+          <g font-size="13">
+            <rect x="325" y="70" width="230" height="56" rx="12" fill="var(--surface)" stroke="var(--border)"/>
+            <text x="340" y="94" fill="var(--text)" font-weight="600">สมัครโรงเรียน /register-school</text>
+            <text x="340" y="114" fill="var(--muted)">รหัส สพฐ. · สังกัด · จังหวัด</text>
+            <rect x="30" y="70" width="230" height="56" rx="12" fill="var(--surface)" stroke="var(--primary)"/>
+            <text x="45" y="94" fill="var(--text)" font-weight="600">อนุมัติในกล่องข้อความ</text>
+            <text x="45" y="114" fill="var(--muted)">สร้างโรงเรียนให้อัตโนมัติ</text>
+            <rect x="325" y="150" width="230" height="56" rx="12" fill="var(--surface)" stroke="var(--border)"/>
+            <text x="340" y="174" fill="var(--text)" font-weight="600">ห้องเรียน + รายชื่อ + รหัสครู</text>
+            <text x="340" y="194" fill="var(--muted)">วางตารางจาก Excel ได้</text>
+            <rect x="620" y="150" width="230" height="56" rx="12" fill="var(--surface)" stroke="var(--border)"/>
+            <text x="635" y="174" fill="var(--text)" font-weight="600">ใช้รหัสโรงเรียน → รออนุมัติ</text>
+            <text x="635" y="194" fill="var(--muted)">ผู้ดูแลเลือกห้องให้ตอนอนุมัติ</text>
+            <rect x="620" y="220" width="230" height="48" rx="12" fill="var(--surface)" stroke="var(--border)"/>
+            <text x="635" y="249" fill="var(--text)" font-weight="600">พิมพ์ใบเชิญ QR รายคน</text>
+            <rect x="915" y="150" width="235" height="56" rx="12" fill="var(--surface)" stroke="var(--border)"/>
+            <text x="930" y="174" fill="var(--text)" font-weight="600">สแกน QR → สมัคร + ยินยอม</text>
+            <text x="930" y="194" fill="var(--muted)">ชื่อ-นามสกุล · PDPA ในหน้าเดียว</text>
+            <rect x="915" y="220" width="235" height="48" rx="12" fill="var(--primary)"/>
+            <text x="930" y="249" fill="#fff" font-weight="600">ครูอนุมัติ → เริ่มฝึกกับลูก</text>
+          </g>
+          <g stroke="var(--muted)" stroke-width="1.6" fill="none" marker-end="url(#arrow)">
+            <path d="M325 98 H266"/>
+            <path d="M145 126 V178 H319"/>
+            <path d="M555 178 H614"/>
+            <path d="M735 206 V214"/>
+            <path d="M850 244 H880 V178 H909"/>
+            <path d="M1032 206 V214"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+  </section>
+
+  <section id="start" aria-labelledby="start-h"><div class="section-head"><h2 id="start-h">เริ่มใช้งาน</h2><p>หน้าแรก เข้าสู่ระบบ สมัคร และตัวอย่างระบบ</p></div><div data-group="start">
+<article class="pair"><div class="pair-head"><h3>หน้าแรก</h3><span class="route">/</span></div>
+    <div class="shots"><figure><a href="before/home.jpg"><img src="before/home.jpg" alt="หน้าแรก — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/home.jpg"><img src="after/home.jpg" alt="หน้าแรก — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>เนื้อหาตรงกับระบบจริง: 3 แนวทาง เสียง ป ก ม ไม่มีคะแนน AI</li><li>เพิ่มส่วนสำหรับโรงเรียน และลิงก์ใช้รหัสเข้าร่วม</li></ul></article><article class="pair"><div class="pair-head"><h3>เข้าสู่ระบบ</h3><span class="route">/auth/signin</span></div>
+    <div class="shots"><figure><a href="before/signin.jpg"><img src="before/signin.jpg" alt="เข้าสู่ระบบ — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/signin.jpg"><img src="after/signin.jpg" alt="เข้าสู่ระบบ — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>อีเมล + รหัสผ่าน ไม่มีตัวเลือกบทบาท</li><li>ลืมรหัสผ่าน · ข้อความผิดพลาดภาษาไทย</li></ul></article><article class="pair"><div class="pair-head"><h3>สมัครบัญชี</h3><span class="route">/auth/signup</span></div>
+    <div class="shots"><figure><a href="before/signup.jpg"><img src="before/signup.jpg" alt="สมัครบัญชี — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/signup.jpg"><img src="after/signup.jpg" alt="สมัครบัญชี — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>ชื่อ-นามสกุล คำนำหน้า เบอร์โทร และยอมรับข้อตกลง</li><li>ไม่ต้องยืนยันอีเมล ใช้งานได้ทันที</li></ul></article><article class="pair"><div class="pair-head"><h3>ตั้งโปรไฟล์เด็ก (ทดลอง)</h3><span class="route">/onboarding</span></div>
+    <div class="shots"><figure><a href="before/onboarding.jpg"><img src="before/onboarding.jpg" alt="ตั้งโปรไฟล์เด็ก (ทดลอง) — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/onboarding.jpg"><img src="after/onboarding.jpg" alt="ตั้งโปรไฟล์เด็ก (ทดลอง) — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>ใช้สีและปุ่มชุดเดียวกับระบบ</li><li>ลิงก์ไปใช้รหัสเข้าร่วม</li></ul></article><article class="pair"><div class="pair-head"><h3>Showcase → ตัวอย่างระบบ</h3><span class="route">/demo</span></div>
+    <div class="shots"><figure><a href="before/demo.jpg"><img src="before/demo.jpg" alt="Showcase → ตัวอย่างระบบ — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/demo.jpg"><img src="after/demo.jpg" alt="Showcase → ตัวอย่างระบบ — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>สร้างเด็กตัวอย่างพร้อมผลฝึก 3 สัปดาห์ในเครื่อง</li><li>อธิบายสิ่งที่แต่ละบทบาทเห็น</li></ul></article>
+</div></section>
+  <section id="school" aria-labelledby="school-h"><div class="section-head"><h2 id="school-h">แอดมิน โรงเรียน และครู</h2><p>จากคำเชิญทางอีเมล เป็นรหัสเข้าร่วม ใบเชิญ QR และการอนุมัติในกล่องข้อความ</p></div><div data-group="school">
+<article class="pair"><div class="pair-head"><h3>เพิ่มโรงเรียน → โรงเรียนสมัครเอง</h3><span class="route">/register-school</span></div>
+    <div class="shots"><figure><a href="before/register-school.jpg"><img src="before/register-school.jpg" alt="เพิ่มโรงเรียน → โรงเรียนสมัครเอง — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/register-school.jpg"><img src="after/register-school.jpg" alt="เพิ่มโรงเรียน → โรงเรียนสมัครเอง — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>ไม่ต้องให้แอดมินพิมพ์อีเมลผู้ดูแล</li><li>รหัส สพฐ. สังกัด จังหวัด และเลขที่คำขอ</li></ul></article><article class="pair"><div class="pair-head"><h3>แอดมินแพลตฟอร์ม</h3><span class="route">/platform</span></div>
+    <div class="shots"><figure><a href="before/platform.jpg"><img src="before/platform.jpg" alt="แอดมินแพลตฟอร์ม — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/platform.jpg"><img src="after/platform.jpg" alt="แอดมินแพลตฟอร์ม — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>ตารางโรงเรียนค้นหาและแบ่งหน้า</li><li>รายละเอียดเปิดเป็นแผงด้านข้าง</li></ul></article><article class="pair"><div class="pair-head"><h3>ภาพรวมโรงเรียน</h3><span class="route">/school</span></div>
+    <div class="shots"><figure><a href="before/school.jpg"><img src="before/school.jpg" alt="ภาพรวมโรงเรียน — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/school.jpg"><img src="after/school.jpg" alt="ภาพรวมโรงเรียน — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>รายการสิ่งที่ต้องทำ ตัวเลขสรุป และตารางห้อง</li><li>เมนูย่อย: ภาพรวม · ห้องเรียน · ครู · ตั้งค่า</li></ul></article><article class="pair"><div class="pair-head"><h3>จัดครูเข้าห้อง → หน้าห้องเรียน</h3><span class="route">/school/classrooms/[id]</span></div>
+    <div class="shots"><figure><a href="before/school-classroom.jpg"><img src="before/school-classroom.jpg" alt="จัดครูเข้าห้อง → หน้าห้องเรียน — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/school-classroom.jpg"><img src="after/school-classroom.jpg" alt="จัดครูเข้าห้อง → หน้าห้องเรียน — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>นักเรียน ครู และใบเชิญอยู่ในห้องเดียว</li><li>เลขที่ไม่ซ้ำ ย้ายห้องหลายคนพร้อมกัน</li></ul></article><article class="pair"><div class="pair-head"><h3>ส่งคำเชิญครู → รหัสครู</h3><span class="route">/school/teachers</span></div>
+    <div class="shots"><figure><a href="before/school-teachers.jpg"><img src="before/school-teachers.jpg" alt="ส่งคำเชิญครู → รหัสครู — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/school-teachers.jpg"><img src="after/school-teachers.jpg" alt="ส่งคำเชิญครู → รหัสครู — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>ครูสมัครเองด้วยรหัสโรงเรียน</li><li>อนุมัติและเลือกห้องในกล่องข้อความ</li></ul></article><article class="pair"><div class="pair-head"><h3>ห้องของครู</h3><span class="route">/teacher/classrooms/[id]</span></div>
+    <div class="shots"><figure><a href="before/teacher-classroom.jpg"><img src="before/teacher-classroom.jpg" alt="ห้องของครู — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/teacher-classroom.jpg"><img src="after/teacher-classroom.jpg" alt="ห้องของครู — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>รายชื่อเดียวกับผู้ดูแล เพิ่ม วาง หรือนำเข้าได้</li><li>ดูผู้ปกครองที่เชื่อมแล้วและความก้าวหน้ารายคน</li></ul></article><article class="pair"><div class="pair-head"><h3>ลิงก์เชิญผู้ปกครอง → ใบเชิญ QR</h3><span class="route">/classrooms/[id]/slips</span></div>
+    <div class="shots"><figure><a href="before/slips.jpg"><img src="before/slips.jpg" alt="ลิงก์เชิญผู้ปกครอง → ใบเชิญ QR — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/slips.jpg"><img src="after/slips.jpg" alt="ลิงก์เชิญผู้ปกครอง → ใบเชิญ QR — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>พิมพ์ใบเชิญทั้งห้องในครั้งเดียว</li><li>รหัส 8 ตัว + QR รายคน</li></ul></article><article class="pair"><div class="pair-head"><h3>ครูตรวจคำขอ</h3><span class="route">/inbox</span></div>
+    <div class="shots"><figure><a href="before/teacher-inbox.jpg"><img src="before/teacher-inbox.jpg" alt="ครูตรวจคำขอ — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/teacher-inbox.jpg"><img src="after/teacher-inbox.jpg" alt="ครูตรวจคำขอ — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>ชื่อจริงและความสัมพันธ์ ปุ่มดูเบอร์โทร</li><li>อนุมัติหรือไม่อนุมัติในที่เดียว</li></ul></article><article class="pair"><div class="pair-head"><h3>ครูดูความก้าวหน้ารายเด็ก</h3><span class="route">/progress?child=</span></div>
+    <div class="shots"><figure><a href="before/teacher-student-progress.jpg"><img src="before/teacher-student-progress.jpg" alt="ครูดูความก้าวหน้ารายเด็ก — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/teacher-student-progress.jpg"><img src="after/teacher-student-progress.jpg" alt="ครูดูความก้าวหน้ารายเด็ก — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>ภาพรวม ประวัติการฝึก และข้อสังเกต</li><li>ประวัติแบบฝึกเดิมพับเก็บ ฟังเสียงเดิมได้</li></ul></article><article class="pair"><div class="pair-head"><h3>ห้องเรียนทั้งหมด</h3><span class="route">/school/classrooms</span></div>
+    <div class="shots"><figure><a href="after/school-classrooms.jpg"><img src="after/school-classrooms.jpg" alt="ห้องเรียนทั้งหมด — หน้าใหม่" loading="lazy"></a><figcaption><span class="tag new">หน้าใหม่</span></figcaption></figure></div>
+    <ul class="changes"><li>สร้างหลายห้องพร้อมกัน จัดกลุ่มตามชั้น</li></ul></article><article class="pair"><div class="pair-head"><h3>เลื่อนชั้นสิ้นปี</h3><span class="route">/school/promote</span></div>
+    <div class="shots"><figure><a href="after/school-promote.jpg"><img src="after/school-promote.jpg" alt="เลื่อนชั้นสิ้นปี — หน้าใหม่" loading="lazy"></a><figcaption><span class="tag new">หน้าใหม่</span></figcaption></figure></div>
+    <ul class="changes"><li>แนะนำปลายทางทุกห้อง ย้อนกลับได้ 14 วัน</li></ul></article>
+</div></section>
+  <section id="parent" aria-labelledby="parent-h"><div class="section-head"><h2 id="parent-h">ผู้ปกครอง</h2><p>เข้าร่วมด้วยรหัส หน้าหลัก ข้อมูลลูก และตั้งค่า</p></div><div data-group="parent">
+<article class="pair"><div class="pair-head"><h3>ส่งคำขอเชื่อม → ใช้รหัสเข้าร่วม</h3><span class="route">/join</span></div>
+    <div class="shots"><figure><a href="before/join.jpg"><img src="before/join.jpg" alt="ส่งคำขอเชื่อม → ใช้รหัสเข้าร่วม — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/join.jpg"><img src="after/join.jpg" alt="ส่งคำขอเชื่อม → ใช้รหัสเข้าร่วม — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>กรอกรหัสหรือสแกน QR เห็นว่ารหัสของใคร</li><li>สมัคร ยินยอม และส่งคำขอในหน้าเดียว</li></ul></article><article class="pair"><div class="pair-head"><h3>หน้าหลักผู้ปกครอง</h3><span class="route">/dashboard</span></div>
+    <div class="shots"><figure><a href="before/dashboard.jpg"><img src="before/dashboard.jpg" alt="หน้าหลักผู้ปกครอง — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/dashboard.jpg"><img src="after/dashboard.jpg" alt="หน้าหลักผู้ปกครอง — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>การ์ดฝึกต่อจากผลจริง ไม่มี Pre-test</li><li>ผลล่าสุด ตัวเลขสรุป และทางลัด</li></ul></article><article class="pair"><div class="pair-head"><h3>ข้อมูลลูก</h3><span class="route">/profile</span></div>
+    <div class="shots"><figure><a href="before/profile.jpg"><img src="before/profile.jpg" alt="ข้อมูลลูก — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/profile.jpg"><img src="after/profile.jpg" alt="ข้อมูลลูก — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>การ์ดข้อมูลเด็ก</li><li>ชวนผู้ปกครองร่วมด้วย QR ไม่ต้องรู้อีเมล</li></ul></article><article class="pair"><div class="pair-head"><h3>ตั้งค่าบัญชี</h3><span class="route">/settings</span></div>
+    <div class="shots"><figure><a href="before/settings.jpg"><img src="before/settings.jpg" alt="ตั้งค่าบัญชี — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/settings.jpg"><img src="after/settings.jpg" alt="ตั้งค่าบัญชี — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>ข้อมูลส่วนตัว เปลี่ยนรหัสผ่าน</li><li>ความเป็นส่วนตัว PDPA และขอลบข้อมูล</li></ul></article>
+</div></section>
+  <section id="practice" aria-labelledby="practice-h"><div class="section-head"><h2 id="practice-h">ฝึกและผลการฝึก</h2><p>ห้องฝึกกลืนกับธีม และหน้าผลทั้งหมดใช้ผลจากห้องฝึกปัจจุบัน</p></div><div data-group="practice">
+<article class="pair"><div class="pair-head"><h3>ฝึกและเรียน</h3><span class="route">/training</span></div>
+    <div class="shots"><figure><a href="before/training.jpg"><img src="before/training.jpg" alt="ฝึกและเรียน — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/training.jpg"><img src="after/training.jpg" alt="ฝึกและเรียน — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>หัวข้อและแท็บแบบเดียวกับทั้งแอป</li><li>ตัวอักษรเล็กสุด 12 px สีผ่าน AA</li></ul></article><article class="pair"><div class="pair-head"><h3>คลังกิจกรรม</h3><span class="route">/training#library</span></div>
+    <div class="shots"><figure><a href="before/training-library.jpg"><img src="before/training-library.jpg" alt="คลังกิจกรรม — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/training-library.jpg"><img src="after/training-library.jpg" alt="คลังกิจกรรม — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>หน้าเนื้อหาเดิมรวมเข้ามาที่นี่</li></ul></article><article class="pair"><div class="pair-head"><h3>ความก้าวหน้า</h3><span class="route">/progress</span></div>
+    <div class="shots"><figure><a href="before/progress.jpg"><img src="before/progress.jpg" alt="ความก้าวหน้า — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/progress.jpg"><img src="after/progress.jpg" alt="ความก้าวหน้า — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>ใช้ผลจากห้องฝึกปัจจุบัน</li><li>กราฟรายสัปดาห์ แยกตามแนวทางและเสียง</li></ul></article><article class="pair"><div class="pair-head"><h3>รางวัล</h3><span class="route">/rewards</span></div>
+    <div class="shots"><figure><a href="before/rewards.jpg"><img src="before/rewards.jpg" alt="รางวัล — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/rewards.jpg"><img src="after/rewards.jpg" alt="รางวัล — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>ดาวความพยายาม 1 ดวงต่อกิจกรรม</li><li>ตรา 13 แบบนับจากความสม่ำเสมอ</li></ul></article><article class="pair"><div class="pair-head"><h3>รายงานและ PDF</h3><span class="route">/report</span></div>
+    <div class="shots"><figure><a href="before/report.jpg"><img src="before/report.jpg" alt="รายงานและ PDF — ก่อน" loading="lazy"></a><figcaption><span class="tag before">ก่อน</span></figcaption></figure><figure><a href="after/report.jpg"><img src="after/report.jpg" alt="รายงานและ PDF — หลัง" loading="lazy"></a><figcaption><span class="tag after">หลัง</span></figcaption></figure></div>
+    <ul class="changes"><li>เลือกช่วงเวลา พิมพ์เป็นสีสว่างเสมอ</li><li>ข้อแนะนำ ไม่ใช่ผลวินิจฉัย</li></ul></article>
+</div></section>
+
+  <section id="extra" aria-labelledby="extra-h">
+    <div class="section-head"><h2 id="extra-h">มือถือและโหมดมืด</h2><p>ตรวจที่ 375 / 768 / 1440 px ทั้งโหมดสว่างและมืด ไม่มีหน้าไหนล้นแนวนอน</p></div>
+    <div class="gallery">
+      <figure class="phone"><a href="after/dashboard-mobile.jpg"><img src="after/dashboard-mobile.jpg" alt="หน้าหลักผู้ปกครองบนมือถือ" loading="lazy"></a><figcaption>หน้าหลัก · มือถือ</figcaption></figure>
+      <figure class="phone"><a href="after/training-mobile.jpg"><img src="after/training-mobile.jpg" alt="ห้องฝึกบนมือถือ แท็บเลื่อนแนวนอน" loading="lazy"></a><figcaption>ห้องฝึก · มือถือ</figcaption></figure>
+      <figure class="phone"><a href="after/progress-mobile-dark.jpg"><img src="after/progress-mobile-dark.jpg" alt="ความก้าวหน้าบนมือถือในโหมดมืด" loading="lazy"></a><figcaption>ความก้าวหน้า · มือถือ โหมดมืด</figcaption></figure>
+      <figure><a href="after/dashboard-dark.jpg"><img src="after/dashboard-dark.jpg" alt="หน้าหลักผู้ปกครองโหมดมืด" loading="lazy"></a><figcaption>หน้าหลัก · โหมดมืด</figcaption></figure>
+      <figure><a href="after/progress-dark.jpg"><img src="after/progress-dark.jpg" alt="ความก้าวหน้าโหมดมืด" loading="lazy"></a><figcaption>ความก้าวหน้า · โหมดมืด</figcaption></figure>
+    </div>
+  </section>
+
+  <section id="quality" aria-labelledby="quality-h">
+    <div class="section-head"><h2 id="quality-h">ตรวจคุณภาพ (หมวด E)</h2><p>ตรวจอัตโนมัติทุกหน้าของทั้ง 4 บทบาทและหน้าสาธารณะ ด้วยสคริปต์ในเบราว์เซอร์ แล้วทดสอบด้วยคีย์บอร์ดเอง</p></div>
+    <div class="checks">
+      <div class="check"><h3>ขนาดจอ</h3><p>375 / 768 / 1440 px ทุกหน้า ไม่มีหน้าที่ล้นแนวนอน ตารางเปลี่ยนเป็นการ์ดบนมือถือ</p></div>
+      <div class="check"><h3>สีตัดกัน WCAG AA</h3><p>ตัวอักษรรองเข้มขึ้นเป็น #58677D (สว่าง) และ #8A9DB3 (มืด) สีสถานะใช้คู่ soft/text ตัวอักษรบนพื้นแดงมีสีเฉพาะในโหมดมืด</p></div>
+      <div class="check"><h3>คีย์บอร์ดและโปรแกรมอ่านหน้าจอ</h3><p>ลิงก์ "ข้ามไปเนื้อหาหลัก" เมนูใช้ลูกศรและ Esc ได้ ปุ่มทุกปุ่มมีชื่อ ช่องกรอกทุกช่องมี label ปุ่มกดขนาดอย่างน้อย 24 px</p></div>
+      <div class="check"><h3>ความเป็นส่วนตัว</h3><p>อีเมลของบัญชีเห็นได้เฉพาะคนที่ทำงานร่วมกัน เบอร์โทรเห็นเฉพาะผู้อนุมัติคำขอ เสียงที่อัดไม่ถูกอัปโหลด</p></div>
+      <div class="check"><h3>โค้ด</h3><p>TypeScript ผ่าน ESLint 0 error 0 warning ห้องฝึกผ่าน learning:test ครบ</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+  document.getElementById("theme").addEventListener("click", () => {
+    const root = document.documentElement;
+    const dark = root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+  });
+</script>
+</body>
+</html>

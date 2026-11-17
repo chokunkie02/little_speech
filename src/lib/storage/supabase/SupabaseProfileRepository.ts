@@ -240,6 +240,11 @@ export class SupabaseProfileRepository implements IProfileRepository {
 
   /** Load profiles from localStorage. Tries PROFILES_LIST first, then legacy PROFILE key. */
   private _loadFromLocalStorage(): void {
+    // Start from nothing for the current scope: children kept in memory from guest mode (e.g. the
+    // /demo sample child) must not appear as this signed-in account's children.
+    this._profiles = SUPABASE_EMPTY_PROFILES;
+    this._selectedChildId = null;
+    this._cache = null;
     const listRaw = localRead(this._profilesListKey());
     if (listRaw) {
       try {

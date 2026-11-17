@@ -76,7 +76,7 @@ function mapTeacher(row: DbTeacher): ClassroomTeacher {
 }
 
 function mapDisplay(row: DbDisplay): UserDisplayInfo {
-  return { userId: row.user_id, email: row.email, role: row.role };
+  return { userId: row.user_id, email: row.email, role: row.role, displayName: row.display_name ?? null };
 }
 
 const SERVER_ORGS: Organization[] = [];

@@ -209,7 +209,22 @@ export type DbUserDisplayProfile = {
   user_id: string;
   email: string;
   role: string | null;
+  /** "ชื่อ นามสกุล" from account_profiles; null for accounts that have not added a name yet. */
+  display_name: string | null;
   created_at: string;
+};
+
+// ── account_profiles (readable by the owner only) ────────────────────────────
+
+export type DbAccountProfile = {
+  user_id: string;
+  title: string | null;
+  first_name: string;
+  last_name: string;
+  phone: string | null;
+  terms_accepted_at: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 // ── observation_notes ─────────────────────────────────────────────────────────

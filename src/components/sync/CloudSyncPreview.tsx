@@ -120,9 +120,9 @@ function providerLabel(p: StorageProvider): string {
 }
 
 function providerBadgeCls(p: StorageProvider): string {
-  if (p === "supabase") return "bg-info/10 text-info border border-info/20";
+  if (p === "supabase") return "bg-info/10 text-info-text border border-info/20";
   if (p === "hybrid") return "bg-primary/10 text-primary border border-primary/20";
-  return "bg-success/10 text-success border border-success/20";
+  return "bg-success/10 text-success-text border border-success/20";
 }
 
 function domainLabel(d: SyncDomainPlan["domain"]): string {
@@ -176,7 +176,7 @@ function AuthStatusRow({ isAuthLoading, isAuthenticated, userEmail, isSupabaseEn
   if (isAuthenticated && userEmail) {
     return (
       <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-success/6 border border-success/20">
-        <span className="text-success flex-shrink-0"><CheckCircleIcon /></span>
+        <span className="text-success-text flex-shrink-0"><CheckCircleIcon /></span>
         <div className="min-w-0">
           <span className="text-xs font-semibold text-text">เข้าสู่ระบบแล้ว</span>
           <span className="text-xs text-text-muted ml-1.5 truncate">{userEmail}</span>
@@ -222,7 +222,7 @@ function DomainCard({ domain, recordCount, syncOrder, migrated }: DomainCardProp
           <span className="text-sm font-semibold text-text">{domainLabel(domain)}</span>
         </div>
         {migrated ? (
-          <span className="text-xs font-medium text-success flex items-center gap-1">
+          <span className="text-xs font-medium text-success-text flex items-center gap-1">
             <CheckCircleIcon size={12} />
             อัปโหลดแล้ว
           </span>
@@ -289,7 +289,7 @@ function MigrationSteps({ currentDomain, completedDomains, uploadedRecords, tota
           return (
             <div key={domain} className="flex items-center gap-2.5">
               <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${
-                isDone ? "bg-success text-white" : isActive ? "bg-primary text-white" : "bg-border text-text-muted"
+                isDone ? "bg-success-soft text-success-text" : isActive ? "bg-primary text-white" : "bg-border text-text-muted"
               }`}>
                 {isDone ? (
                   <CheckCircleIcon size={12} />
@@ -299,7 +299,7 @@ function MigrationSteps({ currentDomain, completedDomains, uploadedRecords, tota
                   <span className="text-[10px] font-bold">{steps.findIndex((s) => s.domain === domain) + 1}</span>
                 )}
               </div>
-              <span className={`text-xs font-medium ${isDone ? "text-success" : isActive ? "text-text" : "text-text-muted"}`}>
+              <span className={`text-xs font-medium ${isDone ? "text-success-text" : isActive ? "text-text" : "text-text-muted"}`}>
                 {label}
                 {isActive && <span className="ml-1 opacity-70">กำลังอัปโหลด…</span>}
                 {isDone && <span className="ml-1 opacity-70">เสร็จสิ้น</span>}
@@ -324,7 +324,7 @@ function ConflictWarningCard({ conflictSummary, acknowledged, onAcknowledge }: C
   return (
     <div className="bg-warning/8 border border-warning/30 rounded-xl p-4 space-y-3">
       <div className="flex items-start gap-2.5">
-        <span className="text-warning mt-0.5 flex-shrink-0"><AlertTriangleIcon size={16} /></span>
+        <span className="text-warning-text mt-0.5 flex-shrink-0"><AlertTriangleIcon size={16} /></span>
         <div className="space-y-1.5">
           <p className="text-sm font-semibold text-text">ตรวจพบข้อมูลบน Cloud แล้ว</p>
           <p className="text-xs text-text-muted leading-relaxed">{conflictSummary}</p>
@@ -370,11 +370,11 @@ function ConfirmationCard({ totalRecords, hasConflict, onConfirm, onCancel }: Co
             — ข้อมูลบนอุปกรณ์นี้จะไม่ถูกลบหรือเปลี่ยนแปลง
           </p>
           {hasConflict ? (
-            <p className="text-xs text-warning mt-1 font-medium">
+            <p className="text-xs text-warning-text mt-1 font-medium">
                Cloud มีข้อมูลอยู่แล้ว — การอัปโหลดจะเพิ่มข้อมูลใหม่ต่อท้าย (ไม่เขียนทับ)
             </p>
           ) : (
-            <p className="text-xs text-warning mt-1">
+            <p className="text-xs text-warning-text mt-1">
                อย่ากดอัปโหลดซ้ำ เนื่องจากจะสร้างข้อมูลซ้ำในฐานข้อมูล
             </p>
           )}
@@ -504,7 +504,7 @@ export default function CloudSyncPreview() {
         </div>
 
         {isSupabaseEnvSet ? (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-success/10 text-success border border-success/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-success/10 text-success-text border border-success/20">
             <CheckCircleIcon />
             <span>Supabase พร้อมใช้งาน</span>
           </div>
@@ -516,7 +516,7 @@ export default function CloudSyncPreview() {
         )}
 
         {hasMigrated && (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-success/10 text-success border border-success/20">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-success/10 text-success-text border border-success/20">
             <CheckCircleIcon />
             <span>อัปโหลดแล้ว</span>
           </div>
@@ -550,7 +550,7 @@ export default function CloudSyncPreview() {
       {/* ── Migration success ── */}
       {migrationState === "success" && (
         <div className="bg-success/6 border border-success/20 rounded-xl px-4 py-3 space-y-2">
-          <div className="flex items-center gap-2 text-success">
+          <div className="flex items-center gap-2 text-success-text">
             <CheckCircleIcon size={16} />
             <p className="text-sm font-semibold">อัปโหลดสำเร็จ</p>
           </div>
@@ -583,7 +583,7 @@ export default function CloudSyncPreview() {
       {/* ── Previous migration info ── */}
       {previousMigration && migrationState !== "success" && (
         <div className="bg-success/6 border border-success/20 rounded-xl px-4 py-3">
-          <div className="flex items-center gap-2 text-success mb-1">
+          <div className="flex items-center gap-2 text-success-text mb-1">
             <CheckCircleIcon size={14} />
             <p className="text-xs font-semibold">อัปโหลดข้อมูลแล้วเมื่อ {formatDate(previousMigration.completedAt)}</p>
           </div>
@@ -653,7 +653,7 @@ export default function CloudSyncPreview() {
       {/* ── Blocked reason ── */}
       {!hasMigrated && blockedMessage && !isMigrating && (
         <div className="bg-info/8 border border-info/20 rounded-xl px-4 py-3 flex items-start gap-3">
-          <div className="mt-0.5 text-info flex-shrink-0">
+          <div className="mt-0.5 text-info-text flex-shrink-0">
             <AlertTriangleIcon />
           </div>
           <p className="text-xs text-text-muted leading-relaxed">{blockedMessage}</p>

@@ -5,6 +5,7 @@ import { useChildAccess } from "@/hooks/useChildAccess";
 import type { ChildProfileData } from "@/lib/child-profile/childProfileStorage";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import SchoolGuardianMembers from "@/components/layout/SchoolGuardianMembers";
+import { JoinCodeCard } from "@/components/join/JoinCodeCard";
 import type { Database } from "@/types/supabase";
 import { profileAvatarOptions } from "@/components/ui/ProfileMark";
 
@@ -16,8 +17,6 @@ export default function SharedGuardianSettings({ child }: { child: ChildProfileD
   const { refreshChildAccess } = useChildAccess();
   const client = getSupabaseClient();
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [invitation, setInvitation] = useState<{ id: string; email: string }>();
-  const [email, setEmail] = useState("");
   const [refresh, setRefresh] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -129,30 +128,14 @@ export default function SharedGuardianSettings({ child }: { child: ChildProfileD
         </form>
       </details>
       <SchoolGuardianMembers childId={childId} mode="guardian" revision={refresh} />
-      <div className="space-y-1 border-t border-border pt-4">
-        <h3 className="text-sm font-semibold">เชิญผู้ปกครองร่วม</h3>
-        <p className="text-sm text-text-muted">ระบบจะส่งคำเชิญไปที่กล่องข้อความของบัญชีตามอีเมลที่ระบุ</p>
-      </div>
-      <form className="flex flex-wrap items-end gap-2" onSubmit={(event) => {
-        event.preventDefault();
-        void run(async () => {
-          const { data, error } = await client.rpc("send_guardian_inbox_invite", { p_child_id: childId, p_email: email });
-          if (error) throw new Error(error.message);
-          setInvitation({ id: data, email });
-          setEmail("");
-        });
-      }}>
-        <label className="min-w-48 flex-1 text-sm">อีเมลผู้ปกครองร่วม
-          <input type="email" required maxLength={254} value={email} onChange={(event) => setEmail(event.target.value)}
-            className="w-full rounded-lg border border-border bg-bg px-3 py-2" />
-        </label>
-        <button disabled={busy} className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
-          ส่งคำเชิญ
-        </button>
-      </form>
-      {invitation && <p role="status" className="break-all rounded-lg border border-success/30 bg-success/10 p-3 text-sm text-text">
-        ส่งคำเชิญเข้ากล่องข้อความของ {invitation.email} แล้ว
-      </p>}
+      <JoinCodeCard
+        className="border-t-0"
+        kind="guardian"
+        childId={childId}
+        title="ชวนผู้ปกครองร่วม"
+        description="ให้พ่อ แม่ หรือญาติสแกน QR หรือกรอกรหัสนี้ เขาจะดูผลการฝึกของบุตรหลานได้ทันที ไม่ต้องรู้อีเมลของกันและกัน"
+        revealLabel="แสดงรหัสชวน"
+      />
 
     </div>
   );

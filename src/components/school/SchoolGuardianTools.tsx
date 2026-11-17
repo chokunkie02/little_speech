@@ -13,33 +13,7 @@ export default function SchoolGuardianTools({ organizationId, onOpenClassroom }:
   organizationId: string;
   onOpenClassroom: (id: string) => void;
 }) {
-  const [account, setAccount] = useState<{ busy?: boolean; text?: string; code?: string; error?: boolean }>({});
   const [search, setSearch] = useState<{ busy?: boolean; matches?: SchoolPersonMatch[]; error?: boolean }>({});
-  const [copyStatus, setCopyStatus] = useState("");
-
-  async function prepare(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const email = String(new FormData(event.currentTarget).get("email"));
-    setCopyStatus("");
-    setAccount({ busy: true });
-    try {
-      const session = await getSupabaseClient()?.auth.getSession();
-      const token = session?.data.session?.access_token;
-      if (!token) throw new Error("กรุณาเข้าสู่ระบบผู้ดูแลโรงเรียน");
-      const response = await fetch("/api/parent-activation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
-        body: JSON.stringify({ action: "prepare", organizationId, email }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error);
-      setAccount(result.existing
-        ? { text: "มีบัญชีอีเมลนี้แล้ว ให้เจ้าของบัญชีเข้าสู่ระบบตามปกติ" }
-        : { code: result.code, text: "ส่งรหัสนี้ให้เจ้าของบัญชีโดยตรง รหัสใช้ได้ครั้งเดียว การออกรหัสใหม่จะยกเลิกรหัสเดิม" });
-    } catch (error) {
-      setAccount({ error: true, text: error instanceof Error ? error.message : "เตรียมบัญชีไม่สำเร็จ" });
-    }
-  }
 
   async function find(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -55,27 +29,7 @@ export default function SchoolGuardianTools({ organizationId, onOpenClassroom }:
   }
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
-      <section className="space-y-3 rounded-2xl border border-border bg-surface p-4">
-        <h3 className="font-semibold">เตรียมบัญชีผู้ปกครอง</h3>
-        <form onSubmit={prepare} className="flex flex-wrap items-end gap-2">
-          <label className="min-w-40 flex-1 text-sm">อีเมลผู้ปกครอง<input name="email" className={field} type="email" required maxLength={254} onChange={() => { if (!account.busy) setAccount({}); }} disabled={account.busy} /></label>
-          <button className={button} disabled={account.busy}>{account.busy ? "กำลังเตรียม…" : "เตรียมบัญชี / ออกรหัสใหม่"}</button>
-        </form>
-        {account.text && <p role={account.error ? "alert" : "status"} className="text-sm text-text-muted">{account.text}</p>}
-        {account.code && <div className="space-y-2">
-          <label className="block text-sm">รหัสเปิดใช้<input className={field + " font-mono"} value={account.code} readOnly onFocus={(event) => event.target.select()} /></label>
-          <button type="button" className="rounded-lg border border-border px-3 py-2 text-sm font-semibold text-primary" onClick={async () => {
-            try {
-              await navigator.clipboard.writeText(account.code!);
-              setCopyStatus("คัดลอกรหัสแล้ว");
-            } catch {
-              setCopyStatus("แตะช่องรหัสเพื่อเลือกและคัดลอก");
-            }
-          }}>คัดลอกรหัส</button>
-          {copyStatus && <p role="status" className="text-xs text-text-muted">{copyStatus}</p>}
-        </div>}
-      </section>
+    <div>
       <section className="space-y-3 rounded-2xl border border-border bg-surface p-4">
         <h3 className="font-semibold">ค้นหาในโรงเรียน</h3>
         <form onSubmit={find} className="flex flex-wrap items-end gap-2">

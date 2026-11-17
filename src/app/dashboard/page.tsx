@@ -1,500 +1,166 @@
 "use client";
 
-import { plainFeedback } from "@/lib/speech-evaluation/plainFeedback";
-import DisplayIcon from "@/components/ui/DisplayIcon";
-import { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useMemo, type ReactNode } from "react";
+import { BookOpen, ChartColumn, ChevronRight, FileText, Mic, Play, Sparkles, Star, Target, Trophy } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
-import { useChildProfile } from "@/hooks/useChildProfile";
-import { useSpeechProgress } from "@/hooks/useSpeechProgress";
-import { usePhonicsProgress } from "@/hooks/usePhonicsProgress";
+import {
+  Avatar, Badge, ButtonLink, Card, CardContent, EmptyState, LoadingState, Page, PageHeader, Section, StatCard,
+} from "@/components/ui";
+import { useStudioState } from "@/features/learning-studio/useStudioState";
 import { useAuth } from "@/hooks/useAuth";
+import { useChildProfile } from "@/hooks/useChildProfile";
 import { useCurrentChildAccess } from "@/hooks/useCurrentChildAccess";
-import type { TrainingMode } from "@/lib/child-profile/childProfileStorage";
-import type { PracticeAttempt } from "@/types/speechAdventure";
-import type { PhonicsAttempt } from "@/types/phonics";
+import { useLearningResults } from "@/hooks/useLearningResults";
+import { summarize, TRACK_LABELS, type LearningResult } from "@/lib/learning/results";
+import { formatRelativeTime } from "@/lib/thaiDate";
 
-// ── Tiny inline SVG helpers (no external icon lib) ────────────────────────────
-
-function StarIcon({ filled = false, size = 13 }: { filled?: boolean; size?: number }) {
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill={filled ? "#FFB347" : "none"}
-      stroke="#FFB347"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
-      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-    </svg>
-  );
-}
-
-function ChevronRightIcon({ size = 14 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M9 18l6-6-6-6" />
-    </svg>
-  );
-}
-
-function MicIcon({ size = 16, color = "currentColor" }: { size?: number; color?: string }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" />
-      <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-      <line x1="12" y1="19" x2="12" y2="22" />
-    </svg>
-  );
-}
-
-// ── Mode label helpers ────────────────────────────────────────────────────────
-
-function modeBadge(mode: TrainingMode) {
-  if (mode === "kindergarten_phonics") {
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs font-semibold">
-        <DisplayIcon name="star" className="mr-1" /> เรียนเสียงไทย
-      </span>
-    );
+function LatestResult({ latest }: { latest: LearningResult | undefined }) {
+  if (!latest) {
+    return <Card dashed><CardContent className="text-center text-sm text-text-muted">ยังไม่มีรอบที่ฝึกจบ เริ่มฝึกเพื่อดูผล</CardContent></Card>;
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-      <DisplayIcon name="target" className="mr-1" /> ฝึกเสียงให้ชัด
-    </span>
+    <Card>
+      <CardContent className="space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-caption text-text-muted">{formatRelativeTime(latest.completedAt)} · {TRACK_LABELS[latest.track]} · เสียง {latest.sound}</p>
+            <p className="mt-0.5 break-words font-semibold text-text">{latest.stageLabel}</p>
+          </div>
+          <Badge tone="warning" icon={<Star size={12} className="fill-current" />}><span className="tabular-nums">+{latest.activities}</span></Badge>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-text-muted">
+          <span>ลองทำ {latest.activities} กิจกรรม</span>
+          {latest.choiceCount > 0 && <span>· ฟังแล้วเลือกตรงเสียง {latest.correctChoices}/{latest.choiceCount} ข้อ</span>}
+          <Link href="/progress" className="ml-auto inline-flex items-center gap-0.5 font-semibold text-primary-text hover:underline">
+            ดูทั้งหมด <ChevronRight size={14} aria-hidden="true" />
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
-function statusLabel(status: string) {
-  if (status === "passed") return { text: "ผ่าน", cls: "text-emerald-600 dark:text-emerald-400" };
-  if (status === "almost") return { text: "เสียงใกล้เคียงแล้ว", cls: "text-amber-600 dark:text-amber-400" };
-  return { text: "ลองอีกครั้ง", cls: "text-rose-500 dark:text-rose-400" };
-}
-
-// ── Score pill ────────────────────────────────────────────────────────────────
-
-function ScorePill({ score }: { score: number }) {
-  const cls =
-    score >= 80
-      ? "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300"
-      : score >= 60
-      ? "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300"
-      : "bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400";
+function QuickLink({ href, icon, label }: { href: string; icon: ReactNode; label: string }) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold tabular-nums ${cls}`}>
-      {score}%
-    </span>
+    <Link href={href} className="block rounded-card">
+      <Card interactive className="flex h-full items-center gap-3 p-4">
+        <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-primary-soft text-primary-text">{icon}</span>
+        <span className="text-sm font-semibold text-text">{label}</span>
+      </Card>
+    </Link>
   );
 }
-
-// ── Loading skeleton ──────────────────────────────────────────────────────────
-
-function Skeleton({ className }: { className?: string }) {
-  return (
-    <div className={`animate-pulse rounded-lg bg-border/40 dark:bg-white/8 ${className ?? ""}`} aria-hidden="true" />
-  );
-}
-
-// ── Empty state card ──────────────────────────────────────────────────────────
-
-function EmptyState({ message, cta, href }: { message: string; cta: string; href: string }) {
-  return (
-    <div className="flex flex-col items-center gap-3 py-8 text-center">
-      <span className="text-4xl" aria-hidden="true"><DisplayIcon name="sprout" /></span>
-      <p className="text-sm text-text-muted">{message}</p>
-      <Link
-        href={href}
-        className="px-4 py-2 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-all active:scale-[0.98]"
-      >
-        {cta}
-      </Link>
-    </div>
-  );
-}
-
-// ── Stars row ─────────────────────────────────────────────────────────────────
-
-function StarsRow({ stars, max = 3 }: { stars: number; max?: number }) {
-  return (
-    <span className="flex items-center gap-0.5" aria-label={`${stars} ดาว`}>
-      {Array.from({ length: max }).map((_, i) => (
-        <StarIcon key={i} filled={i < stars} size={12} />
-      ))}
-    </span>
-  );
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main component
-// ─────────────────────────────────────────────────────────────────────────────
 
 export default function ParentDashboardPage() {
   const router = useRouter();
-  const { isAuthenticated, isLoading: isAuthLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading } = useAuth();
   const { profile, hasProfile, isHydrated } = useChildProfile();
-  const { summary, isHydrated: spHydrated, selectedSoundId } = useSpeechProgress();
-  const {
-    summary: phonicsSummary,
-    progress: phonicsProgress,
-    isHydrated: phHydrated,
-  } = usePhonicsProgress();
   const { canStartPractice } = useCurrentChildAccess();
+  const { results, status } = useLearningResults(profile?.id);
+  const studio = useStudioState(user?.id, profile?.id);
+  const summary = useMemo(() => summarize(results), [results]);
+  const phonics = profile?.trainingMode === "kindergarten_phonics";
 
-  const trainingMode: TrainingMode = profile?.trainingMode ?? "speech_clarity";
-
-  // Redirect unauthenticated users
   useEffect(() => {
     if (!isHydrated || isAuthLoading) return;
     if (!isAuthenticated) router.replace("/auth/signin");
   }, [isHydrated, isAuthLoading, isAuthenticated, router]);
 
-  // ── Recommendations ───────────────────────────────────────────────────────
-
-
-
-  // ── Latest attempt ────────────────────────────────────────────────────────
-
-  const latestSpeechAttempt: PracticeAttempt | null =
-    summary.recentAttempts[0] ?? null;
-
-  const latestPhonicsAttempt: PhonicsAttempt | null = (() => {
-    if (!phonicsProgress?.attempts.length) return null;
-    return [...phonicsProgress.attempts].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    )[0] ?? null;
-  })();
-
-  // ── CTAs ──────────────────────────────────────────────────────────────────
-
-  const practiceHref = "/training";
-
-  const progressHref = "/progress";
-  const contentHref = "/library";
-
-  // ── Loading guard ─────────────────────────────────────────────────────────
-  // Show skeleton until hydrated; redirect guards above handle invalid states.
-
-  const showSkeleton = !isHydrated || isAuthLoading;
-
-  if (showSkeleton) {
-    return (
-      <AppShell>
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-6 space-y-4">
-          <Skeleton className="h-28 w-full" />
-          <Skeleton className="h-40 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-12 w-full" />
-        </div>
-      </AppShell>
-    );
+  if (!isHydrated || isAuthLoading) {
+    return <AppShell><Page width="narrow"><LoadingState variant="cards" rows={3} /></Page></AppShell>;
   }
 
-  // Keep the dashboard open while school and family profiles load.
   if (!hasProfile || !profile) {
     return (
       <AppShell>
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-12">
-          <EmptyState
-            message="ยังไม่มีโปรไฟล์เด็ก — ตั้งค่าก่อนเพื่อเริ่มฝึก"
-            cta="เปิดข้อมูลลูก"
-            href="/profile"
-          />
-        </div>
+        <Page width="narrow">
+          <EmptyState icon={<Sparkles size={22} />} title="ยังไม่มีข้อมูลเด็ก"
+            description="ใช้รหัสจากใบเชิญของโรงเรียน หรือเพิ่มข้อมูลลูกเองเพื่อเริ่มฝึก"
+            action={<><ButtonLink href="/join">ใช้รหัสเข้าร่วม</ButtonLink><ButtonLink href="/profile" variant="outline">เปิดข้อมูลลูก</ButtonLink></>} />
+        </Page>
       </AppShell>
     );
   }
 
-  // ── Derived display values ────────────────────────────────────────────────
-
-  const childFirstName = profile.name.split(" ")[0] ?? profile.name;
-  const targetSoundLabel = selectedSoundId || profile.targetSound || "ก";
-
-  const phonicsCompletedCount = phonicsSummary.completedLessonIds.length;
+  const firstName = profile.nickname || (profile.name.split(" ")[0] ?? profile.name);
+  const plan = studio?.plan.childId === profile.id ? studio.plan : undefined;
+  const paused = studio?.sessions.find((session) => session.id === studio.activeSessionId && session.status === "active" && session.childId === profile.id);
+  const latest = results[0];
+  const track = plan?.track ?? (phonics ? "phonics" : "speech");
+  const sound = plan?.sound ?? profile.targetSound ?? "ก";
 
   return (
     <AppShell>
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-5 space-y-4">
+      <Page>
+        <PageHeader title={`วันนี้จะฝึกอะไรกับ${firstName}?`} description="รอบละไม่กี่นาที ฝึกสม่ำเสมอดีกว่าฝึกนาน ๆ" />
 
-        {/* ── Page header ── */}
-        <header>
-          <nav className="text-xs text-text-muted mb-2" aria-label="Breadcrumb">
-            <Link href="/training" className="hover:text-primary transition-colors">ฝึกออกเสียง</Link>
-            <span className="mx-1.5 text-disabled">/</span>
-            <span className="text-text font-medium">หน้าหลัก</span>
-          </nav>
-          <h1 className="text-xl font-bold text-text">
-            วันนี้จะฝึกอะไรกับ{childFirstName}?
-          </h1>
-          <p className="text-sm text-text-muted mt-0.5">
-            {trainingMode === "kindergarten_phonics"
-              ? "สวนเสียง · เรียนเสียงไทยทีละขั้น"
-              : "ฝึกเสียงให้ชัด · เลือกระดับที่เหมาะสม"}
-          </p>
-        </header>
-
-        {/* ── Child card ── */}
-        <section
-          className="bg-surface border border-border rounded-2xl px-5 py-4 flex items-center gap-4"
-          aria-label="ข้อมูลเด็ก"
-        >
-          {/* Child avatar — first letter of name */}
-          <div
-            className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xl font-bold select-none ${
-              trainingMode === "kindergarten_phonics"
-                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400"
-                : "bg-primary/10 text-primary"
-            }`}
-            aria-hidden="true"
-          >
-            {profile.name.charAt(0).toUpperCase()}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <p className="text-base font-bold text-text leading-tight truncate">
-                {profile.name}
-              </p>
-              {modeBadge(trainingMode)}
-            </div>
-            <div className="flex items-center gap-3 mt-1 flex-wrap">
-              <span className="text-xs text-text-muted">{profile.age} ปี</span>
-              {trainingMode === "speech_clarity" && (
-                <span className="inline-flex items-center gap-1 text-xs text-text-muted">
-                  <MicIcon size={12} />
-                  เสียง&nbsp;/{targetSoundLabel}/
-                </span>
-              )}
-              {trainingMode === "kindergarten_phonics" && (
-                <span className="text-xs text-text-muted">
-                  เสร็จแล้ว {phonicsCompletedCount} บทเรียน
-                </span>
-              )}
-            </div>
-          </div>
-          {/* Edit link */}
-          <Link
-            href="/profile"
-            className="text-xs text-text-muted hover:text-primary transition-colors px-2 py-1 rounded-lg hover:bg-primary/8 flex-shrink-0"
-          >
-            ข้อมูลลูก
-          </Link>
-        </section>
-
-        {/* ── Today's practice plan ── */}
-        <section aria-labelledby="plan-heading">
-          <h2 id="plan-heading" className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3 px-0.5">
-            วันนี้ควรฝึกอะไรต่อดี
-          </h2>
-
-          <div className="space-y-3 rounded-2xl border border-border bg-surface px-5 py-4">
-            <div className="flex items-start gap-3">
-              <span className="text-primary" aria-hidden="true"><DisplayIcon name="star" /></span>
-              <div>
-                <p className="font-bold text-text">แผนฝึกของวันนี้</p>
-                <p className="mt-1 text-xs text-text-muted">เปิดแผนฝึกเพื่อเลือกกิจกรรมหรือกลับไปทำรอบที่ค้างไว้</p>
-              </div>
-            </div>
-            {canStartPractice ? (
-              <Link href={practiceHref} className="flex justify-center rounded-xl bg-primary py-3 text-sm font-bold text-white hover:bg-primary/90">
-                ไปหน้าฝึกและเรียน →
-              </Link>
-            ) : (
-              <p className="rounded-xl bg-bg py-3 text-center text-sm text-text-muted">บัญชีนี้มีสิทธิ์ดูผลฝึก</p>
-            )}
-          </div>
-        </section>
-
-        {/* ── Latest result ── */}
-        <section aria-labelledby="latest-heading">
-          <h2 id="latest-heading" className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3 px-0.5">
-            ผลล่าสุด
-          </h2>
-
-          {/* Speech clarity: last attempt */}
-          {trainingMode === "speech_clarity" && spHydrated && (
-            latestSpeechAttempt ? (
-              <div className="bg-surface border border-border rounded-2xl px-5 py-4 space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-text-muted">
-                      {new Date(latestSpeechAttempt.createdAt).toLocaleDateString("th-TH", {
-                        day: "numeric",
-                        month: "short",
-                        year: "2-digit",
-                      })}
-                    </p>
-                    <p className="text-sm font-semibold text-text mt-0.5 truncate">
-                      {latestSpeechAttempt.promptText || latestSpeechAttempt.practiceItemId}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <ScorePill score={latestSpeechAttempt.score} />
-                    <StarsRow stars={latestSpeechAttempt.starsEarned} />
+        {/* Desktop: practice on the left, the at-a-glance numbers and shortcuts on the right. */}
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:items-start">
+          <div className="min-w-0 space-y-6">
+            <Card>
+              <CardContent className="flex items-center gap-4">
+                <Avatar name={profile.name} size="lg" />
+                <div className="min-w-0 flex-1 space-y-1">
+                  <p className="text-card-title break-words">{profile.name}</p>
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <Badge tone={track === "phonics" ? "warning" : "primary"} icon={track === "phonics" ? <Sparkles size={12} /> : <Target size={12} />}>
+                      {TRACK_LABELS[track]}
+                    </Badge>
+                    <Badge>{profile.age} ปี</Badge>
+                    <Badge icon={<Mic size={12} />}>เสียง {sound}</Badge>
                   </div>
                 </div>
-                {latestSpeechAttempt.feedback && (
-                  <p className="text-xs text-text-muted leading-relaxed line-clamp-2">
-                    {plainFeedback(latestSpeechAttempt.feedback)}
+                <ButtonLink href="/profile" variant="ghost" size="sm">ข้อมูลลูก</ButtonLink>
+              </CardContent>
+            </Card>
+
+            <Card className="overflow-hidden border-primary/25">
+              <CardContent className="space-y-4 bg-primary-soft/60">
+                <div>
+                  <p className="text-caption font-semibold text-primary-text">{paused ? "มีรอบที่พักไว้" : latest ? "ฝึกต่อจากครั้งก่อน" : "เริ่มรอบแรก"}</p>
+                  <p className="text-section-title text-text">
+                    {paused ? paused.stageLabel : latest ? latest.stageLabel : "ฟัง ดูปาก แล้วลองพูดตามทีละขั้น"}
                   </p>
-                )}
-                <div className="flex items-center gap-2">
-                  {(() => {
-                    const { text, cls } = statusLabel(latestSpeechAttempt.status);
-                    return <span className={`text-xs font-semibold ${cls}`}>{text}</span>;
-                  })()}
-                  <Link
-                    href={progressHref}
-                    className="ml-auto text-xs text-primary hover:text-primary/80 flex items-center gap-0.5 transition-colors"
-                  >
-                    ดูทั้งหมด
-                    <ChevronRightIcon size={11} />
-                  </Link>
-                </div>
-              </div>
-            ) : (
-              <div className="bg-surface/60 border border-border/60 rounded-2xl px-5 py-6 text-center">
-                <p className="text-sm text-text-muted">ยังไม่มีผลการฝึก — เริ่มฝึกเพื่อดูผล</p>
-              </div>
-            )
-          )}
-
-          {/* Phonics: last attempt */}
-          {trainingMode === "kindergarten_phonics" && phHydrated && (
-            latestPhonicsAttempt ? (
-              <div className="bg-surface border border-border rounded-2xl px-5 py-4 space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-text-muted">
-                      {new Date(latestPhonicsAttempt.createdAt).toLocaleDateString("th-TH", {
-                        day: "numeric",
-                        month: "short",
-                        year: "2-digit",
-                      })}
-                      {" · "}
-                      {latestPhonicsAttempt.unitId}
-                    </p>
-                    <p className="text-sm font-semibold text-text mt-0.5 truncate">
-                      {latestPhonicsAttempt.prompt}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <ScorePill score={latestPhonicsAttempt.score} />
-                    <StarsRow stars={latestPhonicsAttempt.starsEarned} />
-                  </div>
-                </div>
-                {latestPhonicsAttempt.feedback && (
-                  <p className="text-xs text-text-muted leading-relaxed line-clamp-2">
-                    {plainFeedback(latestPhonicsAttempt.feedback)}
+                  <p className="text-sm text-text-muted">
+                    {paused ? `ทำไปแล้ว ${paused.attempts.length} จาก ${paused.itemIds.length} กิจกรรม`
+                      : latest ? `ฝึกล่าสุด ${formatRelativeTime(latest.completedAt)} · ${TRACK_LABELS[latest.track]}`
+                        : `${TRACK_LABELS[track]} · เสียง ${sound}`}
                   </p>
-                )}
-                <div className="flex items-center gap-2">
-                  {(() => {
-                    const { text, cls } = statusLabel(latestPhonicsAttempt.status);
-                    return <span className={`text-xs font-semibold ${cls}`}>{text}</span>;
-                  })()}
-                  <Link
-                    href={progressHref}
-                    className="ml-auto text-xs text-primary hover:text-primary/80 flex items-center gap-0.5 transition-colors"
-                  >
-                    ดูทั้งหมด
-                    <ChevronRightIcon size={11} />
-                  </Link>
                 </div>
-              </div>
-            ) : (
-              <div className="bg-surface/60 border border-border/60 rounded-2xl px-5 py-6 text-center">
-                <p className="text-sm text-text-muted">ยังไม่มีผลการฝึก — เริ่มเรียนเพื่อดูผล</p>
-              </div>
-            )
-          )}
-        </section>
+                {canStartPractice
+                  ? <ButtonLink href="/training" size="lg" block icon={<Play size={18} className="fill-current" aria-hidden="true" />}>{paused ? "ทำรอบที่พักไว้ต่อ" : latest ? "ฝึกต่อ" : "เริ่มฝึก"}</ButtonLink>
+                  : <p className="rounded-control bg-surface px-3 py-2 text-center text-sm text-text-muted">บัญชีนี้ดูผลการฝึกได้อย่างเดียว</p>}
+              </CardContent>
+            </Card>
 
-        {/* ── Progress snapshot ── */}
-        <section aria-labelledby="snapshot-heading">
-          <h2 id="snapshot-heading" className="text-sm font-semibold text-text-muted uppercase tracking-wider mb-3 px-0.5">
-            ภาพรวมความก้าวหน้า
-          </h2>
-
-          {trainingMode === "speech_clarity" && spHydrated && (
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-surface border border-border rounded-xl px-3 py-3 text-center">
-                <p className="text-xl font-bold text-primary tabular-nums">{summary.totalAttempts}</p>
-                <p className="text-xs text-text-muted mt-0.5 leading-tight">ครั้งที่ฝึก</p>
-              </div>
-              <div className="bg-surface border border-border rounded-xl px-3 py-3 text-center">
-                <p className="text-xl font-bold text-primary tabular-nums">{summary.starsEarned}</p>
-                <p className="text-xs text-text-muted mt-0.5 leading-tight">ดาวรวม</p>
-              </div>
-              <div className="bg-surface border border-border rounded-xl px-3 py-3 text-center">
-                <p className="text-xl font-bold text-primary tabular-nums">
-                  {summary.completedStages}
-                  <span className="text-text-muted font-normal text-xs">/7</span>
-                </p>
-                <p className="text-xs text-text-muted mt-0.5 leading-tight">ระดับผ่าน</p>
-              </div>
-            </div>
-          )}
-
-          {trainingMode === "kindergarten_phonics" && phHydrated && (
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-surface border border-border rounded-xl px-3 py-3 text-center">
-                <p className="text-xl font-bold text-amber-500 tabular-nums">
-                  {phonicsSummary.totalAttempts}
-                </p>
-                <p className="text-xs text-text-muted mt-0.5 leading-tight">ครั้งที่ฝึก</p>
-              </div>
-              <div className="bg-surface border border-border rounded-xl px-3 py-3 text-center">
-                <p className="text-xl font-bold text-amber-500 tabular-nums">
-                  {phonicsCompletedCount}
-                </p>
-                <p className="text-xs text-text-muted mt-0.5 leading-tight">บทเรียนผ่าน</p>
-              </div>
-              <div className="bg-surface border border-border rounded-xl px-3 py-3 text-center">
-                <p className="text-xl font-bold text-amber-500 tabular-nums">
-                  {phonicsSummary.completedUnitIds.length}
-                  <span className="text-text-muted font-normal text-xs">/7</span>
-                </p>
-                <p className="text-xs text-text-muted mt-0.5 leading-tight">ระดับผ่าน</p>
-              </div>
-            </div>
-          )}
-
-          {((trainingMode === "speech_clarity" && !spHydrated) ||
-            (trainingMode === "kindergarten_phonics" && !phHydrated)) && (
-            <div className="grid grid-cols-3 gap-3">
-              {[0, 1, 2].map((i) => <Skeleton key={i} className="h-16" />)}
-            </div>
-          )}
-        </section>
-
-        {/* ── Quick actions ── */}
-        <section aria-label="ทางลัด" className="pb-4">
-          <div className="grid grid-cols-2 gap-3">
-            {/* ดูความก้าวหน้า */}
-            <Link
-              href={progressHref}
-              className="flex flex-col items-center gap-2 bg-surface hover:bg-surface/80 border border-border rounded-xl px-3 py-3.5 text-center transition-all active:scale-[0.97]"
-            >
-              <span className="text-xl" aria-hidden="true"><DisplayIcon name="chart" /></span>
-              <span className="text-xs font-semibold text-text-muted leading-tight">ดูความก้าวหน้า</span>
-            </Link>
-
-            {/* ดูเนื้อหา */}
-            <Link
-              href={contentHref}
-              className="flex flex-col items-center gap-2 bg-surface hover:bg-surface/80 border border-border rounded-xl px-3 py-3.5 text-center transition-all active:scale-[0.97]"
-            >
-              <span className="text-xl" aria-hidden="true"><DisplayIcon name="book" /></span>
-              <span className="text-xs font-semibold text-text-muted leading-tight">ดูเนื้อหา</span>
-            </Link>
+            <Section title="ผลล่าสุด">
+              {status === "loading" && !results.length ? <LoadingState variant="list" rows={1} /> : <LatestResult latest={latest} />}
+            </Section>
           </div>
-        </section>
 
-      </div>
+          <div className="min-w-0 space-y-6 lg:sticky lg:top-20">
+            <Section title="ภาพรวม">
+              <div className="grid grid-cols-3 gap-3">
+                <StatCard label="รอบที่ฝึกจบ" value={summary.sessions} />
+                <StatCard label="วันที่ฝึกใน 7 วัน" tone="success"
+                  value={<>{summary.daysThisWeek}<span className="text-sm font-normal text-text-muted">/7</span></>} />
+                <StatCard label="ดาวความพยายาม" tone="warning" value={summary.activities} />
+              </div>
+            </Section>
+
+            <Section title="ทางลัด">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-2">
+                <QuickLink href="/progress" icon={<ChartColumn size={20} />} label="ความก้าวหน้า" />
+                <QuickLink href="/rewards" icon={<Trophy size={20} />} label="รางวัล" />
+                <QuickLink href="/report" icon={<FileText size={20} />} label="รายงาน" />
+                <QuickLink href="/training#library" icon={<BookOpen size={20} />} label="คลังกิจกรรม" />
+              </div>
+            </Section>
+          </div>
+        </div>
+      </Page>
     </AppShell>
   );
 }

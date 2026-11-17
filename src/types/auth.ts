@@ -6,6 +6,8 @@
 // Foundation only — organization/classroom system is not implemented yet.
 // Stored in Supabase user_metadata.role. Defaults to "parent" when absent.
 
+import type { SignUpDetails } from "@/lib/auth/accountDetails";
+
 export type UserRole = "parent" | "teacher" | "therapist" | "school_admin";
 
 export const DEFAULT_ROLE: UserRole = "parent";
@@ -28,6 +30,8 @@ export interface AuthSession {
 export interface AuthResult {
   success: boolean;
   error?: string;
+  /** Sign-up only: true when the account must confirm its email before it can sign in. */
+  needsConfirmation?: boolean;
 }
 
 export type AuthLoadingState = "initializing" | "ready";
@@ -39,7 +43,7 @@ export interface AuthContextValue {
   isAuthenticated: boolean;
   isLoading: boolean;
   signIn: (email: string, password: string) => Promise<AuthResult>;
-  /** role defaults to "parent" when omitted. */
-  signUp: (email: string, password: string, role?: UserRole) => Promise<AuthResult>;
+  /** Name, phone and consent go into user metadata; the database turns them into account_profiles. */
+  signUp: (email: string, password: string, details: SignUpDetails) => Promise<AuthResult>;
   signOut: () => Promise<void>;
 }

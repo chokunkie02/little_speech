@@ -2,7 +2,10 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { KeyRound, LogOut, Settings, Trash2, UserCircle } from "lucide-react";
+import { Avatar, Badge, Button, ButtonLink, Card, CardContent, ConfirmDialog, FormField, Page, PageHeader, Section, SectionNav, Textarea, toast, type SectionNavItem } from "@/components/ui";
+import { ROLE_LABELS, appRole } from "@/components/layout/navigation";
+import { requestDataDeletion } from "@/lib/joinCodes";
 import AppShell from "@/components/layout/AppShell";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { useTheme } from "@/components/ui/ThemeProvider";
@@ -16,143 +19,99 @@ import {
   readBackupFile,
   getStorageSummary,
 } from "@/lib/local-data/localDataBackup";
-import { DEMO_ATTEMPT_COUNT, DEMO_PROGRESS, DEMO_OBSERVATIONS } from "@/lib/demo/speechAdventureDemoData";
 import { STORAGE_KEYS } from "@/lib/storage/storageKeys";
 import type { SpeechProgress } from "@/types/speechAdventure";
 import type { ObservationNote } from "@/types/observations";
 import type { ChildProfileData } from "@/lib/child-profile/childProfileStorage";
 import { useChildAccess } from "@/hooks/useChildAccess";
-import { useInvitations } from "@/hooks/useInvitations";
 import { ACCESS_ROLE_LABELS } from "@/types/childAccess";
-import { INVITATION_ROLE_LABELS } from "@/types/invitations";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { useAccountProfile } from "@/components/account/AccountProfileProvider";
+import { ChangePasswordCard, PersonalInfoCard } from "@/components/account/AccountSettings";
 
-// ── Role display helpers ──────────────────────────────────────────────────────
-
-const ROLE_LABELS: Record<string, string> = {
-  parent:      "ผู้ปกครอง",
-  teacher:     "ครูผู้สอน",
-  school_admin:"ผู้ดูแลโรงเรียน",
-  therapist:   "นักบำบัด",
-};
-
-function roleBadgeClass(role: string): string {
-  switch (role) {
-    case "teacher":      return "bg-violet-500/10 text-violet-700 dark:text-violet-300";
-    case "school_admin": return "bg-amber-500/10 text-amber-700 dark:text-amber-300";
-    case "therapist":    return "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300";
-    default:             return "bg-primary/10 text-primary";
-  }
-}
-
-// ── Icons ─────────────────────────────────────────────────────────────────────
-
-function UserCircleIcon({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M18 20a6 6 0 0 0-12 0" />
-      <circle cx="12" cy="10" r="4" />
-      <circle cx="12" cy="12" r="10" />
-    </svg>
-  );
-}
-
-function LogOutIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-      <polyline points="16 17 21 12 16 7" />
-      <line x1="21" y1="12" x2="9" y2="12" />
-    </svg>
-  );
-}
-
-function LinkIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
-      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
-    </svg>
-  );
-}
-
-// ── Section header ────────────────────────────────────────────────────────────
-
-function SectionHeader({ title, description }: { title: string; description?: string }) {
-  return (
-    <div className="mb-4">
-      <h2 className="text-base font-bold text-text">{title}</h2>
-      {description && <p className="text-xs text-text-muted mt-0.5">{description}</p>}
-    </div>
-  );
-}
-
-// ── Account Card (authenticated) ──────────────────────────────────────────────
+// ── Account ───────────────────────────────────────────────────────────────────
 
 function AccountCard() {
   const { user, signOut } = useAuth();
+  const { displayName } = useAccountProfile();
   const [signingOut, setSigningOut] = useState(false);
-
-  const role = user?.role ?? "parent";
-  const label = ROLE_LABELS[role] ?? role;
-  const badgeClass = roleBadgeClass(role);
-  const isCloud = isSupabaseConfigured();
-
-  async function handleSignOut() {
-    setSigningOut(true);
-    await signOut();
-    setSigningOut(false);
-  }
-
   if (!user) return null;
-
+  const role = appRole(user);
   return (
-    <div className="bg-surface border border-border rounded-xl divide-y divide-border">
-      {/* User info */}
-      <div className="flex items-center gap-3 px-4 py-4">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${badgeClass}`}>
-          <UserCircleIcon size={20} />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-text truncate">{user.email}</p>
-          <div className="flex items-center gap-2 mt-1 flex-wrap">
-            <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${badgeClass}`}>
-              {label}
-            </span>
-            {isCloud ? (
-              <span className="inline-flex items-center gap-1 text-xs text-success">
-                <span className="w-1.5 h-1.5 rounded-full bg-success flex-shrink-0" aria-hidden="true" />
-                เชื่อมต่อ Cloud
-              </span>
-            ) : (
-              <span className="text-xs text-text-muted">โหมดออฟไลน์</span>
-            )}
+    <Card>
+      <CardContent className="flex flex-wrap items-center gap-3">
+        <Avatar name={displayName} size="lg" />
+        <div className="min-w-48 flex-1">
+          <p className="font-semibold text-text [overflow-wrap:anywhere]">{displayName}</p>
+          <p className="text-sm text-text-muted [overflow-wrap:anywhere]">{user.email}</p>
+          <div className="mt-1 flex flex-wrap gap-1.5">
+            <Badge tone="primary">{ROLE_LABELS[role]}</Badge>
+            {isSupabaseConfigured() ? <Badge tone="success" dot>บันทึกออนไลน์</Badge> : <Badge>โหมดออฟไลน์</Badge>}
           </div>
         </div>
-      </div>
-      {/* Sign out */}
-      <div className="px-4 py-3">
-        <button
-          type="button"
-          onClick={handleSignOut}
-          disabled={signingOut}
-          className="flex items-center gap-2 text-sm font-medium text-error hover:text-error/80 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-        >
-          <LogOutIcon />
-          {signingOut ? "กำลังออกจากระบบ…" : "ออกจากระบบ"}
-        </button>
-      </div>
-    </div>
+        <Button variant="outline" icon={<LogOut size={16} aria-hidden="true" />} loading={signingOut} loadingText="กำลังออกจากระบบ…"
+          onClick={async () => {
+            setSigningOut(true);
+            await signOut();
+            window.location.replace("/auth/signin");
+          }}>
+          ออกจากระบบ
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
-// ── Local mode card (anonymous user) ─────────────────────────────────────────
+// ── Privacy (PDPA) ────────────────────────────────────────────────────────────
+
+function PrivacySection({ parent }: { parent: boolean }) {
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState("");
+  const [busy, setBusy] = useState(false);
+  return (
+    <Card>
+      <CardContent className="space-y-3 text-sm">
+        <ul className="list-disc space-y-1 pl-5 text-text-muted">
+          <li>ระบบเก็บเสียงที่อัดตอนฝึกและผลคะแนน เพื่อให้ผู้ปกครองและครูประจำห้องติดตามพัฒนาการ</li>
+          {parent && <li>ยกเลิกการเชื่อมกับนักเรียนได้ที่หน้า <Link href="/profile" className="font-semibold text-primary hover:underline">ข้อมูลลูก</Link> (ส่วนผู้ปกครองร่วม)</li>}
+          <li>ขอลบบัญชีและข้อมูลทั้งหมดได้ ทีมงานจะยืนยันทางอีเมลภายใน 30 วัน</li>
+        </ul>
+        <Button variant="outline" icon={<Trash2 size={16} aria-hidden="true" />} onClick={() => setOpen(true)}>ขอลบบัญชีและข้อมูล</Button>
+      </CardContent>
+      <ConfirmDialog
+        open={open}
+        tone="danger"
+        title="ขอลบบัญชีและข้อมูล?"
+        description="ทีมงานจะติดต่อกลับทางอีเมลของบัญชีนี้เพื่อยืนยันก่อนลบ เมื่อลบแล้วจะกู้คืนไม่ได้ รวมถึงผลการฝึกและเสียงที่อัดไว้"
+        confirmLabel="ส่งคำขอ"
+        loading={busy}
+        onCancel={() => setOpen(false)}
+        onConfirm={async () => {
+          setBusy(true);
+          try {
+            await requestDataDeletion(reason);
+            toast.success("ส่งคำขอแล้ว", "ทีมงานจะติดต่อกลับทางอีเมลภายใน 30 วัน");
+            setOpen(false);
+          } catch (cause) {
+            toast.error("ส่งคำขอไม่สำเร็จ", cause instanceof Error ? cause.message : undefined);
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <FormField label="เหตุผล (ไม่บังคับ)">
+          <Textarea value={reason} onChange={(event) => setReason(event.target.value)} maxLength={500} rows={3} />
+        </FormField>
+      </ConfirmDialog>
+    </Card>
+  );
+}
 
 function LocalModeCard() {
   return (
     <div className="bg-surface border border-border rounded-xl px-4 py-4 flex items-start gap-3">
       <div className="w-9 h-9 rounded-full bg-border/50 flex items-center justify-center flex-shrink-0 text-text-muted mt-0.5">
-        <UserCircleIcon />
+        <UserCircle size={18} aria-hidden="true" />
       </div>
       <div className="flex-1">
         <p className="text-sm font-semibold text-text">โหมดออฟไลน์</p>
@@ -190,114 +149,6 @@ function AppearanceSection() {
   );
 }
 
-function ReceivedInviteSection() {
-  const router = useRouter();
-  const [input, setInput] = useState("");
-  const [error, setError] = useState<string | null>(null);
-
-  function handleOpen(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setError(null);
-    const value = input.trim();
-    let path = "/invite/accept";
-    let token = /^[a-z0-9-]{8,}$/i.test(value) ? value : null;
-    if (!token) {
-      try {
-        const url = new URL(value, window.location.origin);
-        if (url.protocol === "https:" || url.protocol === "http:") {
-          if (["/invite/school-admin", "/invite/school-teacher", "/invite/accept"].includes(url.pathname)) {
-            path = url.pathname;
-            token = url.searchParams.get("token");
-          } else {
-            token = url.pathname.match(/^\/invite\/([a-z0-9-]{8,})\/?$/i)?.[1] ?? null;
-          }
-        }
-      } catch {
-        // Invalid input is reported below.
-      }
-    }
-    if (!token || !/^[a-z0-9-]{8,}$/i.test(token)) {
-      setError("กรุณาวางลิงก์หรือรหัสคำเชิญที่ถูกต้อง");
-      return;
-    }
-    router.push(path + "?token=" + encodeURIComponent(token));
-  }
-
-  return (
-    <form className="space-y-3" onSubmit={handleOpen}>
-      <p className="text-sm text-text-muted">
-        วางลิงก์หรือรหัสคำเชิญที่ได้รับเพื่อเปิดคำเชิญ
-      </p>
-      <div className="flex gap-2">
-        <input
-          type="text"
-          aria-label="ลิงก์หรือรหัสคำเชิญ"
-          aria-invalid={!!error}
-          aria-describedby={error ? "received-invite-error" : undefined}
-          value={input}
-          onChange={(e) => { setInput(e.target.value); setError(null); }}
-          placeholder="https://…/invite/accept?token=… หรือรหัส"
-          className="flex-1 min-w-0 bg-bg border border-border aria-invalid:border-error rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
-        />
-        <button
-          type="submit"
-          disabled={!input.trim()}
-          className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-primary text-white text-sm font-semibold hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all flex-shrink-0"
-        >
-          <LinkIcon />
-          เปิด
-        </button>
-      </div>
-      {error && <p id="received-invite-error" role="alert" className="text-xs text-error">{error}</p>}
-    </form>
-  );
-}
-
-// ── Pending received invitations ──────────────────────────────────────────────
-
-function PendingReceivedInvites() {
-  const router = useRouter();
-  const { receivedInvitations } = useInvitations();
-  const pending = receivedInvitations.filter((invitation) =>
-    invitation.status === "pending" || (invitation.requiresTeacherApproval && invitation.requestedAt),
-  );
-
-  if (pending.length === 0) return null;
-
-  return (
-    <div className="space-y-2">
-      <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">
-        คำเชิญที่ส่งถึงฉัน
-      </p>
-      {pending.map((inv) => (
-        <div
-          key={inv.id}
-          className="bg-surface border border-primary/20 rounded-xl px-4 py-3 flex items-start justify-between gap-3"
-        >
-          <div className="flex-1 min-w-0 space-y-0.5">
-            <p className="text-sm font-semibold text-text truncate">
-              {inv.inviterEmail ?? "ผู้ส่งคำเชิญ"}
-            </p>
-            <p className="text-xs text-text-muted">
-              {INVITATION_ROLE_LABELS[inv.role]} · {inv.requiresTeacherApproval && inv.requestedAt
-                ? inv.status === "pending" ? (inv.isAdditionalGuardian ? "รออนุมัติ" : "รอครูอนุมัติ") : inv.status === "accepted" ? "อนุมัติแล้ว" : "คำขอปิดแล้ว"
-                : `หมดอายุ ${new Date(inv.expiresAt).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}`}
-            </p>
-          </div>
-          <button
-            onClick={() => router.push(`/invite/accept?token=${encodeURIComponent(inv.token)}`)}
-            className="px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-all flex-shrink-0"
-          >
-            {inv.requiresTeacherApproval ? "ดูคำเชิญ" : "ตอบรับ"}
-          </button>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ── Received grants ───────────────────────────────────────────────────────────
-
 function ReceivedGrantsSection() {
   const { receivedGrants } = useChildAccess();
   const active = receivedGrants.filter((g) => !g.revokedAt);
@@ -318,7 +169,7 @@ function ReceivedGrantsSection() {
             </p>
             <p className="text-xs text-text-muted">{ACCESS_ROLE_LABELS[grant.role]}</p>
           </div>
-          <span className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success border border-success/20 flex-shrink-0">
+          <span className="text-xs px-2 py-0.5 rounded-full bg-success/10 text-success-text border border-success/20 flex-shrink-0">
             ใช้งานอยู่
           </span>
         </div>
@@ -398,22 +249,15 @@ function DataManagerSection() {
     flash("success", "ล้างข้อมูลทั้งหมดสำเร็จ — ยังคงตั้งค่าธีมและเมนูไว้");
   }, [userId, progressRepo, obsRepo, profileRepo, flash]);
 
-  const handleLoadDemo = useCallback(() => {
-    void progressRepo.replaceProgress(DEMO_PROGRESS);
-    void obsRepo.replaceNotes(DEMO_OBSERVATIONS);
-    setStorageInfo(getStorageSummary(userId));
-    flash("success", `โหลดข้อมูลสาธิตสำเร็จ (${DEMO_ATTEMPT_COUNT} ครั้ง)`);
-  }, [userId, progressRepo, obsRepo, flash]);
-
   return (
     <div>
       {/* Storage status */}
       <div className="flex items-center gap-3 flex-wrap mb-4">
         {storageInfo.hasProfile && (
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-success/10 text-success text-xs font-semibold">มีโปรไฟล์</span>
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-success/10 text-success-text text-xs font-semibold">มีโปรไฟล์</span>
         )}
         {storageInfo.hasProgress && (
-          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-info/10 text-info text-xs font-semibold">มีข้อมูลการฝึก</span>
+          <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-info/10 text-info-text text-xs font-semibold">มีข้อมูลการฝึก</span>
         )}
         {storageInfo.hasObservations && (
           <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-secondary/10 text-secondary text-xs font-semibold">มีบันทึก</span>
@@ -428,7 +272,7 @@ function DataManagerSection() {
         <div
           className={`mb-4 px-4 py-3 rounded-xl text-sm font-medium ${
             message.type === "success"
-              ? "bg-success/10 text-success border border-success/20"
+              ? "bg-success/10 text-success-text border border-success/20"
               : "bg-error/10 text-error border border-error/20"
           }`}
           role="alert"
@@ -444,7 +288,7 @@ function DataManagerSection() {
           <p className="text-xs text-text-muted mb-4">ข้อมูลโปรไฟล์ การฝึก บันทึก จะถูกลบทั้งหมด ไม่สามารถกู้คืนได้</p>
           <div className="flex gap-3 justify-center">
             <button onClick={() => setConfirmState(null)} className="px-5 py-2 rounded-xl border border-border text-text-muted font-medium text-sm hover:bg-gray-50 dark:hover:bg-white/5 transition-all">ยกเลิก</button>
-            <button onClick={handleClear} className="px-5 py-2 rounded-xl bg-error text-white font-semibold text-sm hover:bg-error/90 transition-all">ล้างข้อมูล</button>
+            <button onClick={handleClear} className="px-5 py-2 rounded-xl bg-error text-error-foreground font-semibold text-sm hover:bg-error/90 transition-all">ล้างข้อมูล</button>
           </div>
         </div>
       )}
@@ -475,9 +319,9 @@ function DataManagerSection() {
             </button>
           </div>
           <div className="grid grid-cols-2 gap-2">
-            <button onClick={handleLoadDemo} className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/8 border border-primary/15 text-sm font-semibold text-primary hover:bg-primary/12 transition-all active:scale-[0.98]">
-              โหลดข้อมูลสาธิต
-            </button>
+            <Link href="/demo" className="flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary/8 border border-primary/15 text-sm font-semibold text-primary-text hover:bg-primary/12 transition-all active:scale-[0.98]">
+              ดูตัวอย่างระบบ
+            </Link>
             <button onClick={() => setConfirmState("clear")} className="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-error/30 text-sm font-semibold text-error hover:bg-error/8 transition-all active:scale-[0.98]">
               ล้างข้อมูลทั้งหมด
             </button>
@@ -502,76 +346,73 @@ function DataManagerSection() {
 export default function SettingsPage() {
   const { user } = useAuth();
   const isParentUser = !user || (isParent(user) && !user.isPlatformAdmin);
+  const online = Boolean(user) && isSupabaseConfigured();
+  const sections: SectionNavItem[] = [
+    { id: "account", label: "บัญชีผู้ใช้" },
+    ...(online ? [{ id: "personal", label: "ข้อมูลส่วนตัว" }, { id: "password", label: "รหัสผ่าน" }] : []),
+    { id: "appearance", label: "การแสดงผล" },
+    { id: "invitations", label: "รหัสเข้าร่วมและสิทธิ์" },
+    ...(isParentUser ? [{ id: "device-data", label: "ข้อมูลในเครื่อง" }] : []),
+    ...(user ? [{ id: "privacy", label: "ความเป็นส่วนตัว" }] : []),
+    { id: "about", label: "เกี่ยวกับแอป" },
+  ];
 
   return (
     <AppShell>
-      <div className="max-w-3xl mx-auto px-4 py-5 space-y-5">
+      <Page>
+        <PageHeader icon={<Settings size={20} />} title="ตั้งค่า" description="บัญชี การแสดงผล และความเป็นส่วนตัว" />
 
-        {/* Page title */}
-        <div>
-          <h1 className="text-xl font-bold text-text">ตั้งค่า</h1>
-          <p className="text-sm text-text-muted mt-1">จัดการบัญชีและการตั้งค่าแอป</p>
+        {/* Desktop: section menu on the left, settings on the right. Phones: chips above the settings. */}
+        <div className="space-y-6 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:items-start lg:gap-10 lg:space-y-0">
+          <SectionNav items={sections} label="หมวดการตั้งค่า" />
+          <div className="min-w-0 max-w-3xl space-y-8">
+            <Section id="account" title="บัญชีผู้ใช้">{user ? <AccountCard /> : <LocalModeCard />}</Section>
+
+            {online && (
+              <>
+                <Section id="personal" title="ข้อมูลส่วนตัว" description="ชื่อนี้แสดงให้ครู ผู้ดูแลโรงเรียน และผู้ปกครองร่วมเห็น เบอร์โทรเห็นเฉพาะคนที่อนุมัติคำขอของคุณ">
+                  <PersonalInfoCard />
+                </Section>
+                <Section id="password" title="รหัสผ่าน"><ChangePasswordCard /></Section>
+              </>
+            )}
+
+            <Section id="appearance" title="การแสดงผล"><AppearanceSection /></Section>
+
+            <Section id="invitations" title="รหัสเข้าร่วมและสิทธิ์ที่ได้รับ" description="ได้รับใบเชิญ QR หรือรหัสจากครูหรือโรงเรียน ใช้ที่หน้าใช้รหัสเข้าร่วม"
+              action={<ButtonLink href="/join" size="sm" variant="outline" icon={<KeyRound size={14} aria-hidden="true" />}>ใช้รหัสเข้าร่วม</ButtonLink>}>
+              <Card><CardContent><ReceivedGrantsSection /></CardContent></Card>
+            </Section>
+
+            {isParentUser && (
+              <Section id="device-data" title="ข้อมูลในเครื่อง" description="สำรอง นำเข้า หรือล้างข้อมูลที่เก็บในเบราว์เซอร์นี้">
+                <Card><CardContent>
+                  <details>
+                    <summary className="cursor-pointer text-sm font-semibold text-text">เปิดเครื่องมือสำรองและจัดการข้อมูล</summary>
+                    <div className="mt-4 space-y-4">
+                      <DataManagerSection />
+                      <details className="border-t border-border pt-3">
+                        <summary className="cursor-pointer text-sm text-text-muted">ตัวช่วยตรวจสอบข้อมูลก่อนซิงก์</summary>
+                        <div className="mt-3"><CloudSyncPreview /></div>
+                      </details>
+                    </div>
+                  </details>
+                </CardContent></Card>
+              </Section>
+            )}
+
+            {user && <Section id="privacy" title="ความเป็นส่วนตัวและข้อมูล"><PrivacySection parent={isParentUser} /></Section>}
+
+            <Section id="about" title="เกี่ยวกับแอป">
+              <Card><dl className="divide-y divide-border text-sm">
+                <div className="flex items-center justify-between px-4 py-3"><dt className="text-text-muted">เวอร์ชัน</dt><dd className="font-medium">0.1.0</dd></div>
+                <div className="flex items-center justify-between px-4 py-3"><dt className="text-text-muted">ข้อมูลจัดเก็บที่</dt>
+                  <dd className="font-medium">{isSupabaseConfigured() ? "ออนไลน์ (Supabase)" : "ในเบราว์เซอร์นี้"}</dd></div>
+              </dl></Card>
+            </Section>
+          </div>
         </div>
-
-        {/* ── Account ───────────────────────────────────────────────────── */}
-        <section>
-          <SectionHeader title="บัญชีผู้ใช้" />
-          {user ? <AccountCard /> : <LocalModeCard />}
-        </section>
-
-        {/* ── Appearance ────────────────────────────────────────────────── */}
-        <section>
-          <SectionHeader title="การแสดงผล" />
-          <AppearanceSection />
-        </section>
-
-        <section id="invitations" className="scroll-mt-14">
-          <SectionHeader title="คำเชิญที่ได้รับ" description={isParentUser && user ? "เปิดกล่องข้อความเพื่อตอบรับคำเชิญจากครู" : "เปิดลิงก์คำเชิญหรือดูสิทธิ์ที่บัญชีนี้ได้รับ"} />
-          <div className="space-y-4 rounded-xl border border-border bg-surface p-4">
-            {isParentUser && user ?
-              <Link href="/inbox" className="font-semibold text-primary">เปิดกล่องข้อความ</Link> :
-              <><PendingReceivedInvites /><ReceivedInviteSection /></>}
-            <ReceivedGrantsSection />
-          </div>
-        </section>
-
-        {isParentUser && (
-          <>
-            <Link href="/profile" className="block rounded-xl border border-border bg-surface p-4 text-sm hover:border-primary">
-              <span className="block font-semibold text-primary">ข้อมูลลูกและผู้ปกครองร่วม →</span>
-              <span className="mt-1 block text-xs text-text-muted">ดูข้อมูลเด็ก เชิญผู้ปกครองร่วม และจัดการการเชื่อม</span>
-            </Link>
-            <details className="rounded-xl border border-border bg-surface p-4">
-              <summary className="cursor-pointer text-sm font-semibold text-text">สำรองและจัดการข้อมูลในอุปกรณ์</summary>
-              <div className="mt-4 space-y-4">
-                <DataManagerSection />
-                <details className="border-t border-border pt-3">
-                  <summary className="cursor-pointer text-sm text-text-muted">ตัวช่วยตรวจสอบข้อมูลก่อนซิงก์</summary>
-                  <div className="mt-3"><CloudSyncPreview /></div>
-                </details>
-              </div>
-            </details>
-          </>
-        )}
-
-        {/* ── App info ──────────────────────────────────────────────────── */}
-        <section>
-          <SectionHeader title="เกี่ยวกับแอป" />
-          <div className="bg-surface border border-border rounded-xl divide-y divide-border">
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-text-muted">เวอร์ชัน</span>
-              <span className="text-sm font-medium text-text">0.1.0</span>
-            </div>
-            <div className="flex items-center justify-between px-4 py-3">
-              <span className="text-sm text-text-muted">ข้อมูลจัดเก็บที่</span>
-              <span className="text-sm font-medium text-text">
-                {isSupabaseConfigured() ? "Supabase Cloud" : "localStorage"}
-              </span>
-            </div>
-          </div>
-        </section>
-
-      </div>
+      </Page>
     </AppShell>
   );
 }

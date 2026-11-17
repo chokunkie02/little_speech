@@ -42,3 +42,7 @@ yarn-error.log*
 next-env.d.ts
 
 /.learning-runtime/
+
+# Supabase CLI local state (start-secrets holds local service keys)
+supabase/.branches/
+supabase/.temp/

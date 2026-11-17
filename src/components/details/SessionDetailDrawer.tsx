@@ -199,7 +199,7 @@ export default function SessionDetailDrawer({ session, allAttempts, onClose, onA
                       <div
                         className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0 ${
                           isPassed
-                            ? "bg-success/12 text-success"
+                            ? "bg-success/12 text-success-text"
                             : isAlmost
                             ? "bg-secondary/12 text-secondary"
                             : "bg-error/12 text-error"

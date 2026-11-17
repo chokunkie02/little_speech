@@ -63,6 +63,8 @@ export interface UserDisplayInfo {
   userId: string;
   email: string;
   role: string | null;
+  /** "ชื่อ นามสกุล" when the account has one. */
+  displayName: string | null;
 }
 
 export const ORG_TYPE_LABELS: Record<OrganizationType, string> = {

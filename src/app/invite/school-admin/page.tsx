@@ -1,5 +1,6 @@
-import SchoolInvitationPage from "@/components/school/SchoolInvitationPage";
+import RetiredInvitePage from "@/components/join/RetiredInvitePage";
 
-export default function SchoolAdminInvitationPage() {
-  return <SchoolInvitationPage role="school_admin" />;
+// Old email-invitation links land here; joining now uses /join.
+export default function Page() {
+  return <RetiredInvitePage />;
 }

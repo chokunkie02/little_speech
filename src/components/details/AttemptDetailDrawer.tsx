@@ -156,8 +156,8 @@ export default function AttemptDetailDrawer({ attempt, linkedSession, onClose, o
                   <span className="text-sm text-text flex-1">
                     &ldquo;{attempt.transcript}&rdquo;
                     <span className={`ml-2 text-xs font-medium ${
-                      attempt.confidence >= 0.8 ? "text-success" :
-                      attempt.confidence >= 0.55 ? "text-info" : "text-warning"
+                      attempt.confidence >= 0.8 ? "text-success-text" :
+                      attempt.confidence >= 0.55 ? "text-info-text" : "text-warning-text"
                     }`}>
                       {attempt.confidence >= 0.8 ? "· ชัดเจน" :
                        attempt.confidence >= 0.55 ? "· ค่อนข้างชัด" : "· เสียงยังไม่ชัด"}
@@ -255,7 +255,7 @@ export default function AttemptDetailDrawer({ attempt, linkedSession, onClose, o
           {/* Feedback */}
           {attempt.feedback && (
             <div className="bg-info/8 border border-info/20 rounded-xl p-4">
-              <p className="text-xs font-semibold text-info mb-1.5">ผลการประเมินจาก AI</p>
+              <p className="text-xs font-semibold text-info-text mb-1.5">ผลการประเมินจาก AI</p>
               <p className="text-sm text-text leading-relaxed">{plainFeedback(attempt.feedback)}</p>
             </div>
           )}
@@ -263,7 +263,7 @@ export default function AttemptDetailDrawer({ attempt, linkedSession, onClose, o
           {/* Practice tip — only if differs from recommendation to avoid duplication */}
           {attempt.practiceTip && attempt.practiceTip !== attempt.recommendation && (
             <div className="bg-success/8 border border-success/20 rounded-xl p-4">
-              <p className="text-xs font-semibold text-success mb-1.5">เคล็ดลับการฝึก</p>
+              <p className="text-xs font-semibold text-success-text mb-1.5">เคล็ดลับการฝึก</p>
               <p className="text-sm text-text leading-relaxed">{plainFeedback(attempt.practiceTip)}</p>
             </div>
           )}
@@ -271,12 +271,12 @@ export default function AttemptDetailDrawer({ attempt, linkedSession, onClose, o
           {/* Detected issues — shown with supportive framing */}
           {attempt.detectedIssues && attempt.detectedIssues.length > 0 && (
             <div className="bg-warning/8 border border-warning/20 rounded-xl p-4">
-              <p className="text-xs font-semibold text-warning mb-2">จุดที่ AI สังเกตเห็น</p>
+              <p className="text-xs font-semibold text-warning-text mb-2">จุดที่ AI สังเกตเห็น</p>
               <p className="text-xs text-text-muted mb-2">ลองฝึกซ้ำกับจุดเหล่านี้จะช่วยพัฒนาได้มากขึ้นค่ะ</p>
               <ul className="space-y-1">
                 {attempt.detectedIssues.map((issue, i) => (
                   <li key={i} className="flex items-start gap-2 text-sm text-text">
-                    <span className="text-warning flex-shrink-0 mt-0.5">·</span>
+                    <span className="text-warning-text flex-shrink-0 mt-0.5">·</span>
                     {issue}
                   </li>
                 ))}

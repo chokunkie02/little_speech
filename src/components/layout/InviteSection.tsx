@@ -1,44 +1,15 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
-import { useInvitations } from "@/hooks/useInvitations";
+import { useState, useCallback, useEffect, useEffectEvent, useMemo } from "react";
+import { useSchool } from "@/hooks/useSchool";
 import { useChildAccess } from "@/hooks/useChildAccess";
 import { useChildProfile } from "@/hooks/useChildProfile";
 import { useAuth } from "@/hooks/useAuth";
-import { useCurrentChildAccess } from "@/hooks/useCurrentChildAccess";
 import type { ChildAccess, ChildPermissions } from "@/types/childAccess";
-import type { Invitation, InvitationRole, InvitationStatus } from "@/types/invitations";
-import { INVITATION_ROLE_LABELS, INVITATION_STATUS_LABELS } from "@/types/invitations";
+import type { UserDisplayInfo } from "@/types/school";
 import { ACCESS_ROLE_LABELS } from "@/types/childAccess";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
-
-function PlusIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="12" y1="5" x2="12" y2="19" />
-      <line x1="5" y1="12" x2="19" y2="12" />
-    </svg>
-  );
-}
-
-function CopyIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-      <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-    </svg>
-  );
-}
-
-function XIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  );
-}
 
 function CheckIcon() {
   return (
@@ -53,23 +24,6 @@ function DashIcon() {
     <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <line x1="5" y1="12" x2="19" y2="12" />
     </svg>
-  );
-}
-
-// ── Status badge ──────────────────────────────────────────────────────────────
-
-const STATUS_CLASSES: Record<InvitationStatus, string> = {
-  pending:  "bg-warning/10 text-warning border-warning/20",
-  accepted: "bg-success/10 text-success border-success/20",
-  expired:  "bg-border/60 text-text-muted border-border",
-  revoked:  "bg-error/10 text-error border-error/20",
-};
-
-function StatusBadge({ status }: { status: InvitationStatus }) {
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border ${STATUS_CLASSES[status]}`}>
-      {INVITATION_STATUS_LABELS[status]}
-    </span>
   );
 }
 
@@ -96,9 +50,9 @@ function PermissionChips({ permissions, editable, onToggle }: PermissionChipsPro
     <div className="flex flex-wrap gap-1.5">
       {entries.map((key) => {
         const on = permissions[key];
-        const baseClass = "inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border transition-all";
+        const baseClass = "inline-flex min-h-7 items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border transition-colors";
         const stateClass = on
-          ? "bg-success/10 text-success border-success/20"
+          ? "bg-success/10 text-success-text border-success/20"
           : "bg-border/40 text-text-muted border-border";
         const clickableClass = editable ? " hover:scale-[1.02] cursor-pointer" : "";
         return (
@@ -115,285 +69,6 @@ function PermissionChips({ permissions, editable, onToggle }: PermissionChipsPro
           </button>
         );
       })}
-    </div>
-  );
-}
-
-// ── Create form ───────────────────────────────────────────────────────────────
-
-const ROLE_OPTIONS: InvitationRole[] = ["parent", "teacher", "therapist", "school_admin", "viewer"];
-
-interface CreateFormProps {
-  onClose: () => void;
-}
-
-function CreateInviteForm({ onClose }: CreateFormProps) {
-  const { createInvitation } = useInvitations();
-  const { profiles } = useChildProfile();
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<InvitationRole>("parent");
-  const [childId, setChildId] = useState<string>(profiles[0]?.id ?? "");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!email.trim()) return;
-    setLoading(true);
-    setError(null);
-    try {
-      await createInvitation({ email: email.trim(), role, childId: childId || undefined });
-      onClose();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "เกิดข้อผิดพลาด");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4 bg-surface border border-primary/20 rounded-xl p-4">
-      <div>
-        <label className="block text-sm font-semibold text-text mb-1.5">อีเมล</label>
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="example@email.com"
-          required
-          className="w-full bg-bg border border-border rounded-lg px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
-        />
-      </div>
-
-      {profiles.length > 0 && (
-        <div>
-          <label className="block text-sm font-semibold text-text mb-1.5">เด็กที่แชร์</label>
-          <select
-            value={childId}
-            onChange={(e) => setChildId(e.target.value)}
-            className="w-full bg-bg border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
-          >
-            <option value="">— ไม่ระบุ —</option>
-            {profiles.map((p) => (
-              <option key={p.id} value={p.id}>{p.name}</option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      <div>
-        <label className="block text-sm font-semibold text-text mb-1.5">บทบาท</label>
-        <select
-          value={role}
-          onChange={(e) => setRole(e.target.value as InvitationRole)}
-          className="w-full bg-bg border border-border rounded-lg px-3 py-2 text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all"
-        >
-          {ROLE_OPTIONS.map((r) => (
-            <option key={r} value={r}>{INVITATION_ROLE_LABELS[r]}</option>
-          ))}
-        </select>
-      </div>
-
-      {error && (
-        <p className="text-sm text-error">{error}</p>
-      )}
-
-      <div className="flex gap-2 pt-1">
-        <button
-          type="submit"
-          disabled={loading || !email.trim()}
-          className="flex-1 bg-primary text-white text-sm font-semibold py-2 rounded-lg hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
-        >
-          {loading ? "กำลังสร้าง…" : "ส่งคำเชิญ"}
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className="px-4 py-2 rounded-lg border border-border text-sm text-text-muted hover:text-text transition-all"
-        >
-          ยกเลิก
-        </button>
-      </div>
-    </form>
-  );
-}
-
-// ── Section 1: Invite New Member ──────────────────────────────────────────────
-
-export function InviteNewMemberSection() {
-  const { isAuthenticated } = useAuth();
-  const { canManageAccess } = useCurrentChildAccess();
-  const [showForm, setShowForm] = useState(false);
-
-  if (!isAuthenticated) {
-    return (
-      <p className="text-sm text-text-muted bg-surface border border-border rounded-xl px-4 py-3">
-        กรุณา <span className="font-semibold text-primary">เข้าสู่ระบบ</span> ก่อนเชิญสมาชิก
-      </p>
-    );
-  }
-
-  // Only owner can invite new members.
-  if (!canManageAccess) {
-    return (
-      <p className="text-sm text-text-muted">
-        คุณมีสิทธิ์ดูเท่านั้น — การเชิญสมาชิกทำได้เฉพาะเจ้าของโปรไฟล์เด็ก
-      </p>
-    );
-  }
-
-  if (showForm) {
-    return <CreateInviteForm onClose={() => setShowForm(false)} />;
-  }
-
-  return (
-    <button
-      onClick={() => setShowForm(true)}
-      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary/90 transition-all"
-    >
-      <PlusIcon />
-      เชิญสมาชิกใหม่
-    </button>
-  );
-}
-
-// ── Section 2: Sent Invitations (history + cancel pending) ────────────────────
-
-export function SentInvitesSection() {
-  const { sentInvitations, revokeInvitation } = useInvitations();
-  const { isAuthenticated } = useAuth();
-  const [copiedToken, setCopiedToken] = useState<string | null>(null);
-  const [confirmRevokeId, setConfirmRevokeId] = useState<string | null>(null);
-  const [revoking, setRevoking] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const copyLink = useCallback((token: string) => {
-    const url = `${window.location.origin}/invite/accept?token=${token}`;
-    void navigator.clipboard.writeText(url).then(() => {
-      setCopiedToken(token);
-      setTimeout(() => setCopiedToken(null), 2000);
-    });
-  }, []);
-
-  const handleRevoke = useCallback(
-    async (id: string) => {
-      setRevoking(true);
-      setError(null);
-      try {
-        await revokeInvitation(id);
-        setConfirmRevokeId(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "ยกเลิกคำเชิญไม่สำเร็จ");
-      } finally {
-        setRevoking(false);
-      }
-    },
-    [revokeInvitation],
-  );
-
-  const pending = sentInvitations.filter((i) => i.status === "pending");
-  const others = sentInvitations.filter((i) => i.status !== "pending");
-
-  if (!isAuthenticated) return null;
-
-  if (sentInvitations.length === 0) {
-    return (
-      <p className="text-sm text-text-muted text-center py-4">
-        ยังไม่มีคำเชิญที่ส่ง — กดปุ่ม &quot;เชิญสมาชิกใหม่&quot; เพื่อเริ่มต้น
-      </p>
-    );
-  }
-
-  return (
-    <div className="space-y-3">
-      {error && (
-        <div className="flex items-start justify-between gap-3 bg-error/10 border border-error/30 text-error rounded-xl px-3 py-2 text-xs">
-          <span className="flex-1">{error}</span>
-          <button onClick={() => setError(null)} className="font-semibold hover:underline flex-shrink-0">
-            ปิด
-          </button>
-        </div>
-      )}
-
-      {/* Pending: still actionable (copy link / cancel) */}
-      {pending.length > 0 && (
-        <div className="space-y-2">
-          {pending.map((inv) => (
-            <div
-              key={inv.id}
-              className="bg-surface border border-border rounded-xl px-4 py-3 flex items-start justify-between gap-3"
-            >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-sm font-semibold text-text truncate">{inv.email}</span>
-                  <span className="text-xs text-text-muted">{INVITATION_ROLE_LABELS[inv.role]}</span>
-                  <StatusBadge status={inv.status} />
-                </div>
-                <p className="text-xs text-text-muted mt-0.5">
-                  หมดอายุ {new Date(inv.expiresAt).toLocaleDateString("th-TH", { day: "numeric", month: "short", year: "numeric" })}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-1.5 flex-shrink-0">
-                {confirmRevokeId === inv.id ? (
-                  <>
-                    <button
-                      onClick={() => void handleRevoke(inv.id)}
-                      disabled={revoking}
-                      className="px-2.5 py-1.5 rounded-lg bg-error text-white text-xs font-semibold hover:bg-error/90 disabled:opacity-40 transition-all"
-                    >
-                      {revoking ? "…" : "ยืนยัน"}
-                    </button>
-                    <button
-                      onClick={() => setConfirmRevokeId(null)}
-                      className="px-2.5 py-1.5 rounded-lg border border-border text-xs text-text-muted hover:text-text transition-all"
-                    >
-                      ยกเลิก
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <button
-                      onClick={() => copyLink(inv.token)}
-                      title="คัดลอกลิงก์คำเชิญ"
-                      className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-border text-xs text-text-muted hover:text-text hover:border-primary/30 transition-all"
-                    >
-                      <CopyIcon />
-                      {copiedToken === inv.token ? "คัดลอกแล้ว" : "คัดลอกลิงก์"}
-                    </button>
-                    <button
-                      onClick={() => setConfirmRevokeId(inv.id)}
-                      title="ยกเลิกคำเชิญ"
-                      className="p-1.5 rounded-lg border border-transparent text-text-muted hover:text-error hover:border-error/30 transition-all"
-                    >
-                      <XIcon />
-                    </button>
-                  </>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* History: accepted / expired / revoked, read-only */}
-      {others.length > 0 && (
-        <div className="space-y-1.5">
-          <p className="text-xs font-semibold text-text-muted uppercase tracking-wide">ประวัติ</p>
-          {others.map((inv) => (
-            <div
-              key={inv.id}
-              className="flex items-center justify-between gap-3 px-3 py-2.5 bg-surface border border-border rounded-xl opacity-80"
-            >
-              <span className="text-sm text-text-muted truncate">{inv.email}</span>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="text-xs text-text-muted">{INVITATION_ROLE_LABELS[inv.role]}</span>
-                <StatusBadge status={inv.status} />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   );
 }
@@ -449,7 +124,7 @@ function MemberCard({ grant, email, onRevoke, onUpdatePermission }: MemberCardPr
               <button
                 onClick={() => void handleRevokeClick()}
                 disabled={busy}
-                className="px-2.5 py-1.5 rounded-lg bg-error text-white text-xs font-semibold hover:bg-error/90 disabled:opacity-40 transition-all"
+                className="px-2.5 py-1.5 rounded-lg bg-error text-error-foreground text-xs font-semibold hover:bg-error/90 disabled:opacity-40 transition-all"
               >
                 {busy ? "…" : "ยืนยัน"}
               </button>
@@ -489,7 +164,8 @@ function MemberCard({ grant, email, onRevoke, onUpdatePermission }: MemberCardPr
 export function ChildAccessSection() {
   const { profiles } = useChildProfile();
   const { issuedGrants, revokeChildAccess, updateChildPermissions } = useChildAccess();
-  const { sentInvitations } = useInvitations();
+  const { resolveUserDisplays } = useSchool();
+  const [people, setPeople] = useState<Map<string, UserDisplayInfo>>(new Map());
   const { isAuthenticated } = useAuth();
 
   const active = useMemo(() => issuedGrants.filter((g) => !g.revokedAt), [issuedGrants]);
@@ -505,18 +181,21 @@ export function ChildAccessSection() {
     return map;
   }, [active]);
 
-  // Email lookup: invitation.acceptedBy === grant.userId AND childId matches.
+  // Names of the people who joined with the family code (account_profiles → user_display_profiles).
+  const userIds = useMemo(() => [...new Set(active.map((grant) => grant.userId))].sort().join(","), [active]);
+  const resolve = useEffectEvent((ids: string[]) => resolveUserDisplays(ids));
+  useEffect(() => {
+    if (!userIds) return;
+    let current = true;
+    resolve(userIds.split(",")).then((map) => { if (current) setPeople(map); }).catch(() => {});
+    return () => { current = false; };
+  }, [userIds]);
   const memberEmail = useCallback(
     (grant: ChildAccess): string => {
-      const inv = sentInvitations.find(
-        (i: Invitation) =>
-          i.acceptedBy === grant.userId &&
-          i.childId === grant.childId &&
-          i.status === "accepted",
-      );
-      return inv?.email ?? `${grant.userId.slice(0, 8)}…`;
+      const person = people.get(grant.userId);
+      return person?.displayName || person?.email || "ผู้ใช้ที่เข้าร่วมด้วยรหัสชวน";
     },
-    [sentInvitations],
+    [people],
   );
 
   // Child name lookup: prefer owned profile, fall back to snapshot, else id prefix.

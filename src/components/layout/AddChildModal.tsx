@@ -329,7 +329,7 @@ export default function AddChildModal({ open, onClose }: AddChildModalProps) {
 
               {/* Info notice */}
               <div className="bg-info/8 border border-info/20 rounded-xl px-4 py-3">
-                <p className="text-xs text-info leading-relaxed">
+                <p className="text-xs text-info-text leading-relaxed">
                   ข้อมูลการฝึกของน้อง <strong>{name.trim()}</strong> จะเริ่มต้นใหม่
                   โดยไม่กระทบประวัติของเด็กคนอื่น
                 </p>

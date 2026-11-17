@@ -8,9 +8,10 @@ import {
   useState,
 } from "react";
 import type { ReactNode } from "react";
-import type { AuthContextValue, AuthSession, UserRole } from "@/types/auth";
+import type { AuthContextValue, AuthSession } from "@/types/auth";
+import type { SignUpDetails } from "@/lib/auth/accountDetails";
 import * as supabaseAuth from "@/lib/auth/supabaseAuth";
-import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 // ── Context ───────────────────────────────────────────────────────────────────
 
@@ -57,9 +58,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
+    // A password-reset link can land on any allowed URL; always finish it on the reset page.
+    const recovery = getSupabaseClient()?.auth.onAuthStateChange((event) => {
+      if (event === "PASSWORD_RECOVERY" && window.location.pathname !== "/auth/reset-password") {
+        window.location.replace("/auth/reset-password");
+      }
+    });
+
     return () => {
       cancelled = true;
       unsubscribe();
+      recovery?.data.subscription.unsubscribe();
     };
   }, []);
 
@@ -69,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signUp = useCallback(
-    (email: string, password: string, role?: UserRole) => supabaseAuth.signUp(email, password, role),
+    (email: string, password: string, details: SignUpDetails) => supabaseAuth.signUp(email, password, details),
     [],
   );
 

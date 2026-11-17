@@ -5,6 +5,7 @@
 import { getSupabaseClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import type { AuthResult, AuthSession, AuthUser, UserRole } from "@/types/auth";
 import type { User, Session } from "@supabase/supabase-js";
+import type { SignUpDetails } from "@/lib/auth/accountDetails";
 
 // Keep a local reference to the constant without importing the value
 // (avoids a circular-style import oddity with `as const` re-exports).
@@ -74,6 +75,7 @@ export async function signIn(email: string, password: string): Promise<AuthResul
 export async function signUp(
   email: string,
   password: string,
+  details: SignUpDetails,
   role: UserRole = "parent",
 ): Promise<AuthResult> {
   if (!isSupabaseConfigured()) {
@@ -83,13 +85,24 @@ export async function signUp(
   if (!client) return { success: false, error: "ยังไม่ได้ตั้งค่า Authentication" };
 
   try {
-    const { error } = await client.auth.signUp({
+    const { data, error } = await client.auth.signUp({
       email,
       password,
-      options: { data: { role } },
+      options: {
+        data: {
+          role,
+          title: details.title,
+          first_name: details.firstName,
+          last_name: details.lastName,
+          phone: details.phone,
+          accepted_terms: details.acceptedTerms,
+          full_name: `${details.firstName} ${details.lastName}`,
+        },
+      },
     });
     if (error) return { success: false, error: error.message };
-    return { success: true };
+    // No session means the project still requires email confirmation.
+    return { success: true, needsConfirmation: !data.session };
   } catch {
     return { success: false, error: "เกิดข้อผิดพลาด กรุณาลองใหม่" };
   }

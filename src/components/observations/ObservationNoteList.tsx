@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Plus } from "lucide-react";
 import type { ObservationNote, ObservationCategory, ObservationTargetType } from "@/types/observations";
 import { CATEGORY_META } from "@/types/observations";
 import ObservationNoteCard from "./ObservationNoteCard";
@@ -35,15 +36,6 @@ export default function ObservationNoteList({ notes, onAdd, onEdit, onDelete, ta
 
   const usedCategories = [...new Set(notes.map((n) => n.category))];
 
-  function PlusIcon() {
-    return (
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-        <line x1="12" y1="5" x2="12" y2="19" />
-        <line x1="5" y1="12" x2="19" y2="12" />
-      </svg>
-    );
-  }
-
   return (
     <div className="space-y-4">
       {/* Header */}
@@ -60,7 +52,7 @@ export default function ObservationNoteList({ notes, onAdd, onEdit, onDelete, ta
             onClick={() => setShowForm(true)}
             className="flex items-center gap-1.5 text-xs font-semibold text-primary border border-primary/30 px-3 py-1.5 rounded-xl hover:bg-primary/8 transition-all"
           >
-            <PlusIcon />
+            <Plus size={14} strokeWidth={2.5} aria-hidden="true" />
             เพิ่มบันทึก
           </button>
         )}

@@ -1,7 +1,8 @@
-/* The practice layout is scoped to this feature and uses the host theme. */
+/* The practice layout is scoped to this feature and uses the host theme tokens (globals.css). */
 .learning-studio-scope.learning-studio-scope {
   --primary: var(--color-primary);
-  --primary-soft: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  --primary-soft: var(--color-primary-soft);
+  --primary-ink: var(--color-primary-text);
   --orange: var(--color-secondary);
   --success: var(--color-success);
   --error: var(--color-error);
@@ -11,67 +12,73 @@
   --text: var(--color-text);
   --muted: var(--color-text-muted);
   --border: var(--color-border);
+  --shadow: var(--shadow-card);
   font-family: var(--font-sans);
+}
+
+/* Same focus ring as the rest of the app (the studio drew an orange one). */
+.learning-studio-scope.learning-studio-scope :is(button, a, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .learning-studio-scope > .app-shell > .main-shell {
   margin-left: 0;
 }
 
+/* Header = PageHeader + underline tabs, on the same gutters as <Page>. */
 .learning-studio-scope .studio-header {
   max-width: 72rem;
   margin-inline: auto;
-  padding: 1rem clamp(1rem, 3vw, 2rem) 0;
+  padding: 1.25rem 1rem 0;
 }
+@media (min-width: 640px) { .learning-studio-scope .studio-header { padding-inline: 1.5rem; } }
+@media (min-width: 1024px) { .learning-studio-scope .studio-header { padding-top: 2rem; } }
 
-.learning-studio-scope .studio-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
+.learning-studio-scope .studio-page-header h1 {
+  font-size: var(--text-page-title);
+  font-weight: 700;
+  line-height: 1.3;
+}
+.learning-studio-scope .studio-page-header p {
+  line-height: 1.5;
 }
 
 .learning-studio-scope .studio-nav {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.375rem;
-  padding: 0.375rem;
-  border: 1px solid var(--border);
-  border-radius: 1rem;
-  background: var(--surface);
+  gap: 0.25rem;
+  margin-top: 1rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--border);
+  scrollbar-width: none;
 }
+.learning-studio-scope .studio-nav::-webkit-scrollbar { display: none; }
 
 .learning-studio-scope .studio-nav button {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   gap: 0.5rem;
+  margin-bottom: -1px;
   padding: 0.625rem 0.75rem;
-  border-radius: 0.75rem;
+  border-bottom: 2px solid transparent;
   font-size: 0.875rem;
-  color: var(--muted);
-}
-
-.learning-studio-scope .studio-nav button:hover,
-.learning-studio-scope .studio-nav button[aria-current="page"] {
-  background: var(--primary-soft);
-  color: var(--primary);
-}
-
-.learning-studio-scope .studio-nav button[aria-current="page"] {
   font-weight: 600;
-}
-
-.learning-studio-scope .studio-storage-note {
-  margin-top: 0.75rem;
   color: var(--muted);
-  font-size: 0.8125rem;
+  transition: color .15s, border-color .15s;
+}
+.learning-studio-scope .studio-nav button:hover { color: var(--text); }
+.learning-studio-scope .studio-nav button[aria-current="page"] {
+  border-bottom-color: var(--primary);
+  color: var(--primary-ink);
 }
 
 .learning-studio-scope .main-shell > .content {
   max-width: 72rem;
-  padding: 1rem clamp(1rem, 3vw, 2rem) 1.5rem;
+  min-height: 0;
+  padding: 1.25rem 1rem 2rem;
 }
+@media screen and (min-width: 640px) { .learning-studio-scope .main-shell > .content { padding-inline: 1.5rem; } }
 
 .learning-studio-scope .main-shell .hero,
 .learning-studio-scope .main-shell .practice-card,
@@ -119,7 +126,7 @@
   .learning-studio-scope .plan-preview .preview-facts strong { font-size: .85rem; }
   .learning-studio-scope .journey-card { min-height: 0; gap: .8rem; }
   .learning-studio-scope .journey-card.is-current { border-color: var(--primary); }
-  .learning-studio-scope .current-stage { color: var(--primary); font-weight: 700; }
+  .learning-studio-scope .current-stage { color: var(--primary-ink); font-weight: 700; }
   .learning-studio-scope .preview-mouth .mouth-active-photo { width: min(100%, 11rem); }
   .learning-studio-scope .speaking-layout.with-mouth { display: grid; gap: 1rem; align-items: start; }
   .learning-studio-scope .speaking-media .mouth-coach { margin-bottom: 0; }
@@ -144,4 +151,58 @@
 @media screen and (max-width: 640px) {
   .learning-studio-scope .hero { grid-template-columns: minmax(0, 1fr); }
   .learning-studio-scope .level-picker-heading { align-items: flex-start; flex-direction: column; gap: .35rem; }
+}
+
+/* Colour chips use the host status pairs so they follow light/dark mode. */
+.learning-studio-scope .purple,
+.learning-studio-scope .plan-symbol,
+.learning-studio-scope .guide-icon { background: var(--color-primary-soft); color: var(--color-primary-text); }
+.learning-studio-scope .orange { background: var(--color-warning-soft); color: var(--color-warning-text); }
+.learning-studio-scope .green,
+.learning-studio-scope .pill.green,
+.learning-studio-scope .chips .green,
+.learning-studio-scope .status-tag.green { background: var(--color-success-soft); color: var(--color-success-text); }
+
+/* Chapter numbers are text: keep the stage hue but make it readable. */
+.learning-studio-scope .journey-number:not(.done) { color: color-mix(in srgb, var(--stage-color) 50%, var(--text)); }
+
+
+/* Selected options sit on primary-soft: secondary text uses the primary ink there, not grey. */
+.learning-studio-scope :is(.track-options, .sound-options) > button.selected :is(small, strong, span) { color: var(--primary-ink); }
+
+/* Answer feedback and result tags use the host status pairs (readable in both themes). */
+.learning-studio-scope.learning-studio-scope .feedback.positive { background: var(--color-success-soft); color: var(--color-success-text); }
+.learning-studio-scope.learning-studio-scope .feedback.gentle { background: var(--color-warning-soft); color: var(--color-warning-text); }
+@media screen {
+  .learning-studio-scope .status-tag { background: var(--color-primary-soft); color: var(--primary-ink); }
+  .learning-studio-scope .status-tag.green { background: var(--color-success-soft); color: var(--color-success-text); }
+}
+
+/* Frame counter sits on a cream chip over the mouth photo in both themes. */
+.learning-studio-scope .mouth-step-number { color: #5E4A3F; }
+
+/* ── Desktop / phone layout ─────────────────────────────────────────────── */
+
+/* Phones: keep the sound toggle on the title row instead of wrapping it onto a line of its own. */
+@media (max-width: 639px) {
+  .learning-studio-scope .studio-page-header > div:last-child { flex-wrap: nowrap; }
+  /* Tabs scroll sideways: fade the right edge so it is clear there are more. The end padding lets
+     the last tab scroll clear of the fade. */
+  .learning-studio-scope .studio-nav {
+    padding-right: 2.5rem;
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
+    mask-image: linear-gradient(90deg, #000 calc(100% - 2.5rem), transparent);
+  }
+}
+
+/* Wide screens (1400px+, below that the cards get cramped): the six chapters in two columns instead of one long, mostly empty column. */
+@media (min-width: 1400px) {
+  .learning-studio-scope .journey {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1.5rem;
+  }
+  .learning-studio-scope .journey:before { display: none; }
+  .learning-studio-scope .journey-row { align-items: stretch; }
+  .learning-studio-scope .journey-number { align-self: center; }
+  .learning-studio-scope .journey-card > .button { margin-left: auto; }
 }

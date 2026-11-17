@@ -83,7 +83,7 @@ export default function SchoolGuardianMembers({
                 ? "บัญชีของคุณจะเปิดโปรไฟล์เด็กคนนี้ไม่ได้ ข้อมูลเด็กและผลฝึกยังอยู่กับโรงเรียน"
                 : "บัญชีนี้จะเปิดโปรไฟล์เด็กคนนี้ไม่ได้ ผู้ปกครองคนอื่นยังเชื่อมได้ตามเดิม"}</p>
               <div className="flex gap-2">
-                <button className="rounded-lg bg-error px-2.5 py-1.5 font-semibold text-white disabled:opacity-50"
+                <button className="rounded-lg bg-error px-2.5 py-1.5 font-semibold text-error-foreground disabled:opacity-50"
                   disabled={busy} onClick={() => void remove(member)}>ยืนยัน</button>
                 <button className="rounded-lg border border-border px-2.5 py-1.5" disabled={busy}
                   onClick={() => setConfirmId(undefined)}>ยกเลิก</button>

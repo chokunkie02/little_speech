@@ -3,6 +3,8 @@
 import DisplayIcon from "@/components/ui/DisplayIcon";
 import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
+import { buttonClasses } from "@/components/ui/Button";
+import { EmptyState, LoadingState } from "@/components/ui";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useChildProfile } from "@/hooks/useChildProfile";
 import { useSpeechProgress } from "@/hooks/useSpeechProgress";
@@ -141,14 +143,20 @@ function OnboardingContent() {
   const progressStep = currentDotIndex + 1;
 
   if (authLoading || signedInCreation) {
-    return <main className="p-6 text-sm text-text-muted" role="status">กำลังเปิดข้อมูลบัญชี…</main>;
+    return (
+      <main className="mx-auto min-h-screen w-full max-w-xl bg-bg px-4 pt-10 sm:pt-16">
+        <LoadingState variant="cards" rows={1} label="กำลังเปิดข้อมูลบัญชี…" />
+      </main>
+    );
   }
 
   if (user && (!isOwner || !existingProfile || existingProfile.organizationId)) {
-    return <main className="space-y-2 p-6 text-sm">
-      <p>โปรไฟล์นี้แก้ไขผ่านหน้าข้อมูลลูก</p>
-      <Link href="/profile" className="font-semibold text-primary">เปิดข้อมูลลูก</Link>
-    </main>;
+    return (
+      <main className="mx-auto min-h-screen w-full max-w-xl bg-bg px-4 pt-10 sm:pt-16">
+        <EmptyState title="โปรไฟล์นี้แก้ไขผ่านหน้าข้อมูลลูก"
+          action={<Link href="/profile" className={buttonClasses({ variant: "primary" })}>เปิดข้อมูลลูก</Link>} />
+      </main>
+    );
   }
 
   return (
@@ -159,7 +167,7 @@ function OnboardingContent() {
           <div className="flex items-center justify-between px-6 py-3 max-w-xl mx-auto">
             <button
               onClick={handleBack}
-              className="flex items-center gap-2 text-text-muted hover:text-text transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/8"
+              className="flex items-center gap-2 text-text-muted hover:text-text transition-colors px-2 py-1 rounded-lg hover:bg-surface-muted"
             >
               <BackIcon />
               <span className="text-sm font-medium hidden sm:inline">ย้อนกลับ</span>
@@ -201,13 +209,13 @@ function OnboardingContent() {
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3">
-                <button type="button" onClick={() => setStep(2)} className="rounded-xl bg-primary px-5 py-2.5 font-semibold text-white">
+                <button type="button" onClick={() => setStep(2)} className={buttonClasses()}>
                   เริ่มตั้งค่า
                 </button>
-                <Link href="/" className="rounded-xl border border-border px-4 py-2.5 text-sm font-medium text-text">กลับหน้าแรก</Link>
+                <Link href="/" className={buttonClasses({ variant: "outline" })}>กลับหน้าแรก</Link>
               </div>
               <p className="border-t border-border pt-4 text-sm text-text-muted">
-                ได้รับบัญชีจากโรงเรียนแล้ว? <Link href="/auth/signin" className="font-semibold text-primary">เข้าสู่ระบบ</Link>
+                ได้รับใบเชิญหรือ QR จากโรงเรียน? <Link href="/join" className="font-semibold text-primary">ใช้รหัสเข้าร่วม</Link>
               </p>
             </section>
           )}
@@ -222,15 +230,16 @@ function OnboardingContent() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-text mb-2">
+                  <label htmlFor="profile-name" className="block text-sm font-semibold text-text mb-2">
                     ชื่อ-นามสกุล (หรือชื่อเล่น)
                   </label>
                   <input
+                    id="profile-name"
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="เช่น น้องส้ม หรือ อรวรรณ สุขใจ"
-                    className="w-full bg-surface border border-border rounded-xl px-4 py-3 text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/60 transition-all"
+                    className="w-full bg-surface border border-border rounded-control px-4 py-3 text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary transition-colors"
                   />
                 </div>
 
@@ -245,10 +254,10 @@ function OnboardingContent() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-text mb-2">
+                  <p id="profile-goal" className="block text-sm font-semibold text-text mb-2">
                     เป้าหมายการฝึก
-                  </label>
-                  <div className="space-y-2">
+                  </p>
+                  <div className="space-y-2" role="group" aria-labelledby="profile-goal">
                     {GOALS.map((goal) => (
                       <button
                         key={goal.id}
@@ -281,7 +290,7 @@ function OnboardingContent() {
               <button
                 onClick={() => setStep(3)}
                 disabled={!name.trim()}
-                className="w-full bg-primary text-white font-semibold px-8 py-3.5 rounded-xl text-base hover:bg-primary/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.99]"
+                className={buttonClasses({ size: "lg", block: true })}
               >
                 ถัดไป →
               </button>
@@ -332,23 +341,23 @@ function OnboardingContent() {
                   onClick={() => setTrainingMode("kindergarten_phonics")}
                   className={`w-full flex items-start gap-4 px-5 py-4 rounded-xl border-2 transition-all text-left active:scale-[0.99] ${
                     trainingMode === "kindergarten_phonics"
-                      ? "border-amber-500 bg-amber-500/8"
-                      : "border-border bg-surface hover:border-amber-400/60"
+                      ? "border-warning bg-warning-soft"
+                      : "border-border bg-surface hover:border-warning/60"
                   }`}
                 >
                   <span className="text-3xl mt-0.5 flex-shrink-0"><DisplayIcon name="star" /></span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <p className={`font-bold text-base ${trainingMode === "kindergarten_phonics" ? "text-amber-600 dark:text-amber-400" : "text-text"}`}>
+                        <p className={`font-bold text-base ${trainingMode === "kindergarten_phonics" ? "text-warning-text" : "text-text"}`}>
                           เรียนเสียงไทย
                         </p>
-                        <span className="px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 text-xs font-semibold rounded-full">
+                        <span className="px-1.5 py-0.5 bg-warning-soft text-warning-text text-xs font-semibold rounded-full">
                           เร็ว ๆ นี้
                         </span>
                       </div>
                       {trainingMode === "kindergarten_phonics" && (
-                        <span className="text-amber-500 flex-shrink-0 ml-2">
+                        <span className="text-warning-text flex-shrink-0 ml-2">
                           <CheckIcon />
                         </span>
                       )}
@@ -363,7 +372,7 @@ function OnboardingContent() {
 
               <button
                 onClick={advanceFromStep3}
-                className="w-full bg-primary text-white font-semibold px-8 py-3.5 rounded-xl text-base hover:bg-primary/90 transition-all active:scale-[0.99]"
+                className={buttonClasses({ size: "lg", block: true })}
               >
                 ถัดไป →
               </button>
@@ -410,7 +419,7 @@ function OnboardingContent() {
 
               <button
                 onClick={() => setStep(5)}
-                className="w-full bg-primary text-white font-semibold px-8 py-3.5 rounded-xl text-base hover:bg-primary/90 transition-all active:scale-[0.99]"
+                className={buttonClasses({ size: "lg", block: true })}
               >
                 ถัดไป →
               </button>
@@ -438,7 +447,7 @@ function OnboardingContent() {
                 </div>
                 <div className="flex items-center justify-between px-5 py-3.5">
                   <span className="text-sm text-text-muted">โหมดการฝึก</span>
-                  <span className={`font-semibold ${trainingMode === "kindergarten_phonics" ? "text-amber-600 dark:text-amber-400" : "text-primary"}`}>
+                  <span className={`font-semibold ${trainingMode === "kindergarten_phonics" ? "text-warning-text" : "text-primary"}`}>
                     {MODE_LABELS[trainingMode]}
                   </span>
                 </div>
@@ -462,7 +471,7 @@ function OnboardingContent() {
               </div>
 
               <div className="bg-info/8 border border-info/20 rounded-xl px-4 py-3">
-                <p className="text-sm text-info">
+                <p className="text-sm text-info-text">
                   {isEdit
                     ? "การเปลี่ยนโหมดหรือเสียงจะไม่ลบประวัติการฝึกเดิม"
                     : trainingMode === "speech_clarity"
@@ -473,7 +482,7 @@ function OnboardingContent() {
 
               <button
                 onClick={handleFinish}
-                className="w-full bg-primary text-white font-semibold px-8 py-4 rounded-xl text-base hover:bg-primary/90 transition-all hover:scale-[1.01] active:scale-[0.99] shadow-md shadow-primary/25"
+                className={buttonClasses({ size: "lg", block: true })}
               >
                 {isEdit
                   ? "บันทึกข้อมูลลูก"
