@@ -229,9 +229,11 @@
 - [x] **มือถือทั่วไป**: แถบล่างและระยะล่างของเนื้อหาเผื่อ safe-area ลิงก์เล็กในหน้าเข้าระบบสูงอย่างน้อย 44px
 - ไม่ได้แก้ (ตั้งใจ): หน้าห้องเรียนของครู (ตารางเต็มความกว้างเหมาะกับคอมอยู่แล้ว) และรายการห้องของผู้ดูแลโรงเรียน (เป็น grid 3 คอลัมน์อยู่แล้ว) หน้า onboarding เป็นวิซาร์ดกลางจอแบบเดิม
 
-## I. เกณฑ์ประเมินระดับโรงเรียน (ออกแบบ 17 พ.ย. 2569 · เฟส 1 เสร็จ)
+## I. เกณฑ์ประเมินระดับโรงเรียน (ออกแบบ 17 พ.ย. 2569 · เฟส 1–2 เสร็จ)
 
-> เฟส 1 ทำแล้ว: `policy.ts` (`frameOf`, `validateSchoolSettings`, `effectivePolicy`) · migration `20261116001500_school_assessment_settings.sql` (ตารางชื่อ `school_assessment_versions` เก็บ `settings` = { aiEnabled, reviewers, overrides }) · `/api/assessment/school` · evaluate และ `/api/assessment/policy?childId=` ใช้เกณฑ์ของเด็ก · หน้า `/school/assessment` · กรอบในหน้า `/platform/assessment` · ทดสอบเพิ่ม 3 ข้อใน `assessment:test` ยังไม่ทำ: แจ้งในกล่องข้อความเมื่อแอดมินระบบแคบกรอบ (ตอนนี้แสดงคำเตือนในหน้าโรงเรียน) และ `reviewers` ยังไม่มีผลจนเฟส 2
+> เฟส 1 ทำแล้ว: `policy.ts` (`frameOf`, `validateSchoolSettings`, `effectivePolicy`) · migration `20261116001500_school_assessment_settings.sql` (ตารางชื่อ `school_assessment_versions` เก็บ `settings` = { aiEnabled, reviewers, overrides }) · `/api/assessment/school` · evaluate และ `/api/assessment/policy?childId=` ใช้เกณฑ์ของเด็ก · หน้า `/school/assessment` · กรอบในหน้า `/platform/assessment` · ทดสอบเพิ่ม 3 ข้อใน `assessment:test` แจ้งแอดมินโรงเรียนในกล่องข้อความเมื่อเกณฑ์กลางใหม่ทำให้ค่าของโรงเรียนเกินกรอบ (`notifyNarrowedSchools`, แจ้งเฉพาะขั้นที่เพิ่งเกิน)
+>
+> เฟส 2 ทำแล้ว: migration `20261116001600_assessment_reviewers.sql` (`can_review_assessment`) · `/api/assessment/review` ใช้สิทธิ์นี้ · `/api/assessment/pending?classroomId=` (ครูประจำห้องเท่านั้น) · แท็บ "รอตรวจ" ในหน้าห้องเรียนของครู (`TeacherReviewQueue`) รายการคือผลที่ "รอผู้ใหญ่ช่วยตรวจ" และผล AI ที่ยังไม่มีคนยืนยัน หมายเหตุ: การเลือกผลระหว่างฝึกในข้อสังเกต (observation) ยังเป็นของผู้ปกครองที่ฝึกกับเด็ก ไม่ผ่าน `reviewers` ส่วนการฟังเสียงที่อัดในรายการรอตรวจยังไม่มี เพราะผลประเมินไม่ได้เก็บไฟล์เสียง
 
 แนวคิด: **แอดมินระบบวางโครงกลาง แอดมินโรงเรียนปรับภายในโครง** ต่อจากงานศูนย์ประเมินของสกาย (`/platform/assessment`) ซึ่งตอนนี้มีเกณฑ์ชุดเดียวทั้งระบบ รอบนี้ปรับได้เฉพาะเกณฑ์และวิธีตรวจ ส่วนการแก้โจทย์และเฉลยผ่านหน้าเว็บ (ตอนนี้อยู่ใน `curriculum.ts`) ทำทีหลัง
 

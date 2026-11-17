@@ -4,7 +4,7 @@ import {
   assessmentCaller,
   assessmentDb,
   assessmentFailure,
-  requireChildAccess,
+  requireReviewer,
 } from "@/lib/assessment/server";
 
 const schema = z
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     if (!parsed.success)
       throw new AssessmentError("ข้อมูลผลตรวจของผู้ใหญ่ไม่ถูกต้อง");
     const input = parsed.data;
-    await requireChildAccess(caller, input.childId, true);
+    await requireReviewer(caller, input.childId);
     const db = assessmentDb();
     const rows = await db
       .from("assessment_results")

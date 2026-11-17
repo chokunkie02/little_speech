@@ -3,9 +3,11 @@ import { policySchema } from "@/lib/assessment/policy";
 import { azureConnection } from "@/lib/assessment/azure";
 import {
   AssessmentError,
+  activePolicy,
   assessmentCaller,
   assessmentDb,
   assessmentFailure,
+  notifyNarrowedSchools,
 } from "@/lib/assessment/server";
 
 export const runtime = "nodejs";
@@ -104,6 +106,7 @@ export async function POST(request: Request) {
         "ตั้ง AZURE_SPEECH_KEY และ region หรือ endpoint บนเซิร์ฟเวอร์ก่อนเปิด AI",
         409,
       );
+    const previous = await activePolicy().catch(() => null);
     const result = await db.rpc("publish_assessment_policy", {
       p_expected_revision: input.expectedRevision,
       p_actor: user.id,
@@ -115,6 +118,8 @@ export async function POST(request: Request) {
           : "เผยแพร่เกณฑ์ไม่สำเร็จ",
         result.error.code === "40001" ? 409 : 503,
       );
+    // Best effort: a failed notice never undoes the publish.
+    await notifyNarrowedSchools(previous?.config ?? null, draft.data, result.data?.version).catch(() => {});
     return Response.json(result.data);
   } catch (error) {
     return assessmentFailure(error);

@@ -119,6 +119,56 @@ export async function requireSchoolAdmin(
     throw new AssessmentError("เฉพาะผู้ดูแลโรงเรียนนี้ที่ตั้งเกณฑ์ได้", 403);
 }
 
+/** Throws 403 unless the caller may confirm this child's results (see can_review_assessment). */
+export async function requireReviewer(
+  caller: Awaited<ReturnType<typeof assessmentCaller>>,
+  childId: string,
+) {
+  const { data, error } = await caller.client.rpc("can_review_assessment", { p_child_id: childId });
+  if (error || data !== true)
+    throw new AssessmentError("บัญชีนี้ยืนยันผลของเด็กคนนี้ไม่ได้ (นักเรียนในโรงเรียนให้ครูประจำห้องหรือผู้ที่โรงเรียนกำหนดเป็นผู้ยืนยัน)", 403);
+}
+
+/**
+ * After a new central policy is published: tell the admins of every school whose saved criteria now
+ * fall outside the frame (newly, compared with the previous policy) that the edge values apply.
+ */
+export async function notifyNarrowedSchools(previous: AssessmentPolicy | null, next: AssessmentPolicy, version?: number) {
+  const db = assessmentDb();
+  const { data, error } = await db
+    .from("school_assessment_versions")
+    .select("organization_id,revision,settings")
+    .order("organization_id")
+    .order("revision", { ascending: false });
+  if (error || !data) return;
+  const latest = new Map<string, SchoolSettings>();
+  for (const row of data) {
+    if (latest.has(row.organization_id)) continue;
+    const settings = schoolSettingsSchema.safeParse(row.settings);
+    if (settings.success) latest.set(row.organization_id, settings.data);
+  }
+  for (const [organizationId, settings] of latest) {
+    const now = effectivePolicy(next, settings).clampedStages;
+    const before = previous ? effectivePolicy(previous, settings).clampedStages : [];
+    const fresh = now.filter((stage) => !before.includes(stage));
+    if (!fresh.length) continue;
+    const admins = await db
+      .from("organization_members")
+      .select("user_id")
+      .eq("organization_id", organizationId)
+      .in("role", ["owner", "admin"])
+      .eq("status", "active");
+    if (admins.error || !admins.data?.length) continue;
+    await db.from("notifications").insert(admins.data.map((admin) => ({
+      user_id: admin.user_id,
+      kind: "assessment_frame",
+      title: "เกณฑ์ประเมินของโรงเรียนถูกปรับตามกรอบใหม่",
+      body: `แอดมินระบบเผยแพร่เกณฑ์กลาง${version ? `เวอร์ชัน ${version}` : "ใหม่"} ค่าของโรงเรียน ${now.length} ขั้นเกินกรอบ ระบบใช้ค่าขอบของกรอบแทน ตรวจแล้วกดบันทึกอีกครั้ง`,
+      link: "/school/assessment",
+    })));
+  }
+}
+
 export async function requireChildAccess(
   caller: Awaited<ReturnType<typeof assessmentCaller>>,
   childId: string,

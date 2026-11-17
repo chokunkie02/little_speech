@@ -6,16 +6,19 @@ import { GraduationCap, Printer, Star, Users } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import { ClassroomRoster } from "@/components/school-admin/ClassroomRoster";
 import { JoinCodeCard } from "@/components/join/JoinCodeCard";
+import { TeacherReviewQueue } from "@/components/assessment/TeacherReviewQueue";
 import {
   Badge, ButtonLink, Card, CardContent, DataLoadError, EmptyState, LoadingState, Page, PageHeader, Tabs,
 } from "@/components/ui";
+import { assessmentRequest } from "@/lib/assessment/client";
 import { getTeacherOverview, type TeacherOverview } from "@/lib/schoolAdmin";
 
 export default function TeacherClassroomPage() {
   const { id } = useParams<{ id: string }>();
   const [state, setState] = useState<{ revision: number; data?: TeacherOverview; failed?: boolean }>();
   const [revision, setRevision] = useState(0);
-  const [tab, setTab] = useState<"students" | "invites">("students");
+  const [tab, setTab] = useState<"students" | "review" | "invites">("students");
+  const [pending, setPending] = useState<number>();
 
   useEffect(() => {
     let active = true;
@@ -25,6 +28,14 @@ export default function TeacherClassroomPage() {
     );
     return () => { active = false; };
   }, [revision]);
+
+  // Count for the "รอตรวจ" tab before it is opened; the tab keeps it current afterwards.
+  useEffect(() => {
+    let active = true;
+    assessmentRequest<unknown[]>(`/api/assessment/pending?classroomId=${id}`)
+      .then((rows) => { if (active) setPending(rows.length); }, () => {});
+    return () => { active = false; };
+  }, [id]);
 
   const room = state?.data?.classrooms.find((classroom) => classroom.id === id);
   const reload = () => setRevision((value) => value + 1);
@@ -54,10 +65,13 @@ export default function TeacherClassroomPage() {
             </div>
             <Tabs label="ข้อมูลห้องเรียน" value={tab} onValueChange={setTab} items={[
               { value: "students", label: "นักเรียน", count: room.student_count },
+              { value: "review", label: "รอตรวจ", count: pending || undefined },
               { value: "invites", label: "ใบเชิญผู้ปกครอง" },
             ]}>
               {tab === "students" ? (
                 <ClassroomRoster mode="teacher" classroomId={room.id} classroomName={room.name} onChanged={reload} />
+              ) : tab === "review" ? (
+                <TeacherReviewQueue classroomId={room.id} onCount={setPending} />
               ) : (
                 <div className="space-y-4">
                   <Card><CardContent className="flex flex-wrap items-center gap-3">
