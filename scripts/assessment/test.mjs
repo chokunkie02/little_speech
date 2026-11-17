@@ -258,6 +258,75 @@ await check(
     );
   },
 );
+await check(
+  "The central frame: old policies get the default frame, central values must sit inside it, adult-only stages stay locked",
+  () => {
+    const old = structuredClone(policy.DEFAULT_POLICY);
+    delete old.allowSchoolAi;
+    for (const rule of old.rules) delete rule.school;
+    assert.equal(policy.policySchema.safeParse(old).success, true);
+    const words = old.rules.find((rule) => rule.stageId === "words");
+    assert.deepEqual(policy.frameOf(words).passScore, [60, 90]);
+    assert.equal(policy.frameOf(words).mode, "choice");
+    assert.equal(policy.frameOf(old.rules.find((rule) => rule.stageId === "listen")).mode, "locked");
+    const outside = structuredClone(policy.DEFAULT_POLICY);
+    outside.rules.find((rule) => rule.stageId === "words").school.passScore = [80, 90];
+    assert.equal(policy.policySchema.safeParse(outside).success, false);
+    const unlocked = structuredClone(policy.DEFAULT_POLICY);
+    unlocked.rules.find((rule) => rule.stageId === "listen").school.mode = "choice";
+    assert.equal(policy.policySchema.safeParse(unlocked).success, false);
+  },
+);
+await check(
+  "School settings are rejected outside the frame, on locked stages, with inverted scores, or with AI the platform has not allowed",
+  () => {
+    const central = structuredClone(policy.DEFAULT_POLICY);
+    const valid = { aiEnabled: false, reviewers: "teacher", overrides: [{ stageId: "words", mode: "adult", passScore: 85 }] };
+    assert.deepEqual(policy.validateSchoolSettings(valid, central), []);
+    const high = { ...valid, overrides: [{ stageId: "words", passScore: 95 }] };
+    assert.equal(policy.validateSchoolSettings(high, central).length, 1);
+    const locked = { ...valid, overrides: [{ stageId: "listen", mode: "azure" }] };
+    assert.equal(policy.validateSchoolSettings(locked, central).length, 1);
+    const inverted = { ...valid, overrides: [{ stageId: "words", passScore: 60, practiceScore: 70 }] };
+    assert.equal(policy.validateSchoolSettings(inverted, central).length, 1);
+    const ai = { ...valid, aiEnabled: true };
+    assert.equal(policy.validateSchoolSettings(ai, central).length, 1);
+    central.enabled = true;
+    central.allowSchoolAi = true;
+    assert.deepEqual(policy.validateSchoolSettings(ai, central), []);
+  },
+);
+await check(
+  "A child is judged by central rules, or by school rules clamped into the frame; school AI needs platform, permission and school",
+  () => {
+    const central = structuredClone(policy.DEFAULT_POLICY);
+    central.enabled = true;
+    const family = policy.effectivePolicy(central);
+    assert.equal(family.config, central);
+    const noSettings = policy.effectivePolicy(central, null);
+    assert.equal(noSettings.config.enabled, false);
+    const school = { aiEnabled: true, reviewers: "teacher", overrides: [{ stageId: "words", mode: "adult", passScore: 85 }] };
+    assert.equal(policy.effectivePolicy(central, school).config.enabled, false);
+    central.allowSchoolAi = true;
+    const applied = policy.effectivePolicy(central, school);
+    assert.equal(applied.config.enabled, true);
+    const words = applied.config.rules.find((rule) => rule.stageId === "words");
+    assert.equal(words.mode, "adult");
+    assert.equal(words.passScore, 85);
+    assert.equal(applied.config.rules.find((rule) => rule.stageId === "syllables").passScore, 75);
+    assert.deepEqual(applied.clampedStages, []);
+    // The platform narrows the frame after the school saved: the school value is pulled to the edge.
+    const narrowed = structuredClone(central);
+    const frame = narrowed.rules.find((rule) => rule.stageId === "words").school;
+    frame.passScore = [60, 80];
+    frame.mode = "locked";
+    const clamped = policy.effectivePolicy(narrowed, school);
+    const clampedWords = clamped.config.rules.find((rule) => rule.stageId === "words");
+    assert.equal(clampedWords.passScore, 80);
+    assert.equal(clampedWords.mode, "azure");
+    assert.deepEqual(clamped.clampedStages, ["words"]);
+  },
+);
 console.log(
   `${checks} central assessment checks passed. Azure responses are test fixtures, not live service results.`,
 );

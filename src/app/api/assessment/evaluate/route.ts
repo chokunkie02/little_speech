@@ -11,6 +11,7 @@ import {
   assessmentDb,
   assessmentFailure,
   assessmentForm,
+  childPolicy,
   requireChildAccess,
 } from "@/lib/assessment/server";
 
@@ -73,14 +74,17 @@ export async function POST(request: Request) {
       }
     }
     const snapshot = await activePolicy();
-    const rule = snapshot.config.rules.find(
+    // School children are judged by their school's criteria inside the central frame.
+    const judged = await childPolicy(snapshot.config, input.childId);
+    const policy = judged.config;
+    const rule = policy.rules.find(
       (rule) => rule.stageId === input.stageId,
     )!;
     const automatic =
       item.kind === "speech" &&
       !item.hidePrompt &&
       rule.mode === "azure" &&
-      snapshot.config.enabled;
+      policy.enabled;
     const db = assessmentDb();
     const inputHash = createHash("sha256")
       .update(JSON.stringify(input))
@@ -151,6 +155,8 @@ export async function POST(request: Request) {
       source: "adult",
       outcome: "needs_review",
       policyVersion: snapshot.version,
+      ...(judged.schoolVersion ? { schoolRevision: judged.schoolVersion.revision } : {}),
+      rule: { mode: rule.mode, passScore: rule.passScore, practiceScore: rule.practiceScore, minCompleteness: rule.minCompleteness },
       feedback: "ให้ผู้ใหญ่ช่วยตรวจการสื่อสารและบันทึกผลของข้อนี้",
       createdAt: new Date().toISOString(),
     };
@@ -183,7 +189,7 @@ export async function POST(request: Request) {
       !item.hidePrompt &&
       rule.mode === "azure"
     ) {
-      if (!snapshot.config.enabled) {
+      if (!policy.enabled) {
         result.reason = "ai_disabled";
         result.feedback =
           "รอบนี้ใช้การฟังร่วมกับผู้ใหญ่ แอดมินยังไม่ได้เปิดประเมินเสียงด้วย AI";
@@ -196,8 +202,8 @@ export async function POST(request: Request) {
         });
       } else if (
         !measurement ||
-        measurement.durationMs < snapshot.config.minDurationMs ||
-        measurement.durationMs > snapshot.config.maxDurationMs ||
+        measurement.durationMs < policy.minDurationMs ||
+        measurement.durationMs > policy.maxDurationMs ||
         measurement.rms < 0.003
       ) {
         Object.assign(result, {
@@ -222,7 +228,7 @@ export async function POST(request: Request) {
             Object.assign(result, {
               source: "azure",
               ...scores,
-              ...judgeSpeech(scores, rule, snapshot.config.minConfidence),
+              ...judgeSpeech(scores, rule, policy.minConfidence),
             });
           }
         } catch (error) {
@@ -244,7 +250,7 @@ export async function POST(request: Request) {
     }
     const saved = await db
       .from("assessment_results")
-      .update({ state: "completed", result })
+      .update({ state: "completed", result, school_version_id: judged.schoolVersion?.id ?? null })
       .eq("id", input.requestId)
       .eq("recorded_by", caller.user.id);
     if (saved.error)

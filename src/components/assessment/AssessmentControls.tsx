@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { recordingToWav } from "@/lib/assessment/audio-client";
+import { assessmentRequest } from "@/lib/assessment/client";
 import type { AssessmentResult, PolicySnapshot } from "@/lib/assessment/policy";
 import type { Item, Session } from "@/features/learning-studio/types";
 import { submitStudioAssessment } from "@/features/learning-studio/assessment-client";
@@ -33,11 +34,11 @@ export default function AssessmentControls({
   useEffect(() => {
     active.current = true;
     const abort = new AbortController();
-    fetch("/api/assessment/policy", { cache: "no-store", signal: abort.signal })
-      .then(async (response) => {
-        if (!response.ok)
-          throw new Error("ยังโหลดเกณฑ์กลางไม่ได้ ให้ผู้ใหญ่ช่วยตรวจรอบนี้ได้");
-        return response.json() as Promise<PolicySnapshot>;
+    // The child's own criteria: the school's when the child belongs to one, otherwise the central policy.
+    assessmentRequest<PolicySnapshot>(`/api/assessment/policy?childId=${encodeURIComponent(session.childId)}`, { signal: abort.signal })
+      .catch((error) => {
+        if (error.name === "AbortError") throw error;
+        throw new Error("ยังโหลดเกณฑ์ไม่ได้ ให้ผู้ใหญ่ช่วยตรวจรอบนี้ได้");
       })
       .then((policy) => {
         if (active.current) setPolicy(policy);
@@ -51,7 +52,7 @@ export default function AssessmentControls({
       abort.abort();
       controller.current?.abort();
     };
-  }, []);
+  }, [session.childId]);
   const rule = policy?.config.rules.find(
     (rule) => rule.stageId === session.stageId,
   );

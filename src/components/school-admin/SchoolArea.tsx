@@ -25,6 +25,7 @@ const TABS = [
   { href: "/school", label: "ภาพรวม", exact: true },
   { href: "/school/classrooms", label: "ห้องเรียนและนักเรียน" },
   { href: "/school/teachers", label: "ครู" },
+  { href: "/school/assessment", label: "เกณฑ์ประเมิน" },
   { href: "/school/settings", label: "ตั้งค่า" },
 ];
 

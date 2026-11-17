@@ -23,10 +23,14 @@ import { assessmentRequest } from "@/lib/assessment/client";
 import {
   DEFAULT_POLICY,
   OUTCOME_LABELS,
+  SCORE_KEYS,
+  SCORE_LABELS,
   STAGE_DEFINITIONS,
+  frameOf,
   judgeSpeech,
   policySchema,
   type AssessmentPolicy,
+  type SchoolFrame,
   type PolicySnapshot,
 } from "@/lib/assessment/policy";
 import { formatThaiDate } from "@/lib/thaiDate";
@@ -131,6 +135,36 @@ export default function AssessmentAdmin() {
       rules: draft.rules.map((rule) => (rule.stageId === stageId ? { ...rule, ...values } : rule)),
     }));
   }
+  function updateFrame(stageId: string, values: Partial<SchoolFrame>) {
+    setDraft((draft) => ({
+      ...draft,
+      rules: draft.rules.map((rule) => (rule.stageId === stageId ? { ...rule, school: { ...frameOf(rule), ...values } } : rule)),
+    }));
+  }
+  /** What schools may change for one automatic stage. A render function, not a component, so inputs keep focus. */
+  function frameControls(stageId: string, rule: AssessmentPolicy["rules"][number]) {
+    const frame = frameOf(rule);
+    return (
+      <div className="space-y-2.5 rounded-control bg-surface-muted p-3">
+        <FormField inline label="โรงเรียนเลือกวิธีตรวจเองได้">
+          <Switch checked={frame.mode === "choice"} onCheckedChange={(choice) => updateFrame(stageId, { mode: choice ? "choice" : "locked" })} />
+        </FormField>
+        <p className="text-caption font-semibold text-text-muted">กรอบคะแนนที่โรงเรียนปรับได้</p>
+        <div className="space-y-2">
+          {SCORE_KEYS.map((key) => (
+            <div key={key} className="grid grid-cols-[4.5rem_minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2">
+              <span className="text-sm text-text-muted">{SCORE_LABELS[key]}</span>
+              <Input type="number" min={0} max={100} aria-label={`${SCORE_LABELS[key]} ต่ำสุด`}
+                value={frame[key][0]} onChange={(event) => updateFrame(stageId, { [key]: [Number(event.target.value), frame[key][1]] })} />
+              <span aria-hidden="true" className="text-text-muted">–</span>
+              <Input type="number" min={0} max={100} aria-label={`${SCORE_LABELS[key]} สูงสุด`}
+                value={frame[key][1]} onChange={(event) => updateFrame(stageId, { [key]: [frame[key][0], Number(event.target.value)] })} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
   const reload = () => {
     if (!dirty || window.confirm("โหลดใหม่และทิ้งการแก้ไขที่ยังไม่ได้บันทึก?")) void load();
   };
@@ -230,6 +264,10 @@ export default function AssessmentAdmin() {
                     hint={!data.provider.ready ? "ต้องตั้งคีย์ Azure บนเซิร์ฟเวอร์ก่อน จึงเผยแพร่แบบเปิด AI ได้" : undefined}>
                     <Switch checked={draft.enabled} onCheckedChange={(enabled) => setDraft({ ...draft, enabled })} />
                   </FormField>
+                  <FormField inline label="อนุญาตให้โรงเรียนเปิด AI เอง"
+                    hint="โรงเรียนที่ได้รับอนุญาตเลือกเปิดหรือปิด AI ของตัวเองได้ ใช้ได้เมื่อเปิด AI ทั้งระบบแล้วเท่านั้น">
+                    <Switch checked={!!draft.allowSchoolAi} onCheckedChange={(allowSchoolAi) => setDraft({ ...draft, allowSchoolAi })} />
+                  </FormField>
                   <div className="grid gap-4 sm:grid-cols-3">
                     <FormField label="ความมั่นใจขั้นต่ำ (0–1)">
                       <Input type="number" min={0} max={1} step={0.05} value={draft.minConfidence}
@@ -289,9 +327,10 @@ export default function AssessmentAdmin() {
                                   </FormField>
                                 </div>
                               )}
+                              {frameControls(stage.id, rule)}
                             </>
                           ) : (
-                            <p className="text-sm text-text-muted">ข้อเลือกภาพตรวจจากเฉลย ส่วนการสื่อสารและท่าทางให้ผู้ใหญ่ช่วยตรวจ</p>
+                            <p className="text-sm text-text-muted">ข้อเลือกภาพตรวจจากเฉลย ส่วนการสื่อสารและท่าทางให้ผู้ใหญ่ช่วยตรวจ · โรงเรียนเปลี่ยนไม่ได้</p>
                           )}
                         </div>
                       );

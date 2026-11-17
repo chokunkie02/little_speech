@@ -1,5 +1,12 @@
 import { createClient } from "@supabase/supabase-js";
-import { policySchema, type PolicySnapshot } from "./policy";
+import {
+  effectivePolicy,
+  policySchema,
+  schoolSettingsSchema,
+  type AssessmentPolicy,
+  type PolicySnapshot,
+  type SchoolSettings,
+} from "./policy";
 
 const authOptions = {
   persistSession: false,
@@ -60,6 +67,56 @@ export async function activePolicy(): Promise<PolicySnapshot> {
   if (row.error || !config.success)
     throw new AssessmentError("อ่านเกณฑ์ที่เผยแพร่ไม่สำเร็จ", 503);
   return { ...row.data, config: config.data } as PolicySnapshot;
+}
+
+export interface SchoolVersion {
+  id: string;
+  revision: number;
+  settings: SchoolSettings;
+  created_at: string;
+}
+
+/** Latest saved criteria of a school, or null when it has never saved any. */
+export async function latestSchoolVersion(organizationId: string): Promise<SchoolVersion | null> {
+  const { data, error } = await assessmentDb()
+    .from("school_assessment_versions")
+    .select("id,revision,settings,created_at")
+    .eq("organization_id", organizationId)
+    .order("revision", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new AssessmentError("อ่านเกณฑ์ของโรงเรียนไม่สำเร็จ", 503);
+  if (!data) return null;
+  const settings = schoolSettingsSchema.safeParse(data.settings);
+  if (!settings.success) throw new AssessmentError("เกณฑ์ของโรงเรียนไม่สมบูรณ์", 503);
+  return { ...data, settings: settings.data } as SchoolVersion;
+}
+
+/**
+ * The criteria a child is judged by: the central policy, plus the school's criteria when the child
+ * belongs to a school (child_profiles.organization_id).
+ */
+export async function childPolicy(central: AssessmentPolicy, childId: string) {
+  const { data, error } = await assessmentDb()
+    .from("child_profiles")
+    .select("organization_id")
+    .eq("id", childId)
+    .maybeSingle();
+  if (error) throw new AssessmentError("อ่านข้อมูลเด็กไม่สำเร็จ", 503);
+  const organizationId: string | null = data?.organization_id ?? null;
+  if (!organizationId) return { ...effectivePolicy(central), schoolVersion: null, organizationId };
+  const schoolVersion = await latestSchoolVersion(organizationId);
+  return { ...effectivePolicy(central, schoolVersion?.settings ?? null), schoolVersion, organizationId };
+}
+
+/** Throws 403 unless the caller administers this school. */
+export async function requireSchoolAdmin(
+  caller: Awaited<ReturnType<typeof assessmentCaller>>,
+  organizationId: string,
+) {
+  const { data, error } = await caller.client.rpc("is_org_admin", { p_org_id: organizationId });
+  if (error || data !== true)
+    throw new AssessmentError("เฉพาะผู้ดูแลโรงเรียนนี้ที่ตั้งเกณฑ์ได้", 403);
 }
 
 export async function requireChildAccess(
