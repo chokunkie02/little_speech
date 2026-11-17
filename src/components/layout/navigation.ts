@@ -69,7 +69,10 @@ const GROUPS: Record<Exclude<AppRole, "parent">, NavGroup[]> = {
     { label: "บัญชี", items: [inbox, settings] },
   ],
   platform_admin: [
-    { label: "ระบบ", items: [{ href: "/platform", label: "โรงเรียนทั้งหมด", shortLabel: "โรงเรียน", icon: "school" }] },
+    { label: "ระบบ", items: [
+      { href: "/platform", label: "โรงเรียนทั้งหมด", shortLabel: "โรงเรียน", icon: "school", exact: true },
+      { href: "/platform/assessment", label: "ศูนย์ประเมิน", shortLabel: "ประเมิน", icon: "progress" },
+    ] },
     { label: "บัญชี", items: [inbox, settings] },
   ],
 };

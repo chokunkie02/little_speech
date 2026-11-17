@@ -2,6 +2,11 @@
 import "./studio.generated.css";
 import "./host-theme.css";
 import { useStudioResultSync } from "./useStudioResultSync";
+import { useAuth } from "@/hooks/useAuth";
+import AssessmentControls from "@/components/assessment/AssessmentControls";
+import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
+import { submitStudioAssessment } from "./assessment-client";
+import type { AssessmentResult } from "@/lib/assessment/policy";
 import {
   createStudioState,
   studioStorageKey,
@@ -1541,6 +1546,8 @@ function Preview({
     </Modal>
   );
 }
+/** Only cloud child profiles (uuid ids) have a central assessment history; local and demo ids do not. */
+const CENTRAL_CHILD_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function Practice({
   session,
   stages,
@@ -1554,6 +1561,7 @@ function Practice({
   onNext: () => void;
   onPause: () => void;
 }) {
+  const { user } = useAuth();
   const stage = stages.find((s) => s.id === session.stageId);
   const item = stage?.items.find(
     (i) => i.id === session.itemIds[session.index],
@@ -1577,6 +1585,12 @@ function Practice({
   const [recording, setRecording] = useState(false);
   const [requesting, setRequesting] = useState(false);
   const [audio, setAudio] = useState("");
+  const [recordedBlob, setRecordedBlob] = useState<Blob>();
+  const [assessment, setAssessment] = useState<AssessmentResult>();
+  const [assessmentBusy, setAssessmentBusy] = useState(false);
+  const [assessmentMessage, setAssessmentMessage] = useState("");
+  const saveRequestId = useRef("");
+  const saveRequestInput = useRef("");
   const [micError, setMicError] = useState("");
   const [elapsed, setElapsed] = useState(0);
   const mediaRef = useRef<MediaRecorder | null>(null);
@@ -1661,6 +1675,7 @@ function Practice({
         if (urlRef.current) URL.revokeObjectURL(urlRef.current);
         urlRef.current = URL.createObjectURL(blob);
         setAudio(urlRef.current);
+        setRecordedBlob(blob);
         setRecording(false);
         setDemo(false);
       };
@@ -1671,6 +1686,9 @@ function Practice({
         setRecording(false);
       };
       setAudio("");
+      setRecordedBlob(undefined);
+      setAssessment(undefined);
+      setAssessmentMessage("");
       setDemo(false);
       setElapsed(0);
       media.start();
@@ -1700,6 +1718,9 @@ function Practice({
     if (urlRef.current) URL.revokeObjectURL(urlRef.current);
     urlRef.current = "";
     setAudio("");
+    setRecordedBlob(undefined);
+    setAssessment(undefined);
+    setAssessmentMessage("");
     setDemo(false);
     setRetries((v) => v + 1);
   }
@@ -1719,7 +1740,30 @@ function Practice({
     speaker.speak(item.sample);
     setSupport((s) => (s === "adult" ? "adult" : "modeled"));
   };
-  const save = () => {
+  const save = async () => {
+    if (assessmentBusy) return;
+    let assessed = assessment;
+    // The central copy is best effort: a child is never stuck on an item because the assessment
+    // service is unreachable, rate-limited or not deployed. The attempt is still saved locally.
+    if (user && CENTRAL_CHILD_ID.test(session.childId) && (isChoice || item.kind === "observation")) {
+      setAssessmentBusy(true);
+      setAssessmentMessage("");
+      try {
+        const inputKey = JSON.stringify({ choice, review });
+        if (!saveRequestId.current || saveRequestInput.current !== inputKey) {
+          saveRequestId.current = uid();
+          saveRequestInput.current = inputKey;
+        }
+        assessed = await submitStudioAssessment(session, item, saveRequestId.current, {
+          selectedChoice: isChoice ? choice ?? undefined : undefined,
+          adultReview: item.kind === "observation" ? review : undefined,
+        });
+        setAssessment(assessed);
+      } catch {
+        setAssessmentMessage("บันทึกในเครื่องแล้ว แต่ยังส่งผลเข้าศูนย์ประเมินไม่ได้");
+      }
+      setAssessmentBusy(false);
+    }
     if (isChoice && correct)
       window.dispatchEvent(
         new CustomEvent("speech-adventure:chime", { detail: "success" }),
@@ -1740,17 +1784,18 @@ function Practice({
       choiceCorrect: isChoice ? correct : undefined,
       support: isChoice ? "independent" : support,
       review: isChoice
-        ? "achieved"
+        ? correct ? "achieved" : "practice"
         : item.kind === "observation"
           ? review
           : "pending",
       retries,
+      assessment: assessed,
     });
   };
   return (
     <div className="practice-shell">
       <div className="practice-toolbar">
-        <button className="text-button" onClick={onPause}>
+        <button className="text-button" onClick={onPause} disabled={assessmentBusy}>
           <ArrowLeft size={17} />
           พักไว้ก่อน
         </button>
@@ -1783,7 +1828,7 @@ function Practice({
         <div className="voice-instruction">
           <button
             className="text-button"
-            disabled={recording || requesting}
+            disabled={recording || requesting || assessmentBusy}
             onClick={() => speaker.speak(item.instruction)}
           >
             <Volume2 size={16} />
@@ -1817,7 +1862,7 @@ function Practice({
                 <button
                   key={opt.id}
                   className={`choice-card ${choice === opt.id ? "chosen" : ""} ${choice !== null && opt.id === item.answer ? "answer-correct" : ""}`}
-                  disabled={!!saved}
+                  disabled={!!saved || assessmentBusy}
                   onClick={() => setChoice(opt.id)}
                   aria-label={`เลือก ${opt.label}`}
                   aria-pressed={choice === opt.id}
@@ -1914,7 +1959,7 @@ function Practice({
                   <Button
                     variant="secondary"
                     onClick={read}
-                    disabled={recording || requesting}
+                    disabled={recording || requesting || assessmentBusy}
                   >
                     <Volume2 size={18} />
                     ฟังตัวอย่าง
@@ -1956,7 +2001,7 @@ function Practice({
                             type="radio"
                             name="observation"
                             value={r.id}
-                            disabled={!!saved}
+                            disabled={!!saved || assessmentBusy}
                             checked={review === r.id}
                             onChange={() => setReview(r.id)}
                           />
@@ -1986,7 +2031,7 @@ function Practice({
                           onClick={() =>
                             recording ? mediaRef.current?.stop() : record()
                           }
-                          disabled={requesting}
+                          disabled={requesting || assessmentBusy}
                         >
                           {recording ? (
                             <Square size={25} fill="currentColor" />
@@ -2013,7 +2058,7 @@ function Practice({
                               onPlay={() => speaker.stop()}
                               aria-label="เสียงที่อัดไว้ในข้อนี้"
                             />
-                            <button className="text-button" onClick={resetAudio}>
+                            <button className="text-button" onClick={resetAudio} disabled={assessmentBusy}>
                               <RotateCcw size={15} />
                               อัดใหม่
                             </button>
@@ -2021,10 +2066,13 @@ function Practice({
                         )}
                         {!recording && (
                           <button
+                            disabled={assessmentBusy}
                             className={`demo-answer ${demo ? "active" : ""}`}
                             onClick={() => {
                               setDemo(true);
                               setAudio("");
+                              setRecordedBlob(undefined);
+                              setAssessment(undefined);
                               setMicError("");
                             }}
                           >
@@ -2082,10 +2130,16 @@ function Practice({
             {micError}
           </p>
         )}
+        {item.kind === "speech" && audio && recordedBlob && !saved && user && CENTRAL_CHILD_ID.test(session.childId) && (
+          <AssessmentControls session={session} item={item} blob={recordedBlob} onResult={setAssessment} onBusy={setAssessmentBusy} />
+        )}
+        {saved?.assessment && <AssessmentResultCard result={saved.assessment} />}
+        {assessmentMessage && <p className="notice" role="alert">{assessmentMessage}</p>}
         <div className="practice-bottom">
           {!saved && isChoice && choice !== null && (
             <Button
               variant="secondary"
+              disabled={assessmentBusy}
               onClick={() => {
                 setChoice(null);
                 setRetries((v) => v + 1);
@@ -2099,15 +2153,15 @@ function Practice({
             <Button
               onClick={save}
               disabled={
-                isChoice
+                assessmentBusy || (isChoice
                   ? choice === null
                   : item.kind === "observation"
                     ? review === "pending"
-                    : (!audio && !demo) || recording || requesting
+                    : (!audio && !demo) || recording || requesting)
               }
             >
               <Check size={17} />
-              {isChoice ? "บันทึกคำตอบ" : "บันทึกการลองทำ"}
+              {assessmentBusy ? "กำลังบันทึก…" : isChoice ? "บันทึกคำตอบ" : "บันทึกการลองทำ"}
             </Button>
           )}
           {saved && (
@@ -2122,7 +2176,7 @@ function Practice({
       </div>
       <p className="practice-footnote">
         <ShieldCheck size={14} />
-        ดาวให้กับการลองทำ · ไม่มีคะแนน AI · เสียงใช้เฉพาะข้อนี้ในเครื่อง
+        ดาวให้กับการลองทำ · การส่งตรวจเสียงใช้เกณฑ์กลางและบันทึกผลแยกจากการตรวจของผู้ใหญ่
       </p>
     </div>
   );
@@ -2529,6 +2583,7 @@ function Progress({
                           ? "ฟังตัวอย่าง"
                           : "มีผู้ใหญ่ช่วย"}
                     </p>
+                    {a.assessment && <AssessmentResultCard result={a.assessment} />}
                   </div>
                   <span className="status-tag">{attemptLabel(a)}</span>
                 </div>
@@ -2694,7 +2749,7 @@ function Guide({
           <p>
             ข้อเลือกภาพตรวจคำตอบได้ตรงตัว
             ส่วนการพูดใช้บันทึกความช่วยเหลือและผลสังเกตจากผู้ใหญ่
-            ดาวแสดงการลองทำ ไม่ใช้แทนคะแนนความชัด และไม่มีคะแนน AI สุ่ม
+            ดาวแสดงความพยายาม ส่วนผลประเมินเสียงดูแยกได้พร้อมเวอร์ชันเกณฑ์และผลตรวจจากผู้ใหญ่
           </p>
           <h2>ก่อนนำไปใช้กับเด็กจริง</h2>
           <p>

@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { ChartColumn, FileText, NotebookPen, Play } from "lucide-react";
+import AssessmentHistory from "@/components/assessment/AssessmentHistory";
 import ObservationNoteList from "@/components/observations/ObservationNoteList";
 import SchoolObservations from "@/components/observations/SchoolObservations";
 import { Alert, ButtonLink, DataLoadError, EmptyState, LoadingState, Page, PageHeader, Tabs } from "@/components/ui";
@@ -72,6 +73,7 @@ export function ProgressView({ childId, childName, mode, teacher = false, viewer
         {tab === "history" && (
           <div className="space-y-5">
             {status === "loading" && !results.length ? <LoadingState variant="table" rows={5} /> : <SessionHistory results={results} />}
+            <AssessmentHistory key={childId} childId={childId} />
             {legacy}
           </div>
         )}

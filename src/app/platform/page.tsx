@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { Activity, GraduationCap, Plus, School, ShieldCheck, Users } from "lucide-react";
+import { Activity, Gauge, GraduationCap, Plus, School, ShieldCheck, Users } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import { JoinCodeCard } from "@/components/join/JoinCodeCard";
 import { useInbox } from "@/components/inbox/InboxProvider";
@@ -258,7 +258,10 @@ export default function PlatformAdminPage() {
   return (
     <AppShell>
       <Page>
-        <PageHeader icon={<ShieldCheck size={20} />} title="ภาพรวมระบบ" description="โรงเรียนทั้งหมด คำขอใช้งาน และข้อมูลการใช้งานเว็บ" />
+        <PageHeader icon={<ShieldCheck size={20} />} title="ภาพรวมระบบ" description="โรงเรียนทั้งหมด คำขอใช้งาน และข้อมูลการใช้งานเว็บ"
+          actions={user?.isPlatformAdmin && (
+            <ButtonLink href="/platform/assessment" variant="outline" icon={<Gauge size={16} aria-hidden="true" />}>ศูนย์ประเมิน</ButtonLink>
+          )} />
         {isLoading ? <LoadingState variant="stats" rows={4} /> : !user ? (
           <EmptyState title="กรุณาเข้าสู่ระบบ" action={<ButtonLink href="/auth/signin?redirect=%2Fplatform">เข้าสู่ระบบ</ButtonLink>} />
         ) : !user.isPlatformAdmin ? (

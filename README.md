@@ -105,12 +105,22 @@ npm run lint     # ตรวจสอบ code style
 
 ## ข้อมูลสำหรับนักพัฒนา
 
-- ข้อมูลผู้ใช้ทั้งหมดเก็บใน **localStorage** ของเบราว์เซอร์ (ไม่มี backend database)
+- ห้องฝึกเก็บแผนและรายละเอียดรอบใน **localStorage** ส่วนบัญชี สิทธิ์เด็ก ผลสรุปรอบ และผลประเมินกลางรองรับ Supabase ตามค่าของ storage provider
 - การประเมินเสียงพูดใช้ทั้ง mock evaluator และ AI API จริง (`src/app/api/speech/evaluate/`)
 - รองรับ dark/light mode ผ่าน `ThemeProvider`
 - รองรับทั้ง desktop sidebar และ mobile bottom navigation
 
 ---
+
+## ศูนย์ประเมินการเรียนรู้ · POC
+
+เปิด `/platform/assessment` ด้วยบัญชีแอดมินระบบเพื่อปรับเกณฑ์รายขั้น ทดลองคะแนนตัวอย่าง บันทึกร่าง และเผยแพร่เป็นเวอร์ชัน ห้องฝึก `/training` ใช้เกณฑ์กลางตรวจข้อเลือกตอบและเชื่อม Azure Speech สำหรับโจทย์พูดตาม ผลถูกเก็บพร้อมเวอร์ชันและผลยืนยันของผู้ใหญ่
+
+ติดตั้ง migrations `20261116001300` และ `20261116001400` ใน Supabase ผ่าน Docker ของเครื่อง แล้วตั้ง `SUPABASE_SERVICE_ROLE_KEY` เฉพาะเซิร์ฟเวอร์ ค่าเริ่มต้นปิด AI ไว้ เมื่อมี Azure resource ให้ตั้ง `AZURE_SPEECH_KEY` กับ `AZURE_SPEECH_REGION` หรือ `AZURE_SPEECH_ENDPOINT` ตาม `.env.example` เปิดเซิร์ฟเวอร์ใหม่และเผยแพร่เกณฑ์ที่เปิด AI
+
+- อ่าน [รายละเอียดระบบ แผนก่อนนำเสนอ และวิธีตั้งค่า](docs/assessment-handoff.md)
+- อ่าน [Handoff สำหรับทีมและ AI](HANDOFF.md)
+- รัน `npm run assessment:test` เพื่อตรวจตรรกะเกณฑ์ รูปแบบเสียง การอ่านผลบริการ และความเข้ากันได้กับประวัติเดิม
 
 ## ลิขสิทธิ์
 

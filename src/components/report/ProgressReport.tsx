@@ -2,6 +2,7 @@
 
 import { useMemo, useState, type ReactNode } from "react";
 import { FileText, Printer } from "lucide-react";
+import AssessmentHistory from "@/components/assessment/AssessmentHistory";
 import { Alert, Button, DataLoadError, Input, Label, LoadingState, Page, PageHeader, Select } from "@/components/ui";
 import { useLearningResults } from "@/hooks/useLearningResults";
 import { formatThaiDate } from "@/lib/thaiDate";
@@ -185,6 +186,8 @@ export function ProgressReport({ childId, childName, subtitle, back, canPrint, n
               </section>
             </>
           )}
+
+          <AssessmentHistory key={`${range.from}:${range.to}`} childId={childId} from={range.from} to={range.to} />
 
           {notes && (
             <section className="space-y-2">
