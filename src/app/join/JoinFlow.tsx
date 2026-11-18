@@ -228,29 +228,48 @@ export default function JoinFlow() {
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<RedeemResult>();
+  // Bumped on every "ตรวจรหัส" so checking the same code again runs a new lookup instead of
+  // waiting forever for a code change that never comes.
+  const [attempt, setAttempt] = useState(0);
 
   // Resume a code saved before sign-up / email confirmation.
   useEffect(() => {
     if (code) return;
-    const saved = readSavedCode();
-    if (saved) router.replace(`/join?code=${encodeURIComponent(saved)}`);
+    const saved = normalizeJoinCode(readSavedCode());
+    if (saved.length === 8) router.replace(`/join?code=${encodeURIComponent(saved)}`);
   }, [code, router]);
+
+  // `code` is set from the URL on mount only; follow later URL changes too (the resume above, or a
+  // QR link opened while this page is already showing).
+  const urlCode = normalizeJoinCode(params.get("code") ?? "");
+  const [seenUrlCode, setSeenUrlCode] = useState(urlCode);
+  if (urlCode !== seenUrlCode) {
+    setSeenUrlCode(urlCode);
+    if (urlCode && urlCode !== code) setCode(urlCode);
+  }
 
   useEffect(() => {
     if (code.length !== 8) return;
     let active = true;
     previewJoinCode(code)
-      .then((value) => { if (active) { setPreview(value); setError(""); } })
+      .then((value) => {
+        if (!active) return;
+        setPreview(value);
+        setError("");
+        // A remembered code that is used up, expired or revoked must not come back on every visit.
+        if (value.status !== "valid" && readSavedCode() === code) clearSavedCode();
+      })
       .catch((cause) => { if (active) setError(cause instanceof Error ? cause.message : "ตรวจรหัสไม่สำเร็จ"); })
       .finally(() => { if (active) setChecking(false); });
     return () => { active = false; };
-  }, [code]);
+  }, [code, attempt]);
 
   function check(next: string) {
     setChecking(true);
     setPreview(undefined);
     setError("");
     setCode(next);
+    setAttempt((value) => value + 1);
     router.replace(`/join?code=${encodeURIComponent(next)}`);
   }
 
