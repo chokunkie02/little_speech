@@ -114,9 +114,9 @@ npm run lint     # ตรวจสอบ code style
 
 ## ศูนย์ประเมินการเรียนรู้ · POC
 
-เปิด `/platform/assessment` ด้วยบัญชีแอดมินระบบเพื่อปรับเกณฑ์รายขั้น ทดลองคะแนนตัวอย่าง บันทึกร่าง และเผยแพร่เป็นเวอร์ชัน ห้องฝึก `/training` ใช้เกณฑ์กลางตรวจข้อเลือกตอบและเชื่อม Azure Speech สำหรับโจทย์พูดตาม ผลถูกเก็บพร้อมเวอร์ชันและผลยืนยันของผู้ใหญ่
+เปิด `/platform/assessment` ด้วยบัญชีแอดมินระบบเพื่อปรับเกณฑ์รายขั้น ทดลองคะแนนตัวอย่าง บันทึกร่าง และเผยแพร่เป็นเวอร์ชัน ห้องฝึก `/training` ใช้เกณฑ์กลางตรวจข้อเลือกตอบและเชื่อม AI ตรวจเสียง (OpenAI เป็นค่าเริ่มต้น หรือ Azure Speech) สำหรับโจทย์พูดตาม ผลถูกเก็บพร้อมเวอร์ชันและผลยืนยันของผู้ใหญ่
 
-ติดตั้ง migrations `20261116001300` และ `20261116001400` ใน Supabase ผ่าน Docker ของเครื่อง แล้วตั้ง `SUPABASE_SERVICE_ROLE_KEY` เฉพาะเซิร์ฟเวอร์ ค่าเริ่มต้นปิด AI ไว้ เมื่อมี Azure resource ให้ตั้ง `AZURE_SPEECH_KEY` กับ `AZURE_SPEECH_REGION` หรือ `AZURE_SPEECH_ENDPOINT` ตาม `.env.example` เปิดเซิร์ฟเวอร์ใหม่และเผยแพร่เกณฑ์ที่เปิด AI
+ติดตั้ง migrations `20261116001300` และ `20261116001400` ใน Supabase ผ่าน Docker ของเครื่อง แล้วตั้ง `SUPABASE_SERVICE_ROLE_KEY` เฉพาะเซิร์ฟเวอร์ ค่าเริ่มต้นปิด AI ไว้ ใส่ `ASSESSMENT_OPENAI_API_KEY` ใน `.env.local` แล้วรัน `npm run assessment:check-openai` (หรือตั้ง `ASSESSMENT_SPEECH_PROVIDER=azure` พร้อม `AZURE_SPEECH_KEY` กับ `AZURE_SPEECH_REGION`/`AZURE_SPEECH_ENDPOINT`) ตาม `.env.example` เปิดเซิร์ฟเวอร์ใหม่และเผยแพร่เกณฑ์ที่เปิด AI
 
 - อ่าน [รายละเอียดระบบ แผนก่อนนำเสนอ และวิธีตั้งค่า](docs/assessment-handoff.md)
 - อ่าน [Handoff สำหรับทีมและ AI](HANDOFF.md)

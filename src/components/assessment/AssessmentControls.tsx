@@ -56,17 +56,17 @@ export default function AssessmentControls({
   const rule = policy?.config.rules.find(
     (rule) => rule.stageId === session.stageId,
   );
-  const useAzure =
+  const useAi =
     !!policy?.config.enabled && rule?.mode === "azure" && !item.hidePrompt;
   async function evaluate() {
-    if (busy || !policy || (useAzure && !consent)) return;
+    if (busy || !policy || (useAi && !consent)) return;
     setBusy(true);
     onBusy(true);
     setError("");
     controller.current = new AbortController();
     const timeout = setTimeout(() => controller.current?.abort(), 25000);
     try {
-      const audio = useAzure ? await recordingToWav(blob) : undefined;
+      const audio = useAi ? await recordingToWav(blob) : undefined;
       if (!active.current) return;
       const next = await submitStudioAssessment(session, item, requestId, {
         audio,
@@ -107,11 +107,11 @@ export default function AssessmentControls({
     <section className="assessment-panel" aria-label="ตรวจผลตามเกณฑ์กลาง">
       <strong>ตรวจผลตามเกณฑ์กลาง</strong>
       <p>
-        {useAzure
-          ? "ส่งคลิปเสียงและข้อความเป้าหมายไปประเมิน แล้วรับคำแนะนำหลังตรวจเสร็จ"
+        {useAi
+          ? "ส่งคลิปเสียงให้ AI ฟัง แล้วเทียบสิ่งที่ได้ยินกับคำเป้าหมาย รับคำแนะนำหลังตรวจเสร็จ"
           : "รอบนี้ใช้ผู้ใหญ่ตรวจ บันทึกสถานะเข้าประวัติกลางได้"}
       </p>
-      {useAzure && !result && (
+      {useAi && !result && (
         <label className="assessment-consent">
           <input
             type="checkbox"
@@ -119,19 +119,19 @@ export default function AssessmentControls({
             disabled={busy}
             onChange={(event) => setConsent(event.target.checked)}
           />
-          ยินยอมส่งคลิปนี้ไปให้ Azure Speech ประเมิน
+          ยินยอมส่งคลิปนี้ไปให้บริการ AI ภายนอก ({policy?.providerLabel ?? "AI"}) ประเมิน
         </label>
       )}
       {!result && (
         <button
           type="button"
           className="button secondary"
-          disabled={busy || !policy || (useAzure && !consent)}
+          disabled={busy || !policy || (useAi && !consent)}
           onClick={() => void evaluate()}
         >
           {busy
             ? "กำลังตรวจและบันทึกผล…"
-            : useAzure
+            : useAi
               ? "ส่งเสียงให้ AI ตรวจ"
               : "บันทึกสถานะรอผู้ใหญ่ตรวจ"}
         </button>

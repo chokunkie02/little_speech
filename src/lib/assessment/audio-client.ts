@@ -1,4 +1,4 @@
-/** Convert the browser's WebM/MP4 recording to the Azure short-audio PCM format. */
+/** Convert the browser's WebM/MP4 recording to 16 kHz mono PCM WAV, accepted by both Azure and OpenAI. */
 export async function recordingToWav(blob: Blob): Promise<Blob> {
   const context = new AudioContext();
   try {

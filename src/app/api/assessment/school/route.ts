@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { azureConnection } from "@/lib/assessment/azure";
+import { speechProvider } from "@/lib/assessment/provider";
 import { effectivePolicy, schoolSettingsSchema, validateSchoolSettings } from "@/lib/assessment/policy";
 import {
   AssessmentError,
@@ -56,7 +56,7 @@ export async function GET(request: Request) {
           aiEnabled: settings.aiEnabled,
         })),
         clampedStages: effective.clampedStages,
-        provider: { ready: azureConnection().ready },
+        provider: { ready: speechProvider().ready, label: speechProvider().label },
       },
       { headers: { "Cache-Control": "no-store" } },
     );

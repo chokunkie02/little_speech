@@ -126,6 +126,8 @@ export interface PolicySnapshot {
   version: number;
   config: AssessmentPolicy;
   published_at: string;
+  /** Name of the service that checks speech (for consent text); added by GET /api/assessment/policy. */
+  providerLabel?: string;
 }
 export type Outcome =
   | "achieved"
@@ -133,9 +135,14 @@ export type Outcome =
   | "retry"
   | "needs_review"
   | "unavailable";
+/** Results scored by a speech service ("azure" results predate the switch to OpenAI). */
+export type AiSource = "azure" | "openai";
+export const AI_SOURCE_LABELS: Record<AiSource, string> = { azure: "Azure Speech", openai: "OpenAI" };
+export const isAiSource = (source: AssessmentResult["source"]): source is AiSource =>
+  source === "azure" || source === "openai";
 export interface AssessmentResult {
   id: string;
-  source: "azure" | "rules" | "adult" | "unavailable";
+  source: AiSource | "rules" | "adult" | "unavailable";
   outcome: Outcome;
   policyVersion: number;
   /** Revision of the school criteria used, when the child belongs to a school that saved some. */

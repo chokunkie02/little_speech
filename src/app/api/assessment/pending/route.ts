@@ -40,7 +40,7 @@ export async function GET(request: Request) {
       .in("child_id", [...roster.keys()])
       .eq("state", "completed")
       .is("adult_review", null)
-      .or("result->>outcome.eq.needs_review,result->>source.eq.azure")
+      .or("result->>outcome.eq.needs_review,result->>source.in.(azure,openai)")
       .order("created_at", { ascending: false })
       .limit(LIMIT);
     if (results.error) throw new AssessmentError("โหลดรายการรอตรวจไม่สำเร็จ", 503);

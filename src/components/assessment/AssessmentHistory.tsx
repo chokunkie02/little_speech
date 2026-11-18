@@ -5,7 +5,15 @@ import { RefreshCw } from "lucide-react";
 import { Alert, Badge, Button, Card, Section, type BadgeTone } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
 import { assessmentRequest } from "@/lib/assessment/client";
-import { OUTCOME_LABELS, STAGE_DEFINITIONS, type AssessmentResult, type Outcome } from "@/lib/assessment/policy";
+import { aiScoreSummary } from "@/components/assessment/AssessmentResultCard";
+import {
+  AI_SOURCE_LABELS,
+  OUTCOME_LABELS,
+  STAGE_DEFINITIONS,
+  isAiSource,
+  type AssessmentResult,
+  type Outcome,
+} from "@/lib/assessment/policy";
 import { formatThaiDate } from "@/lib/thaiDate";
 
 interface Row {
@@ -26,8 +34,7 @@ const OUTCOME_TONES: Record<Outcome, BadgeTone> = {
 };
 
 function sourceText(result: AssessmentResult) {
-  if (result.source === "azure")
-    return `Azure Speech · คะแนนรวม ${result.score?.toFixed(0)} · ความถูกต้อง ${result.accuracy?.toFixed(0)} · ความครบ ${result.completeness?.toFixed(0)}`;
+  if (isAiSource(result.source)) return `${AI_SOURCE_LABELS[result.source]} · ${aiScoreSummary(result)}`;
   if (result.source === "rules") return "ตรวจจากเฉลยข้อเลือกตอบ";
   if (result.source === "adult") return "ผู้ใหญ่ช่วยตรวจ";
   return "ยังไม่ได้ผลตรวจเสียง";

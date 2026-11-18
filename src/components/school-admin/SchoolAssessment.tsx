@@ -39,7 +39,7 @@ interface SchoolData {
   school: { id: string; revision: number; settings: SchoolSettings; created_at: string } | null;
   history: { id: string; revision: number; created_at: string; changedStages: number; aiEnabled: boolean }[];
   clampedStages: string[];
-  provider: { ready: boolean };
+  provider: { ready: boolean; label?: string };
 }
 
 type StageValues = Pick<AssessmentRule, "mode" | "passScore" | "practiceScore" | "minCompleteness">;
@@ -50,7 +50,8 @@ const TRACKS = [
   { id: "communication", label: "พูดเพื่อสื่อสาร" },
   { id: "phonics", label: "เสียงกับตัวอักษร" },
 ] as const;
-const MODE_LABELS = { azure: "AI ตรวจ (Azure Speech)", adult: "ผู้ใหญ่ตรวจ" } as const;
+/** rule.mode "azure" is the stored name of the AI method, whichever service runs it. */
+const MODE_LABELS = { azure: "AI ตรวจเสียง", adult: "ผู้ใหญ่ตรวจ" } as const;
 
 const pick = (rule: AssessmentRule): StageValues => ({
   mode: rule.mode,

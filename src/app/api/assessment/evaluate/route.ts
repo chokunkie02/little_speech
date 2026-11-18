@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { z } from "zod";
 import { getStages } from "@/features/learning-studio/curriculum";
-import { assessWithAzure, azureConnection } from "@/lib/assessment/azure";
+import { assessSpeech, speechProvider } from "@/lib/assessment/provider";
 import { judgeSpeech, type AssessmentResult } from "@/lib/assessment/policy";
 import { inspectWav } from "@/lib/assessment/wav";
 import {
@@ -193,7 +193,7 @@ export async function POST(request: Request) {
         result.reason = "ai_disabled";
         result.feedback =
           "รอบนี้ใช้การฟังร่วมกับผู้ใหญ่ แอดมินยังไม่ได้เปิดประเมินเสียงด้วย AI";
-      } else if (!azureConnection().ready) {
+      } else if (!speechProvider().ready) {
         Object.assign(result, {
           source: "unavailable",
           outcome: "unavailable",
@@ -215,7 +215,7 @@ export async function POST(request: Request) {
         });
       } else {
         try {
-          const scores = await assessWithAzure(audio!, item.sample);
+          const { source, scores } = await assessSpeech(audio!, item.sample);
           if (!scores) {
             Object.assign(result, {
               source: "unavailable",
@@ -226,7 +226,7 @@ export async function POST(request: Request) {
             });
           } else {
             Object.assign(result, {
-              source: "azure",
+              source,
               ...scores,
               ...judgeSpeech(scores, rule, policy.minConfidence),
             });
@@ -237,7 +237,7 @@ export async function POST(request: Request) {
             outcome: "unavailable",
             reason:
               error instanceof Error &&
-              ["provider_auth_failed", "provider_failed"].includes(
+              ["provider_auth_failed", "provider_rate_limited", "provider_failed"].includes(
                 error.message,
               )
                 ? error.message

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { ClipboardCheck, RefreshCw } from "lucide-react";
 import { Badge, Button, Card, DataLoadError, EmptyState, LoadingState, Section, toast } from "@/components/ui";
 import { assessmentRequest } from "@/lib/assessment/client";
-import { OUTCOME_LABELS, STAGE_DEFINITIONS, type AssessmentResult } from "@/lib/assessment/policy";
+import { OUTCOME_LABELS, STAGE_DEFINITIONS, isAiSource, type AssessmentResult } from "@/lib/assessment/policy";
 import { formatThaiDate } from "@/lib/thaiDate";
 
 interface PendingItem {
@@ -87,14 +87,14 @@ export function TeacherReviewQueue({ classroomId, onCount }: { classroomId: stri
                   <p className="font-semibold text-text">
                     {item.studentNumber ? `${item.studentNumber}. ` : ""}{item.childName}
                   </p>
-                  <Badge tone={item.result.source === "azure" ? "info" : "neutral"}>
-                    {item.result.source === "azure" ? "AI แนะนำ" : OUTCOME_LABELS[item.result.outcome]}
+                  <Badge tone={isAiSource(item.result.source) ? "info" : "neutral"}>
+                    {isAiSource(item.result.source) ? "AI แนะนำ" : OUTCOME_LABELS[item.result.outcome]}
                   </Badge>
                 </div>
                 <p className="text-sm text-text">“{item.referenceText}”</p>
                 <p className="text-caption text-text-muted">
                   {STAGE_DEFINITIONS.find((stage) => stage.id === item.stageId)?.label} · {formatThaiDate(item.createdAt, "datetime")}
-                  {item.result.source === "azure" && ` · AI: ${OUTCOME_LABELS[item.result.outcome]} (คะแนน ${item.result.score?.toFixed(0) ?? "—"})`}
+                  {isAiSource(item.result.source) && ` · AI: ${OUTCOME_LABELS[item.result.outcome]} (คะแนน ${item.result.score?.toFixed(0) ?? "—"})`}
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-2 lg:flex">

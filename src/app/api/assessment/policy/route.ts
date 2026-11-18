@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { speechProvider } from "@/lib/assessment/provider";
 import {
   AssessmentError,
   activePolicy,
@@ -27,7 +28,12 @@ export async function GET(request: Request) {
     await requireChildAccess(caller, childId, false);
     const judged = await childPolicy(snapshot.config, childId);
     return Response.json(
-      { ...snapshot, config: judged.config, schoolRevision: judged.schoolVersion?.revision },
+      {
+        ...snapshot,
+        config: judged.config,
+        schoolRevision: judged.schoolVersion?.revision,
+        providerLabel: speechProvider().label,
+      },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {

@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { policySchema } from "@/lib/assessment/policy";
-import { azureConnection } from "@/lib/assessment/azure";
+import { speechProvider } from "@/lib/assessment/provider";
 import {
   AssessmentError,
   activePolicy,
@@ -48,12 +48,11 @@ export async function GET(request: Request) {
         "ติดตั้ง migration ระบบประเมินก่อนเปิดหน้านี้",
         503,
       );
-    const connection = azureConnection();
     return Response.json(
       {
         state: state.data,
         versions: versions.data,
-        provider: { ready: connection.ready, region: connection.region },
+        provider: speechProvider(),
       },
       { headers: { "Cache-Control": "no-store" } },
     );
@@ -101,9 +100,12 @@ export async function POST(request: Request) {
     const draft = policySchema.safeParse(state.data?.draft);
     if (state.error || !draft.success)
       throw new AssessmentError("ร่างไม่สมบูรณ์ กรุณาบันทึกเกณฑ์อีกครั้ง", 409);
-    if (draft.data.enabled && !azureConnection().ready)
+    const provider = speechProvider();
+    if (draft.data.enabled && !provider.ready)
       throw new AssessmentError(
-        "ตั้ง AZURE_SPEECH_KEY และ region หรือ endpoint บนเซิร์ฟเวอร์ก่อนเปิด AI",
+        provider.id === "openai"
+          ? "ตั้ง ASSESSMENT_OPENAI_API_KEY (คีย์ของ OpenAI ไม่ใช่ OpenRouter) บนเซิร์ฟเวอร์ก่อนเปิด AI"
+          : "ตั้ง AZURE_SPEECH_KEY และ region หรือ endpoint บนเซิร์ฟเวอร์ก่อนเปิด AI",
         409,
       );
     const previous = await activePolicy().catch(() => null);

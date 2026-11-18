@@ -43,7 +43,7 @@ interface AdminData {
     updated_at: string;
   };
   versions: PolicySnapshot[];
-  provider: { ready: boolean; region?: string };
+  provider: { id: "openai" | "azure"; label: string; ready: boolean; detail?: string };
 }
 
 const TRACKS = [
@@ -204,11 +204,13 @@ export default function AssessmentAdmin() {
                     </dd>
                   </div>
                   <div className="flex items-start justify-between gap-3 py-2.5">
-                    <dt className="text-text-muted">Azure Speech</dt>
-                    <dd>
-                      <Badge tone={data.provider.ready ? "success" : "warning"}>
+                    <dt className="text-text-muted">บริการ AI ตรวจเสียง</dt>
+                    <dd className="text-right">
+                      <p className="font-semibold">{data.provider.label}</p>
+                      <Badge tone={data.provider.ready ? "success" : "warning"} className="mt-1">
                         {data.provider.ready ? "ตั้งค่าแล้ว" : "ยังไม่ได้ตั้งคีย์"}
                       </Badge>
+                      {data.provider.detail && <p className="mt-1 text-caption text-text-muted">{data.provider.detail}</p>}
                     </dd>
                   </div>
                   <div className="flex items-start justify-between gap-3 py-2.5">
@@ -260,8 +262,8 @@ export default function AssessmentAdmin() {
                   <FormField label="ชื่อชุดเกณฑ์">
                     <Input maxLength={100} value={draft.name} onChange={(event) => setDraft({ ...draft, name: event.target.value })} />
                   </FormField>
-                  <FormField inline label="เปิดการประเมินเสียงด้วย Azure หลังเผยแพร่"
-                    hint={!data.provider.ready ? "ต้องตั้งคีย์ Azure บนเซิร์ฟเวอร์ก่อน จึงเผยแพร่แบบเปิด AI ได้" : undefined}>
+                  <FormField inline label={`เปิดการประเมินเสียงด้วย AI (${data.provider.label}) หลังเผยแพร่`}
+                    hint={!data.provider.ready ? `ต้องตั้งคีย์ ${data.provider.label} บนเซิร์ฟเวอร์ก่อน จึงเผยแพร่แบบเปิด AI ได้` : undefined}>
                     <Switch checked={draft.enabled} onCheckedChange={(enabled) => setDraft({ ...draft, enabled })} />
                   </FormField>
                   <FormField inline label="อนุญาตให้โรงเรียนเปิด AI เอง"
@@ -283,7 +285,9 @@ export default function AssessmentAdmin() {
                     </FormField>
                   </div>
                   <p className="text-caption text-text-muted">
-                    ความมั่นใจมาจากระบบรู้จำเสียง ส่วนคะแนนการออกเสียงเป็นผลประเมินอีกส่วน ควรทดลองกับผู้เชี่ยวชาญก่อนตั้งค่าจริง
+                    {data.provider.id === "openai"
+                      ? "ความมั่นใจมาจากความน่าจะเป็นของการถอดเสียง ส่วนคะแนนคือความตรงระหว่างคำที่ AI ได้ยินกับคำเป้าหมาย ไม่ใช่คะแนนความชัดของการออกเสียง ควรทดลองกับผู้เชี่ยวชาญก่อนตั้งค่าจริง"
+                      : "ความมั่นใจมาจากระบบรู้จำเสียง ส่วนคะแนนการออกเสียงเป็นผลประเมินอีกส่วน ควรทดลองกับผู้เชี่ยวชาญก่อนตั้งค่าจริง"}
                   </p>
                 </CardContent>
               </Card>
@@ -307,7 +311,7 @@ export default function AssessmentAdmin() {
                             <>
                               <FormField label="วิธีตรวจเสียง">
                                 <Select value={rule.mode} onChange={(event) => updateRule(stage.id, { mode: event.target.value as "azure" | "adult" })}>
-                                  <option value="azure">Azure Speech</option>
+                                  <option value="azure">AI ตรวจเสียง ({data.provider.label})</option>
                                   <option value="adult">ผู้ใหญ่ช่วยตรวจ</option>
                                 </Select>
                               </FormField>
@@ -339,7 +343,7 @@ export default function AssessmentAdmin() {
                 </details>
               ))}
               <p className="text-caption text-text-muted">
-                โจทย์ที่ให้พูดเองจากภาพใช้ผู้ใหญ่ตรวจเสมอ แม้ขั้นนั้นจะเปิด Azure เพราะคำตอบอาจต่างจากตัวอย่าง เกณฑ์นี้ใช้ร่วมกันทั้ง 4 ระดับความยาก
+                โจทย์ที่ให้พูดเองจากภาพใช้ผู้ใหญ่ตรวจเสมอ แม้ขั้นนั้นจะเปิด AI เพราะคำตอบอาจต่างจากตัวอย่าง เกณฑ์นี้ใช้ร่วมกันทั้ง 4 ระดับความยาก
               </p>
               {!valid.success && <Alert tone="error">{valid.error.issues[0].message}</Alert>}
               <div className="flex flex-wrap gap-3">
@@ -378,23 +382,34 @@ export default function AssessmentAdmin() {
               </Card>
             </Section>
 
-            <Section id="connection-guide" title="เชื่อม Azure Speech" description="ทำเมื่อพร้อมเปิดการประเมินเสียงด้วย AI">
+            <Section id="connection-guide" title={`เชื่อม ${data.provider.label}`} description="ทำเมื่อพร้อมเปิดการประเมินเสียงด้วย AI">
               <Card>
                 <CardContent className="space-y-3 p-4 sm:p-5">
-                  <ol className="list-decimal space-y-2 pl-5 text-sm">
-                    <li>สร้างบัญชี Azure และ Speech resource แล้วเลือกภูมิภาค</li>
-                    <li>เปิด Keys and Endpoint ของ resource แล้วตั้ง AZURE_SPEECH_KEY กับ AZURE_SPEECH_REGION (หรือ AZURE_SPEECH_ENDPOINT) ใน .env.local ฝั่งเซิร์ฟเวอร์</li>
-                    <li>เปิดเซิร์ฟเวอร์ใหม่ กลับมาโหลดสถานะ ตั้งเกณฑ์ เปิด AI แล้วเผยแพร่</li>
-                    <li>อัดเสียงในห้องฝึกด้วยบัญชีผู้ปกครอง แล้วเทียบผลกับการฟังของผู้ใหญ่</li>
-                  </ol>
+                  {data.provider.id === "openai" ? (
+                    <ol className="list-decimal space-y-2 pl-5 text-sm">
+                      <li>ให้เจ้าของบัญชี OpenAI สร้าง API key แยกสำหรับโปรเจกต์นี้ และตั้งวงเงินรายเดือน</li>
+                      <li>ใส่คีย์ใน ASSESSMENT_OPENAI_API_KEY ของ .env.local ฝั่งเซิร์ฟเวอร์ แล้วรัน npm run assessment:check-openai</li>
+                      <li>เปิดเซิร์ฟเวอร์ใหม่ กลับมาโหลดสถานะ ตั้งเกณฑ์ เปิด AI แล้วเผยแพร่</li>
+                      <li>อัดเสียงในห้องฝึกด้วยบัญชีผู้ปกครอง แล้วเทียบผลกับการฟังของผู้ใหญ่</li>
+                    </ol>
+                  ) : (
+                    <ol className="list-decimal space-y-2 pl-5 text-sm">
+                      <li>สร้างบัญชี Azure และ Speech resource แล้วเลือกภูมิภาค</li>
+                      <li>เปิด Keys and Endpoint ของ resource แล้วตั้ง AZURE_SPEECH_KEY กับ AZURE_SPEECH_REGION (หรือ AZURE_SPEECH_ENDPOINT) ใน .env.local ฝั่งเซิร์ฟเวอร์</li>
+                      <li>เปิดเซิร์ฟเวอร์ใหม่ กลับมาโหลดสถานะ ตั้งเกณฑ์ เปิด AI แล้วเผยแพร่</li>
+                      <li>อัดเสียงในห้องฝึกด้วยบัญชีผู้ปกครอง แล้วเทียบผลกับการฟังของผู้ใหญ่</li>
+                    </ol>
+                  )}
                   <a className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline"
-                    href="https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-started-speech-to-text"
+                    href={data.provider.id === "openai"
+                      ? "https://platform.openai.com/api-keys"
+                      : "https://learn.microsoft.com/en-us/azure/ai-services/speech-service/get-started-speech-to-text"}
                     target="_blank" rel="noreferrer">
-                    คู่มือตั้งค่า Speech resource ของ Microsoft
+                    {data.provider.id === "openai" ? "หน้าจัดการ API key ของ OpenAI" : "คู่มือตั้งค่า Speech resource ของ Microsoft"}
                     <ExternalLink size={14} aria-hidden="true" />
                   </a>
                   <p className="text-caption text-text-muted">
-                    คีย์อยู่บนเซิร์ฟเวอร์เท่านั้น คลิปเสียงถูกส่งไป Azure เฉพาะเมื่อผู้ใช้กดส่งตรวจ ระบบกลางเก็บแค่ผลกับเวอร์ชันเกณฑ์ ไม่เก็บไฟล์เสียง
+                    คีย์อยู่บนเซิร์ฟเวอร์เท่านั้น คลิปเสียงถูกส่งไป {data.provider.label} เฉพาะเมื่อผู้ใช้ยินยอมและกดส่งตรวจ ระบบกลางเก็บแค่ผลกับเวอร์ชันเกณฑ์ ไม่เก็บไฟล์เสียง
                   </p>
                 </CardContent>
               </Card>
