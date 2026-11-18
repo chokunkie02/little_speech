@@ -11,6 +11,7 @@ import {
 } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
 import { useInvitations } from "@/hooks/useInvitations";
+import { useRepositories } from "@/lib/providers/RepositoryProvider";
 import { useInbox } from "@/components/inbox/InboxProvider";
 import { useAccountProfile } from "@/components/account/AccountProfileProvider";
 import { InlineAuth } from "@/components/auth/InlineAuth";
@@ -189,7 +190,7 @@ function ConfirmForm({ preview, code, onDone }: { preview: JoinCodePreview; code
 
 // ── Done ────────────────────────────────────────────────────────────────────
 
-function DoneState({ result }: { result: RedeemResult }) {
+function DoneState({ result, preview }: { result: RedeemResult; preview?: JoinCodePreview }) {
   if (result.result === "requested") {
     return (
       <div className="space-y-4 text-center">
@@ -203,14 +204,21 @@ function DoneState({ result }: { result: RedeemResult }) {
     );
   }
   const linked = result.result === "linked";
+  // "joined" also comes back for a teacher who is already a member of the school.
+  const admin = preview?.kind === "school_admin";
+  const school = preview?.school_name;
   return (
     <div className="space-y-4 text-center">
       <CheckCircle2 size={40} className="mx-auto text-success-text" aria-hidden="true" />
       <div className="space-y-1">
-        <h2 className="text-section-title">{linked ? "เชื่อมกับนักเรียนแล้ว" : "เข้าร่วมโรงเรียนแล้ว"}</h2>
-        <p className="text-sm text-text-muted">{linked ? "ดูผลการฝึกและเริ่มฝึกที่บ้านได้เลย" : "เริ่มจัดการโรงเรียนได้เลย"}</p>
+        <h2 className="text-section-title">{linked ? "เชื่อมกับนักเรียนแล้ว" : admin ? "เป็นผู้ดูแลโรงเรียนแล้ว" : "เข้าร่วมโรงเรียนแล้ว"}</h2>
+        <p className="text-sm text-text-muted">
+          {linked ? "ดูผลการฝึกและเริ่มฝึกที่บ้านได้เลย"
+            : admin ? `${school ? `บัญชีนี้ดูแล ${school} แล้ว ` : ""}เริ่มจัดการห้องเรียน ครู และนักเรียนได้เลย`
+            : `${school ? `บัญชีนี้เป็นครูของ ${school} แล้ว ` : ""}ดูห้องเรียนของคุณได้เลย`}
+        </p>
       </div>
-      <ButtonLink href={linked ? "/dashboard" : "/school"} block>{linked ? "ไปหน้าหลัก" : "ไปหน้าโรงเรียน"}</ButtonLink>
+      <ButtonLink href={linked ? "/dashboard" : admin ? "/school" : "/teacher"} block>{linked ? "ไปหน้าหลัก" : admin ? "ไปหน้าโรงเรียน" : "ไปห้องเรียนของฉัน"}</ButtonLink>
     </div>
   );
 }
@@ -222,6 +230,7 @@ export default function JoinFlow() {
   const router = useRouter();
   const { user, isLoading, signOut } = useAuth();
   const { openLinkedChild } = useInvitations();
+  const { school: schoolRepo } = useRepositories();
   const { refresh: refreshInbox } = useInbox();
   const [code, setCode] = useState(() => normalizeJoinCode(params.get("code") ?? ""));
   const [preview, setPreview] = useState<JoinCodePreview>();
@@ -277,6 +286,9 @@ export default function JoinFlow() {
     setResult(value);
     refreshInbox();
     if (value.result === "linked") await openLinkedChild(value.child_id).catch(() => undefined);
+    // The school list was loaded before this account joined; reload it so the school pages see the new school
+    // instead of "บัญชีนี้ยังไม่ได้ดูแลโรงเรียนไหน".
+    if (value.result === "joined") await Promise.resolve(schoolRepo?.rehydrate?.()).catch(() => undefined);
   }
 
   const valid = preview?.status === "valid";
@@ -291,7 +303,7 @@ export default function JoinFlow() {
               <p className="text-sm text-text-muted">สำหรับผู้ปกครอง ครู และผู้ดูแลโรงเรียนที่ได้รับรหัสหรือ QR</p>
             </div>
 
-            {result ? <DoneState result={result} /> : (
+            {result ? <DoneState result={result} preview={preview} /> : (
               <>
                 {(!preview || !valid) && !loadingPreview && (
                   <CodeForm key={code} initial={code} onSubmit={check} busy={checking} />

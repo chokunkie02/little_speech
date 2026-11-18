@@ -20,7 +20,7 @@ import type { ValidatedImportRow, ImportResult } from "@/types/schoolImport";
  * membership when possible.
  */
 export interface ISchoolRepository {
-  rehydrate?(): void;
+  rehydrate?(): void | Promise<void>;
   subscribe(callback: () => void): () => void;
 
   // ── Organizations ─────────────────────────────────────────────────────────────

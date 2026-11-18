@@ -213,7 +213,7 @@ export function SchoolAssessment() {
               <Switch checked={form.aiEnabled} disabled={!aiAllowed}
                 onCheckedChange={(aiEnabled) => setForm({ ...form, aiEnabled })} />
             </FormField>
-            <FormField label="ใครยืนยันผลได้" hint="มีผลเมื่อเปิดหน้ายืนยันผลของครู ซึ่งยังอยู่ระหว่างพัฒนา">
+            <FormField label="ใครยืนยันผลได้" hint="ผลที่รอยืนยันจะขึ้นในแท็บ “รอตรวจ” ของห้องเรียน">
               <Select value={form.reviewers} onChange={(event) => setForm({ ...form, reviewers: event.target.value as Form["reviewers"] })}>
                 {Object.entries(REVIEWER_OPTIONS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               </Select>

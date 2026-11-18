@@ -306,10 +306,12 @@ export class SupabaseSchoolRepository implements ISchoolRepository {
     this._notify();
   }
 
-  public rehydrate(): void {
+  /** Reloads everything from the server; resolves once the new data is in the cache. */
+  public rehydrate(): Promise<void> {
     this._hydratePromise = null;
     this._hydrateGen++;
     this._triggerHydrate();
+    return this._hydratePromise ?? Promise.resolve();
   }
 
   // ── User display ──────────────────────────────────────────────────────────────
