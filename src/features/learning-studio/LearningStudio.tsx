@@ -689,8 +689,8 @@ export function LearningStudio({
               </div>
               <div className="bottom-note">
                 <ShieldCheck size={16} />
-                กิจกรรมเพื่อทดลองการใช้งาน ผลการพูดต้องให้ผู้ใหญ่ช่วยสังเกต
-                ไม่มีการประเมินเสียงด้วย AI จริงในต้นแบบนี้
+                กิจกรรมเพื่อทดลองการใช้งาน ผลการพูดให้ผู้ใหญ่ช่วยสังเกต
+                AI ช่วยฟังได้เฉพาะเมื่อเปิดใช้และผู้ใหญ่กดยินยอม
               </div>
             </>
           )}
@@ -1007,7 +1007,7 @@ export function LearningStudio({
             </span>
             <span>
               <ShieldCheck size={18} />
-              เสียงไม่ถูกอัปโหลด และไม่เก็บถาวร
+              ไม่เก็บไฟล์เสียง ส่งให้ AI เฉพาะเมื่อยินยอม
             </span>
             <span>
               <Users size={18} />
@@ -1745,11 +1745,15 @@ function Practice({
     let assessed = assessment;
     // The central copy is best effort: a child is never stuck on an item because the assessment
     // service is unreachable, rate-limited or not deployed. The attempt is still saved locally.
-    if (user && CENTRAL_CHILD_ID.test(session.childId) && (isChoice || item.kind === "observation")) {
+    // A recorded speech attempt that was not checked yet still goes to the central record, as waiting
+    // for an adult (no audio is sent), so it reaches the teacher's queue and the child's progress.
+    // Simulated answers ("ทดลองตอบโดยไม่อัดเสียง") stay local, like before.
+    const unsentSpeech = item.kind === "speech" && !assessed && !demo && !!recordedBlob;
+    if (user && CENTRAL_CHILD_ID.test(session.childId) && (isChoice || item.kind === "observation" || unsentSpeech)) {
       setAssessmentBusy(true);
       setAssessmentMessage("");
       try {
-        const inputKey = JSON.stringify({ choice, review });
+        const inputKey = JSON.stringify({ choice, review, unsentSpeech });
         if (!saveRequestId.current || saveRequestInput.current !== inputKey) {
           saveRequestId.current = uid();
           saveRequestInput.current = inputKey;
@@ -1757,6 +1761,7 @@ function Practice({
         assessed = await submitStudioAssessment(session, item, saveRequestId.current, {
           selectedChoice: isChoice ? choice ?? undefined : undefined,
           adultReview: item.kind === "observation" ? review : undefined,
+          adultOnly: unsentSpeech || undefined,
         });
         setAssessment(assessed);
       } catch {

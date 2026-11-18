@@ -256,10 +256,7 @@ export class SupabaseProfileRepository implements IProfileRepository {
           );
           if (profiles.length > 0) {
             this._profiles = profiles;
-            const savedId = localRead(this._selectedChildKey());
-            const selected = profiles.find(p => p.id === savedId) ?? profiles[0] ?? null;
-            this._selectedChildId = selected?.id ?? null;
-            this._cache = selected;
+            this._restoreSelection(profiles);
             return;
           }
         }
@@ -267,19 +264,36 @@ export class SupabaseProfileRepository implements IProfileRepository {
     }
     // Fallback: legacy single-profile key
     const legacyRaw = localRead(this._legacyProfileKey());
-    if (!legacyRaw) return;
-    try {
-      const profile = parseOrNull(
-        ChildProfileDataSchema,
-        JSON.parse(legacyRaw),
-        "supabase-profile-legacy",
-      ) as ChildProfileData | null;
-      if (profile) {
-        this._profiles = [profile];
-        this._selectedChildId = profile.id;
-        this._cache = profile;
-      }
-    } catch { /* ignore */ }
+    if (legacyRaw) {
+      try {
+        const profile = parseOrNull(
+          ChildProfileDataSchema,
+          JSON.parse(legacyRaw),
+          "supabase-profile-legacy",
+        ) as ChildProfileData | null;
+        if (profile) {
+          this._profiles = [profile];
+          this._restoreSelection(this._profiles);
+          return;
+        }
+      } catch { /* ignore */ }
+    }
+    // No owned children (e.g. a parent whose only children are shared by a school): still keep the
+    // saved choice so useChildProfile can resolve it among the shared children.
+    this._restoreSelection([]);
+  }
+
+  /**
+   * Restore the saved selection after loading the owned children. A saved id that is not an owned
+   * child may be a child shared with this account, which useChildProfile resolves against the shared
+   * list, so it is kept instead of being overwritten with the first owned child. That overwrite made
+   * a reload switch a parent from a school child back to their own child.
+   */
+  private _restoreSelection(profiles: ChildProfileData[]): void {
+    const savedId = localRead(this._selectedChildKey());
+    const owned = profiles.find(p => p.id === savedId) ?? null;
+    this._cache = owned ?? profiles[0] ?? null;
+    this._selectedChildId = owned?.id ?? savedId ?? this._cache?.id ?? null;
   }
 
   private _notify(): void {
@@ -327,11 +341,7 @@ export class SupabaseProfileRepository implements IProfileRepository {
     if (rows && rows.length > 0) {
       const profiles = rows.map(row => dbToDomainProfile(row));
       this._profiles = profiles;
-      // Restore selection: prefer the saved ID; fall back to first profile
-      const savedId = localRead(this._selectedChildKey());
-      const selected = profiles.find(p => p.id === savedId) ?? profiles[0] ?? null;
-      this._selectedChildId = selected?.id ?? null;
-      this._cache = selected;
+      this._restoreSelection(profiles);
       // Write through so offline fallback is always fresh
       this._persistToLocalStorage();
     } else {

@@ -59,7 +59,8 @@ export function LearningStudioClient() {
           child
             ? {
                 id: child.id,
-                name: child.name,
+                // Same name the child picker shows, so a school child reads "น้องฟ้า", not the full name.
+                name: child.nickname || child.name,
                 age: child.age,
                 targetSound: child.targetSound,
                 initialTrack: child.trainingMode === "kindergarten_phonics" ? "phonics" : "speech",

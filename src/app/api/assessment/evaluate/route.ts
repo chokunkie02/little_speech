@@ -30,6 +30,8 @@ const inputSchema = z
     adultReview: z
       .enum(["pending", "achieved", "practice", "unavailable"])
       .optional(),
+    /** A recorded speech attempt saved without sending audio to AI: waits for an adult instead. */
+    adultOnly: z.literal(true).optional(),
   })
   .strict();
 
@@ -84,7 +86,8 @@ export async function POST(request: Request) {
       item.kind === "speech" &&
       !item.hidePrompt &&
       rule.mode === "azure" &&
-      policy.enabled;
+      policy.enabled &&
+      !input.adultOnly;
     const db = assessmentDb();
     const inputHash = createHash("sha256")
       .update(JSON.stringify(input))
@@ -189,7 +192,10 @@ export async function POST(request: Request) {
       !item.hidePrompt &&
       rule.mode === "azure"
     ) {
-      if (!policy.enabled) {
+      if (input.adultOnly) {
+        result.reason = "not_sent_to_ai";
+        result.feedback = "บันทึกไว้ให้ผู้ใหญ่ช่วยฟังและตรวจ รอบนี้ไม่ได้ส่งเสียงให้ AI";
+      } else if (!policy.enabled) {
         result.reason = "ai_disabled";
         result.feedback =
           "รอบนี้ใช้การฟังร่วมกับผู้ใหญ่ แอดมินยังไม่ได้เปิดประเมินเสียงด้วย AI";

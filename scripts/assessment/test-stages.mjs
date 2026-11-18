@@ -164,7 +164,7 @@ globalThis.fetch = async (url, options) => {
 const hears = (text, logprob = -0.05) => () => Response.json({ text, logprobs: [...text].map((token) => ({ token, logprob })) });
 
 // ── Calling the real route ────────────────────────────────────────────────────
-async function evaluate({ token = "parent-token", childId = HOME_CHILD, item, stage, track, sound, level, selectedChoice, adultReview, audio, requestId = randomUUID() }) {
+async function evaluate({ token = "parent-token", childId = HOME_CHILD, item, stage, track, sound, level, selectedChoice, adultReview, adultOnly, audio, requestId = randomUUID() }) {
   const form = new FormData();
   form.append(
     "context",
@@ -179,6 +179,7 @@ async function evaluate({ token = "parent-token", childId = HOME_CHILD, item, st
       itemId: item.id,
       ...(selectedChoice ? { selectedChoice } : {}),
       ...(adultReview ? { adultReview } : {}),
+      ...(adultOnly !== undefined ? { adultOnly } : {}),
     }),
   );
   if (audio) form.append("audio", new File([audio], "attempt.wav", { type: "audio/wav" }));
@@ -283,6 +284,13 @@ for (const track of TRACKS)
         }
       }
 record("Curriculum still has 432 activities", () => assert.equal(itemCount, 432));
+// Matches ANSWER_KEY_STAGES in src/components/assessment/AssessmentAdmin.tsx (the "ตรวจจากเฉลย" badge).
+record("Stages labelled 'ตรวจจากเฉลย' in the admin page are exactly the choice-only stages", () =>
+  assert.deepEqual(
+    [...stageRows.values()].filter((row) => Object.keys(row.methods).join() === "rules").map((row) => row.stageId).sort(),
+    ["letter", "listen", "understand"],
+  ),
+);
 
 // ── 3. Speech scenarios on one AI item ───────────────────────────────────────
 const pick = (stageId, test = () => true) => {
@@ -365,6 +373,30 @@ await scenario("AI item without a recording → asked to record first", () => ev
   assert.equal(result.status, 400);
   assert.match(body.error, /อัดเสียง/);
 });
+await scenario("Recorded attempt saved without an AI check (adultOnly) → waits for an adult, no audio, no AI call", () =>
+  evaluate({ ...word, adultOnly: true }), (body, result) => {
+  assert.equal(result.status, 200, JSON.stringify(body));
+  assert.equal(body.source, "adult");
+  assert.equal(body.outcome, "needs_review");
+  assert.equal(body.reason, "not_sent_to_ai");
+  assert.equal(openaiCalls.length, 0);
+});
+await scenario("adultOnly on an adult-checked speech item → still adult review", () => {
+  let adultSpeech;
+  for (const track of TRACKS)
+    for (const level of LEVELS)
+      for (const stage of getStages(track, "ป", level))
+        for (const item of stage.items)
+          if (!adultSpeech && item.kind === "speech" && (!DESIGN[stage.id].ai || item.hidePrompt))
+            adultSpeech = { item, stage, track, sound: "ป", level };
+  assert.ok(adultSpeech, "no adult-checked speech item in the curriculum");
+  return evaluate({ ...adultSpeech, adultOnly: true });
+}, (body) => {
+  assert.equal(body.source, "adult");
+  assert.equal(body.outcome, "needs_review");
+});
+await scenario("adultOnly must be exactly true (no other values accepted)", () =>
+  evaluate({ ...word, adultOnly: "yes" }), (_body, result) => assert.equal(result.status, 400));
 for (const [status, reason] of [[401, "provider_auth_failed"], [429, "provider_rate_limited"], [500, "provider_failed"]])
   await scenario(`OpenAI answers ${status} → unavailable (${reason}), no score`, () => {
     openaiReply = () => new Response("{}", { status });

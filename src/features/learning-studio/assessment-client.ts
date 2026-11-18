@@ -10,6 +10,8 @@ export async function submitStudioAssessment(
     audio?: Blob;
     selectedChoice?: string;
     adultReview?: Review;
+    /** Record a speech attempt as waiting for an adult, without sending any audio to AI. */
+    adultOnly?: boolean;
     signal?: AbortSignal;
   } = {},
 ) {
@@ -27,6 +29,7 @@ export async function submitStudioAssessment(
       itemId: item.id,
       selectedChoice: options.selectedChoice,
       adultReview: options.adultReview,
+      adultOnly: options.adultOnly || undefined,
     }),
   );
   if (options.audio) form.set("audio", options.audio, "practice.wav");

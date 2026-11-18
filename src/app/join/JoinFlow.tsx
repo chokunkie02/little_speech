@@ -171,8 +171,8 @@ function ConfirmForm({ preview, code, onDone }: { preview: JoinCodePreview; code
           <div className="space-y-2 rounded-card border border-border bg-surface-muted p-3.5 text-sm">
             <p className="flex items-center gap-2 font-semibold text-text"><ShieldCheck size={16} aria-hidden="true" />ข้อมูลที่ระบบเก็บ</p>
             <ul className="list-disc space-y-0.5 pl-5 text-text-muted">
-              <li>ผลการฝึก: รอบที่ฝึก กิจกรรมที่ได้ลอง และข้อที่ฟังแล้วเลือกตรงเสียง (ไม่มีคะแนน AI)</li>
-              <li>เสียงที่อัดตอนฝึกใช้ฟังทบทวนในเครื่องเท่านั้น ไม่ถูกอัปโหลด</li>
+              <li>ผลการฝึก: รอบที่ฝึก กิจกรรมที่ได้ลอง ข้อที่ฟังแล้วเลือกตรงเสียง และผลตรวจรายข้อ (ผลจาก AI มีเฉพาะเมื่อเปิดใช้และผู้ใหญ่ยินยอม)</li>
+              <li>เสียงที่อัดตอนฝึกใช้ฟังทบทวนในเครื่อง ระบบไม่เก็บไฟล์เสียง และส่งให้ AI ตรวจเฉพาะเมื่อผู้ใหญ่กดยินยอม</li>
               <li>ครูประจำห้องและผู้ดูแลโรงเรียนดูผลการฝึกได้ <Link href="/privacy" target="_blank" className="font-semibold text-primary-text underline">อ่านนโยบายความเป็นส่วนตัว</Link></li>
               <li>ขอยกเลิกการเชื่อมหรือขอลบข้อมูลได้ทุกเมื่อจากหน้าตั้งค่า</li>
             </ul>

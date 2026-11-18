@@ -122,10 +122,10 @@ export default function AppTopBar() {
         </Link>
 
         {showChild && (
-          <button type="button" onClick={() => setMobileOpen(true)} aria-label={`เด็กที่เลือก: ${profile.name} เปิดเมนูเพื่อเปลี่ยน`}
+          <button type="button" onClick={() => setMobileOpen(true)} aria-label={`เด็กที่เลือก: ${profile.nickname || profile.name} เปิดเมนูเพื่อเปลี่ยน`}
             className="flex min-w-0 max-w-[45vw] items-center gap-2 rounded-control px-2 py-1 transition-colors hover:bg-surface-muted lg:hidden">
-            <Avatar name={profile.name} size="sm" />
-            <span className="truncate text-sm font-semibold text-text">{profile.name}</span>
+            <Avatar name={profile.nickname || profile.name} size="sm" />
+            <span className="truncate text-sm font-semibold text-text">{profile.nickname || profile.name}</span>
           </button>
         )}
 

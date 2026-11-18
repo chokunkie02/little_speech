@@ -46,6 +46,9 @@ interface AdminData {
   provider: { id: "openai" | "azure"; label: string; ready: boolean; detail?: string };
 }
 
+/** Stages whose items are all picture choices, checked by the answer key (see test-stages.mjs). */
+const ANSWER_KEY_STAGES = new Set(["listen", "understand", "letter"]);
+
 const TRACKS = [
   { id: "speech", label: "ฝึกออกเสียง", count: 6 },
   { id: "communication", label: "พูดเพื่อสื่อสาร", count: 3 },
@@ -305,7 +308,9 @@ export default function AssessmentAdmin() {
                         <div key={stage.id} className="space-y-3 rounded-control border border-border p-3.5">
                           <div className="flex items-center justify-between gap-2">
                             <h3 className="font-semibold">{stage.label}</h3>
-                            {!stage.automatic && <Badge tone="neutral">ผู้ใหญ่ตรวจ</Badge>}
+                            {!stage.automatic && (
+                              <Badge tone="neutral">{ANSWER_KEY_STAGES.has(stage.id) ? "ตรวจจากเฉลย" : "ผู้ใหญ่ตรวจ"}</Badge>
+                            )}
                           </div>
                           {stage.automatic ? (
                             <>
