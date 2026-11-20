@@ -20,7 +20,7 @@ import { ROLE_LABELS, appRole, isNavActive, navGroups, type NavGroup } from "./n
 function Logo({ withText }: { withText: boolean }) {
   return (
     <Link href="/" className="flex min-w-0 items-center gap-2" aria-label="หน้าแรก Speech Adventure">
-      <span className="grid size-8 shrink-0 place-items-center rounded-control bg-primary text-primary-foreground">
+      <span className="btn-primary grid size-8 shrink-0 place-items-center rounded-control bg-primary text-primary-foreground">
         <Mic size={16} strokeWidth={2.5} aria-hidden="true" />
       </span>
       {withText && (
@@ -59,14 +59,13 @@ function NavList({ groups, collapsed, pending, onNavigate }: {
                     aria-current={active ? "page" : undefined}
                     title={collapsed ? item.label : undefined}
                     className={cn(
-                      "relative flex items-center gap-3 rounded-control px-3 py-2.5 text-sm transition-colors",
+                      "relative flex items-center gap-3 rounded-control px-3 py-2.5 text-[0.9375rem] transition-colors",
                       active
                         ? "bg-primary-soft font-semibold text-primary-text"
                         : "font-medium text-text-muted hover:bg-surface-muted hover:text-text",
                       collapsed && "justify-center px-0",
                     )}
                   >
-                    {active && <span aria-hidden="true" className="absolute inset-y-2 left-0 w-1 rounded-r-full bg-primary" />}
                     <span className="relative flex w-5 shrink-0 items-center justify-center">
                       <NavIcon name={item.icon} active={active} size={18} />
                       {badge && collapsed && (
@@ -162,7 +161,7 @@ export default function AppSidebar() {
     <>
       {/* Desktop sidebar */}
       <aside
-        className="fixed bottom-0 left-0 top-0 z-20 hidden flex-col border-r border-border bg-surface transition-[width] duration-200 ease-in-out print:hidden lg:flex"
+        className="nav-dark fixed bottom-0 left-0 top-0 z-20 hidden flex-col border-r border-border transition-[width] duration-200 ease-in-out print:hidden lg:flex"
         style={{ width: isCollapsed ? 72 : 240 }}
         aria-label="เมนูหลัก"
       >
@@ -198,7 +197,7 @@ export default function AppSidebar() {
       {/* Mobile drawer */}
       <aside
         className={cn(
-          "fixed bottom-16 left-0 top-0 z-50 flex w-[280px] flex-col border-r border-border bg-surface shadow-overlay transition-transform duration-200 ease-in-out print:hidden lg:hidden",
+          "nav-dark fixed bottom-16 left-0 top-0 z-50 flex w-[280px] flex-col border-r border-border shadow-overlay transition-transform duration-200 ease-in-out print:hidden lg:hidden",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
         )}
         aria-label="เมนูหลัก"

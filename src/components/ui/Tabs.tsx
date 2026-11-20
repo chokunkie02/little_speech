@@ -56,15 +56,15 @@ export function Tabs<T extends string>({ items, value, onValueChange, label, chi
               tabIndex={active ? 0 : -1}
               onClick={() => onValueChange(item.value)}
               className={cn(
-                "-mb-px inline-flex shrink-0 items-center gap-2 border-b-2 px-3 py-2.5 text-sm font-semibold transition-colors",
-                active ? "border-primary text-primary" : "border-transparent text-text-muted hover:text-text",
+                "-mb-px inline-flex shrink-0 items-center gap-2 border-b-2 px-3.5 py-2.5 font-display text-[0.9375rem] font-medium transition-colors",
+                active ? "border-primary text-text" : "border-transparent text-text-muted hover:text-text",
               )}
             >
               {item.label}
               {item.count !== undefined && (
                 <span className={cn(
                   "rounded-full px-1.5 py-px text-[11px] tabular-nums",
-                  active ? "bg-primary-soft text-primary-text" : "bg-surface-muted text-text-muted",
+                  active ? "bg-primary text-primary-foreground" : "bg-surface-muted text-text-muted",
                 )}>{item.count}</span>
               )}
             </button>

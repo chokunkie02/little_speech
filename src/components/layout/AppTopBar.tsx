@@ -114,10 +114,10 @@ export default function AppTopBar() {
   const showChild = role === "parent" && !restricted && isHydrated && profile;
 
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-surface/90 backdrop-blur-md print:hidden">
+    <header className="sticky top-0 z-30 border-b border-border bg-bg/80 backdrop-blur-md backdrop-saturate-150 print:hidden">
       <div className="flex h-14 items-center gap-2 px-3 sm:px-4 lg:px-6">
         <Link href="/" aria-label="หน้าแรก Speech Adventure"
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-primary text-primary-foreground lg:hidden">
+          className="btn-primary inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-control bg-primary text-primary-foreground lg:hidden">
           <Mic size={17} strokeWidth={2.5} aria-hidden="true" />
         </Link>
 

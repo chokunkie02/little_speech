@@ -225,3 +225,234 @@
 .learning-studio-scope .assessment-consent { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0; font-size: 14px; }
 .learning-studio-scope .assessment-consent input { margin-top: 5px; flex-shrink: 0; }
 .learning-studio-scope .assessment-panel button { min-height: 44px; }
+
+/* ── ราตรีม่วง · ฝึกและเรียน ─────────────────────────────────────────────────
+   Today's plan: the same deep indigo block as the parent home, gold start button,
+   and the scene inside a lit frame. Level cards each carry their own colour. */
+.learning-studio-scope.learning-studio-scope .main-shell .hero {
+  position: relative;
+  border: 0;
+  border-radius: 1.5rem;
+  color: #FFFFFF;
+  background:
+    radial-gradient(560px 280px at 92% 0%, rgb(255 200 97 / 0.2), transparent 60%),
+    linear-gradient(135deg, #2C2185 0%, #5548D4 70%, #6F63EE 100%);
+  box-shadow: 0 24px 48px -26px rgb(44 33 133 / 0.65);
+  overflow: hidden;
+}
+.dark .learning-studio-scope.learning-studio-scope .main-shell .hero {
+  background: radial-gradient(560px 280px at 92% 0%, rgb(255 200 97 / 0.14), transparent 60%), linear-gradient(135deg, #231A6E 0%, #4337B8 75%, #5A4FD6 100%);
+}
+.learning-studio-scope.learning-studio-scope .main-shell .hero::before {
+  content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .4;
+  background-image: radial-gradient(rgb(255 255 255 / 0.18) 1px, transparent 1px); background-size: 18px 18px;
+  -webkit-mask-image: linear-gradient(120deg, transparent 35%, #000 90%); mask-image: linear-gradient(120deg, transparent 35%, #000 90%);
+}
+.learning-studio-scope.learning-studio-scope .main-shell .hero-copy { padding: clamp(1.25rem, 3vw, 2.25rem); display: flex; flex-direction: column; align-items: flex-start; gap: .25rem; }
+.learning-studio-scope.learning-studio-scope .hero-copy .hero-learner {
+  display: inline-flex; padding: .2rem .75rem; border-radius: 999px; background: rgb(255 255 255 / 0.15);
+  color: #FFFFFF; font-size: .78rem; font-weight: 600; margin-bottom: .75rem;
+}
+.learning-studio-scope.learning-studio-scope .main-shell .hero-copy h2 { color: #FFFFFF; font-family: var(--font-display); font-weight: 600; font-size: clamp(1.75rem, 3vw, 2.375rem); letter-spacing: -0.015em; line-height: 1.15; }
+.learning-studio-scope.learning-studio-scope .hero-copy > p { color: rgb(255 255 255 / 0.78); margin: .35rem 0 1.25rem; }
+.learning-studio-scope.learning-studio-scope .main-shell .hero .button.primary {
+  background-image: linear-gradient(180deg, #FFD58A 0%, #F2B23A 100%); color: #3A2300; border: 0;
+  padding: .85rem 1.6rem; border-radius: 0.875rem; font-family: var(--font-display); font-weight: 600; font-size: 1.05rem;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 3px 0 #C98B1C, 0 12px 24px -12px rgb(242 178 58 / 0.85);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.learning-studio-scope.learning-studio-scope .main-shell .hero .button.primary:active { transform: translateY(3px); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5), 0 0 0 #C98B1C; }
+.learning-studio-scope.learning-studio-scope .hero .text-button { color: rgb(255 255 255 / 0.88); margin-top: .5rem; }
+.learning-studio-scope.learning-studio-scope .hero .voice-stop { color: #FFFFFF; }
+.learning-studio-scope.learning-studio-scope .hero-copy small { color: rgb(255 255 255 / 0.62); margin-top: .75rem; }
+.learning-studio-scope.learning-studio-scope .main-shell .hero-art {
+  margin: 1.25rem 1.25rem 1.25rem 0; border-radius: 1.25rem; overflow: hidden; align-self: stretch;
+  background: linear-gradient(180deg, #FFFFFF 0%, #ECE9FF 100%);
+  box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.55), 0 0 0 6px rgb(255 255 255 / 0.12);
+}
+.learning-studio-scope.learning-studio-scope .hero-art .hero-star { color: #B9B0FF; }
+
+.learning-studio-scope.learning-studio-scope .level-picker-heading h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.25rem; letter-spacing: -0.01em; }
+.learning-studio-scope.learning-studio-scope .level-current { background: var(--color-primary-soft); color: var(--color-primary-text); border-radius: 999px; font-weight: 600; }
+.learning-studio-scope.learning-studio-scope .level-options { gap: .875rem; }
+.learning-studio-scope.learning-studio-scope .level-options > button {
+  --lv: #5548D4; --lv-soft: rgb(85 72 212 / 0.1);
+  display: flex; flex-direction: column; gap: .2rem; overflow: hidden;
+  padding: 1.35rem 1.1rem 1rem; border-radius: 1.125rem; border: 1px solid var(--color-border);
+  background: var(--color-surface); box-shadow: 0 1px 2px rgb(21 19 46 / 0.04);
+  transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease, border-color .18s ease;
+}
+.learning-studio-scope.learning-studio-scope .level-options > button:nth-child(1) { --lv: #1F9D6E; --lv-soft: rgb(31 157 110 / 0.12); }
+.learning-studio-scope.learning-studio-scope .level-options > button:nth-child(2) { --lv: #5548D4; --lv-soft: rgb(85 72 212 / 0.12); }
+.learning-studio-scope.learning-studio-scope .level-options > button:nth-child(3) { --lv: #2E86C9; --lv-soft: rgb(46 134 201 / 0.12); }
+.learning-studio-scope.learning-studio-scope .level-options > button:nth-child(4) { --lv: #D2861B; --lv-soft: rgb(210 134 27 / 0.14); }
+.learning-studio-scope.learning-studio-scope .level-options > button::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 5px; background: var(--lv);
+}
+.learning-studio-scope.learning-studio-scope .level-options > button:hover { transform: translateY(-3px); box-shadow: 0 16px 32px -18px rgb(21 19 46 / 0.35); border-color: color-mix(in srgb, var(--lv) 40%, var(--color-border)); }
+.learning-studio-scope.learning-studio-scope .level-options > button.selected {
+  border: 2px solid var(--lv); background: linear-gradient(180deg, var(--lv-soft), var(--color-surface) 55%);
+  box-shadow: 0 16px 32px -18px color-mix(in srgb, var(--lv) 60%, transparent);
+}
+.learning-studio-scope.learning-studio-scope .level-index {
+  display: flex; align-items: center; justify-content: space-between; width: 100%;
+  font-family: var(--font-display); font-size: 1.75rem; font-weight: 600; line-height: 1; color: var(--lv); letter-spacing: -0.02em;
+}
+.learning-studio-scope.learning-studio-scope .level-index svg { width: 1.6rem; height: 1.6rem; padding: .3rem; border-radius: 999px; background: var(--lv); color: #FFFFFF; }
+.learning-studio-scope.learning-studio-scope .level-options h3 { font-family: var(--font-display); font-size: 1.05rem; font-weight: 600; color: var(--color-text); margin: .6rem 0 .1rem; }
+.learning-studio-scope.learning-studio-scope .level-options small { width: fit-content; padding: .1rem .55rem; border-radius: 999px; background: var(--lv-soft); color: var(--lv); font-weight: 600; font-size: .72rem; }
+.dark .learning-studio-scope.learning-studio-scope .level-options small, .dark .learning-studio-scope.learning-studio-scope .level-index { filter: brightness(1.35); }
+.learning-studio-scope.learning-studio-scope .level-example {
+  margin-top: .75rem; padding: .6rem .75rem; border-radius: .75rem; background: var(--color-surface-muted);
+  color: var(--color-text); font-size: .82rem; line-height: 1.55;
+}
+.learning-studio-scope.learning-studio-scope .level-select-label {
+  margin-top: auto; padding-top: .85rem; display: flex; align-items: center; justify-content: space-between;
+  font-family: var(--font-display); font-weight: 500; font-size: .85rem; color: var(--lv);
+}
+
+/* ── ราตรีม่วง · เส้นทางของฉัน ── */
+.learning-studio-scope.learning-studio-scope .section-head .eyebrow { font-family: var(--font-display); letter-spacing: .02em; text-transform: none; color: var(--color-primary-text); font-weight: 600; }
+.learning-studio-scope.learning-studio-scope .section-head h1 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.015em; }
+.learning-studio-scope.learning-studio-scope .path-summary {
+  border: 0; border-radius: 1.375rem; padding: 1.25rem 1.5rem; gap: 1.25rem; color: #FFFFFF;
+  background: radial-gradient(420px 200px at 100% 0%, rgb(255 200 97 / 0.18), transparent 60%), linear-gradient(135deg, #2C2185, #5548D4);
+  box-shadow: 0 20px 40px -24px rgb(44 33 133 / 0.6);
+}
+.learning-studio-scope.learning-studio-scope .path-summary > div:not(.path-count) { flex: 1; min-width: 0; }
+.learning-studio-scope.learning-studio-scope .path-summary .plan-symbol { width: 3.75rem; height: 3.75rem; border-radius: 1.1rem; font-size: 1.75rem; font-family: var(--font-display); background: rgb(255 255 255 / 0.95); color: #4A3DC8; box-shadow: 0 10px 20px -10px rgb(0 0 0 / 0.5); }
+.learning-studio-scope.learning-studio-scope .path-summary h3 { color: #FFFFFF; font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; }
+.learning-studio-scope.learning-studio-scope .path-summary p { color: rgb(255 255 255 / 0.72); }
+.learning-studio-scope .path-meter { margin-top: .7rem; height: .5rem; border-radius: 999px; background: rgb(255 255 255 / 0.18); overflow: hidden; }
+.learning-studio-scope .path-meter i { display: block; height: 100%; min-width: .5rem; border-radius: 999px; background: linear-gradient(90deg, #FFD58A, #F2B23A); }
+.learning-studio-scope .path-count { font-family: var(--font-display); font-size: 1rem; color: rgb(255 255 255 / 0.7); white-space: nowrap; }
+.learning-studio-scope .path-count strong { font-size: 2.25rem; font-weight: 600; color: #FFFFFF; }
+.learning-studio-scope.learning-studio-scope .journey::before { border-left: 3px solid color-mix(in srgb, var(--color-primary) 18%, transparent); left: 24px; }
+.learning-studio-scope.learning-studio-scope .journey-number {
+  width: 3.1rem; height: 3.1rem; border: 0; font-family: var(--font-display); font-weight: 600; font-size: 1.15rem; color: #FFFFFF;
+  background: radial-gradient(circle at 35% 28%, color-mix(in srgb, var(--stage-color) 55%, white), var(--stage-color) 62%);
+  box-shadow: 0 4px 0 color-mix(in srgb, var(--stage-color) 65%, black), 0 12px 20px -10px var(--stage-color), inset 0 2px 0 rgb(255 255 255 / 0.35);
+}
+.learning-studio-scope.learning-studio-scope .journey-number.done {
+  background: radial-gradient(circle at 35% 30%, #FFE7A8, #FFC861 45%, #E39A1E); color: #6B3E00;
+  box-shadow: 0 4px 0 #B8741A, 0 12px 20px -10px rgb(227 154 30 / 0.7), inset 0 2px 0 rgb(255 255 255 / 0.55);
+}
+.learning-studio-scope.learning-studio-scope .journey-card {
+  border-radius: 1.25rem; border: 1px solid var(--color-border); background: var(--color-surface);
+  box-shadow: 0 1px 2px rgb(21 19 46 / 0.04); transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s ease;
+}
+.learning-studio-scope.learning-studio-scope .journey-card:hover { transform: translateY(-2px); box-shadow: 0 16px 32px -20px rgb(21 19 46 / 0.35); }
+.learning-studio-scope.learning-studio-scope .journey-card.is-current {
+  border: 2px solid var(--color-primary);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--color-primary) 7%, var(--color-surface)), var(--color-surface) 60%);
+  box-shadow: 0 18px 36px -22px rgb(85 72 212 / 0.55);
+}
+.learning-studio-scope.learning-studio-scope .journey-icon { border-radius: 1rem; }
+.learning-studio-scope.learning-studio-scope .journey-info .eyebrow { font-family: var(--font-display); letter-spacing: .02em; color: var(--color-text-muted); font-weight: 500; }
+.learning-studio-scope.learning-studio-scope .journey-info h2 { font-family: var(--font-display); font-weight: 600; font-size: 1.2rem; }
+.learning-studio-scope.learning-studio-scope .journey-card .chips span { border-radius: 999px; }
+.learning-studio-scope.learning-studio-scope .journey-card .current-stage { background: var(--color-primary); color: #FFFFFF !important; padding-inline: .6rem; }
+.learning-studio-scope.learning-studio-scope .main-shell .button.primary { background-image: linear-gradient(180deg, #6B5FEC, #5548D4); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 8px 18px -10px rgb(85 72 212 / 0.85); border-radius: .875rem; font-family: var(--font-display); }
+
+/* ── ราตรีม่วง · ระหว่างฝึก ──────────────────────────────────────────────────
+   Toy-like tactile controls for the child: thick progress, chunky listen button,
+   answer tiles that sit on a solid edge and sink when tapped. */
+.learning-studio-scope.learning-studio-scope .mission-counter { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; }
+.learning-studio-scope.learning-studio-scope .lesson-progress {
+  height: .875rem; margin: 1rem 0 1.75rem; border-radius: 999px; background: var(--color-surface-muted);
+  box-shadow: inset 0 1px 2px rgb(21 19 46 / 0.08);
+}
+.learning-studio-scope.learning-studio-scope .lesson-progress span {
+  min-width: .875rem; border-radius: 999px;
+  background: linear-gradient(180deg, #8C82FF, #5548D4) !important;
+  box-shadow: inset 0 3px 0 rgb(255 255 255 / 0.28);
+}
+.learning-studio-scope.learning-studio-scope .practice-heading .eyebrow { font-family: var(--font-display); letter-spacing: .02em; text-transform: none; color: var(--color-primary-text); }
+.learning-studio-scope.learning-studio-scope .practice-heading h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(1.75rem, 4vw, 2.25rem); letter-spacing: -0.015em; }
+.learning-studio-scope.learning-studio-scope .main-shell .practice-card {
+  border-radius: 1.75rem; border: 1px solid var(--color-border); background: var(--color-surface);
+  box-shadow: 0 1px 2px rgb(21 19 46 / 0.04), 0 24px 48px -32px rgb(44 33 133 / 0.4);
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+.learning-studio-scope.learning-studio-scope .listen-button {
+  padding: 1rem 1.6rem; border-radius: 999px; font-family: var(--font-display); font-weight: 600; font-size: 1.05rem;
+  color: #FFFFFF; background: linear-gradient(180deg, #7B6FF3, #5548D4);
+  box-shadow: 0 5px 0 #3F33B5, 0 14px 26px -12px rgb(85 72 212 / 0.8), inset 0 1px 0 rgb(255 255 255 / 0.28);
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.learning-studio-scope.learning-studio-scope .listen-button svg { width: 2rem; height: 2rem; padding: .4rem; border-radius: 999px; background: rgb(255 255 255 / 0.2); }
+.learning-studio-scope.learning-studio-scope .listen-button:active { transform: translateY(5px); box-shadow: 0 0 0 #3F33B5, 0 4px 10px -6px rgb(85 72 212 / 0.8); }
+.learning-studio-scope.learning-studio-scope .choice-grid { gap: 1rem; }
+.learning-studio-scope.learning-studio-scope .choice-card {
+  border: 2px solid var(--color-border); border-radius: 1.5rem; background: var(--color-surface);
+  box-shadow: 0 5px 0 var(--color-border); padding: 1.1rem 1rem .9rem;
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background-color .12s ease;
+}
+.learning-studio-scope.learning-studio-scope .choice-card:hover:not(:disabled) { transform: translateY(-2px); border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border)); box-shadow: 0 7px 0 color-mix(in srgb, var(--color-primary) 30%, var(--color-border)); }
+.learning-studio-scope.learning-studio-scope .choice-card:active:not(:disabled) { transform: translateY(5px); box-shadow: 0 0 0 var(--color-border); }
+.learning-studio-scope.learning-studio-scope .choice-card.chosen { border-color: var(--color-primary); background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface)); box-shadow: 0 5px 0 #3F33B5; }
+.learning-studio-scope.learning-studio-scope .choice-card > span:not(.choice-tick) { font-family: var(--font-display); font-weight: 500; font-size: 1.5rem; margin-top: .35rem; }
+.learning-studio-scope.learning-studio-scope .choice-tick { width: 1.75rem; height: 1.75rem; box-shadow: 0 2px 0 #3F33B5; }
+.learning-studio-scope.learning-studio-scope .practice-bottom { border-top: 0; padding-top: .5rem; }
+.learning-studio-scope.learning-studio-scope .practice-bottom .button.primary {
+  min-width: 14rem; padding: .95rem 1.75rem; border-radius: 1rem; font-size: 1.05rem; font-weight: 600;
+  box-shadow: 0 5px 0 #3F33B5, 0 14px 26px -14px rgb(85 72 212 / 0.8), inset 0 1px 0 rgb(255 255 255 / 0.25);
+}
+.learning-studio-scope.learning-studio-scope .practice-bottom .button.primary:disabled { opacity: .55; box-shadow: 0 5px 0 rgb(63 51 181 / 0.5); }
+@media (max-width: 640px) { .learning-studio-scope.learning-studio-scope .practice-bottom .button { flex: 1; min-width: 0; } }
+
+
+/* ── ราตรีม่วง · activity library ───────────────────────────────────────── */
+.learning-studio-scope.learning-studio-scope .stage-chips { display: flex; flex-wrap: wrap; gap: .5rem; margin: -.25rem 0 1.25rem; }
+.learning-studio-scope.learning-studio-scope .stage-chip {
+  display: inline-flex; align-items: center; gap: .45rem; min-height: 2.5rem; padding: .35rem .9rem .35rem .4rem;
+  border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-surface);
+  font-family: var(--font-display); font-size: .875rem; font-weight: 500; color: var(--color-text-muted);
+  box-shadow: 0 1px 2px rgb(21 19 46 / .04); transition: border-color .15s, color .15s, background .15s;
+}
+.learning-studio-scope.learning-studio-scope .stage-chip:first-child { padding-left: .9rem; }
+.learning-studio-scope.learning-studio-scope .stage-chip i {
+  display: grid; place-items: center; width: 1.6rem; height: 1.6rem; border-radius: 999px; font-style: normal; font-size: .75rem; font-weight: 600;
+  color: #fff; background: color-mix(in srgb, var(--chip, var(--color-primary)) 75%, #15132E);
+}
+.learning-studio-scope.learning-studio-scope .stage-chip b { font-weight: 600; color: var(--color-text-muted); font-size: .75rem; padding: .05rem .45rem; border-radius: 999px; background: var(--color-surface-muted); }
+.learning-studio-scope.learning-studio-scope .stage-chip:hover { color: var(--color-text); border-color: color-mix(in srgb, var(--chip, var(--color-primary)) 45%, var(--color-border)); }
+.learning-studio-scope.learning-studio-scope .stage-chip.active {
+  color: var(--color-text); border-color: var(--chip, var(--color-primary));
+  background: color-mix(in srgb, var(--chip, var(--color-primary)) 10%, var(--color-surface));
+}
+.learning-studio-scope.learning-studio-scope .stage-chip.active b { background: color-mix(in srgb, var(--chip, var(--color-primary)) 75%, #15132E); color: #fff; }
+
+.learning-studio-scope.learning-studio-scope .library-grid { gap: 1.1rem; }
+.learning-studio-scope.learning-studio-scope .library-card {
+  position: relative; overflow: hidden; border-radius: 1.4rem; border: 1px solid var(--color-border);
+  background: var(--color-surface); box-shadow: 0 1px 2px rgb(21 19 46 / .04), 0 14px 30px -24px rgb(36 27 102 / .45);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s;
+}
+.learning-studio-scope.learning-studio-scope .library-card::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 4px; background: var(--lv, var(--color-primary)); z-index: 1;
+}
+.learning-studio-scope.learning-studio-scope .library-card:hover {
+  transform: translateY(-3px); border-color: color-mix(in srgb, var(--lv, var(--color-primary)) 40%, var(--color-border));
+  box-shadow: 0 2px 4px rgb(21 19 46 / .05), 0 24px 40px -26px rgb(36 27 102 / .55);
+}
+.learning-studio-scope.learning-studio-scope .library-art {
+  background: radial-gradient(120% 90% at 50% 100%, color-mix(in srgb, var(--lv, var(--color-primary)) 16%, transparent), transparent 70%),
+    linear-gradient(180deg, color-mix(in srgb, var(--lv, var(--color-primary)) 7%, var(--color-surface)), var(--color-surface)) !important;
+}
+.learning-studio-scope.learning-studio-scope .library-art .small-tag {
+  border-radius: 999px; border: 0; background: var(--color-surface); font-family: var(--font-display); font-weight: 500;
+  box-shadow: 0 4px 12px -6px rgb(21 19 46 / .35);
+}
+.learning-studio-scope.learning-studio-scope .library-info h3 { font-family: var(--font-display); font-size: 1.5rem; font-weight: 600; letter-spacing: -0.01em; color: var(--color-text); }
+.learning-studio-scope.learning-studio-scope .library-info p { color: var(--color-text-muted); font-size: .875rem; }
+.learning-studio-scope.learning-studio-scope .library-info > span {
+  margin-top: .75rem; padding-top: .75rem; border-top: 1px solid var(--color-border);
+  font-family: var(--font-display); font-weight: 500; color: var(--color-primary-text);
+}
+.learning-studio-scope.learning-studio-scope .library-card:hover .library-info > span svg { transform: translateX(3px); }
+.learning-studio-scope.learning-studio-scope .library-info > span svg { transition: transform .18s ease; }
+@media (prefers-reduced-motion: reduce) {
+  .learning-studio-scope.learning-studio-scope .library-card, .learning-studio-scope.learning-studio-scope .library-info > span svg { transition: none; }
+  .learning-studio-scope.learning-studio-scope .library-card:hover { transform: none; }
+}

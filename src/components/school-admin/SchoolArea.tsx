@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import { School } from "lucide-react";
+import { ChevronLeft, School } from "lucide-react";
 import AppShell from "@/components/layout/AppShell";
 import { Alert, ButtonLink, DataLoadError, EmptyState, LoadingState, Page, PageHeader, Select } from "@/components/ui";
 import { useAuth } from "@/hooks/useAuth";
@@ -41,8 +41,8 @@ function SubNav() {
           return (
             <li key={tab.href} className="shrink-0">
               <Link href={tab.href} aria-current={active ? "page" : undefined}
-                className={cn("-mb-px inline-flex border-b-2 px-3 py-2.5 text-sm font-semibold transition-colors",
-                  active ? "border-primary text-primary" : "border-transparent text-text-muted hover:text-text")}>
+                className={cn("-mb-px inline-flex border-b-2 px-3.5 py-2.5 font-display text-[0.9375rem] font-medium transition-colors",
+                  active ? "border-primary text-text" : "border-transparent text-text-muted hover:text-text")}>
                 {tab.label}
               </Link>
             </li>
@@ -57,12 +57,14 @@ function SubNav() {
  * Shell for every /school page: AppShell, school header with sub-navigation, and the school overview
  * loaded once and shared through useSchoolArea().
  */
-export function SchoolArea({ title, description, actions, back, children }: {
+export function SchoolArea({ title, description, actions, back, bare, children }: {
   /** Page title under the school name; omit on the overview. */
   title?: string;
   description?: string;
   actions?: ReactNode;
   back?: { href: string; label: string };
+  /** Only the back link: the page draws its own heading (e.g. the room name). */
+  bare?: boolean;
   children: ReactNode;
 }) {
   const { user, isLoading } = useAuth();
@@ -112,7 +114,29 @@ export function SchoolArea({ title, description, actions, back, children }: {
   return (
     <AppShell>
       <Page>
-        <PageHeader
+        {bare && back ? (
+          <Link href={back.href} className="inline-flex w-fit items-center gap-1 rounded-md text-sm text-text-muted transition-colors hover:text-text">
+            <ChevronLeft size={16} aria-hidden="true" />{back.label}
+          </Link>
+        ) : !title && !back && school ? (
+          <header className="flex flex-wrap items-center gap-4">
+            <span aria-hidden="true" className="hero-night grid size-14 shrink-0 place-items-center rounded-[1.1rem] font-display text-2xl font-semibold text-white shadow-[0_12px_28px_-14px_rgb(36_27_102/0.9)]">
+              <School size={26} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-caption font-semibold tracking-wide text-primary-text">ผู้ดูแลโรงเรียน{school.academic_year ? ` · ปีการศึกษา ${school.academic_year}` : ""}</p>
+              <h1 className="truncate text-page-title text-text">{school.name}</h1>
+            </div>
+            {(schools.length > 1 || actions) && <div className="flex flex-wrap gap-2">{schools.length > 1 && (
+              <Select aria-label="เลือกโรงเรียน" value={orgId} onChange={(event) => {
+                setChosen(event.target.value);
+                try { localStorage.setItem(ORG_KEY, event.target.value); } catch { /* per-device only */ }
+              }}>
+                {schools.map((option) => <option key={option.id} value={option.id}>{option.name}</option>)}
+              </Select>
+            )}{actions}</div>}
+          </header>
+        ) : <PageHeader
           icon={<School size={20} />}
           back={back}
           title={title ?? school?.name ?? "จัดการโรงเรียน"}
@@ -128,7 +152,7 @@ export function SchoolArea({ title, description, actions, back, children }: {
             )}
             {actions}
           </>}
-        />
+        />}
         {orgId && !back && <SubNav />}
         {current?.overview && !current.overview.school.academic_year && !title && (
           <Alert tone="info" title="ตั้งปีการศึกษาปัจจุบันก่อนเริ่ม" action={<ButtonLink href="/school/settings" size="sm">ตั้งค่า</ButtonLink>}>

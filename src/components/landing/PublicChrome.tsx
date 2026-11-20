@@ -6,10 +6,10 @@ import { ButtonLink } from "@/components/ui";
 function Brand({ small = false }: { small?: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-2 rounded-control">
-      <span aria-hidden="true" className={`flex shrink-0 items-center justify-center rounded-control bg-primary text-primary-foreground ${small ? "h-6 w-6" : "h-8 w-8"}`}>
+      <span aria-hidden="true" className={`btn-primary flex shrink-0 items-center justify-center rounded-[0.7rem] text-primary-foreground ${small ? "h-6 w-6" : "h-9 w-9"}`}>
         <Mic size={small ? 12 : 16} strokeWidth={2.5} />
       </span>
-      <span className={`font-bold text-text ${small ? "text-sm" : "text-sm sm:text-base"}`}>Speech Adventure</span>
+      <span className={`font-display font-semibold text-text ${small ? "text-sm" : "text-base sm:text-lg"}`}>Speech Adventure</span>
     </Link>
   );
 }
@@ -17,7 +17,7 @@ function Brand({ small = false }: { small?: boolean }) {
 /** Header for public pages (landing, demo): no app shell, just brand, theme and sign-in. */
 export function PublicHeader() {
   return (
-    <header className="sticky top-0 z-30 border-b border-border bg-bg/90 backdrop-blur-md">
+    <header className="sticky top-0 z-30 border-b border-border/70 bg-bg/80 backdrop-blur-md backdrop-saturate-150">
       <nav aria-label="เมนูหลัก" className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3 sm:px-6">
         <Brand />
         <div className="flex items-center gap-1.5">

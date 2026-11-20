@@ -2,8 +2,8 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import Link from "next/link";
-import { KeyRound, LogOut, Settings, Trash2, UserCircle } from "lucide-react";
-import { Avatar, Badge, Button, ButtonLink, Card, CardContent, ConfirmDialog, FormField, Page, PageHeader, Section, SectionNav, Textarea, toast, type SectionNavItem } from "@/components/ui";
+import { Database, Info, KeyRound, Lock, LogOut, Palette, Settings, ShieldCheck, Trash2, User, UserCircle } from "lucide-react";
+import { Avatar, Button, ButtonLink, Card, CardContent, ConfirmDialog, FormField, Page, PageHeader, Section, SectionNav, Textarea, toast, type SectionNavItem } from "@/components/ui";
 import { ROLE_LABELS, appRole } from "@/components/layout/navigation";
 import { requestDataDeletion } from "@/lib/joinCodes";
 import AppShell from "@/components/layout/AppShell";
@@ -38,18 +38,21 @@ function AccountCard() {
   if (!user) return null;
   const role = appRole(user);
   return (
-    <Card>
-      <CardContent className="flex flex-wrap items-center gap-3">
-        <Avatar name={displayName} size="lg" />
+    <section className="hero-night relative overflow-hidden rounded-[1.5rem] p-5 sm:p-6">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(rgb(255_255_255/0.18)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(120deg,transparent_35%,#000_90%)]" />
+      <div className="relative flex flex-wrap items-center gap-4">
+        <span className="rounded-full ring-4 ring-white/15"><Avatar name={displayName} size="lg" /></span>
         <div className="min-w-48 flex-1">
-          <p className="font-semibold text-text [overflow-wrap:anywhere]">{displayName}</p>
-          <p className="text-sm text-text-muted [overflow-wrap:anywhere]">{user.email}</p>
-          <div className="mt-1 flex flex-wrap gap-1.5">
-            <Badge tone="primary">{ROLE_LABELS[role]}</Badge>
-            {isSupabaseConfigured() ? <Badge tone="success" dot>บันทึกออนไลน์</Badge> : <Badge>โหมดออฟไลน์</Badge>}
+          <p className="font-display text-[1.5rem] font-semibold leading-tight [overflow-wrap:anywhere]">{displayName}</p>
+          <p className="text-sm text-white/75 [overflow-wrap:anywhere]">{user.email}</p>
+          <div className="mt-2 flex flex-wrap gap-1.5 text-xs font-semibold">
+            <span className="rounded-full bg-white/15 px-2.5 py-0.5 ring-1 ring-inset ring-white/15">{ROLE_LABELS[role]}</span>
+            {isSupabaseConfigured()
+              ? <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-2.5 py-0.5 ring-1 ring-inset ring-white/15"><span aria-hidden="true" className="size-1.5 rounded-full bg-[#7CE3B5]" />บันทึกออนไลน์</span>
+              : <span className="rounded-full bg-white/15 px-2.5 py-0.5">โหมดออฟไลน์</span>}
           </div>
         </div>
-        <Button variant="outline" icon={<LogOut size={16} aria-hidden="true" />} loading={signingOut} loadingText="กำลังออกจากระบบ…"
+        <Button variant="inverse-outline" className="border-white/25 bg-white/10" icon={<LogOut size={16} aria-hidden="true" />} loading={signingOut} loadingText="กำลังออกจากระบบ…"
           onClick={async () => {
             setSigningOut(true);
             await signOut();
@@ -57,8 +60,8 @@ function AccountCard() {
           }}>
           ออกจากระบบ
         </Button>
-      </CardContent>
-    </Card>
+      </div>
+    </section>
   );
 }
 
@@ -348,13 +351,13 @@ export default function SettingsPage() {
   const isParentUser = !user || (isParent(user) && !user.isPlatformAdmin);
   const online = Boolean(user) && isSupabaseConfigured();
   const sections: SectionNavItem[] = [
-    { id: "account", label: "บัญชีผู้ใช้" },
-    ...(online ? [{ id: "personal", label: "ข้อมูลส่วนตัว" }, { id: "password", label: "รหัสผ่าน" }] : []),
-    { id: "appearance", label: "การแสดงผล" },
-    { id: "invitations", label: "รหัสเข้าร่วมและสิทธิ์" },
-    ...(isParentUser ? [{ id: "device-data", label: "ข้อมูลในเครื่อง" }] : []),
-    ...(user ? [{ id: "privacy", label: "ความเป็นส่วนตัว" }] : []),
-    { id: "about", label: "เกี่ยวกับแอป" },
+    { id: "account", label: "บัญชีผู้ใช้", icon: <UserCircle size={17} /> },
+    ...(online ? [{ id: "personal", label: "ข้อมูลส่วนตัว", icon: <User size={17} /> }, { id: "password", label: "รหัสผ่าน", icon: <Lock size={17} /> }] : []),
+    { id: "appearance", label: "การแสดงผล", icon: <Palette size={17} /> },
+    { id: "invitations", label: "รหัสเข้าร่วมและสิทธิ์", icon: <KeyRound size={17} /> },
+    ...(isParentUser ? [{ id: "device-data", label: "ข้อมูลในเครื่อง", icon: <Database size={17} /> }] : []),
+    ...(user ? [{ id: "privacy", label: "ความเป็นส่วนตัว", icon: <ShieldCheck size={17} /> }] : []),
+    { id: "about", label: "เกี่ยวกับแอป", icon: <Info size={17} /> },
   ];
 
   return (

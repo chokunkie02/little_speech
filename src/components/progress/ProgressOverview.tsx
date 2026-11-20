@@ -26,6 +26,8 @@ export function SummaryStats({ summary }: { summary: LearningSummary }) {
   );
 }
 
+const DOTS = ["#5548D4", "#2E86C9", "#D2861B", "#1F9D6E", "#C24D7A"];
+
 export function BreakdownCard({ title, description, groups }: { title: string; description?: string; groups: GroupSummary[] }) {
   const max = Math.max(1, ...groups.map((group) => group.sessions));
   return (
@@ -34,16 +36,18 @@ export function BreakdownCard({ title, description, groups }: { title: string; d
       <CardContent>
         {groups.length === 0 ? <p className="text-sm text-text-muted">ยังไม่มีข้อมูล</p> : (
           <ul className="space-y-3">
-            {groups.map((group) => (
+            {groups.map((group, index) => (
               <li key={group.key} className="space-y-1.5">
                 <div className="flex items-baseline justify-between gap-3 text-sm">
-                  <span className="min-w-0 truncate font-semibold text-text">{group.label}</span>
+                  <span className="flex min-w-0 items-center gap-2 truncate font-display font-medium text-text">
+                    <span aria-hidden="true" className="size-2.5 shrink-0 rounded-full" style={{ background: DOTS[index % DOTS.length] }} />{group.label}
+                  </span>
                   <span className="shrink-0 tabular-nums text-text-muted">
                     {group.sessions} รอบ{group.accuracy ? ` · เลือกตรง ${group.accuracy.percent}%` : ""}
                   </span>
                 </div>
-                <div aria-hidden="true" className="h-1.5 overflow-hidden rounded-full bg-surface-muted">
-                  <div className="h-full rounded-full bg-primary" style={{ width: `${(group.sessions / max) * 100}%` }} />
+                <div aria-hidden="true" className="h-2.5 overflow-hidden rounded-full bg-surface-muted">
+                  <div className="h-full rounded-full" style={{ width: `${Math.max(4, (group.sessions / max) * 100)}%`, background: `linear-gradient(90deg, ${DOTS[index % DOTS.length]}cc, ${DOTS[index % DOTS.length]})` }} />
                 </div>
                 <p className="text-caption text-text-muted">{group.activities} กิจกรรม · ล่าสุด {formatRelativeTime(group.lastAt)}</p>
               </li>
@@ -57,11 +61,11 @@ export function BreakdownCard({ title, description, groups }: { title: string; d
 
 export function NextStepCard({ summary }: { summary: LearningSummary }) {
   return (
-    <div className="flex gap-3 rounded-card border border-primary/25 bg-primary-soft/60 p-4">
-      <Lightbulb size={20} aria-hidden="true" className="mt-0.5 shrink-0 text-primary-text" />
+    <div className="flex items-center gap-4 rounded-card border border-primary/20 bg-gradient-to-r from-primary-soft to-surface p-4 sm:p-5">
+      <span aria-hidden="true" className="btn-primary grid size-11 shrink-0 place-items-center rounded-[0.9rem] text-primary-foreground"><Lightbulb size={20} /></span>
       <div>
         <p className="text-caption font-semibold text-primary-text">ขั้นต่อไปที่แนะนำ</p>
-        <p className="mt-0.5 text-sm text-text">{suggestNextStep(summary)}</p>
+        <p className="mt-0.5 font-display text-[1.0625rem] font-medium leading-snug text-text">{suggestNextStep(summary)}</p>
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { Mic } from "lucide-react";
+import { Mic, Star } from "lucide-react";
+import { Art } from "@/features/learning-studio/Art";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import { Card, CardContent } from "@/components/ui";
 import { cn } from "@/lib/cn";
@@ -21,28 +22,37 @@ export function AuthAside({ eyebrow = "Speech Adventure", title, description, po
 }) {
   return (
     <section aria-label={title}
-      className="relative hidden overflow-hidden rounded-overlay bg-gradient-to-br from-primary to-[#2E2690] p-10 text-white lg:flex lg:min-h-[30rem] lg:flex-col xl:p-12">
-      <span aria-hidden="true" className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-white/10" />
-      <span aria-hidden="true" className="pointer-events-none absolute -bottom-32 -left-16 size-80 rounded-full bg-white/5" />
+      className="hero-night relative hidden overflow-hidden rounded-[2rem] p-10 text-white lg:flex lg:min-h-[32rem] lg:flex-col xl:p-12">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(rgb(255_255_255/0.18)_1px,transparent_1px)] [background-size:20px_20px] [mask-image:linear-gradient(140deg,transparent_35%,#000_95%)]" />
       <div className="relative space-y-3">
-        <p className="text-sm font-semibold text-white/80">{eyebrow}</p>
-        <h2 className="text-3xl font-bold leading-tight xl:text-4xl">{title}</h2>
-        {description && <p className="max-w-md text-base leading-relaxed text-white/85">{description}</p>}
+        <p className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-caption font-semibold text-white/90 ring-1 ring-inset ring-white/15">
+          <span aria-hidden="true" className="size-1.5 rounded-full bg-[#FFD58A]" />{eyebrow}
+        </p>
+        <h2 className="font-display text-[2.25rem] font-semibold leading-[1.15] tracking-tight xl:text-[2.75rem]">{title}</h2>
+        {description && <p className="max-w-md text-base leading-relaxed text-white/80">{description}</p>}
       </div>
-      <ol className="relative mt-10 space-y-5">
+      <ol className="relative mt-9 space-y-3">
         {points.map((point, index) => (
-          <li key={point.title} className="flex gap-4">
-            <span aria-hidden="true" className="flex size-10 shrink-0 items-center justify-center rounded-control bg-white/15 text-sm font-bold">
+          <li key={point.title} className="flex max-w-md gap-4 rounded-[1.1rem] bg-white/[0.07] p-3.5 ring-1 ring-inset ring-white/10">
+            <span aria-hidden="true" className={steps
+              ? "grid size-10 shrink-0 place-items-center rounded-full bg-[linear-gradient(180deg,#FFD58A,#F2B23A)] font-display text-base font-semibold text-[#3A2300]"
+              : "grid size-10 shrink-0 place-items-center rounded-[0.8rem] bg-white/15 text-[#FFD58A]"}>
               {steps ? index + 1 : point.icon}
             </span>
             <div className="min-w-0 pt-0.5">
-              <p className="font-semibold">{point.title}</p>
-              {point.text && <p className="mt-0.5 text-sm leading-relaxed text-white/80">{point.text}</p>}
+              <p className="font-display font-medium">{point.title}</p>
+              {point.text && <p className="mt-0.5 text-sm leading-relaxed text-white/75">{point.text}</p>}
             </div>
           </li>
         ))}
       </ol>
-      {footnote && <div className="relative mt-auto pt-10 text-sm text-white/80">{footnote}</div>}
+      {!footnote && <div aria-hidden="true" className="absolute -bottom-4 right-8 hidden w-40 rotate-[-4deg] rounded-[1.4rem] bg-white/95 p-3 shadow-[0_24px_48px_-24px_rgb(0_0_0/0.7)] xl:block [&_svg]:h-auto [&_svg]:w-full">
+        <Art kind="chicken" label="" />
+        <span className="absolute -left-4 -top-3 flex items-center gap-1 whitespace-nowrap rounded-full bg-[linear-gradient(180deg,#FFD58A,#F2B23A)] px-2.5 py-1 font-display text-xs font-semibold text-[#3A2300] shadow-card">
+          <Star size={12} className="fill-current" />+3 ดาว
+        </span>
+      </div>}
+      {footnote && <div className="relative mt-auto max-w-[19rem] pt-10 text-sm text-white/80 xl:max-w-[22rem]">{footnote}</div>}
     </section>
   );
 }
@@ -67,8 +77,8 @@ export function AuthLayout({ aside, children, formWidth = "md" }: {
     <main className="flex min-h-screen flex-col bg-bg">
       <header className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-2" aria-label="หน้าแรก Speech Adventure">
-          <span className="grid size-9 place-items-center rounded-control bg-primary text-primary-foreground"><Mic size={17} strokeWidth={2.5} aria-hidden="true" /></span>
-          <span className="font-bold text-text">Speech Adventure</span>
+          <span className="btn-primary grid size-9 place-items-center rounded-[0.7rem] text-primary-foreground"><Mic size={17} strokeWidth={2.5} aria-hidden="true" /></span>
+          <span className="font-display text-lg font-semibold text-text">Speech Adventure</span>
         </Link>
         <ThemeToggle />
       </header>
@@ -90,10 +100,10 @@ export function AuthScreen({ title, description, children, footer, aside }: {
   return (
     <AuthLayout aside={aside} formWidth="sm">
       <div className={cn("space-y-1 text-center", Boolean(aside) && "lg:text-left")}>
-        <h1 className="text-page-title">{title}</h1>
-        {description && <p className="text-sm text-text-muted">{description}</p>}
+        <h1 className="font-display text-[2rem] font-semibold leading-tight tracking-tight text-text">{title}</h1>
+        {description && <p className="text-[0.9375rem] text-text-muted">{description}</p>}
       </div>
-      <Card><CardContent className="space-y-4 p-5 sm:p-6">{children}</CardContent></Card>
+      <Card className="shadow-[0_28px_56px_-36px_rgb(36_27_102/0.5)]"><CardContent className="space-y-4 p-5 sm:p-7">{children}</CardContent></Card>
       {footer}
     </AuthLayout>
   );

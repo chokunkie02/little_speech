@@ -98,9 +98,19 @@ function Promote() {
 
   return (
     <div className="space-y-5">
-      <Alert tone="info" title={`ปีการศึกษา ${fromYear} → ${toYear}`}>
-        ตรวจปลายทางของแต่ละห้อง ห้องปีเดิมจะถูกเก็บเข้าคลัง นักเรียนย้ายไปห้องปีใหม่พร้อมเลขที่เดิม ผู้ปกครองและผลการฝึกยังอยู่ครบ
-      </Alert>
+      <section aria-label={`ปีการศึกษา ${fromYear} ไป ${toYear}`} className="hero-night relative overflow-hidden rounded-[1.5rem] p-5 sm:p-6">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40 [background-image:radial-gradient(rgb(255_255_255/0.18)_1px,transparent_1px)] [background-size:18px_18px] [mask-image:linear-gradient(120deg,transparent_35%,#000_90%)]" />
+        <div className="relative flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div className="flex items-center gap-3">
+            <span className="rounded-[0.9rem] bg-white/10 px-4 py-2 font-display text-[1.75rem] font-semibold tabular-nums text-white/75 ring-1 ring-inset ring-white/15">{fromYear}</span>
+            <ArrowRight size={24} className="text-[#FFD58A]" aria-hidden="true" />
+            <span className="rounded-[0.9rem] bg-[linear-gradient(180deg,#FFD58A,#F2B23A)] px-4 py-2 font-display text-[1.75rem] font-semibold tabular-nums text-[#3A2300]">{toYear}</span>
+          </div>
+          <p className="min-w-0 flex-1 basis-72 text-sm text-white/85">
+            ตรวจปลายทางของแต่ละห้อง ห้องปีเดิมจะถูกเก็บเข้าคลัง นักเรียนย้ายไปห้องปีใหม่พร้อมเลขที่เดิม ผู้ปกครองและผลการฝึกยังอยู่ครบ
+          </p>
+        </div>
+      </section>
 
       {/* Same choices twice: a table on desktop, one card per room on phones (four columns do not fit). */}
       <div className="hidden md:block">
@@ -110,7 +120,7 @@ function Promote() {
           <TBody>
             {steps.map(({ room, step }) => (
               <TR key={room.id}>
-                <TD className="font-semibold">{room.name}</TD>
+                <TD className="font-display text-base font-medium">{room.name}</TD>
                 <TD className="text-right tabular-nums">{room.student_count}</TD>
                 <TD>{actionSelect({ room, step })}</TD>
                 <TD>{targetCell({ room, step })}</TD>
@@ -138,11 +148,17 @@ function Promote() {
         <Switch checked={keepTeachers} onCheckedChange={setKeepTeachers} />
       </FormField>
 
-      <Card><CardContent className="flex flex-wrap items-center gap-3">
-        <p className="min-w-0 flex-1 text-sm">
-          เลื่อนชั้น <strong className="tabular-nums">{count("promote")}</strong> คน · จบการศึกษา <strong className="tabular-nums">{count("graduate")}</strong> คน
-          {count("skip") > 0 && <> · ไม่เปลี่ยน <strong className="tabular-nums">{count("skip")}</strong> คน</>}
-        </p>
+      <Card><CardContent className="flex flex-wrap items-center gap-4">
+        <dl className="flex min-w-0 flex-1 flex-wrap gap-x-6 gap-y-2">
+          {([["promote", "เลื่อนชั้น", "text-primary-text"], ["graduate", "จบการศึกษา", "text-success-text"], ["skip", "ไม่เปลี่ยน", "text-text-muted"]] as const)
+            .filter(([action]) => action !== "skip" || count("skip") > 0)
+            .map(([action, label, tone]) => (
+              <div key={action}>
+                <dt className="text-caption text-text-muted">{label}</dt>
+                <dd className={`font-display text-2xl font-semibold leading-tight tabular-nums ${tone}`}>{count(action)} <span className="text-sm font-normal text-text-muted">คน</span></dd>
+              </div>
+            ))}
+        </dl>
         <Button onClick={() => setConfirming(true)} disabled={missingName}>{missingName ? "ตั้งชื่อห้องปีใหม่ให้ครบ" : `ขึ้นปีการศึกษา ${toYear}`}</Button>
       </CardContent></Card>
 

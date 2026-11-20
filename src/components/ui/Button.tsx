@@ -4,15 +4,16 @@ import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
 /** inverse / inverse-outline: for buttons placed on a brand-coloured fill (e.g. the landing hero), same in both themes. */
-export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "danger" | "link" | "inverse" | "inverse-outline";
+export type ButtonVariant = "primary" | "secondary" | "success" | "outline" | "ghost" | "danger" | "link" | "inverse" | "inverse-outline";
 export type ButtonSize = "sm" | "md" | "lg" | "icon";
 
 const base =
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-control font-semibold transition-colors " +
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-control font-display font-medium transition-[colors,box-shadow,transform] active:translate-y-px " +
   "disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-primary text-primary-foreground shadow-card hover:bg-primary/90",
+  primary: "btn-primary bg-primary text-primary-foreground",
+  success: "bg-success text-white shadow-[0_8px_18px_-10px_rgb(76_175_130/0.9)] hover:bg-success/90",
   secondary: "bg-secondary text-secondary-foreground shadow-card hover:bg-secondary/85",
   outline: "border border-border bg-surface text-text hover:bg-surface-muted",
   ghost: "text-text-muted hover:bg-surface-muted hover:text-text",

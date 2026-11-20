@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Lock, RotateCcw } from "lucide-react";
+import { Bot, Lock, MessageCircle, Mic, RotateCcw, Shapes, UserCheck } from "lucide-react";
 import { useSchoolArea } from "@/components/school-admin/SchoolArea";
 import {
   Alert,
@@ -14,7 +14,6 @@ import {
   FormField,
   Input,
   LoadingState,
-  Section,
   Select,
   Switch,
   toast,
@@ -46,10 +45,30 @@ type StageValues = Pick<AssessmentRule, "mode" | "passScore" | "practiceScore" |
 type Form = { aiEnabled: boolean; reviewers: SchoolSettings["reviewers"]; stages: Record<string, StageValues> };
 
 const TRACKS = [
-  { id: "speech", label: "ฝึกออกเสียง" },
-  { id: "communication", label: "พูดเพื่อสื่อสาร" },
-  { id: "phonics", label: "เสียงกับตัวอักษร" },
+  { id: "speech", label: "ฝึกออกเสียง", color: "#5548D4", icon: Mic },
+  { id: "communication", label: "พูดเพื่อสื่อสาร", color: "#1F9D6E", icon: MessageCircle },
+  { id: "phonics", label: "เสียงกับตัวอักษร", color: "#D2861B", icon: Shapes },
 ] as const;
+
+/** 0–100 strip: below "ฝึกต่อ" is red, up to "ทำได้" is amber, above is green. */
+function ScoreScale({ pass, practice }: { pass: number; practice: number }) {
+  const low = Math.max(0, Math.min(100, practice));
+  const high = Math.max(low, Math.min(100, pass));
+  return (
+    <div aria-hidden="true" className="space-y-1">
+      <div className="flex h-2 overflow-hidden rounded-full">
+        <span className="bg-error/35" style={{ width: `${low}%` }} />
+        <span className="bg-warning/70" style={{ width: `${high - low}%` }} />
+        <span className="flex-1 bg-success/80" />
+      </div>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[0.6875rem] text-text-muted">
+        <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-error/50" />ยังไม่ผ่าน &lt; {practice}</span>
+        <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-warning" />ฝึกต่อ {practice}–{Math.max(practice, pass - 1)}</span>
+        <span className="inline-flex items-center gap-1"><span className="size-2 rounded-full bg-success" />ทำได้ ≥ {pass}</span>
+      </div>
+    </div>
+  );
+}
 const MODE_LABELS = { azure: "AI ตรวจ (Azure Speech)", adult: "ผู้ใหญ่ตรวจ" } as const;
 
 const pick = (rule: AssessmentRule): StageValues => ({
@@ -145,7 +164,7 @@ export function SchoolAssessment() {
     <Button block onClick={() => void save()} disabled={!dirty || issues.length > 0} loading={busy}>บันทึกเกณฑ์</Button>
   );
 
-  function stageRow(stageId: string) {
+  function stageRow(stageId: string, index: number, color: string) {
     const stage = STAGE_DEFINITIONS.find((stage) => stage.id === stageId)!;
     const rule = central!.rules.find((rule) => rule.stageId === stageId)!;
     const frame = frameOf(rule);
@@ -153,10 +172,17 @@ export function SchoolAssessment() {
     const changed = !sameValues(values, pick(rule));
     const canChoose = stage.automatic && frame.mode === "choice";
     return (
-      <li key={stageId} className="space-y-3 p-4 sm:p-5">
+      <li key={stageId} className="space-y-3.5 p-4 sm:p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <div className="flex min-w-0 flex-wrap items-center gap-2">
-            <h3 className="font-semibold text-text">{stage.label}</h3>
+          <div className="flex min-w-0 flex-wrap items-center gap-2.5">
+            <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded-full font-display text-sm font-semibold text-white" style={{ background: color }}>{index + 1}</span>
+            <h3 className="font-display text-base font-medium text-text">{stage.label}</h3>
+            <span className={values.mode === "azure"
+              ? "inline-flex items-center gap-1 rounded-full bg-info-soft px-2 py-0.5 text-[0.6875rem] font-medium text-info-text"
+              : "inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 text-[0.6875rem] font-medium text-text-muted"}>
+              {values.mode === "azure" ? <Bot size={12} aria-hidden="true" /> : <UserCheck size={12} aria-hidden="true" />}
+              {values.mode === "azure" ? "AI ตรวจ" : "ผู้ใหญ่ตรวจ"}
+            </span>
             {changed && <Badge tone="primary">ปรับแล้ว</Badge>}
             {current!.clampedStages.includes(stageId) && <Badge tone="warning">ปรับตามกรอบใหม่</Badge>}
           </div>
@@ -183,16 +209,20 @@ export function SchoolAssessment() {
             </div>
           )}
           {values.mode === "azure" ? (
-            <div className="grid grid-cols-3 gap-2">
-              {SCORE_KEYS.map((key) => (
-                <FormField key={key} label={SCORE_LABELS[key]} hint={`กรอบ ${frame[key][0]}–${frame[key][1]} · กลาง ${rule[key]}`}>
-                  <Input type="number" inputMode="numeric" min={frame[key][0]} max={frame[key][1]} value={values[key]}
-                    onChange={(event) => setStage(stageId, { [key]: Number(event.target.value) })} />
-                </FormField>
-              ))}
+            <div className="space-y-3">
+              <div className="grid grid-cols-3 gap-2">
+                {SCORE_KEYS.map((key) => (
+                  <FormField key={key} label={SCORE_LABELS[key]} hint={`กรอบ ${frame[key][0]}–${frame[key][1]} · กลาง ${rule[key]}`}>
+                    <Input type="number" inputMode="numeric" min={frame[key][0]} max={frame[key][1]} value={values[key]}
+                      className="font-display text-base tabular-nums"
+                      onChange={(event) => setStage(stageId, { [key]: Number(event.target.value) })} />
+                  </FormField>
+                ))}
+              </div>
+              <ScoreScale pass={values.passScore} practice={values.practiceScore} />
             </div>
           ) : (
-            <p className="text-sm text-text-muted md:pt-7">
+            <p className="rounded-control bg-surface-muted px-3 py-2.5 text-sm text-text-muted md:mt-7">
               {stage.automatic ? "ผู้ใหญ่ฟังแล้วบันทึกผลเอง ไม่ใช้คะแนน" : "ข้อเลือกภาพตรวจจากเฉลย ส่วนการสื่อสารและท่าทางผู้ใหญ่บันทึกผลเอง"}
             </p>
           )}
@@ -205,9 +235,24 @@ export function SchoolAssessment() {
   return (
     <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start">
       <aside className="space-y-5 lg:sticky lg:top-20 lg:col-start-2 lg:row-start-1">
-        <Card>
-          <CardHeader title="สรุปของโรงเรียน" description={`อิงเกณฑ์กลางเวอร์ชัน ${current.central.version}`} />
-          <CardContent className="space-y-4">
+        <Card className="overflow-hidden">
+          <div className="hero-night relative px-5 pb-5 pt-4">
+            <p className="text-caption text-white/70">สรุปของโรงเรียน · เกณฑ์กลางเวอร์ชัน {current.central.version}</p>
+            <div className="mt-3 grid grid-cols-2 gap-3">
+              <div>
+                <p className="text-caption text-white/70">ประเมินด้วย AI</p>
+                <p className="mt-1 inline-flex items-center gap-1.5 font-display text-xl font-semibold">
+                  <span aria-hidden="true" className={form.aiEnabled ? "size-2.5 rounded-full bg-[#7CE3B5]" : "size-2.5 rounded-full bg-white/35"} />
+                  {form.aiEnabled ? "เปิด" : "ปิด"}
+                </p>
+              </div>
+              <div>
+                <p className="text-caption text-white/70">ปรับจากค่ากลาง</p>
+                <p className="mt-1 font-display text-xl font-semibold"><span className="text-[#FFD58A]">{changedCount}</span> <span className="text-sm font-normal text-white/70">ขั้น</span></p>
+              </div>
+            </div>
+          </div>
+          <CardContent className="space-y-4 pt-4">
             <FormField inline label="เปิดการประเมินเสียงด้วย AI"
               hint={aiReason ?? "เสียงของเด็กถูกส่งไปตรวจเมื่อผู้ใหญ่กดยินยอมทุกครั้ง"}>
               <Switch checked={form.aiEnabled} disabled={!aiAllowed}
@@ -218,7 +263,7 @@ export function SchoolAssessment() {
                 {Object.entries(REVIEWER_OPTIONS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
               </Select>
             </FormField>
-            <p className="text-sm text-text">{changedCount ? `ปรับจากค่ากลาง ${changedCount} ขั้น` : "ใช้ค่ากลางทุกขั้น"}</p>
+            {dirty && <p className="rounded-control bg-primary-soft px-3 py-2 text-sm text-primary-text">มีการแก้ไขที่ยังไม่บันทึก</p>}
             {issues.length > 0 && <Alert tone="error">{issues[0]}</Alert>}
             <div className="hidden lg:block">{saveButton}</div>
           </CardContent>
@@ -246,15 +291,24 @@ export function SchoolAssessment() {
             บางขั้นมีค่าที่เกินกรอบใหม่ ระบบใช้ค่าขอบของกรอบแทนแล้ว ตรวจแล้วกดบันทึกเพื่อยืนยัน
           </Alert>
         )}
-        {TRACKS.map((track) => (
-          <Section key={track.id} title={track.label}>
-            <Card>
+        {TRACKS.map((track) => {
+          const stages = STAGE_DEFINITIONS.filter((stage) => stage.track === track.id);
+          const Icon = track.icon;
+          return (
+            <Card key={track.id} className="overflow-hidden">
+              <div className="flex items-center gap-3 border-b border-border px-4 py-3.5 sm:px-5" style={{ background: `linear-gradient(90deg, ${track.color}14, transparent 70%)` }}>
+                <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-[0.8rem] text-white shadow-[0_8px_18px_-10px_currentColor]" style={{ background: track.color, color: "#fff" }}><Icon size={19} /></span>
+                <div className="min-w-0">
+                  <h2 className="font-display text-lg font-medium text-text">{track.label}</h2>
+                  <p className="text-caption text-text-muted">{stages.length} ขั้น · {stages.filter((stage) => form.stages[stage.id]?.mode === "azure").length} ขั้นใช้ AI ตรวจ</p>
+                </div>
+              </div>
               <ul className="divide-y divide-border">
-                {STAGE_DEFINITIONS.filter((stage) => stage.track === track.id).map((stage) => stageRow(stage.id))}
+                {stages.map((stage, index) => stageRow(stage.id, index, track.color))}
               </ul>
             </Card>
-          </Section>
-        ))}
+          );
+        })}
       </div>
 
       {dirty && (

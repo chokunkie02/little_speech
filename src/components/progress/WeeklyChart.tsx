@@ -23,13 +23,14 @@ function weekRange(week: WeekBucket) {
 export function WeeklyChart({ weeks }: { weeks: WeekBucket[] }) {
   const [active, setActive] = useState<number | null>(null);
   const max = Math.max(1, ...weeks.map((week) => week.sessions));
-  const height = 120;
+  const height = 168;
 
   return (
     <figure className="space-y-3">
       <div className="relative">
         {/* Recessive guide at the top value */}
         <div aria-hidden="true" className="absolute inset-x-0 top-0 border-t border-dashed border-border" />
+        <div aria-hidden="true" className="absolute inset-x-0 border-t border-dashed border-border/60" style={{ top: height / 2 }} />
         <span aria-hidden="true" className="absolute -top-2.5 left-0 bg-surface pr-1 text-caption tabular-nums text-text-muted">{max} รอบ</span>
         <ol className="flex items-end gap-1 border-b border-border" style={{ height }} aria-label="จำนวนรอบที่ฝึกจบในแต่ละสัปดาห์">
           {weeks.map((week, index) => {
@@ -42,11 +43,11 @@ export function WeeklyChart({ weeks }: { weeks: WeekBucket[] }) {
                   onFocus={() => setActive(index)} onBlur={() => setActive(null)}
                   className="flex h-full w-full items-end justify-center rounded-t-md focus-visible:outline-2 focus-visible:outline-primary">
                   <span aria-hidden="true"
-                    className={cn("w-full max-w-6 rounded-t-[4px] transition-colors", week.current ? "bg-primary" : "bg-primary/45", active === index && "bg-primary")}
+                    className={cn("w-full max-w-10 rounded-t-[10px] transition-colors", week.current ? "bg-gradient-to-t from-primary to-[#8C82FF] shadow-[0_8px_20px_-8px_rgb(85_72_212/0.9)]" : "bg-primary/25", active === index && "bg-primary")}
                     style={{ height: barHeight }} />
                 </button>
-                {week.current && week.sessions > 0 && (
-                  <span aria-hidden="true" className="pointer-events-none absolute text-caption font-semibold tabular-nums text-text" style={{ bottom: barHeight + 4 }}>
+                {week.sessions > 0 && (
+                  <span aria-hidden="true" className={cn("pointer-events-none absolute font-display text-caption font-semibold tabular-nums", week.current ? "text-primary-text" : "text-text-muted")} style={{ bottom: barHeight + 4 }}>
                     {week.sessions}
                   </span>
                 )}

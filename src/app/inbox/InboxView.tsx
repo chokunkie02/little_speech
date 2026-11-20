@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { Bell, CheckCheck, Phone, GraduationCap, Inbox as InboxIcon, KeyRound, RefreshCw, School, Users } from "lucide-react";
+import { Bell, CheckCheck, CheckCircle2, Clock, Link2, Phone, GraduationCap, Inbox as InboxIcon, KeyRound, RefreshCw, School, Send, Users, XCircle } from "lucide-react";
 import {
   Alert, Avatar, Badge, Button, ButtonLink, Card, CardContent, ConfirmDialog, DataLoadError, EmptyState, FormField,
-  Input, LoadingState, Page, PageHeader, Section, Select, StatusBadge, toast,
+  Input, LoadingState, Page, Section, Select, StatusBadge, toast,
 } from "@/components/ui";
 import { useInbox } from "@/components/inbox/InboxProvider";
 import { useGuardianWorkspace } from "@/components/layout/GuardianWorkspace";
@@ -17,7 +17,32 @@ import {
 import { cn } from "@/lib/cn";
 import { affiliationLabel } from "@/lib/thaiProvinces";
 import { formatRelativeTime } from "@/lib/thaiDate";
-import type { JoinRequestToReview, MyJoinRequest } from "@/types/joinCodes";
+import type { AppNotification, JoinRequestToReview, MyJoinRequest } from "@/types/joinCodes";
+
+/** Icon and colour for a notification, from its kind. */
+function notificationLook(kind: string) {
+  if (/reject/.test(kind)) return { icon: <XCircle size={17} />, tone: "bg-error-soft text-error-text" };
+  if (/approv/.test(kind)) return { icon: <CheckCircle2 size={17} />, tone: "bg-success-soft text-success-text" };
+  if (/linked|joined/.test(kind)) return { icon: <Link2 size={17} />, tone: "bg-primary-soft text-primary-text" };
+  if (/request|application|school/.test(kind)) return { icon: <InboxIcon size={17} />, tone: "bg-warning-soft text-warning-text" };
+  return { icon: <Bell size={17} />, tone: "bg-surface-muted text-text-muted" };
+}
+
+const dayKey = (iso: string) => new Date(iso).toLocaleDateString("en-CA", { timeZone: "Asia/Bangkok" });
+
+/** Notifications split into วันนี้ / เมื่อวาน / ก่อนหน้านี้. */
+function groupByDay(items: AppNotification[]) {
+  const today = dayKey(new Date().toISOString());
+  const yesterday = dayKey(new Date(Date.now() - 86_400_000).toISOString());
+  const groups: { label: string; items: AppNotification[] }[] = [
+    { label: "วันนี้", items: [] }, { label: "เมื่อวาน", items: [] }, { label: "ก่อนหน้านี้", items: [] },
+  ];
+  for (const item of items) {
+    const key = dayKey(item.created_at);
+    groups[key === today ? 0 : key === yesterday ? 1 : 2].items.push(item);
+  }
+  return groups.filter((group) => group.items.length > 0);
+}
 
 // ── Requests waiting for my decision ────────────────────────────────────────
 
@@ -43,14 +68,15 @@ function SchoolApplicationCard({ request, onDone }: { request: JoinRequestToRevi
   }
 
   return (
-    <Card>
-      <CardContent className="space-y-3">
+    <Card className="relative overflow-hidden">
+      <span aria-hidden="true" className="absolute inset-y-0 left-0 w-1 bg-[linear-gradient(180deg,#FFD58A,#F2B23A)]" />
+      <CardContent className="space-y-3 sm:p-6">
         <div className="flex items-start gap-3">
-          <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-primary-soft text-primary-text">
+          <span aria-hidden="true" className="btn-primary flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.9rem] text-primary-foreground">
             <School size={20} />
           </span>
           <div className="min-w-0 flex-1 space-y-0.5">
-            <p className="break-words font-semibold text-text">{request.school_name} ขอใช้งาน{request.province ? ` · จ.${request.province}` : ""}</p>
+            <p className="break-words font-display text-[1.0625rem] font-medium text-text">{request.school_name} ขอใช้งาน{request.province ? ` · จ.${request.province}` : ""}</p>
             <p className="break-all text-sm text-text-muted">
               {request.requester_name} ({request.relationship}) · {request.phone} · {request.requester_email}
             </p>
@@ -120,12 +146,13 @@ function ReviewCard({ request, onDone }: { request: JoinRequestToReview; onDone:
   }
 
   return (
-    <Card>
-      <CardContent className="space-y-3">
+    <Card className="relative overflow-hidden">
+      <span aria-hidden="true" className={cn("absolute inset-y-0 left-0 w-1", teacher ? "bg-info" : "bg-primary")} />
+      <CardContent className="space-y-3 sm:p-6">
         <div className="flex items-start gap-3">
           <Avatar name={request.requester_name} />
           <div className="min-w-0 flex-1 space-y-0.5">
-            <p className="break-words font-semibold text-text">
+            <p className="break-words font-display text-[1.0625rem] font-medium text-text">
               {teacher
                 ? <>{request.requester_name} ขอเข้าร่วมโรงเรียนในบทบาทครู</>
                 : <>{request.requester_name} ({request.relationship}) ขอเชื่อมกับ {request.child_name}</>}
@@ -185,15 +212,18 @@ const myStatus = { pending: "review", approved: "approved", rejected: "rejected"
 function MyRequestRow({ request, onDone }: { request: MyJoinRequest; onDone: () => void }) {
   const [busy, setBusy] = useState(false);
   return (
-    <li className="flex flex-wrap items-center justify-between gap-3 px-4 py-3">
+    <li className="flex flex-wrap items-center justify-between gap-3 px-4 py-3.5 sm:px-5">
+      <div className="flex min-w-0 items-center gap-3">
+      <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-[0.8rem] bg-surface-muted text-text-muted"><Send size={17} /></span>
       <div className="min-w-0">
-        <p className="break-words text-sm font-semibold text-text">
+        <p className="break-words font-display text-[0.9375rem] font-medium text-text">
           {request.kind === "school" ? `ขอใช้งานสำหรับ ${request.school_name}` : request.kind === "teacher" ? `ขอเข้าร่วม ${request.school_name}` : `ขอเชื่อมกับ ${request.child_name}`}
         </p>
         <p className="text-caption text-text-muted">
           {[request.kind === "classroom_guardian" && request.school_name, request.classroom_name && `ห้อง ${request.classroom_name}`, formatRelativeTime(request.created_at)]
             .filter(Boolean).join(" · ")}
         </p>
+      </div>
       </div>
       <div className="flex items-center gap-2">
         <StatusBadge status={myStatus[request.status]} />
@@ -238,17 +268,37 @@ export default function InboxView() {
 
   return (
     <Page>
-      <PageHeader
-        icon={<InboxIcon size={20} />}
-        title="กล่องข้อความ"
-        description="คำขอที่รอคุณอนุมัติ คำขอของคุณ และการแจ้งเตือน"
-        actions={user && (
-          <>
+      <header className="flex flex-wrap items-end justify-between gap-3">
+        <div className="space-y-1">
+          <p className="text-caption font-semibold tracking-wide text-primary-text">บัญชี · ข้อความและคำขอ</p>
+          <h1 className="text-page-title text-text">กล่องข้อความ</h1>
+          <p className="text-[0.9375rem] text-text-muted">คำขอที่รอคุณอนุมัติ คำขอของคุณ และการแจ้งเตือน</p>
+        </div>
+        {user && (
+          <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" icon={<RefreshCw size={14} aria-hidden="true" />} onClick={refreshAll}>โหลดใหม่</Button>
             {!user?.isPlatformAdmin && <ButtonLink size="sm" href="/join" icon={<KeyRound size={14} aria-hidden="true" />}>ใช้รหัสเข้าร่วม</ButtonLink>}
-          </>
+          </div>
         )}
-      />
+      </header>
+
+      {inbox && !nothing && (
+        <dl className="grid grid-cols-3 gap-3">
+          {[
+            { label: "รอคุณอนุมัติ", value: inbox.to_review.length, icon: <InboxIcon size={17} />, tone: inbox.to_review.length ? "bg-warning-soft text-warning-text" : "bg-surface-muted text-text-muted" },
+            { label: "คำขอของฉันที่รอผล", value: inbox.my_requests.filter((request) => request.status === "pending").length, icon: <Clock size={17} />, tone: "bg-info-soft text-info-text" },
+            { label: "แจ้งเตือนใหม่", value: justRead.size || inbox.unread, icon: <Bell size={17} />, tone: "bg-primary-soft text-primary-text" },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-3 rounded-card border border-border bg-surface px-4 py-3.5 shadow-card">
+              <span aria-hidden="true" className={cn("hidden size-10 shrink-0 place-items-center rounded-[0.8rem] sm:grid", item.tone)}>{item.icon}</span>
+              <div className="min-w-0">
+                <dt className="text-caption text-text-muted">{item.label}</dt>
+                <dd className="font-display text-[1.75rem] font-semibold leading-none tabular-nums text-text">{item.value}</dd>
+              </div>
+            </div>
+          ))}
+        </dl>
+      )}
 
       {isLoading || (user && loading) ? <LoadingState variant="list" rows={3} label="กำลังโหลดกล่องข้อความ…" /> : !user ? (
         <EmptyState icon={<InboxIcon size={22} />} title="เข้าสู่ระบบเพื่อดูกล่องข้อความ"
@@ -267,7 +317,7 @@ export default function InboxView() {
             {hasRequests && (
               <div className="space-y-6">
                 {inbox && inbox.to_review.length > 0 && (
-                  <Section title={`รอคุณอนุมัติ (${inbox.to_review.length})`} description="คนที่ใช้รหัสของคุณและรอให้ยืนยันตัวตน">
+                  <Section title={`รอคุณอนุมัติ · ${inbox.to_review.length}`} description="คนที่ใช้รหัสของคุณและรอให้ยืนยันตัวตน">
                     <div className="space-y-3">
                       {inbox.to_review.map((request) => request.kind === "school"
                         ? <SchoolApplicationCard key={request.id} request={request} onDone={refresh} />
@@ -291,30 +341,39 @@ export default function InboxView() {
                 <Button size="sm" variant="ghost" icon={<CheckCheck size={14} aria-hidden="true" />}
                   onClick={() => void markNotificationsRead().then(refresh)}>อ่านแล้วทั้งหมด</Button>
               )}>
-                <Card><ul className="divide-y divide-border">
-                  {inbox.notifications.map((item) => {
-                    const fresh = !item.read_at || justRead.has(item.id);
-                    const body = (
-                      <div className="flex items-start gap-3 px-4 py-3">
-                        <span aria-hidden="true" className={cn("mt-1.5 h-2 w-2 shrink-0 rounded-full", fresh ? "bg-primary" : "bg-transparent")} />
-                        <div className="min-w-0 flex-1">
-                          <p className={cn("break-words text-sm text-text", fresh && "font-semibold")}>{item.title}</p>
-                          {item.body && <p className="break-words text-sm text-text-muted">{item.body}</p>}
-                          <p className="mt-0.5 text-caption text-text-muted">
-                            {formatRelativeTime(item.created_at)}{fresh && <span className="sr-only"> · ใหม่</span>}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                    return (
-                      <li key={item.id}>
-                        {item.link && item.link !== "/inbox"
-                          ? <Link href={item.link} className="block transition-colors hover:bg-surface-muted">{body}</Link>
-                          : body}
-                      </li>
-                    );
-                  })}
-                </ul></Card>
+                <Card className="overflow-hidden">
+                  {groupByDay(inbox.notifications).map((group) => (
+                    <div key={group.label}>
+                      <p className="border-b border-border bg-surface-muted/60 px-4 py-2 text-caption font-semibold text-text-muted sm:px-5">{group.label}</p>
+                      <ul className="divide-y divide-border">
+                        {group.items.map((item) => {
+                          const fresh = !item.read_at || justRead.has(item.id);
+                          const look = notificationLook(item.kind);
+                          const body = (
+                            <div className={cn("flex items-start gap-3 px-4 py-3.5 sm:px-5", fresh && "bg-primary-soft/35")}>
+                              <span aria-hidden="true" className={cn("grid size-9 shrink-0 place-items-center rounded-[0.75rem]", look.tone)}>{look.icon}</span>
+                              <div className="min-w-0 flex-1">
+                                <p className={cn("break-words text-sm text-text", fresh ? "font-display font-medium" : "font-medium")}>{item.title}</p>
+                                {item.body && <p className="break-words text-sm text-text-muted">{item.body}</p>}
+                                <p className="mt-0.5 text-caption text-text-muted">
+                                  {formatRelativeTime(item.created_at)}{fresh && <span className="sr-only"> · ใหม่</span>}
+                                </p>
+                              </div>
+                              {fresh && <span aria-hidden="true" className="mt-1.5 size-2 shrink-0 rounded-full bg-primary" />}
+                            </div>
+                          );
+                          return (
+                            <li key={item.id}>
+                              {item.link && item.link !== "/inbox"
+                                ? <Link href={item.link} className="block transition-colors hover:bg-surface-muted">{body}</Link>
+                                : body}
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </div>
+                  ))}
+                </Card>
               </Section>
             )}
           </div>

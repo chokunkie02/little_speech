@@ -85,7 +85,7 @@ export function dayKey(value: string | Date): string {
   return dayFormat.format(typeof value === "string" ? new Date(value) : value);
 }
 
-function shiftDay(key: string, days: number): string {
+export function shiftDay(key: string, days: number): string {
   const date = new Date(`${key}T00:00:00Z`);
   date.setUTCDate(date.getUTCDate() + days);
   return date.toISOString().slice(0, 10);

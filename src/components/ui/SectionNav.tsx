@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/cn";
 
-export type SectionNavItem = { id: string; label: string };
+export type SectionNavItem = { id: string; label: string; icon?: ReactNode };
 
 /**
  * "On this page" menu for long pages made of <Section id>. Phones: a row of chips that scrolls
@@ -32,19 +32,20 @@ export function SectionNav({ items, label = "หมวดในหน้าน�
 
   return (
     <nav aria-label={label} className={cn("print:hidden lg:sticky lg:top-20 lg:self-start", className)}>
-      <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:px-0 lg:pb-0">
+      <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6 lg:mx-0 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:rounded-card lg:border lg:border-border lg:bg-surface lg:p-2 lg:shadow-card">
         {items.map((item) => {
           const current = item.id === active;
           return (
             <li key={item.id} className="shrink-0">
               <a href={`#${item.id}`} onClick={() => setActive(item.id)} aria-current={current ? "location" : undefined}
                 className={cn(
-                  "inline-flex min-h-10 items-center whitespace-nowrap rounded-full border px-3.5 text-sm font-medium transition-colors",
-                  "lg:flex lg:min-h-9 lg:w-full lg:rounded-control lg:border-0 lg:px-3",
+                  "inline-flex min-h-10 items-center gap-2.5 whitespace-nowrap rounded-full border px-3.5 font-display text-sm font-medium transition-colors",
+                  "lg:flex lg:min-h-10 lg:w-full lg:rounded-[0.8rem] lg:border-0 lg:px-3",
                   current
-                    ? "border-primary/30 bg-primary-soft font-semibold text-primary-text"
+                    ? "border-primary/30 bg-primary-soft text-primary-text"
                     : "border-border bg-surface text-text-muted hover:bg-surface-muted hover:text-text lg:bg-transparent",
                 )}>
+                {item.icon && <span aria-hidden="true" className={cn("hidden lg:inline-flex", current ? "text-primary-text" : "text-text-muted")}>{item.icon}</span>}
                 {item.label}
               </a>
             </li>

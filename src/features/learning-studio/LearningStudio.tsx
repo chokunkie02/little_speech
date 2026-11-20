@@ -694,10 +694,12 @@ export function LearningStudio({
               </div>
             </>
           )}
-          {route === "path" && (
+          {route === "path" && (() => {
+            const doneStages = stages.filter((st) => completed.some((s) => s.planId === state.plan.id && s.stageId === st.id)).length;
+            return (
             <>
               <SectionHead
-                eyebrow="MY LEARNING JOURNEY"
+                eyebrow="เส้นทางการฝึก"
                 title="เส้นทางของฉัน"
                 body="เริ่มตรงที่พร้อม พักเมื่ออยากพัก แล้วกลับมาได้เสมอ"
                 action={
@@ -723,19 +725,14 @@ export function LearningStudio({
                       : ""}
                   </h3>
                   <p>
-                    ทำกิจกรรมครบ{" "}
-                    {
-                      stages.filter((st) =>
-                        completed.some(
-                          (s) =>
-                            s.planId === state.plan.id && s.stageId === st.id,
-                        ),
-                      ).length
-                    }
-                    /{stages.length} ช่วง · “ทำครบ” แสดงการเข้าร่วม
+                    ทำกิจกรรมครบ {doneStages}/{stages.length} ช่วง · “ทำครบ” แสดงการเข้าร่วม
                     ไม่ใช่การผ่านทักษะ
                   </p>
+                  <div className="path-meter" role="progressbar" aria-label="ช่วงที่ทำครบ" aria-valuemin={0} aria-valuemax={stages.length} aria-valuenow={doneStages}>
+                    <i style={{ width: `${stages.length ? (doneStages / stages.length) * 100 : 0}%` }} />
+                  </div>
                 </div>
+                <div className="path-count" aria-hidden="true"><strong>{doneStages}</strong>/{stages.length}</div>
               </div>
               <div className="journey">
                 {stages.map((stage, i) => {
@@ -767,7 +764,7 @@ export function LearningStudio({
                         </div>
                         <div className="journey-info">
                           <span className="eyebrow">
-                            CHAPTER {String(i + 1).padStart(2, "0")}
+                            ขั้นที่ {i + 1}
                           </span>
                           <h2>{stage.label}</h2>
                           <p>{stage.description}</p>
@@ -787,7 +784,7 @@ export function LearningStudio({
                           </div>
                         </div>
                         <Button
-                          variant={done ? "secondary" : "primary"}
+                          variant={current ? "primary" : "secondary"}
                           onClick={() => begin(stage)}
                         >
                           {done ? "ฝึกอีกครั้ง" : "เริ่มตรงนี้"}
@@ -803,7 +800,8 @@ export function LearningStudio({
                 ตัวอย่างคำและภาพยังต้องผ่านการตรวจจากนักแก้ไขการพูดก่อนใช้งานกับเด็กจริง
               </p>
             </>
-          )}
+            );
+          })()}
           {route === "plan" && (
             <PlanPage
               plan={state.plan}
@@ -1390,7 +1388,7 @@ function Library({
   return (
     <>
       <SectionHead
-        eyebrow="LITTLE THINGS TO TRY"
+        eyebrow="กิจกรรมสั้น ๆ ให้ลองเล่น"
         title="คลังกิจกรรม"
         body={`${getLevel(level).label} · ${TRACKS[track].label} · เปิดดูแต่ละข้อก่อนเลือกเล่นได้`}
         action={
@@ -1410,25 +1408,28 @@ function Library({
             placeholder="ค้นหาคำหรือกิจกรรม..."
           />
         </label>
-        <select
-          aria-label="กรองช่วงฝึก"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        >
-          <option value="all">ทุกช่วงการฝึก</option>
-          {stages.map((s) => (
-            <option value={s.id} key={s.id}>
-              {s.label}
-            </option>
-          ))}
-        </select>
         <span className="muted">{items.length} กิจกรรม</span>
+      </div>
+      <div className="stage-chips" role="group" aria-label="กรองช่วงฝึก">
+        <button type="button" aria-pressed={filter === "all"} className={filter === "all" ? "stage-chip active" : "stage-chip"}
+          onClick={() => setFilter("all")}>
+          ทั้งหมด <b>{stages.reduce((sum, s) => sum + s.items.length, 0)}</b>
+        </button>
+        {stages.map((s, index) => (
+          <button key={s.id} type="button" aria-pressed={filter === s.id}
+            className={filter === s.id ? "stage-chip active" : "stage-chip"}
+            style={{ "--chip": s.color } as React.CSSProperties}
+            onClick={() => setFilter(s.id)}>
+            <i aria-hidden="true">{index + 1}</i>{s.label} <b>{s.items.length}</b>
+          </button>
+        ))}
       </div>
       <div className="library-grid">
         {items.map(({ item, stage }) => (
           <button
             className="library-card"
             key={item.id}
+            style={{ "--lv": stage.color } as React.CSSProperties}
             onClick={() => onPreview(item, stage)}
           >
             <div
@@ -2364,7 +2365,7 @@ function Progress({
   return (
     <>
       <SectionHead
-        eyebrow="EVERY LITTLE STEP COUNTS"
+        eyebrow="ทุกก้าวเล็ก ๆ มีความหมาย"
         title="มองเห็นทุกความพยายาม"
         body={`ผลการฝึกของ ${childName} · รายละเอียดที่บันทึกบนเครื่องนี้`}
         action={
@@ -2700,7 +2701,7 @@ function Guide({
   return (
     <>
       <SectionHead
-        eyebrow="A GUIDE FOR GROWN-UPS"
+        eyebrow="คู่มือสำหรับผู้ใหญ่"
         title="ลองเล่นด้วยกันอย่างเข้าใจ"
         body="คู่มือการจัดชุดฝึก การใช้เสียง และการดูผลในเครื่องนี้"
       />
