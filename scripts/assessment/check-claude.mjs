@@ -53,7 +53,10 @@ async function check() {
   const model = (env.ASSESSMENT_CLAUDE_MODEL || DEFAULT_MODEL).trim();
   console.log(`• พบ ${NAME} (ยาว ${key.length} ตัวอักษร) · โมเดล ${model}`);
 
-  const client = new Anthropic({ apiKey: key, maxRetries: 0, timeout: 15000 });
+  // Same as the app: ignore ANTHROPIC_AUTH_TOKEN / ANTHROPIC_BASE_URL that other tools may set.
+  const client = new Anthropic({ apiKey: key, authToken: null, baseURL: "https://api.anthropic.com", maxRetries: 0, timeout: 15000 });
+  if (process.env.ANTHROPIC_AUTH_TOKEN || process.env.ANTHROPIC_BASE_URL)
+    console.log("• พบ ANTHROPIC_AUTH_TOKEN/ANTHROPIC_BASE_URL ของเครื่องมืออื่น ระบบประเมินไม่ใช้ค่าเหล่านี้");
   try {
     const info = await client.models.retrieve(model);
     console.log(`✓ คีย์ใช้งานได้ และเข้าถึง ${info.display_name ?? info.id} ได้`);

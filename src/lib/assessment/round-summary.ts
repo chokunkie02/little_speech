@@ -27,6 +27,22 @@ export function claudeConnection() {
   };
 }
 
+/**
+ * The SDK otherwise reads ANTHROPIC_AUTH_TOKEN / ANTHROPIC_BASE_URL from the process environment.
+ * Developer machines often set those for other tools (e.g. a proxy for Claude Code), which would send
+ * this app's requests elsewhere or with the wrong credentials, so both are pinned here.
+ */
+export const CLAUDE_API_URL = "https://api.anthropic.com";
+export function claudeClient() {
+  return new Anthropic({
+    apiKey: process.env[ROUND_SUMMARY_KEY_ENV],
+    authToken: null,
+    baseURL: CLAUDE_API_URL,
+    maxRetries: 1,
+    timeout: 45000,
+  });
+}
+
 export const OUTCOMES = ["achieved", "practice", "retry", "needs_review", "unavailable"] as const;
 export type RoundOutcome = (typeof OUTCOMES)[number];
 const OUTCOME_TEXT: Record<RoundOutcome, string> = {
@@ -136,7 +152,7 @@ export class RoundSummaryError extends Error {}
 export async function writeRoundSummary(facts: RoundFacts): Promise<{ summary: RoundSummary; model: string }> {
   const { ready, model } = claudeConnection();
   if (!ready) throw new RoundSummaryError("provider_not_configured");
-  const client = new Anthropic({ apiKey: process.env[ROUND_SUMMARY_KEY_ENV], maxRetries: 1, timeout: 45000 });
+  const client = claudeClient();
   const fallback = FALLBACK_MODELS.test(model);
   let response;
   try {

@@ -691,6 +691,24 @@ await claudeScenario("Long or extra model output is trimmed before it is stored 
   assert.equal(result.body.summary.strengths.length, 3);
   assert.equal(result.body.summary.homeActivities.length, 2);
 });
+await claudeScenario("Machine-wide ANTHROPIC_BASE_URL / ANTHROPIC_AUTH_TOKEN (other tools) are ignored", async () => {
+  const previous = { url: process.env.ANTHROPIC_BASE_URL, token: process.env.ANTHROPIC_AUTH_TOKEN };
+  process.env.ANTHROPIC_BASE_URL = "https://proxy.example.invalid/anthropic";
+  process.env.ANTHROPIC_AUTH_TOKEN = "fixture-other-tool-token";
+  try {
+    const result = await summarize(roundBody({ sessionId: "round-env" }));
+    assert.equal(result.status, 200, JSON.stringify(result.body));
+    assert.match(claudeCalls[0].url, /^https:\/\/api\.anthropic\.com\//);
+    const sent = [...claudeCalls[0].headers.entries()].map(([name, value]) => `${name}: ${value}`).join("\n");
+    assert.ok(!sent.includes("fixture-other-tool-token"), "another tool's token must never be sent");
+    assert.ok(sent.includes("sk-ant-api03-fixture-not-a-secret"), "the app's own key is used");
+  } finally {
+    for (const [name, value] of [["ANTHROPIC_BASE_URL", previous.url], ["ANTHROPIC_AUTH_TOKEN", previous.token]]) {
+      if (value === undefined) delete process.env[name];
+      else process.env[name] = value;
+    }
+  }
+});
 await claudeScenario("Round summary limit: the 6th new summary in a minute → 429", async () => {
   seed({ enabled: false, roundSummary: true });
   let last;
