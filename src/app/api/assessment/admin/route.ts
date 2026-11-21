@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { policySchema } from "@/lib/assessment/policy";
 import { speechProvider } from "@/lib/assessment/provider";
+import { claudeConnection } from "@/lib/assessment/round-summary";
 import {
   AssessmentError,
   activePolicy,
@@ -53,6 +54,7 @@ export async function GET(request: Request) {
         state: state.data,
         versions: versions.data,
         provider: speechProvider(),
+        summaryProvider: claudeConnection(),
       },
       { headers: { "Cache-Control": "no-store" } },
     );
@@ -108,6 +110,8 @@ export async function POST(request: Request) {
           : "ตั้ง AZURE_SPEECH_KEY และ region หรือ endpoint บนเซิร์ฟเวอร์ก่อนเปิด AI",
         409,
       );
+    if (draft.data.roundSummary && !claudeConnection().ready)
+      throw new AssessmentError("ตั้ง ASSESSMENT_ANTHROPIC_API_KEY บนเซิร์ฟเวอร์ก่อนเปิดสรุปรอบด้วย Claude", 409);
     const previous = await activePolicy().catch(() => null);
     const result = await db.rpc("publish_assessment_policy", {
       p_expected_revision: input.expectedRevision,

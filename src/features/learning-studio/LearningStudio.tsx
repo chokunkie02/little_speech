@@ -5,6 +5,7 @@ import { useStudioResultSync } from "./useStudioResultSync";
 import { useAuth } from "@/hooks/useAuth";
 import AssessmentControls from "@/components/assessment/AssessmentControls";
 import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
+import RoundAdvice from "./RoundAdvice";
 import { submitStudioAssessment } from "./assessment-client";
 import type { AssessmentResult } from "@/lib/assessment/policy";
 import {
@@ -2306,6 +2307,7 @@ function Summary({
           </Button>
         )}
       </section>
+      <RoundAdvice session={session} />
       <div className="summary-actions">
         <Button variant="secondary" onClick={onProgress}>
           <BarChart3 size={17} />

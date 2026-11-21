@@ -86,6 +86,8 @@ export const policySchema = z
     rules: z.array(ruleSchema).length(STAGE_DEFINITIONS.length),
     /** Schools may switch AI on for themselves (only while `enabled` is on). Absent = not allowed. */
     allowSchoolAi: z.boolean().optional(),
+    /** Claude writes an end-of-round summary for adults (text only). Absent = off. */
+    roundSummary: z.boolean().optional(),
   })
   .strict()
   .superRefine((policy, context) => {
@@ -128,6 +130,8 @@ export interface PolicySnapshot {
   published_at: string;
   /** Name of the service that checks speech (for consent text); added by GET /api/assessment/policy. */
   providerLabel?: string;
+  /** The round summary is switched on and the Claude key is set; added by GET /api/assessment/policy. */
+  roundSummaryReady?: boolean;
 }
 export type Outcome =
   | "achieved"

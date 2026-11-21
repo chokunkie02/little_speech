@@ -13,9 +13,11 @@
     "learning:test": "npm run learning:prepare && node scripts/learning-studio/test.mjs && node scripts/learning-studio/test-levels.mjs && node scripts/learning-studio/test-assets.mjs && node scripts/learning-studio/test-integration.mjs",
     "assessment:test": "node scripts/assessment/test.mjs",
     "assessment:check-openai": "node scripts/assessment/check-openai.mjs",
-    "assessment:test-stages": "node scripts/assessment/test-stages.mjs"
+    "assessment:test-stages": "node scripts/assessment/test-stages.mjs",
+    "assessment:check-claude": "node scripts/assessment/check-claude.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.12.0",
     "@supabase/supabase-js": "^2.106.0",
     "lucide-react": "0.468.0",
     "next": "16.2.6",

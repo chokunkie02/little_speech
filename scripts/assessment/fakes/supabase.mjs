@@ -51,6 +51,14 @@ class Query {
     this.filters.push((row) => (row[column] ?? null) === value);
     return this;
   }
+  gte(column, value) {
+    this.filters.push((row) => row[column] >= value);
+    return this;
+  }
+  insert(values) {
+    this.inserting = Array.isArray(values) ? values : [values];
+    return this;
+  }
   order(column, options = {}) {
     this.sorts.push([column, options.ascending !== false]);
     return this;
@@ -75,6 +83,12 @@ class Query {
     return this.run().then(resolve, reject);
   }
   async run() {
+    if (this.inserting) {
+      const now = new Date().toISOString();
+      for (const value of this.inserting)
+        this.rows().push({ id: crypto.randomUUID(), created_at: now, ...structuredClone(value) });
+      return ok(null);
+    }
     let rows = this.rows().filter((row) => this.filters.every((filter) => filter(row)));
     if (this.values) {
       for (const row of rows) Object.assign(row, structuredClone(this.values));

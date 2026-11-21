@@ -47,6 +47,11 @@ Rules that must always hold:
   platform enabled + `allowSchoolAi` + the school's own switch.
 - Same request id + same input → same stored result (provider called once); same id + different input → 409;
   no access → 403; no login → 401; more than 12 new requests per user per minute → 429.
+- Claude round summary (`/api/assessment/round-summary`, text only): off unless the policy has
+  `roundSummary` and `ASSESSMENT_ANTHROPIC_API_KEY` is set. Claude receives curriculum facts and
+  outcomes only — never the child's id or name, the session id, audio, or any free text from the page
+  (extra fields → 400). Same round + same outcomes → stored summary, no new call; 5 new summaries per
+  user per minute; Claude errors give a message and store nothing.
 
 Sources of truth if something looks off: `docs/assessment-handoff.md`, `src/lib/assessment/*`,
 `src/app/api/assessment/*`, migrations `supabase/migrations/202611160013*`–`0016*`. When code and
@@ -90,12 +95,13 @@ prints the key. A missing key is "not configured yet", not a failure.
 
 **Real OpenAI calls cost money and send audio to a third party.** Only make them when the user
 explicitly asks in this run, use an adult volunteer's voice or synthetic audio (never a child's), and
-keep it to a handful of calls.
+keep it to a handful of calls. The same applies to real Claude calls (round summaries): only when asked,
+a handful at most. `npm run assessment:check-claude` checks the key for free.
 
 ## Never
 - Edit source code, migrations or env files, or commit/push. Put any scratch files in `.learning-runtime/`.
 - Run `supabase db reset`, `db push`, migrations, or anything against a non-local database.
-- Use or print the machine's `OPENAI_API_KEY` (it belongs to the user's other tools).
+- Use or print the machine's `OPENAI_API_KEY` (it belongs to the user's other tools), or print any key.
 - Report a pass you did not observe. If a layer was skipped, say it was skipped and why.
 
 ## Report format (Thai)

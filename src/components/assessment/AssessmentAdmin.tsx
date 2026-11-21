@@ -44,6 +44,7 @@ interface AdminData {
   };
   versions: PolicySnapshot[];
   provider: { id: "openai" | "azure"; label: string; ready: boolean; detail?: string };
+  summaryProvider?: { ready: boolean; model: string };
 }
 
 /** Stages whose items are all picture choices, checked by the answer key (see test-stages.mjs). */
@@ -217,6 +218,15 @@ export default function AssessmentAdmin() {
                     </dd>
                   </div>
                   <div className="flex items-start justify-between gap-3 py-2.5">
+                    <dt className="text-text-muted">Claude สรุปรอบ</dt>
+                    <dd className="text-right">
+                      <Badge tone={data.summaryProvider?.ready ? "success" : "warning"}>
+                        {data.summaryProvider?.ready ? "ตั้งค่าแล้ว" : "ยังไม่ได้ตั้งคีย์"}
+                      </Badge>
+                      {data.summaryProvider?.model && <p className="mt-1 text-caption text-text-muted">{data.summaryProvider.model}</p>}
+                    </dd>
+                  </div>
+                  <div className="flex items-start justify-between gap-3 py-2.5">
                     <dt className="text-text-muted">ฉบับร่าง</dt>
                     <dd className="text-right">
                       <p className="font-semibold">แก้ไขครั้งที่ {data.state.draft_revision}</p>
@@ -272,6 +282,12 @@ export default function AssessmentAdmin() {
                   <FormField inline label="อนุญาตให้โรงเรียนเปิด AI เอง"
                     hint="โรงเรียนที่ได้รับอนุญาตเลือกเปิดหรือปิด AI ของตัวเองได้ ใช้ได้เมื่อเปิด AI ทั้งระบบแล้วเท่านั้น">
                     <Switch checked={!!draft.allowSchoolAi} onCheckedChange={(allowSchoolAi) => setDraft({ ...draft, allowSchoolAi })} />
+                  </FormField>
+                  <FormField inline label="สรุปรอบด้วย Claude หลังเผยแพร่"
+                    hint={!data.summaryProvider?.ready
+                      ? "ต้องตั้ง ASSESSMENT_ANTHROPIC_API_KEY บนเซิร์ฟเวอร์ก่อน จึงเผยแพร่แบบเปิดได้"
+                      : "หน้าสรุปรอบมีปุ่มให้ผู้ใหญ่ขอคำแนะนำ Claude ได้รับเฉพาะขั้น คำเป้าหมาย และผลแต่ละข้อ ไม่ได้รับชื่อเด็กหรือเสียง"}>
+                    <Switch checked={!!draft.roundSummary} onCheckedChange={(roundSummary) => setDraft({ ...draft, roundSummary })} />
                   </FormField>
                   <div className="grid gap-4 sm:grid-cols-3">
                     <FormField label="ความมั่นใจขั้นต่ำ (0–1)">
@@ -353,7 +369,7 @@ export default function AssessmentAdmin() {
               {!valid.success && <Alert tone="error">{valid.error.issues[0].message}</Alert>}
               <div className="flex flex-wrap gap-3">
                 <Button disabled={!dirty || !valid.success} onClick={() => void mutate("save")}>บันทึกฉบับร่าง</Button>
-                <Button variant="outline" disabled={dirty || !valid.success || (draft.enabled && !data.provider.ready)}
+                <Button variant="outline" disabled={dirty || !valid.success || (draft.enabled && !data.provider.ready) || (!!draft.roundSummary && !data.summaryProvider?.ready)}
                   onClick={() => void mutate("publish")}>
                   เผยแพร่เป็นเวอร์ชันใหม่
                 </Button>

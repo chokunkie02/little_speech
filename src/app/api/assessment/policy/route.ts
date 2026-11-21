@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { speechProvider } from "@/lib/assessment/provider";
+import { claudeConnection } from "@/lib/assessment/round-summary";
 import {
   AssessmentError,
   activePolicy,
@@ -33,6 +34,7 @@ export async function GET(request: Request) {
         config: judged.config,
         schoolRevision: judged.schoolVersion?.revision,
         providerLabel: speechProvider().label,
+        roundSummaryReady: !!judged.config.roundSummary && claudeConnection().ready,
       },
       { headers: { "Cache-Control": "no-store" } },
     );
