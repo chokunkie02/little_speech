@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Sparkles, Volume2 } from "lucide-react";
+import { CircleCheck, House, ShieldCheck, Sparkles, Target, Volume2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { assessmentRequest } from "@/lib/assessment/client";
 import type { PolicySnapshot } from "@/lib/assessment/policy";
@@ -77,64 +77,100 @@ export default function RoundAdvice({ session }: { session: Session }) {
 
   const pending = attempts.some((attempt) => outcomeOf(attempt) === "needs_review");
   return (
-    <section className="panel summary-details" aria-label="คำแนะนำจาก Claude">
-      <h2>
-        <Sparkles size={18} aria-hidden="true" /> คำแนะนำจาก Claude
-      </h2>
+    <section className="panel advice-card" aria-label="คำแนะนำจาก Claude">
+      <header className="advice-head">
+        <span className="advice-icon" aria-hidden="true">
+          <Sparkles size={20} />
+        </span>
+        <div>
+          <h2>คำแนะนำจาก Claude</h2>
+          <p>สรุปรอบนี้สำหรับผู้ใหญ่ ใช้ประกอบการฝึกกับน้อง</p>
+        </div>
+      </header>
+
       {!summary && (
-        <>
+        <div className="advice-intro">
           <p>
-            ให้ Claude ช่วยสรุปรอบนี้และแนะนำวิธีฝึกที่บ้าน Claude ได้รับเฉพาะขั้น คำเป้าหมาย และผลแต่ละข้อ
-            ไม่ได้รับชื่อเด็กหรือเสียง
-            {pending && " · ตรวจข้อพูดให้เสร็จก่อน คำแนะนำจะตรงขึ้น"}
+            ให้ Claude ช่วยสรุปว่ารอบนี้ทำอะไรได้ดี ควรฝึกอะไรต่อ และมีกิจกรรมสั้น ๆ ให้เล่นที่บ้าน
+            {pending && " ตรวจข้อพูดให้เสร็จก่อน คำแนะนำจะตรงขึ้น"}
           </p>
-          <button type="button" className="button secondary" disabled={busy} onClick={() => void ask()}>
-            {busy ? "กำลังเขียนคำแนะนำ…" : "ขอคำแนะนำจาก Claude"}
+          <button type="button" className="button primary" disabled={busy} onClick={() => void ask()}>
+            <Sparkles size={16} aria-hidden="true" />
+            {busy ? "กำลังเขียนคำแนะนำ… (ประมาณ 20 วินาที)" : "ขอคำแนะนำจาก Claude"}
           </button>
-        </>
+          <small>Claude ได้รับเฉพาะขั้น คำเป้าหมาย และผลแต่ละข้อ ไม่ได้รับชื่อเด็กหรือเสียง</small>
+        </div>
       )}
-      {error && <p role="alert">{error}</p>}
+      {error && (
+        <p className="advice-error" role="alert">
+          {error}
+        </p>
+      )}
+
       {summary && (
-        <div role="status">
-          <p>
-            <strong>{summary.childMessage}</strong>
-          </p>
-          <button type="button" className="button secondary" onClick={() => speaker.speak(summary.childMessage)}>
-            <Volume2 size={16} aria-hidden="true" /> อ่านคำชมให้น้องฟัง
-          </button>
-          {summary.strengths.length > 0 && (
-            <>
-              <h3>ทำได้ดีในรอบนี้</h3>
-              <ul>
-                {summary.strengths.map((text) => (
-                  <li key={text}>{text}</li>
-                ))}
-              </ul>
-            </>
+        <div className="advice-body" role="status">
+          <div className="advice-praise">
+            <span className="advice-praise-label">คำชมสำหรับน้อง</span>
+            <p className="advice-praise-text">“{summary.childMessage}”</p>
+            <button type="button" className="advice-listen" onClick={() => speaker.speak(summary.childMessage)}>
+              <Volume2 size={16} aria-hidden="true" /> อ่านคำชมให้น้องฟัง
+            </button>
+          </div>
+
+          {(summary.strengths.length > 0 || summary.practiceNext.length > 0) && (
+            <div className="advice-grid">
+              {summary.strengths.length > 0 && (
+                <section className="advice-block good">
+                  <h3>
+                    <CircleCheck size={18} aria-hidden="true" /> ทำได้ดีในรอบนี้
+                  </h3>
+                  <ul className="advice-list">
+                    {summary.strengths.map((text) => (
+                      <li key={text}>{text}</li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+              {summary.practiceNext.length > 0 && (
+                <section className="advice-block next">
+                  <h3>
+                    <Target size={18} aria-hidden="true" /> ฝึกต่อครั้งหน้า
+                  </h3>
+                  <ul className="advice-list">
+                    {summary.practiceNext.map((text) => (
+                      <li key={text}>{text}</li>
+                    ))}
+                  </ul>
+                </section>
+              )}
+            </div>
           )}
-          {summary.practiceNext.length > 0 && (
-            <>
-              <h3>ฝึกต่อครั้งหน้า</h3>
-              <ul>
-                {summary.practiceNext.map((text) => (
-                  <li key={text}>{text}</li>
-                ))}
-              </ul>
-            </>
-          )}
+
           {summary.homeActivities.length > 0 && (
-            <>
-              <h3>ลองเล่นที่บ้าน</h3>
-              <ul>
-                {summary.homeActivities.map((activity) => (
+            <section className="advice-block home">
+              <h3>
+                <House size={18} aria-hidden="true" /> ลองเล่นที่บ้าน
+              </h3>
+              <ol className="advice-activities">
+                {summary.homeActivities.map((activity, index) => (
                   <li key={activity.title}>
-                    <strong>{activity.title}</strong> · {activity.howTo}
+                    <span className="advice-num" aria-hidden="true">
+                      {index + 1}
+                    </span>
+                    <div>
+                      <strong>{activity.title}</strong>
+                      <p>{activity.howTo}</p>
+                    </div>
                   </li>
                 ))}
-              </ul>
-            </>
+              </ol>
+            </section>
           )}
-          <small>คำแนะนำจาก AI เพื่อช่วยฝึก ไม่ใช่การวินิจฉัย ผู้ใหญ่ปรับใช้ตามความเหมาะสมของน้อง</small>
+
+          <p className="advice-note">
+            <ShieldCheck size={15} aria-hidden="true" />
+            คำแนะนำจาก AI เพื่อช่วยฝึก ไม่ใช่การวินิจฉัย ผู้ใหญ่ปรับใช้ตามความเหมาะสมของน้อง
+          </p>
         </div>
       )}
     </section>
