@@ -15,8 +15,11 @@ import path from "node:path";
 
 const MODEL = process.env.VOICE_GEMINI_MODEL || "gemini-3.8-flash-tts";
 const OUT = ".learning-runtime/voice-samples";
+// The team chose Sulafat (warm) for พี่ปู on 21 Nov 2026; generate the full clip set in that voice so
+// every clip in the studio sounds like the same person. The others stay here only for comparison.
+export const CHOSEN_VOICE = "Sulafat";
 const VOICES = [
-  { name: "Sulafat", note: "อบอุ่น" },
+  { name: "Sulafat", note: "อบอุ่น · เลือกแล้ว" },
   { name: "Achernar", note: "นุ่ม" },
   { name: "Leda", note: "สดใส อายุน้อย" },
 ];
