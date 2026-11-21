@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CircleCheck, House, ShieldCheck, Sparkles, Target, Volume2 } from "lucide-react";
+import { CircleCheck, House, ShieldCheck, Sparkles, Target } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { assessmentRequest } from "@/lib/assessment/client";
 import type { PolicySnapshot } from "@/lib/assessment/policy";
 import type { RoundOutcome, RoundSummary } from "@/lib/assessment/round-summary";
 import type { Attempt, Session } from "./types";
-import { useSpeaker } from "./useSpeaker";
 
 const CENTRAL_CHILD_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -23,7 +22,6 @@ function outcomeOf(attempt: Attempt): RoundOutcome {
  */
 export default function RoundAdvice({ session }: { session: Session }) {
   const { user } = useAuth();
-  const speaker = useSpeaker();
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -110,11 +108,10 @@ export default function RoundAdvice({ session }: { session: Session }) {
       {summary && (
         <div className="advice-body" role="status">
           <div className="advice-praise">
-            <span className="advice-praise-label">คำชมสำหรับน้อง</span>
+            <span className="advice-praise-label">คำชมสำหรับน้อง · ผู้ใหญ่อ่านให้น้องฟังได้เลย</span>
             <p className="advice-praise-text">“{summary.childMessage}”</p>
-            <button type="button" className="advice-listen" onClick={() => speaker.speak(summary.childMessage)}>
-              <Volume2 size={16} aria-hidden="true" /> อ่านคำชมให้น้องฟัง
-            </button>
+            {/* No listen button: every voice in the studio is a pre-made clip, and Claude writes new text
+                each round, so useSpeaker has nothing to play. Add one back with a runtime voice service. */}
           </div>
 
           {(summary.strengths.length > 0 || summary.practiceNext.length > 0) && (
