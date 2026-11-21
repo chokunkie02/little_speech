@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ExternalLink, RefreshCw } from "lucide-react";
+import { Bot, ExternalLink, ListChecks, MessageCircle, Mic, RefreshCw, Shapes, UserCheck } from "lucide-react";
 import {
   Alert,
   Badge,
@@ -51,10 +51,29 @@ interface AdminData {
 const ANSWER_KEY_STAGES = new Set(["listen", "understand", "letter"]);
 
 const TRACKS = [
-  { id: "speech", label: "ฝึกออกเสียง", count: 6 },
-  { id: "communication", label: "พูดเพื่อสื่อสาร", count: 3 },
-  { id: "phonics", label: "เสียงกับตัวอักษร", count: 3 },
+  { id: "speech", label: "ฝึกออกเสียง", count: 6, color: "#5548D4", icon: Mic },
+  { id: "communication", label: "พูดเพื่อสื่อสาร", count: 3, color: "#1F9D6E", icon: MessageCircle },
+  { id: "phonics", label: "เสียงกับตัวอักษร", count: 3, color: "#D2861B", icon: Shapes },
 ] as const;
+
+const OUTCOME_TONE: Record<string, string> = {
+  achieved: "bg-success-soft text-success-text",
+  practice: "bg-warning-soft text-warning-text",
+  retry: "bg-error-soft text-error-text",
+};
+
+/** 0–100 strip: below "ฝึกต่อ" is red, up to "ทำได้" is amber, above is green. */
+function ScoreScale({ pass, practice }: { pass: number; practice: number }) {
+  const low = Math.max(0, Math.min(100, practice));
+  const high = Math.max(low, Math.min(100, pass));
+  return (
+    <div aria-hidden="true" className="flex h-2 overflow-hidden rounded-full">
+      <span className="bg-error/35" style={{ width: `${low}%` }} />
+      <span className="bg-warning/70" style={{ width: `${high - low}%` }} />
+      <span className="flex-1 bg-success/80" />
+    </div>
+  );
+}
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
@@ -190,23 +209,23 @@ export default function AssessmentAdmin() {
       ) : (
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start">
           <aside className="space-y-5 lg:sticky lg:top-20 lg:col-start-2 lg:row-span-2 lg:row-start-1">
-            <Card>
-              <CardHeader title="สถานะ" action={
-                <Button variant="ghost" size="sm" onClick={reload} disabled={busy} icon={<RefreshCw size={14} aria-hidden="true" />}>
-                  โหลดล่าสุด
-                </Button>
-              } />
-              <CardContent>
+            <Card className="overflow-hidden">
+              <div className="hero-night relative px-5 pb-5 pt-4">
+                <div className="flex items-center justify-between gap-2">
+                  <p className="text-caption text-white/70">เกณฑ์ที่ห้องฝึกใช้อยู่</p>
+                  <button type="button" onClick={reload} disabled={busy}
+                    className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-caption text-white/85 ring-1 ring-inset ring-white/15 hover:bg-white/15 disabled:opacity-50">
+                    <RefreshCw size={12} aria-hidden="true" />โหลดล่าสุด
+                  </button>
+                </div>
+                <p className="mt-2 font-display text-[2.25rem] font-semibold leading-none">เวอร์ชัน <span className="text-[#FFD58A]">{active?.version ?? "—"}</span></p>
+                <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white/10 px-2.5 py-1 text-caption ring-1 ring-inset ring-white/15">
+                  {active?.config.enabled ? <Bot size={13} aria-hidden="true" /> : <UserCheck size={13} aria-hidden="true" />}
+                  {active?.config.enabled ? "AI ประเมินเสียง" : "ผู้ใหญ่ตรวจเสียง"}
+                </p>
+              </div>
+              <CardContent className="pt-2">
                 <dl className="divide-y divide-border text-sm">
-                  <div className="flex items-start justify-between gap-3 py-2.5">
-                    <dt className="text-text-muted">เกณฑ์ที่ห้องฝึกใช้อยู่</dt>
-                    <dd className="text-right">
-                      <p className="font-semibold">เวอร์ชัน {active?.version ?? "—"}</p>
-                      <Badge tone={active?.config.enabled ? "success" : "neutral"} className="mt-1">
-                        {active?.config.enabled ? "AI ประเมินเสียง" : "ผู้ใหญ่ตรวจเสียง"}
-                      </Badge>
-                    </dd>
-                  </div>
                   <div className="flex items-start justify-between gap-3 py-2.5">
                     <dt className="text-text-muted">บริการ AI ตรวจเสียง</dt>
                     <dd className="text-right">
@@ -260,8 +279,9 @@ export default function AssessmentAdmin() {
                       onChange={(event) => setPreviewConfidence(clamp(Number(event.target.value), 0, 1))} />
                   </FormField>
                 </div>
-                <p role="status" className="rounded-control bg-primary-soft p-3 text-sm font-semibold text-primary-text">
-                  ผลจำลอง · {previewRule.mode === "adult" ? "ผู้ใหญ่ช่วยตรวจ" : OUTCOME_LABELS[preview.outcome]}
+                <p role="status" className={`rounded-control p-3 text-sm ${previewRule.mode === "adult" ? "bg-surface-muted text-text" : OUTCOME_TONE[preview.outcome] ?? "bg-surface-muted text-text"}`}>
+                  <span className="block text-caption opacity-80">ผลจำลอง</span>
+                  <span className="font-display text-lg font-semibold">{previewRule.mode === "adult" ? "ผู้ใหญ่ช่วยตรวจ" : OUTCOME_LABELS[preview.outcome]}</span>
                 </p>
               </CardContent>
             </Card>
@@ -312,24 +332,39 @@ export default function AssessmentAdmin() {
               </Card>
 
               {TRACKS.map((track) => (
-                <details key={track.id} open={track.id === "speech"} className="rounded-card border border-border bg-surface">
-                  <summary className="flex min-h-12 cursor-pointer items-center justify-between gap-3 px-4 font-semibold sm:px-5">
-                    {track.label}
-                    <Badge>{track.count} ขั้น</Badge>
+                <details key={track.id} open={track.id === "speech"} className="group overflow-hidden rounded-card border border-border bg-surface shadow-card">
+                  <summary className="flex min-h-16 cursor-pointer list-none items-center gap-3 px-4 py-3 sm:px-5 [&::-webkit-details-marker]:hidden"
+                    style={{ background: `linear-gradient(90deg, ${track.color}14, transparent 70%)` }}>
+                    <span aria-hidden="true" className="grid size-10 shrink-0 place-items-center rounded-[0.8rem] text-white" style={{ background: track.color }}><track.icon size={19} /></span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-display text-lg font-medium text-text">{track.label}</span>
+                      <span className="block text-caption text-text-muted">
+                        {track.count} ขั้น · {STAGE_DEFINITIONS.filter((stage) => stage.track === track.id && draft.rules.find((rule) => rule.stageId === stage.id)?.mode === "azure").length} ขั้นใช้ AI ตรวจ
+                      </span>
+                    </span>
+                    <span aria-hidden="true" className="text-sm text-text-muted transition-transform group-open:rotate-180">▾</span>
                   </summary>
-                  <div className="grid gap-3 border-t border-border p-4 sm:p-5 xl:grid-cols-2">
-                    {STAGE_DEFINITIONS.filter((stage) => stage.track === track.id).map((stage) => {
+                  <div className="grid gap-3 border-t border-border p-4 sm:p-5">
+                    {STAGE_DEFINITIONS.filter((stage) => stage.track === track.id).map((stage, index) => {
                       const rule = draft.rules.find((rule) => rule.stageId === stage.id)!;
+                      const ai = stage.automatic && rule.mode === "azure";
                       return (
-                        <div key={stage.id} className="space-y-3 rounded-control border border-border p-3.5">
-                          <div className="flex items-center justify-between gap-2">
-                            <h3 className="font-semibold">{stage.label}</h3>
-                            {!stage.automatic && (
-                              <Badge tone="neutral">{ANSWER_KEY_STAGES.has(stage.id) ? "ตรวจจากเฉลย" : "ผู้ใหญ่ตรวจ"}</Badge>
-                            )}
+                        <div key={stage.id} className="space-y-3 rounded-[1rem] border border-border p-4">
+                          <div className="flex items-center gap-2.5">
+                            <span aria-hidden="true" className="grid size-7 shrink-0 place-items-center rounded-full font-display text-sm font-semibold text-white" style={{ background: track.color }}>{index + 1}</span>
+                            <h3 className="min-w-0 flex-1 font-display text-base font-medium">{stage.label}</h3>
+                            <span className={ai
+                              ? "inline-flex items-center gap-1 rounded-full bg-info-soft px-2 py-0.5 text-[0.6875rem] font-medium text-info-text"
+                              : "inline-flex items-center gap-1 rounded-full bg-surface-muted px-2 py-0.5 text-[0.6875rem] font-medium text-text-muted"}>
+                              {ai ? <Bot size={12} aria-hidden="true" />
+                                : ANSWER_KEY_STAGES.has(stage.id) ? <ListChecks size={12} aria-hidden="true" />
+                                : <UserCheck size={12} aria-hidden="true" />}
+                              {ai ? "AI ตรวจ" : ANSWER_KEY_STAGES.has(stage.id) ? "ตรวจจากเฉลย" : "ผู้ใหญ่ตรวจ"}
+                            </span>
                           </div>
                           {stage.automatic ? (
-                            <>
+                            <div className="grid gap-4 md:grid-cols-2 md:items-start">
+                              <div className="space-y-3">
                               <FormField label="วิธีตรวจเสียง">
                                 <Select value={rule.mode} onChange={(event) => updateRule(stage.id, { mode: event.target.value as "azure" | "adult" })}>
                                   <option value="azure">AI ตรวจเสียง ({data.provider.label})</option>
@@ -337,6 +372,7 @@ export default function AssessmentAdmin() {
                                 </Select>
                               </FormField>
                               {rule.mode === "azure" && (
+                                <div className="space-y-2.5">
                                 <div className="grid grid-cols-3 gap-2">
                                   <FormField label="ทำได้">
                                     <Input type="number" min={1} max={100} value={rule.passScore}
@@ -351,11 +387,14 @@ export default function AssessmentAdmin() {
                                       onChange={(event) => updateRule(stage.id, { minCompleteness: Number(event.target.value) })} />
                                   </FormField>
                                 </div>
+                                <ScoreScale pass={rule.passScore} practice={rule.practiceScore} />
+                                </div>
                               )}
+                              </div>
                               {frameControls(stage.id, rule)}
-                            </>
+                            </div>
                           ) : (
-                            <p className="text-sm text-text-muted">ข้อเลือกภาพตรวจจากเฉลย ส่วนการสื่อสารและท่าทางให้ผู้ใหญ่ช่วยตรวจ · โรงเรียนเปลี่ยนไม่ได้</p>
+                            <p className="rounded-control bg-surface-muted px-3 py-2.5 text-sm text-text-muted">ข้อเลือกภาพตรวจจากเฉลย ส่วนการสื่อสารและท่าทางให้ผู้ใหญ่ช่วยตรวจ · โรงเรียนเปลี่ยนไม่ได้</p>
                           )}
                         </div>
                       );
@@ -383,12 +422,17 @@ export default function AssessmentAdmin() {
                 <ul className="divide-y divide-border">
                   {data.versions.map((version) => (
                     <li key={version.id} className="flex flex-wrap items-center justify-between gap-3 p-4">
+                      <div className="flex min-w-0 items-center gap-3">
+                      <span aria-hidden="true" className={version.id === data.state.published_id
+                        ? "btn-primary grid size-10 shrink-0 place-items-center rounded-[0.8rem] font-display text-base font-semibold text-primary-foreground"
+                        : "grid size-10 shrink-0 place-items-center rounded-[0.8rem] bg-surface-muted font-display text-base font-semibold text-text-muted"}>v{version.version}</span>
                       <div className="min-w-0">
-                        <p className="font-semibold">
-                          เวอร์ชัน {version.version} · {version.config.name}
-                          {version.id === data.state.published_id && <Badge tone="success" className="ml-2 align-middle">ใช้งานอยู่</Badge>}
+                        <p className="font-display font-medium">
+                          {version.config.name}
+                          {version.id === data.state.published_id && <Badge tone="success" dot className="ml-2 align-middle">ใช้งานอยู่</Badge>}
                         </p>
-                        <p className="text-caption text-text-muted">{formatThaiDate(version.published_at, "datetime")}</p>
+                        <p className="text-caption text-text-muted">เวอร์ชัน {version.version} · {formatThaiDate(version.published_at, "datetime")}</p>
+                      </div>
                       </div>
                       <Button variant="outline" size="sm" disabled={busy}
                         onClick={() => {
@@ -406,21 +450,27 @@ export default function AssessmentAdmin() {
             <Section id="connection-guide" title={`เชื่อม ${data.provider.label}`} description="ทำเมื่อพร้อมเปิดการประเมินเสียงด้วย AI">
               <Card>
                 <CardContent className="space-y-3 p-4 sm:p-5">
-                  {data.provider.id === "openai" ? (
-                    <ol className="list-decimal space-y-2 pl-5 text-sm">
-                      <li>ให้เจ้าของบัญชี OpenAI สร้าง API key แยกสำหรับโปรเจกต์นี้ และตั้งวงเงินรายเดือน</li>
-                      <li>ใส่คีย์ใน ASSESSMENT_OPENAI_API_KEY ของ .env.local ฝั่งเซิร์ฟเวอร์ แล้วรัน npm run assessment:check-openai</li>
-                      <li>เปิดเซิร์ฟเวอร์ใหม่ กลับมาโหลดสถานะ ตั้งเกณฑ์ เปิด AI แล้วเผยแพร่</li>
-                      <li>อัดเสียงในห้องฝึกด้วยบัญชีผู้ปกครอง แล้วเทียบผลกับการฟังของผู้ใหญ่</li>
-                    </ol>
-                  ) : (
-                    <ol className="list-decimal space-y-2 pl-5 text-sm">
-                      <li>สร้างบัญชี Azure และ Speech resource แล้วเลือกภูมิภาค</li>
-                      <li>เปิด Keys and Endpoint ของ resource แล้วตั้ง AZURE_SPEECH_KEY กับ AZURE_SPEECH_REGION (หรือ AZURE_SPEECH_ENDPOINT) ใน .env.local ฝั่งเซิร์ฟเวอร์</li>
-                      <li>เปิดเซิร์ฟเวอร์ใหม่ กลับมาโหลดสถานะ ตั้งเกณฑ์ เปิด AI แล้วเผยแพร่</li>
-                      <li>อัดเสียงในห้องฝึกด้วยบัญชีผู้ปกครอง แล้วเทียบผลกับการฟังของผู้ใหญ่</li>
-                    </ol>
-                  )}
+                  <ol className="space-y-3 text-sm">
+                    {(data.provider.id === "openai"
+                      ? [
+                          "ให้เจ้าของบัญชี OpenAI สร้าง API key แยกสำหรับโปรเจกต์นี้ และตั้งวงเงินรายเดือน",
+                          "ใส่คีย์ใน ASSESSMENT_OPENAI_API_KEY ของ .env.local ฝั่งเซิร์ฟเวอร์ แล้วรัน npm run assessment:check-openai",
+                          "เปิดเซิร์ฟเวอร์ใหม่ กลับมาโหลดสถานะ ตั้งเกณฑ์ เปิด AI แล้วเผยแพร่",
+                          "อัดเสียงในห้องฝึกด้วยบัญชีผู้ปกครอง แล้วเทียบผลกับการฟังของผู้ใหญ่",
+                        ]
+                      : [
+                          "สร้างบัญชี Azure และ Speech resource แล้วเลือกภูมิภาค",
+                          "เปิด Keys and Endpoint ของ resource แล้วตั้ง AZURE_SPEECH_KEY กับ AZURE_SPEECH_REGION (หรือ AZURE_SPEECH_ENDPOINT) ใน .env.local ฝั่งเซิร์ฟเวอร์",
+                          "เปิดเซิร์ฟเวอร์ใหม่ กลับมาโหลดสถานะ ตั้งเกณฑ์ เปิด AI แล้วเผยแพร่",
+                          "อัดเสียงในห้องฝึกด้วยบัญชีผู้ปกครอง แล้วเทียบผลกับการฟังของผู้ใหญ่",
+                        ]
+                    ).map((step, index) => (
+                      <li key={step} className="flex gap-3">
+                        <span aria-hidden="true" className="grid size-6 shrink-0 place-items-center rounded-full bg-primary-soft font-display text-xs font-semibold text-primary-text">{index + 1}</span>
+                        <span className="min-w-0 break-words pt-0.5">{step}</span>
+                      </li>
+                    ))}
+                  </ol>
                   <a className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-primary underline-offset-4 hover:underline"
                     href={data.provider.id === "openai"
                       ? "https://platform.openai.com/api-keys"

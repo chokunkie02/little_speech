@@ -24,18 +24,29 @@ function Teachers() {
   const columns: DataColumn<OverviewTeacher>[] = [
     {
       key: "name", header: "ครู", hideOnMobile: true,
-      cell: (teacher) => <span className="flex items-center gap-2"><Avatar name={teacher.name} size="sm" /><span className="font-medium">{teacher.name}</span></span>,
+      cell: (teacher) => (
+        <span className="flex items-center gap-3">
+          <Avatar name={teacher.name} />
+          <span className="min-w-0">
+            <span className="block font-display text-[0.9375rem] font-medium text-text">{teacher.name}</span>
+            <span className="block break-all text-caption text-text-muted">{teacher.email}</span>
+          </span>
+        </span>
+      ),
     },
-    { key: "email", header: "อีเมล", cell: (teacher) => <span className="break-all text-text-muted">{teacher.email}</span> },
     {
       key: "rooms", header: "ห้องที่ดูแล",
       cell: (teacher) => teacher.classrooms.length ? (
         <span className="flex flex-wrap gap-1">{teacher.classrooms.map((room) => (
-          <Link key={room.id} href={`/school/classrooms/${room.id}`}>
-            <Badge tone={room.is_primary ? "primary" : "neutral"} icon={room.is_primary ? <Star size={11} /> : undefined}>{room.name}</Badge>
+          <Link key={room.id} href={`/school/classrooms/${room.id}`}
+            className={room.is_primary
+              ? "btn-primary inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-display text-xs font-medium text-primary-foreground"
+              : "inline-flex items-center rounded-full border border-border bg-surface px-2.5 py-1 font-display text-xs font-medium text-text hover:border-primary/40"}>
+            {room.is_primary && <Star size={11} aria-hidden="true" className="fill-current" />}{room.name}
+            {room.is_primary && <span className="sr-only">(ครูหลัก)</span>}
           </Link>
         ))}</span>
-      ) : <Badge tone="warning">ยังไม่มีห้อง</Badge>,
+      ) : <Badge tone="warning" dot>ยังไม่มีห้อง</Badge>,
     },
     {
       key: "actions", header: <span className="sr-only">ตัวเลือก</span>, align: "right", hideOnMobile: true,
@@ -54,7 +65,21 @@ function Teachers() {
       <div className="lg:sticky lg:top-20 lg:col-start-2 lg:row-start-1">
         <SchoolTeacherInvitations organizationId={orgId} />
       </div>
-      <Section className="lg:col-start-1 lg:row-start-1" title={`ครูในโรงเรียน (${overview.teachers.length})`} description="จัดครูเข้าห้องได้ที่หน้าของแต่ละห้อง ★ คือครูหลักของห้อง">
+      <Section className="lg:col-start-1 lg:row-start-1" title={`ครูในโรงเรียน · ${overview.teachers.length}`} description="จัดครูเข้าห้องได้ที่หน้าของแต่ละห้อง ป้ายสีม่วงมีดาวคือห้องที่เป็นครูหลัก">
+        {overview.teachers.length > 0 && (
+          <dl className="grid grid-cols-3 gap-3">
+            {[
+              { label: "ครูทั้งหมด", value: overview.teachers.length, tone: "text-text" },
+              { label: "เป็นครูหลักแล้ว", value: overview.teachers.filter((teacher) => teacher.classrooms.some((room) => room.is_primary)).length, tone: "text-primary-text" },
+              { label: "ยังไม่มีห้อง", value: overview.teachers.filter((teacher) => teacher.classrooms.length === 0).length, tone: "text-warning-text" },
+            ].map((item) => (
+              <div key={item.label} className="rounded-card border border-border bg-surface px-4 py-3 shadow-card">
+                <dt className="text-caption text-text-muted">{item.label}</dt>
+                <dd className={`mt-0.5 font-display text-[1.75rem] font-semibold leading-none tabular-nums ${item.tone}`}>{item.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
         {overview.teachers.length === 0 ? (
           <EmptyState icon={<GraduationCap size={22} />} title="ยังไม่มีครู" description="ส่งรหัสเข้าร่วมด้านบนให้ครู เมื่อครูสมัครแล้ว คำขอจะเข้ากล่องข้อความให้คุณอนุมัติ" />
         ) : (
@@ -65,7 +90,7 @@ function Teachers() {
               rows={teachers}
               columns={columns}
               rowKey={(teacher) => teacher.user_id}
-              mobileTitle={(teacher) => teacher.name}
+              mobileTitle={(teacher) => <span className="flex items-center gap-2.5"><Avatar name={teacher.name} size="sm" /><span className="min-w-0"><span className="block">{teacher.name}</span><span className="block break-all text-caption font-normal text-text-muted">{teacher.email}</span></span></span>}
               mobileAside={(teacher) => (
                 <DropdownMenu label={`ตัวเลือกของ ${teacher.name}`} trigger={<MoreHorizontal size={18} aria-hidden="true" />} items={[
                   { label: "นำออกจากโรงเรียน", icon: <UserMinus size={15} />, danger: true, onSelect: () => setRemoving(teacher) },

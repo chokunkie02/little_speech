@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 /* Class-based dark mode — applies when .dark is on any ancestor */
@@ -17,13 +17,13 @@
   --color-error: #B42335;
   --color-error-foreground: #FFFFFF; /* text on bg-error (badges, danger buttons) */
   --color-info: #5BC0EB;
-  --color-bg: #F8FAFC;
+  --color-bg: #F6F6FA;
   --color-surface: #FFFFFF;
-  --color-surface-muted: #F1F5F9;
-  --color-text: #1E293B;
-  --color-text-muted: #58677D; /* ≥ 4.9:1 on every light surface (WCAG AA) */
+  --color-surface-muted: #F2F1F8;
+  --color-text: #15132E;
+  --color-text-muted: #625F7C; /* ≥ 5.6:1 on every light surface (WCAG AA) */
   --color-disabled: #CBD5E1;
-  --color-border: #E2E8F0;
+  --color-border: #E8E7F0;
 
   /* Status pairs for badges and alerts: tinted background + readable text */
   --color-success-soft: #E8F6EF;
@@ -34,23 +34,23 @@
   --color-error-text: #8F1C2A;
   --color-info-soft: #E6F5FC;
   --color-info-text: #155E80;
-  --color-primary-soft: #EEECFB;
-  --color-primary-text: #4337B8;
+  --color-primary-soft: #F0EEFC;
+  --color-primary-text: #4A3DC8;
 
   /* Shape: controls (buttons, inputs) vs cards vs overlays */
   --radius-control: 0.75rem;
-  --radius-card: 1rem;
+  --radius-card: 1.125rem;
   --radius-overlay: 1.25rem;
 
   /* Elevation */
-  --shadow-card: 0 1px 2px 0 rgb(15 23 42 / 0.05);
-  --shadow-raised: 0 4px 12px -2px rgb(15 23 42 / 0.08), 0 2px 4px -2px rgb(15 23 42 / 0.05);
+  --shadow-card: 0 1px 2px 0 rgb(21 19 46 / 0.04);
+  --shadow-raised: 0 10px 28px -14px rgb(21 19 46 / 0.22), 0 2px 4px -2px rgb(21 19 46 / 0.06);
   --shadow-overlay: 0 24px 48px -12px rgb(15 23 42 / 0.25);
 
   /* Type scale: text-page-title / text-section-title / text-card-title / text-caption */
-  --text-page-title: 1.5rem;
-  --text-page-title--line-height: 1.3;
-  --text-page-title--font-weight: 700;
+  --text-page-title: 1.875rem;
+  --text-page-title--line-height: 1.2;
+  --text-page-title--font-weight: 600;
   --text-section-title: 1.125rem;
   --text-section-title--line-height: 1.4;
   --text-section-title--font-weight: 600;
@@ -70,7 +70,9 @@
   --color-level-review: #A29BFE;
 
   /* Typography */
-  --font-sans: 'Kanit', 'Noto Sans Thai', sans-serif;
+  --font-sans: 'IBM Plex Sans Thai', 'Kanit', 'Noto Sans Thai', sans-serif;
+  /* Headings, numbers and buttons keep Kanit, the app's voice. */
+  --font-display: 'Kanit', 'Noto Sans Thai', sans-serif;
 }
 
 /* ── Dark Mode — override CSS custom properties, Tailwind utilities pick these up automatically ── */
@@ -78,13 +80,13 @@
   --color-error: #FF939E;
   --color-error-foreground: #2A0A10; /* the dark-mode error fill is light pink */
   --color-warning: #FBBF24;
-  --color-bg: #0B1829;
-  --color-surface: #111E33;
-  --color-surface-muted: #172840;
-  --color-text: #E1E8F0;
-  --color-text-muted: #8A9DB3; /* ≥ 5.3:1 on every dark surface */
-  --color-disabled: #2A3F58;
-  --color-border: #1E3050;
+  --color-bg: #0E0C22;
+  --color-surface: #17143A;
+  --color-surface-muted: #1F1B48;
+  --color-text: #F1F0FA;
+  --color-text-muted: #A7A4C8; /* ≥ 6:1 on every dark surface */
+  --color-disabled: #343064;
+  --color-border: #2A2654;
 
   --color-success-soft: #12322A;
   --color-success-text: #7DDBB0;
@@ -94,10 +96,10 @@
   --color-error-text: #FFB3BB;
   --color-info-soft: #0F2E40;
   --color-info-text: #9ADCF7;
-  --color-primary-soft: #221F4A;
-  --color-primary-text: #B8AEFF;
+  --color-primary-soft: #262064;
+  --color-primary-text: #C3BBFF;
 
-  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.35);
   --shadow-raised: 0 6px 16px -4px rgb(0 0 0 / 0.45);
   --shadow-overlay: 0 24px 48px -12px rgb(0 0 0 / 0.6);
 }
@@ -128,6 +130,67 @@ body {
   color: var(--color-text);
   font-family: var(--font-sans);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── ราตรีม่วง: Kanit carries headings and numbers, Plex Thai carries reading text ── */
+@layer base {
+  h1, h2, h3, h4 { font-family: var(--font-display); letter-spacing: -0.01em; }
+}
+@utility font-display { font-family: var(--font-display); }
+.text-page-title, .text-section-title, .text-card-title { font-family: var(--font-display); }
+.text-page-title { letter-spacing: -0.015em; }
+.tabular-nums.font-bold, .tabular-nums.font-semibold { font-family: var(--font-display); }
+
+/* Primary actions: indigo with a soft top light and a tinted glow. */
+.btn-primary {
+  background-image: linear-gradient(180deg, #6B5FEC 0%, #5548D4 100%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 8px 18px -10px rgb(85 72 212 / 0.85);
+}
+.btn-primary:hover { background-image: linear-gradient(180deg, #7468F0 0%, #5B4EDC 100%); }
+/* The one gold action per page (the child's "continue" on the parent home). */
+.btn-gold {
+  background-image: linear-gradient(180deg, #FFD58A 0%, #F2B23A 100%);
+  color: #3A2300;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6), 0 2px 0 #C98B1C, 0 10px 22px -10px rgb(242 178 58 / 0.8);
+}
+.btn-gold:hover { background-image: linear-gradient(180deg, #FFDC9C 0%, #F5BB4E 100%); }
+
+/* Navigation rail: deep indigo in both themes. Every token is redefined locally, so the
+   sidebar's own components (child switcher, badges, links) follow without extra classes. */
+.nav-dark {
+  --color-surface: rgb(255 255 255 / 0.06);
+  --color-surface-muted: rgb(255 255 255 / 0.1);
+  --color-text: #FFFFFF;
+  --color-text-muted: rgb(255 255 255 / 0.66);
+  --color-border: rgb(255 255 255 / 0.1);
+  --color-primary-soft: rgb(255 255 255 / 0.13);
+  --color-primary-text: #FFFFFF;
+  --color-disabled: rgb(255 255 255 / 0.25);
+  background: linear-gradient(180deg, #241B66 0%, #150F40 100%);
+  color: #FFFFFF;
+  color-scheme: dark;
+}
+.dark .nav-dark { background: linear-gradient(180deg, #140E3A 0%, #0A0724 100%); }
+.nav-dark .text-primary { color: #C3BBFF; }
+
+/* Hero block on the parent home: deep indigo with soft sound rings. */
+.hero-night {
+  background:
+    radial-gradient(520px 260px at 92% 0%, rgb(255 200 97 / 0.2), transparent 60%),
+    linear-gradient(135deg, #2C2185 0%, #5548D4 70%, #6F63EE 100%);
+  color: #FFFFFF;
+  box-shadow: 0 24px 48px -26px rgb(44 33 133 / 0.65);
+}
+.dark .hero-night { background: radial-gradient(520px 260px at 92% 0%, rgb(255 200 97 / 0.14), transparent 60%), linear-gradient(135deg, #231A6E 0%, #4337B8 75%, #5A4FD6 100%); }
+
+/* Progress ring: set --p (0–100) inline. */
+.ring-progress {
+  --p: 0;
+  border-radius: 9999px;
+  background: conic-gradient(var(--color-primary) calc(var(--p) * 1%), var(--color-surface-muted) 0);
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
+  mask: radial-gradient(farthest-side, transparent calc(100% - 9px), #000 calc(100% - 8px));
 }
 
 @media print {
@@ -167,7 +230,7 @@ body {
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
-.dark ::-webkit-scrollbar-thumb { background: #2A3F58; }
+.dark ::-webkit-scrollbar-thumb { background: #343064; }
 
 /* ── Animations ── */
 @keyframes pulse-gentle {

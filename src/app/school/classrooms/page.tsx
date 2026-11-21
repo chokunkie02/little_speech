@@ -3,12 +3,13 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { Archive, ArchiveRestore, GraduationCap, MoreHorizontal, Pencil, Plus, School, Trash2, Users } from "lucide-react";
+import { Archive, ArchiveRestore, ChevronRight, GraduationCap, MoreHorizontal, Pencil, Plus, School, Trash2, Users } from "lucide-react";
 import { SchoolArea, useSchoolArea } from "@/components/school-admin/SchoolArea";
 import {
-  Alert, Badge, Button, Card, ConfirmDialog, Dialog, DropdownMenu, EmptyState, FilterBar, FormField, Input, Select,
+  Alert, Avatar, Badge, Button, Card, ConfirmDialog, Dialog, DropdownMenu, EmptyState, FilterBar, FormField, Input, Select,
   Switch, Textarea, toast,
 } from "@/components/ui";
+import { cn } from "@/lib/cn";
 import {
   compareClassrooms, createClassrooms, deleteClassroom, GRADES, nextRoomNames, setClassroomArchived, updateClassroom,
   type OverviewClassroom,
@@ -127,37 +128,73 @@ function EditRoomDialog({ room, onClose }: { room: OverviewClassroom | null; onC
 
 // ── page ────────────────────────────────────────────────────────────────────
 
+function MiniBar({ value, max, label, tone }: { value: number; max: number; label: string; tone: "success" | "info" }) {
+  const percent = max > 0 ? Math.round((value / max) * 100) : 0;
+  return (
+    <div className="space-y-1">
+      <div className="flex items-baseline justify-between gap-2 text-caption">
+        <span className="text-text-muted">{label}</span>
+        <span className="font-display font-medium tabular-nums text-text">{value}/{max}</span>
+      </div>
+      <div role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={max} aria-valuenow={value} className="h-2 overflow-hidden rounded-full bg-surface-muted">
+        <div className={tone === "success" ? "h-full rounded-full bg-gradient-to-r from-[#3FBF8C] to-success" : "h-full rounded-full bg-gradient-to-r from-[#7FC8EE] to-info"}
+          style={{ width: `${Math.max(percent ? 4 : 0, percent)}%` }} />
+      </div>
+    </div>
+  );
+}
+
 function RoomCard({ room, onEdit, onDelete }: { room: OverviewClassroom; onEdit: () => void; onDelete: () => void }) {
   const router = useRouter();
   const { reload } = useSchoolArea();
   const primary = room.teachers.find((teacher) => teacher.is_primary) ?? room.teachers[0];
   return (
-    <Card interactive className={room.archived_at ? "opacity-70" : undefined}>
-      <div className="flex items-start justify-between gap-2 p-4 pb-2">
+    <Card interactive className={cn("flex h-full flex-col overflow-hidden", room.archived_at && "opacity-70")}>
+      <div className="flex items-start justify-between gap-2 bg-gradient-to-br from-primary-soft to-surface px-5 pb-3.5 pt-4">
         <Link href={`/school/classrooms/${room.id}`} className="min-w-0 flex-1 rounded-md">
-          <p className="text-card-title break-words text-text">{room.name}</p>
-          <p className="text-caption text-text-muted">{[room.grade_level, room.academic_year && `ปี ${room.academic_year}`].filter(Boolean).join(" · ")}</p>
+          <p className="break-words font-display text-[1.625rem] font-semibold leading-none tracking-tight text-text">{room.name}</p>
+          <p className="mt-1.5 text-caption text-text-muted">{[room.grade_level, room.academic_year && `ปีการศึกษา ${room.academic_year}`].filter(Boolean).join(" · ")}</p>
         </Link>
-        <DropdownMenu label={`ตัวเลือกห้อง ${room.name}`} trigger={<MoreHorizontal size={18} aria-hidden="true" />} items={[
-          { label: "แก้ไขชื่อและชั้น", icon: <Pencil size={15} />, onSelect: onEdit },
-          room.archived_at
-            ? { label: "นำกลับมาใช้", icon: <ArchiveRestore size={15} />, onSelect: () => void setClassroomArchived(room.id, false).then(() => { toast.success("นำห้องกลับมาใช้แล้ว"); reload(); }, (error) => toast.error("ทำรายการไม่สำเร็จ", error.message)) }
-            : { label: "เก็บเข้าคลัง", icon: <Archive size={15} />, onSelect: () => void setClassroomArchived(room.id, true).then(() => { toast.success(`เก็บห้อง ${room.name} แล้ว`, "นำกลับมาได้จาก “แสดงห้องที่เก็บแล้ว”"); reload(); }, (error) => toast.error("ทำรายการไม่สำเร็จ", error.message)) },
-          { label: "ลบห้อง", icon: <Trash2 size={15} />, danger: true, onSelect: onDelete },
-        ]} />
-      </div>
-      <button type="button" onClick={() => router.push(`/school/classrooms/${room.id}`)} className="block w-full space-y-2 px-4 pb-4 text-left">
-        <p className="flex items-center gap-1.5 text-sm text-text">
-          <GraduationCap size={15} className="text-text-muted" aria-hidden="true" />
-          {primary ? <>{primary.name}{room.teachers.length > 1 && <span className="text-text-muted"> +{room.teachers.length - 1}</span>}</> : <Badge tone="warning">ยังไม่มีครู</Badge>}
-        </p>
-        <div className="flex flex-wrap gap-1.5">
-          <Badge icon={<Users size={12} />}>{room.student_count} คน</Badge>
-          {room.student_count > 0 && (
-            <Badge tone={room.linked_count === room.student_count ? "success" : "warning"}>ผู้ปกครอง {room.linked_count}/{room.student_count}</Badge>
-          )}
+        <div className="flex items-center gap-1">
           {room.archived_at && <Badge tone="neutral">เก็บแล้ว</Badge>}
+          <DropdownMenu label={`ตัวเลือกห้อง ${room.name}`} trigger={<MoreHorizontal size={18} aria-hidden="true" />} items={[
+            { label: "แก้ไขชื่อและชั้น", icon: <Pencil size={15} />, onSelect: onEdit },
+            room.archived_at
+              ? { label: "นำกลับมาใช้", icon: <ArchiveRestore size={15} />, onSelect: () => void setClassroomArchived(room.id, false).then(() => { toast.success("นำห้องกลับมาใช้แล้ว"); reload(); }, (error) => toast.error("ทำรายการไม่สำเร็จ", error.message)) }
+              : { label: "เก็บเข้าคลัง", icon: <Archive size={15} />, onSelect: () => void setClassroomArchived(room.id, true).then(() => { toast.success(`เก็บห้อง ${room.name} แล้ว`, "นำกลับมาได้จาก “แสดงห้องที่เก็บแล้ว”"); reload(); }, (error) => toast.error("ทำรายการไม่สำเร็จ", error.message)) },
+            { label: "ลบห้อง", icon: <Trash2 size={15} />, danger: true, onSelect: onDelete },
+          ]} />
         </div>
+      </div>
+      <button type="button" onClick={() => router.push(`/school/classrooms/${room.id}`)} className="group flex w-full flex-1 flex-col gap-3 px-5 pb-4 pt-3.5 text-left">
+        <span className="flex items-center gap-2.5 text-sm text-text">
+          {primary ? (
+            <>
+              <Avatar name={primary.name} size="sm" />
+              <span className="min-w-0">
+                <span className="block truncate font-medium">{primary.name}{room.teachers.length > 1 && <span className="font-normal text-text-muted"> +{room.teachers.length - 1}</span>}</span>
+                <span className="block text-caption text-text-muted">ครูประจำห้อง</span>
+              </span>
+            </>
+          ) : (
+            <>
+              <span aria-hidden="true" className="grid size-8 place-items-center rounded-full border border-dashed border-warning text-warning-text"><GraduationCap size={15} /></span>
+              <Badge tone="warning" dot>ยังไม่มีครูประจำ</Badge>
+            </>
+          )}
+        </span>
+        {room.student_count > 0 ? (
+          <span className="block space-y-2.5">
+            <MiniBar label="ผู้ปกครองเชื่อมแล้ว" value={room.linked_count} max={room.student_count} tone="success" />
+            <MiniBar label="ฝึกใน 7 วัน" value={room.practiced_7d} max={room.student_count} tone="info" />
+          </span>
+        ) : (
+          <span className="block rounded-control border border-dashed border-border px-3 py-2.5 text-caption text-text-muted">ยังไม่มีนักเรียน · เปิดห้องเพื่อเพิ่มรายชื่อ</span>
+        )}
+        <span className="mt-auto flex items-center justify-between gap-2 border-t border-border pt-3 text-caption text-text-muted">
+          <span className="inline-flex items-center gap-1.5 font-display font-medium text-text"><Users size={14} aria-hidden="true" />{room.student_count} คน</span>
+          <span className="inline-flex items-center gap-0.5 font-display font-medium text-primary-text">เปิดห้อง<ChevronRight size={15} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" /></span>
+        </span>
       </button>
     </Card>
   );
@@ -210,9 +247,13 @@ function Classrooms() {
       ) : rooms.length === 0 ? (
         <EmptyState title="ไม่พบห้องที่ตรงกับตัวกรอง" action={<Button variant="outline" onClick={() => { setSearch(""); setGrade(""); }}>ล้างตัวกรอง</Button>} />
       ) : [...groups.entries()].map(([groupName, groupRooms]) => (
-        <section key={groupName} className="space-y-2" aria-labelledby={`grade-${groupName}`}>
-          <h2 id={`grade-${groupName}`} className="text-section-title">{groupName} <span className="text-sm font-normal text-text-muted">· {groupRooms.length} ห้อง</span></h2>
-          <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <section key={groupName} className="space-y-3" aria-labelledby={`grade-${groupName}`}>
+          <div className="flex items-center gap-3">
+            <h2 id={`grade-${groupName}`} className="btn-primary inline-flex h-9 items-center rounded-full px-4 font-display text-base font-medium text-primary-foreground">{groupName}</h2>
+            <p className="text-sm text-text-muted">{groupRooms.length} ห้อง · นักเรียน {groupRooms.reduce((sum, room) => sum + room.student_count, 0)} คน</p>
+            <span aria-hidden="true" className="h-px flex-1 bg-border" />
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {groupRooms.map((room) => <RoomCard key={room.id} room={room} onEdit={() => setEditing(room)} onDelete={() => setDeleting(room)} />)}
           </div>
         </section>

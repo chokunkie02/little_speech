@@ -13,7 +13,7 @@ export function Table({ className, ...props }: ComponentProps<"table">) {
 }
 
 export function THead({ className, ...props }: ComponentProps<"thead">) {
-  return <thead className={cn("bg-surface-muted text-left", className)} {...props} />;
+  return <thead className={cn("bg-surface-muted/50 text-left", className)} {...props} />;
 }
 
 export function TBody({ className, ...props }: ComponentProps<"tbody">) {
@@ -21,12 +21,12 @@ export function TBody({ className, ...props }: ComponentProps<"tbody">) {
 }
 
 export function TR({ className, ...props }: ComponentProps<"tr">) {
-  return <tr className={cn("transition-colors hover:bg-surface-muted/60", className)} {...props} />;
+  return <tr className={cn("transition-colors hover:bg-primary-soft/40", className)} {...props} />;
 }
 
 export function TH({ className, ...props }: ComponentProps<"th">) {
   return (
-    <th scope="col" className={cn("whitespace-nowrap px-4 py-2.5 text-caption font-semibold text-text-muted", className)} {...props} />
+    <th scope="col" className={cn("whitespace-nowrap px-4 py-2.5 text-[0.75rem] font-semibold tracking-wide text-text-muted", className)} {...props} />
   );
 }
 

@@ -33,7 +33,7 @@ export function StatCard({ label, value, hint, icon, tone = "primary", className
       )}
       <div className="min-w-0">
         <p className="text-caption text-text-muted">{label}</p>
-        <p className="mt-0.5 text-2xl font-bold tabular-nums leading-tight text-text">{value}</p>
+        <p className="mt-0.5 font-display text-[2rem] font-semibold tabular-nums leading-none tracking-tight text-text">{value}</p>
         {hint && <p className="mt-1 text-caption text-text-muted">{hint}</p>}
       </div>
     </div>

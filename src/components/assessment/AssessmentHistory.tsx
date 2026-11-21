@@ -91,19 +91,25 @@ export default function AssessmentHistory({ childId, from, to }: { childId?: str
         <Card>
           <ul className="divide-y divide-border">
             {rows!.map((row) => (
-              <li key={row.id} className="space-y-1.5 p-4 text-sm print:break-inside-avoid">
-                <div className="flex flex-wrap items-start justify-between gap-2">
-                  <p className="min-w-0 font-semibold text-text">{row.reference_text}</p>
-                  <Badge tone={OUTCOME_TONES[row.result.outcome]}>{OUTCOME_LABELS[row.result.outcome]}</Badge>
+              <li key={row.id} className="flex gap-4 p-4 text-sm print:break-inside-avoid">
+                <span className="grid h-14 min-w-14 shrink-0 place-items-center rounded-[0.9rem] bg-surface-muted px-2 font-display text-xl font-semibold text-text">
+                  {row.reference_text}
+                </span>
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <p className="text-caption text-text-muted">
+                      {STAGE_DEFINITIONS.find((stage) => stage.id === row.stage_id)?.label} · {formatThaiDate(row.created_at, "datetime")} · เกณฑ์ v{row.result.policyVersion}
+                    </p>
+                    <Badge tone={OUTCOME_TONES[row.result.outcome]}>{OUTCOME_LABELS[row.result.outcome]}</Badge>
+                  </div>
+                  <p className="text-text">{row.result.feedback}</p>
+                  {row.adult_review && (
+                    <p className="inline-flex items-center gap-1.5 rounded-full bg-success-soft px-2.5 py-0.5 text-caption font-semibold text-success-text">
+                      ผู้ใหญ่ตรวจยืนยัน · {OUTCOME_LABELS[row.adult_review.review]}
+                    </p>
+                  )}
+                  <p className="text-caption text-text-muted">{sourceText(row.result)}</p>
                 </div>
-                <p className="text-caption text-text-muted">
-                  {STAGE_DEFINITIONS.find((stage) => stage.id === row.stage_id)?.label} · {formatThaiDate(row.created_at, "datetime")} · เกณฑ์ v{row.result.policyVersion}
-                </p>
-                <p className="text-text">{row.result.feedback}</p>
-                {row.adult_review && (
-                  <p className="font-semibold text-text">ผู้ใหญ่ตรวจยืนยัน · {OUTCOME_LABELS[row.adult_review.review]}</p>
-                )}
-                <p className="text-caption text-text-muted">{sourceText(row.result)}</p>
               </li>
             ))}
           </ul>

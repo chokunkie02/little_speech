@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState, type ReactNode } from "react";
-import { FileText, Printer } from "lucide-react";
+import { Activity, CalendarCheck, FileText, Mic, Printer, Sparkles, Target } from "lucide-react";
 import AssessmentHistory from "@/components/assessment/AssessmentHistory";
-import { Alert, Button, DataLoadError, Input, Label, LoadingState, Page, PageHeader, Select } from "@/components/ui";
+import { Alert, Button, DataLoadError, Input, Label, LoadingState, Page, PageHeader } from "@/components/ui";
 import { useLearningResults } from "@/hooks/useLearningResults";
 import { formatThaiDate } from "@/lib/thaiDate";
 import { dayKey, filterByDays, summarize, suggestNextStep, TRACK_LABELS, type GroupSummary } from "@/lib/learning/results";
@@ -30,20 +30,23 @@ function longDate(key: string) {
   return formatThaiDate(`${key}T12:00:00+07:00`, "long");
 }
 
-function Metric({ label, value, hint }: { label: string; value: ReactNode; hint?: string }) {
+function Metric({ label, value, hint, icon }: { label: string; value: ReactNode; hint?: string; icon: ReactNode }) {
   return (
-    <div className="rounded-control border border-border p-3 print:break-inside-avoid">
-      <p className="text-caption text-text-muted">{label}</p>
-      <p className="mt-0.5 text-xl font-bold tabular-nums text-text">{value}</p>
-      {hint && <p className="text-caption text-text-muted">{hint}</p>}
+    <div className="flex flex-col rounded-[1rem] border border-border bg-surface p-4 print:break-inside-avoid">
+      <p className="flex items-center gap-2 text-caption text-text-muted">
+        <span aria-hidden="true" className="grid size-7 place-items-center rounded-[0.6rem] bg-primary-soft text-primary-text print:hidden">{icon}</span>{label}
+      </p>
+      <p className="mt-auto pt-3 font-display text-[1.875rem] font-semibold leading-none tabular-nums text-text">{value}</p>
+      {hint && <p className="mt-1 text-caption text-text-muted">{hint}</p>}
     </div>
   );
 }
 
 function GroupTable({ caption, groups }: { caption: string; groups: GroupSummary[] }) {
+  const maxSessions = Math.max(1, ...groups.map((group) => group.sessions));
   return (
     <table className="w-full text-left text-sm print:break-inside-avoid">
-      <caption className="mb-2 text-left text-card-title text-text">{caption}</caption>
+      <caption className="mb-2 text-left font-display text-base font-medium text-text">{caption}</caption>
       <thead className="text-caption text-text-muted">
         <tr className="border-b border-border">
           <th className="py-1.5 font-medium" />
@@ -55,7 +58,12 @@ function GroupTable({ caption, groups }: { caption: string; groups: GroupSummary
       <tbody>
         {groups.map((group) => (
           <tr key={group.key} className="border-b border-border last:border-0">
-            <th scope="row" className="py-1.5 font-medium text-text">{group.label}</th>
+            <th scope="row" className="py-2 font-medium text-text">
+              {group.label}
+              <span aria-hidden="true" className="mt-1 block h-1.5 w-full max-w-36 overflow-hidden rounded-full bg-surface-muted print:hidden">
+                <span className="block h-full rounded-full bg-[linear-gradient(90deg,#8D80FF,#5548D4)]" style={{ width: `${(group.sessions / maxSessions) * 100}%` }} />
+              </span>
+            </th>
             <td className="py-1.5 text-right tabular-nums">{group.sessions}</td>
             <td className="py-1.5 text-right tabular-nums">{group.activities}</td>
             <td className="py-1.5 text-right tabular-nums">{accuracyText(group.accuracy)}</td>
@@ -104,11 +112,15 @@ export function ProgressReport({ childId, childName, subtitle, back, canPrint, n
         actions={canPrint && <Button icon={<Printer size={16} aria-hidden="true" />} onClick={() => window.print()}>พิมพ์ / บันทึก PDF</Button>} />
 
       <div className="flex flex-wrap items-end gap-3 print:hidden">
-        <div className="w-48">
-          <Label htmlFor="report-range">ช่วงเวลา</Label>
-          <Select id="report-range" value={preset} onChange={(event) => setPreset(event.target.value as Preset)}>
-            {PRESETS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}
-          </Select>
+        <div role="group" aria-label="ช่วงเวลา" className="flex flex-wrap gap-1 rounded-full border border-border bg-surface p-1 shadow-card">
+          {PRESETS.map((item) => (
+            <button key={item.value} type="button" aria-pressed={preset === item.value} onClick={() => setPreset(item.value)}
+              className={preset === item.value
+                ? "btn-primary rounded-full px-3.5 py-1.5 font-display text-sm font-medium text-primary-foreground"
+                : "rounded-full px-3.5 py-1.5 font-display text-sm font-medium text-text-muted hover:text-text"}>
+              {item.label}
+            </button>
+          ))}
         </div>
         {preset === "custom" && (
           <>
@@ -121,36 +133,43 @@ export function ProgressReport({ childId, childName, subtitle, back, canPrint, n
       {status === "error" && <DataLoadError className="print:hidden" message="โหลดผลฝึกจากระบบไม่สำเร็จ" detail="รายงานนี้ใช้เฉพาะผลที่อยู่ในเครื่องนี้" onRetry={retry} />}
 
       {status === "loading" && !results.length ? <LoadingState variant="cards" rows={2} /> : (
-        <article className="space-y-6 rounded-card border border-border bg-surface p-5 shadow-card sm:p-7 print:border-0 print:p-0 print:shadow-none"
+        <article className="overflow-hidden rounded-[1.5rem] border border-border bg-surface shadow-[0_30px_60px_-40px_rgb(36_27_102/0.55)] print:overflow-visible print:rounded-none print:border-0 print:shadow-none"
           aria-label="รายงานความก้าวหน้า">
-          <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border pb-4">
-            <div>
-              <p className="text-caption font-semibold text-primary-text">Speech Adventure · รายงานการฝึกพูด</p>
-              <h2 className="text-page-title text-text">{childName}</h2>
-              {subtitle && <p className="text-sm text-text-muted">{subtitle}</p>}
+          <header className="hero-night relative flex flex-wrap items-end justify-between gap-4 px-5 py-6 sm:px-8 sm:py-7 print:bg-none print:px-0 print:text-black">
+            <div className="flex items-center gap-4">
+              <span aria-hidden="true" className="grid size-12 shrink-0 place-items-center rounded-[0.9rem] bg-white/15 ring-1 ring-inset ring-white/20 print:hidden"><Mic size={22} /></span>
+              <div>
+                <p className="text-caption font-semibold text-[#FFD58A] print:text-black">Speech Adventure · รายงานการฝึกพูด</p>
+                <h2 className="font-display text-[2rem] font-semibold leading-tight">{childName}</h2>
+                {subtitle && <p className="text-sm text-white/75 print:text-black">{subtitle}</p>}
+              </div>
             </div>
-            <dl className="text-right text-sm">
-              <dt className="text-caption text-text-muted">ช่วงเวลา</dt><dd className="font-medium text-text">{periodText}</dd>
-              <dt className="mt-1 text-caption text-text-muted">วันที่ออกรายงาน</dt><dd className="font-medium text-text">{formatThaiDate(new Date(), "long")}</dd>
+            <dl className="grid grid-cols-2 gap-x-8 gap-y-0.5 text-sm">
+              <dt className="text-caption text-white/65 print:text-black">ช่วงเวลา</dt>
+              <dt className="text-caption text-white/65 print:text-black">วันที่ออกรายงาน</dt>
+              <dd className="font-medium">{periodText}</dd>
+              <dd className="font-medium">{formatThaiDate(new Date(), "long")}</dd>
             </dl>
           </header>
+          <div className="space-y-7 p-5 sm:p-8 print:px-0">
 
           {!inRange.length ? (
             <p className="rounded-control bg-surface-muted p-4 text-center text-sm text-text-muted">ไม่มีรอบที่ฝึกจบในช่วงเวลานี้</p>
           ) : (
             <>
               <section className="space-y-3">
-                <h3 className="text-section-title text-text">สรุป</h3>
+                <h3 className="font-display text-xl font-semibold text-text">สรุป</h3>
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                  <Metric label="รอบที่ฝึกจบ" value={summary.sessions} />
-                  <Metric label="วันที่ฝึก" value={summary.practiceDays} hint={summary.streak > 1 ? `ต่อเนื่องล่าสุด ${summary.streak} วัน` : undefined} />
-                  <Metric label="กิจกรรมที่ได้ลอง" value={summary.activities} />
-                  <Metric label="ฟังแล้วเลือกตรงเสียง" value={accuracyText(summary.accuracy)}
+                  <Metric icon={<Activity size={15} />} label="รอบที่ฝึกจบ" value={summary.sessions} />
+                  <Metric icon={<CalendarCheck size={15} />} label="วันที่ฝึก" value={summary.practiceDays} hint={summary.streak > 1 ? `ต่อเนื่องล่าสุด ${summary.streak} วัน` : undefined} />
+                  <Metric icon={<Sparkles size={15} />} label="กิจกรรมที่ได้ลอง" value={summary.activities} />
+                  <Metric icon={<Target size={15} />} label="ฟังแล้วเลือกตรงเสียง" value={accuracyText(summary.accuracy)}
                     hint={summary.accuracy ? `${summary.accuracy.correct}/${summary.accuracy.total} ข้อ` : undefined} />
                 </div>
-                <p className="rounded-control bg-primary-soft/60 p-3 text-sm text-text print:border print:border-border">
-                  <span className="font-semibold text-primary-text">ข้อแนะนำ: </span>{suggestNextStep(summary)}
-                </p>
+                <div className="flex gap-3 rounded-[1rem] bg-gradient-to-r from-primary-soft to-surface p-4 ring-1 ring-inset ring-primary/15 print:border print:border-border print:bg-none">
+                  <span aria-hidden="true" className="btn-primary grid size-9 shrink-0 place-items-center rounded-[0.7rem] text-primary-foreground print:hidden"><Sparkles size={17} /></span>
+                  <p className="text-sm text-text"><span className="block font-display font-medium text-primary-text">ข้อแนะนำ</span>{suggestNextStep(summary)}</p>
+                </div>
               </section>
 
               <section className="grid gap-6 sm:grid-cols-2">
@@ -159,7 +178,7 @@ export function ProgressReport({ childId, childName, subtitle, back, canPrint, n
               </section>
 
               <section className="space-y-2">
-                <h3 className="text-section-title text-text">รอบที่ฝึก</h3>
+                <h3 className="font-display text-xl font-semibold text-text">รอบที่ฝึก</h3>
                 <table className="w-full text-left text-sm">
                   <thead className="text-caption text-text-muted">
                     <tr className="border-b border-border">
@@ -171,8 +190,8 @@ export function ProgressReport({ childId, childName, subtitle, back, canPrint, n
                   </thead>
                   <tbody>
                     {inRange.slice(0, MAX_ROWS).map((result) => (
-                      <tr key={result.id} className="border-b border-border last:border-0 print:break-inside-avoid">
-                        <td className="whitespace-nowrap py-1.5 pr-2">{formatThaiDate(result.completedAt)}</td>
+                      <tr key={result.id} className="border-b border-border last:border-0 even:bg-surface-muted/40 print:break-inside-avoid print:even:bg-transparent">
+                        <td className="whitespace-nowrap py-2 pl-2 pr-2">{formatThaiDate(result.completedAt)}</td>
                         <td className="py-1.5 pr-2 text-text">{result.stageLabel}</td>
                         <td className="hidden py-1.5 pr-2 text-text-muted sm:table-cell print:table-cell">{TRACK_LABELS[result.track]} · {result.sound}</td>
                         <td className="whitespace-nowrap py-1.5 text-right tabular-nums">
@@ -191,7 +210,7 @@ export function ProgressReport({ childId, childName, subtitle, back, canPrint, n
 
           {notes && (
             <section className="space-y-2">
-              <h3 className="text-section-title text-text">บันทึกของผู้ใหญ่</h3>
+              <h3 className="font-display text-xl font-semibold text-text">บันทึกของผู้ใหญ่</h3>
               {notesInRange.length ? (
                 <ul className="space-y-2">
                   {notesInRange.slice(0, 10).map((note) => (
@@ -210,6 +229,7 @@ export function ProgressReport({ childId, childName, subtitle, back, canPrint, n
             รายงานนี้สรุปความสม่ำเสมอและสิ่งที่ได้ลองฝึก ไม่ใช่ผลวินิจฉัยหรือประเมินทางการแพทย์
             หากกังวลเรื่องพัฒนาการด้านการพูด ควรปรึกษานักแก้ไขการพูดหรือแพทย์
           </footer>
+          </div>
         </article>
       )}
     </Page>

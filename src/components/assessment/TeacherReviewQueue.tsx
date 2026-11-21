@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ClipboardCheck, RefreshCw } from "lucide-react";
-import { Badge, Button, Card, DataLoadError, EmptyState, LoadingState, Section, toast } from "@/components/ui";
+import { Avatar, Badge, Button, Card, DataLoadError, EmptyState, LoadingState, Section, toast } from "@/components/ui";
 import { assessmentRequest } from "@/lib/assessment/client";
 import { OUTCOME_LABELS, STAGE_DEFINITIONS, isAiSource, type AssessmentResult } from "@/lib/assessment/policy";
 import { formatThaiDate } from "@/lib/thaiDate";
@@ -19,8 +19,8 @@ interface PendingItem {
 }
 
 type Review = "achieved" | "practice" | "unavailable";
-const REVIEWS: { value: Review; label: string; variant: "primary" | "outline" | "ghost" }[] = [
-  { value: "achieved", label: "ทำได้", variant: "primary" },
+const REVIEWS: { value: Review; label: string; variant: "success" | "outline" | "ghost" }[] = [
+  { value: "achieved", label: "ทำได้", variant: "success" },
   { value: "practice", label: "ฝึกต่อ", variant: "outline" },
   { value: "unavailable", label: "ประเมินไม่ได้", variant: "ghost" },
 ];
@@ -78,37 +78,44 @@ export function TeacherReviewQueue({ classroomId, onCount }: { classroomId: stri
   return (
     <Section title={`รอตรวจ ${items.length} ข้อ`} description="ดูคำที่เด็กฝึก แล้วเลือกผลที่ตรงกับที่เด็กทำได้จริง"
       action={<Button variant="ghost" size="sm" icon={<RefreshCw size={14} aria-hidden="true" />} onClick={() => setRevision((value) => value + 1)}>โหลดล่าสุด</Button>}>
-      <Card>
-        <ul className="divide-y divide-border">
-          {items.map((item) => (
-            <li key={item.id} className="grid gap-3 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
-              <div className="min-w-0 space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="font-semibold text-text">
-                    {item.studentNumber ? `${item.studentNumber}. ` : ""}{item.childName}
-                  </p>
-                  <Badge tone={isAiSource(item.result.source) ? "info" : "neutral"}>
-                    {isAiSource(item.result.source) ? "AI แนะนำ" : OUTCOME_LABELS[item.result.outcome]}
-                  </Badge>
+      <ul className="grid gap-3">
+        {items.map((item) => {
+          const stage = STAGE_DEFINITIONS.find((entry) => entry.id === item.stageId)?.label;
+          return (
+            <li key={item.id}>
+              <Card className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center">
+                <div className="flex items-center gap-3 lg:w-52">
+                  <Avatar name={item.childName} size="md" />
+                  <div className="min-w-0">
+                    <p className="truncate font-display font-medium text-text">{item.studentNumber ? `${item.studentNumber}. ` : ""}{item.childName}</p>
+                    <p className="text-caption text-text-muted">{formatThaiDate(item.createdAt, "datetime")}</p>
+                  </div>
                 </div>
-                <p className="text-sm text-text">“{item.referenceText}”</p>
-                <p className="text-caption text-text-muted">
-                  {STAGE_DEFINITIONS.find((stage) => stage.id === item.stageId)?.label} · {formatThaiDate(item.createdAt, "datetime")}
-                  {isAiSource(item.result.source) && ` · AI: ${OUTCOME_LABELS[item.result.outcome]} (คะแนน ${item.result.score?.toFixed(0) ?? "—"})`}
-                </p>
-              </div>
-              <div className="grid grid-cols-3 gap-2 lg:flex">
-                {REVIEWS.map((review) => (
-                  <Button key={review.value} variant={review.variant} size="sm" disabled={!!busy}
-                    onClick={() => void confirm(item, review.value)}>
-                    {review.label}
-                  </Button>
-                ))}
-              </div>
+                <div className="flex min-w-0 items-center gap-4 rounded-[1rem] bg-surface-muted/70 px-4 py-3">
+                  <p className="shrink-0 font-display text-[1.75rem] font-semibold leading-none text-text">“{item.referenceText}”</p>
+                  <div className="min-w-0 space-y-1">
+                    <p className="text-caption text-text-muted">{stage}</p>
+                    <Badge tone={isAiSource(item.result.source) ? "info" : "neutral"}>
+                      {isAiSource(item.result.source)
+                        ? `AI แนะนำ: ${OUTCOME_LABELS[item.result.outcome]} · ${item.result.score?.toFixed(0) ?? "—"} คะแนน`
+                        : OUTCOME_LABELS[item.result.outcome]}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-2 lg:flex" role="group" aria-label={`ผลของ ${item.childName}`}>
+                  {REVIEWS.map((review) => (
+                    <Button key={review.value} variant={review.variant} size="sm" disabled={!!busy}
+                      className={review.value === "practice" ? "border-warning/50 text-warning-text hover:bg-warning-soft" : undefined}
+                      onClick={() => void confirm(item, review.value)}>
+                      {review.label}
+                    </Button>
+                  ))}
+                </div>
+              </Card>
             </li>
-          ))}
-        </ul>
-      </Card>
+          );
+        })}
+      </ul>
     </Section>
   );
 }

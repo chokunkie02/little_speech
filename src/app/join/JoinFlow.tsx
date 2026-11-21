@@ -296,10 +296,10 @@ export default function JoinFlow() {
 
   return (
     <AuthLayout aside={<JoinAside />}>
-        <Card>
-          <CardContent className="space-y-5 p-5 sm:p-6">
+        <Card className="shadow-[0_28px_56px_-36px_rgb(36_27_102/0.5)]">
+          <CardContent className="space-y-5 p-5 sm:p-7">
             <div className="space-y-1">
-              <h1 className="flex items-center gap-2 text-page-title"><KeyRound size={22} className="text-primary" aria-hidden="true" />ใช้รหัสเข้าร่วม</h1>
+              <h1 className="flex items-center gap-3 font-display text-[2rem] font-semibold leading-tight tracking-tight text-text"><span aria-hidden="true" className="btn-primary grid size-11 shrink-0 place-items-center rounded-[0.9rem] text-primary-foreground"><KeyRound size={21} /></span>ใช้รหัสเข้าร่วม</h1>
               <p className="text-sm text-text-muted">สำหรับผู้ปกครอง ครู และผู้ดูแลโรงเรียนที่ได้รับรหัสหรือ QR</p>
             </div>
 

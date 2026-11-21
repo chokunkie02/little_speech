@@ -8,6 +8,7 @@ import { useAuth } from "@/hooks/useAuth";
 import type { ChildAccess, ChildPermissions } from "@/types/childAccess";
 import type { UserDisplayInfo } from "@/types/school";
 import { ACCESS_ROLE_LABELS } from "@/types/childAccess";
+import { Avatar } from "@/components/ui";
 
 // ── Icons ─────────────────────────────────────────────────────────────────────
 
@@ -111,11 +112,14 @@ function MemberCard({ grant, email, onRevoke, onUpdatePermission }: MemberCardPr
   }
 
   return (
-    <div className="bg-surface border border-border rounded-xl p-3 space-y-2.5">
+    <div className="bg-surface border border-border rounded-[1rem] p-4 space-y-3 shadow-card">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex-1 min-w-0 space-y-0.5">
-          <p className="text-sm font-semibold text-text truncate">{email}</p>
-          <p className="text-xs text-text-muted">{ACCESS_ROLE_LABELS[grant.role]}</p>
+        <div className="flex flex-1 min-w-0 items-center gap-3">
+          <Avatar name={email} />
+          <div className="min-w-0 space-y-0.5">
+            <p className="font-display text-[0.9375rem] font-medium text-text truncate">{email}</p>
+            <p className="text-xs text-text-muted">{ACCESS_ROLE_LABELS[grant.role]}</p>
+          </div>
         </div>
 
         <div className="flex items-center gap-1.5 flex-shrink-0">
@@ -224,7 +228,7 @@ export function ChildAccessSection() {
       {[...grouped.entries()].map(([childId, grants]) => (
         <div key={childId} className="space-y-2">
           <div className="flex items-baseline justify-between gap-2">
-            <h4 className="text-sm font-bold text-text">{childName(childId)}</h4>
+            <h4 className="font-display text-base font-medium text-text">{childName(childId)}</h4>
             <span className="text-xs text-text-muted">
               {grants.length} คน
             </span>

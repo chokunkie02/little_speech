@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { Printer, Star, Users } from "lucide-react";
+import { Activity, Link2, Printer, Star, Users } from "lucide-react";
 import { SchoolArea, useSchoolArea } from "@/components/school-admin/SchoolArea";
 import { ClassroomRoster } from "@/components/school-admin/ClassroomRoster";
 import { JoinCodeCard } from "@/components/join/JoinCodeCard";
@@ -53,11 +53,14 @@ function TeachersTab({ room }: { room: OverviewClassroom }) {
       ) : (
         <Card><ul className="divide-y divide-border">
           {room.teachers.map((teacher) => (
-            <li key={teacher.user_id} className="flex flex-wrap items-center gap-3 px-4 py-3">
-              <Avatar name={teacher.name} size="sm" />
-              <span className="min-w-0 flex-1 break-words font-medium">{teacher.name}</span>
+            <li key={teacher.user_id} className="flex flex-wrap items-center gap-3 px-4 py-3.5 sm:px-5">
+              <Avatar name={teacher.name} />
+              <span className="min-w-0 flex-1">
+                <span className="block break-words font-display text-[0.9375rem] font-medium text-text">{teacher.name}</span>
+                <span className="block break-all text-caption text-text-muted">{overview.teachers.find((item) => item.user_id === teacher.user_id)?.email ?? ""}</span>
+              </span>
               {teacher.is_primary
-                ? <Badge tone="primary" icon={<Star size={12} />}>ครูหลัก</Badge>
+                ? <span className="btn-primary inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-display text-xs font-medium text-primary-foreground"><Star size={11} className="fill-current" aria-hidden="true" />ครูหลัก</span>
                 : <Button size="sm" variant="ghost" disabled={busy} onClick={() => void run(() => setPrimaryTeacher(room.id, teacher.user_id), `${teacher.name} เป็นครูหลักแล้ว`)}>ตั้งเป็นครูหลัก</Button>}
               <Button size="sm" variant="ghost" disabled={busy} onClick={() => setRemoving(teacher)}>นำออก</Button>
             </li>
@@ -115,11 +118,25 @@ function ClassroomDetail({ id }: { id: string }) {
   return (
     <div className="space-y-4">
       {room.archived_at && <Alert tone="info" title="ห้องนี้ถูกเก็บเข้าคลังแล้ว">ดูข้อมูลได้ แต่เพิ่มนักเรียนใหม่ไม่ได้ นำกลับมาใช้ได้จากหน้าห้องเรียน</Alert>}
-      <div className="flex flex-wrap gap-1.5">
-        <Badge icon={<Users size={12} />}>{room.student_count} คน</Badge>
-        <Badge tone={room.linked_count === room.student_count && room.student_count > 0 ? "success" : "warning"}>ผู้ปกครองเชื่อมแล้ว {room.linked_count}/{room.student_count}</Badge>
-        <Badge tone="info">ฝึกใน 7 วัน {room.practiced_7d} คน</Badge>
-      </div>
+      <dl className="grid grid-cols-3 gap-3">
+        {[
+          { label: "นักเรียน", value: room.student_count, max: undefined, icon: <Users size={16} />, bar: "" },
+          { label: "ผู้ปกครองเชื่อมแล้ว", value: room.linked_count, max: room.student_count, icon: <Link2 size={16} />, bar: "from-[#3FBF8C] to-success" },
+          { label: "ฝึกใน 7 วัน", value: room.practiced_7d, max: room.student_count, icon: <Activity size={16} />, bar: "from-[#7FC8EE] to-info" },
+        ].map((item) => (
+          <div key={item.label} className="rounded-card border border-border bg-surface px-4 py-3.5 shadow-card">
+            <dt className="flex items-center gap-1.5 text-caption text-text-muted"><span aria-hidden="true" className="text-primary-text">{item.icon}</span>{item.label}</dt>
+            <dd className="mt-1 font-display text-[1.75rem] font-semibold leading-none tabular-nums text-text">
+              {item.value}{item.max !== undefined && <span className="text-base font-normal text-text-muted">/{item.max}</span>}
+            </dd>
+            {item.max !== undefined && (
+              <div aria-hidden="true" className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-surface-muted">
+                <div className={`h-full rounded-full bg-gradient-to-r ${item.bar}`} style={{ width: `${item.max ? (item.value / item.max) * 100 : 0}%` }} />
+              </div>
+            )}
+          </div>
+        ))}
+      </dl>
       <Tabs label="ข้อมูลห้องเรียน" value={tab} onValueChange={setTab} items={[
         { value: "students", label: "นักเรียน", count: room.student_count },
         { value: "teachers", label: "ครู", count: room.teachers.length },
@@ -128,15 +145,45 @@ function ClassroomDetail({ id }: { id: string }) {
         {tab === "students" && <StudentsTab room={room} />}
         {tab === "teachers" && <TeachersTab room={room} />}
         {tab === "invites" && (
-          <div className="space-y-4">
-            <Card><CardContent className="flex flex-wrap items-center gap-3">
-              <Printer size={20} className="text-primary" aria-hidden="true" />
-              <p className="min-w-0 flex-1 text-sm text-text-muted">ใบเชิญรายคน (QR + รหัส) ให้นักเรียนนำกลับบ้าน ผู้ปกครองสแกนแล้วเชื่อมได้ทันที</p>
-              <ButtonLink href={`/classrooms/${room.id}/slips`} icon={<Printer size={16} aria-hidden="true" />}>พิมพ์ใบเชิญทั้งห้อง</ButtonLink>
-            </CardContent></Card>
-            <JoinCodeCard kind="classroom_guardian" classroomId={room.id} title={`QR ของห้อง ${room.name}`}
-              description="สำหรับวันประชุมผู้ปกครองหรือกลุ่ม LINE ห้อง ผู้ปกครองเลือกชื่อลูกเอง แล้วคำขอจะเข้ากล่องข้อความให้ครูหรือผู้ดูแลอนุมัติ (ใช้ได้ 7 วัน)"
-              revealLabel="แสดง QR ของห้อง" />
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card className="relative overflow-hidden">
+              <span className="absolute right-4 top-4 rounded-full bg-[linear-gradient(180deg,#FFD58A,#F2B23A)] px-2.5 py-0.5 text-[0.6875rem] font-semibold text-[#3A2300]">แนะนำ</span>
+              <CardContent className="flex h-full flex-col gap-4">
+                <span aria-hidden="true" className="btn-primary grid size-12 place-items-center rounded-[0.9rem] text-primary-foreground"><Printer size={22} /></span>
+                <div>
+                  <h3 className="font-display text-lg font-medium text-text">ใบเชิญรายคน</h3>
+                  <p className="mt-1 text-sm text-text-muted">พิมพ์ใบละคน มี QR และรหัสของเด็กคนนั้น ให้นักเรียนถือกลับบ้าน ผู้ปกครองสแกนแล้วเชื่อมกับลูกได้ทันที</p>
+                </div>
+                <ul className="grid grid-cols-3 gap-2 text-center">
+                  {[["30 วัน", "ใช้ได้"], ["4 บัญชี", "ต่อเด็ก 1 คน"], ["ทันที", "ไม่ต้องอนุมัติ"]].map(([value, label]) => (
+                    <li key={label} className="rounded-control bg-surface-muted px-2 py-2">
+                      <span className="block font-display text-sm font-medium text-text">{value}</span>
+                      <span className="block text-[0.6875rem] text-text-muted">{label}</span>
+                    </li>
+                  ))}
+                </ul>
+                <ButtonLink href={`/classrooms/${room.id}/slips`} className="mt-auto" icon={<Printer size={16} aria-hidden="true" />}>พิมพ์ใบเชิญทั้งห้อง</ButtonLink>
+              </CardContent>
+            </Card>
+            <div className="flex flex-col gap-3">
+              <Card>
+                <CardContent className="space-y-3">
+                  <h3 className="font-display text-lg font-medium text-text">QR ของห้อง</h3>
+                  <p className="text-sm text-text-muted">สำหรับวันประชุมผู้ปกครองหรือกลุ่ม LINE ห้อง ผู้ปกครองเลือกชื่อลูกเอง แล้วคำขอเข้ากล่องข้อความให้ครูหรือผู้ดูแลอนุมัติ</p>
+                  <ul className="grid grid-cols-3 gap-2 text-center">
+                    {[["7 วัน", "ใช้ได้"], ["ทั้งห้อง", "QR เดียว"], ["อนุมัติ", "ก่อนเชื่อม"]].map(([value, label]) => (
+                      <li key={label} className="rounded-control bg-surface-muted px-2 py-2">
+                        <span className="block font-display text-sm font-medium text-text">{value}</span>
+                        <span className="block text-[0.6875rem] text-text-muted">{label}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+              <JoinCodeCard kind="classroom_guardian" classroomId={room.id} title={`QR ของห้อง ${room.name}`}
+                description="กดเพื่อแสดง QR และรหัส แล้วให้ผู้ปกครองสแกนจากหน้าจอนี้ได้เลย"
+                revealLabel="แสดง QR ของห้อง" />
+            </div>
           </div>
         )}
       </Tabs>
@@ -147,7 +194,7 @@ function ClassroomDetail({ id }: { id: string }) {
 export default function ClassroomPage() {
   const params = useParams<{ id: string }>();
   return (
-    <SchoolArea title="ห้องเรียน" back={{ href: "/school/classrooms", label: "ห้องเรียนทั้งหมด" }}>
+    <SchoolArea title="ห้องเรียน" bare back={{ href: "/school/classrooms", label: "ห้องเรียนทั้งหมด" }}>
       <RoomHeading id={params.id} />
       <ClassroomDetail id={params.id} />
     </SchoolArea>
@@ -161,11 +208,16 @@ function RoomHeading({ id }: { id: string }) {
   if (!room) return null;
   const primary = room.teachers.find((teacher) => teacher.is_primary);
   return (
-    <div className="-mt-2">
-      <h2 className="text-page-title">{room.name}</h2>
-      <p className="text-sm text-text-muted">
-        {[room.grade_level, room.academic_year && `ปีการศึกษา ${room.academic_year}`, primary && `ครูหลัก ${primary.name}`].filter(Boolean).join(" · ")}
-      </p>
+    <div className="-mt-1 flex flex-wrap items-end gap-x-4 gap-y-2">
+      <div className="min-w-0">
+        <p className="text-caption font-semibold tracking-wide text-primary-text">{[overview.school.name, room.grade_level, room.academic_year && `ปีการศึกษา ${room.academic_year}`].filter(Boolean).join(" · ")}</p>
+        <h1 className="mt-1 font-display text-[2.5rem] font-semibold leading-none tracking-tight text-text">{room.name}</h1>
+      </div>
+      {primary ? (
+        <span className="mb-1 inline-flex items-center gap-2 rounded-full border border-border bg-surface py-1 pl-1 pr-3 text-sm shadow-card">
+          <Avatar name={primary.name} size="sm" /><span className="text-text-muted">ครูหลัก</span><span className="font-medium text-text">{primary.name}</span>
+        </span>
+      ) : <Badge tone="warning" dot className="mb-1">ยังไม่มีครูประจำ</Badge>}
     </div>
   );
 }

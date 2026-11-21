@@ -71,12 +71,12 @@ export default function AuthPage({ mode }: { mode: "signin" | "signup" }) {
   return (
     <AuthLayout aside={signup ? <SignUpAside /> : <SignInAside />} formWidth={signup ? "md" : "sm"}>
           <div className="space-y-1 text-center lg:text-left">
-            <h1 className="text-page-title">{signup ? "สมัครบัญชี" : "ยินดีต้อนรับกลับ"}</h1>
-            <p className="text-sm text-text-muted">{signup ? "กรอกชื่อจริงเพื่อให้ครูและโรงเรียนรู้ว่าเป็นใคร สมัครเสร็จใช้งานได้ทันที" : "เข้าสู่ระบบด้วยอีเมลและรหัสผ่าน"}</p>
+            <h1 className="font-display text-[2rem] font-semibold leading-tight tracking-tight text-text">{signup ? "สมัครบัญชี" : "ยินดีต้อนรับกลับ"}</h1>
+            <p className="text-[0.9375rem] text-text-muted">{signup ? "กรอกชื่อจริงเพื่อให้ครูและโรงเรียนรู้ว่าเป็นใคร สมัครเสร็จใช้งานได้ทันที" : "เข้าสู่ระบบด้วยอีเมลและรหัสผ่าน"}</p>
           </div>
 
-          <Card>
-            <CardContent className="space-y-4 p-5 sm:p-6">
+          <Card className="shadow-[0_28px_56px_-36px_rgb(36_27_102/0.5)]">
+            <CardContent className="space-y-4 p-5 sm:p-7">
               {!isSupabaseConfigured() ? (
                 <Alert tone="warning" title="ยังไม่ได้เชื่อมต่อระบบบัญชี">ใช้งานแบบไม่ล็อกอินได้ ข้อมูลจะเก็บในเครื่องนี้</Alert>
               ) : isLoading || user ? (

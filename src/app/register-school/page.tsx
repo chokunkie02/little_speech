@@ -77,10 +77,10 @@ export default function RegisterSchoolPage() {
 
   return (
     <AuthLayout aside={<RegisterSchoolAside steps={STEPS} />} formWidth="lg">
-        <Card>
-          <CardContent className="space-y-5 p-5 sm:p-6">
+        <Card className="shadow-[0_28px_56px_-36px_rgb(36_27_102/0.5)]">
+          <CardContent className="space-y-5 p-5 sm:p-7">
             <div className="space-y-2">
-              <h1 className="flex items-center gap-2 text-page-title"><School size={22} className="text-primary" aria-hidden="true" />ลงทะเบียนโรงเรียน</h1>
+              <h1 className="flex items-center gap-3 font-display text-[2rem] font-semibold leading-tight tracking-tight text-text"><span aria-hidden="true" className="btn-primary grid size-11 shrink-0 place-items-center rounded-[0.9rem] text-primary-foreground"><School size={21} /></span>ลงทะเบียนโรงเรียน</h1>
               <ol className="list-decimal space-y-0.5 pl-5 text-sm text-text-muted lg:hidden">
                 {STEPS.map((step) => <li key={step}>{step}</li>)}
               </ol>
@@ -111,7 +111,7 @@ export default function RegisterSchoolPage() {
                   <button type="button" className="font-semibold text-primary hover:underline" onClick={() => void signOut()}>ใช้บัญชีอื่น</button>
                 </p>
                 <form className="grid gap-4 sm:grid-cols-2" onSubmit={submit} noValidate>
-                  <h2 className="text-card-title text-text sm:col-span-2">ข้อมูลโรงเรียน</h2>
+                  <h2 className="flex items-center gap-2.5 font-display text-lg font-medium text-text sm:col-span-2"><span aria-hidden="true" className="grid size-7 place-items-center rounded-full bg-primary-soft font-display text-sm font-semibold text-primary-text">1</span>ข้อมูลโรงเรียน</h2>
                   <FormField label="ชื่อโรงเรียน" required className="sm:col-span-2" error={errors.schoolName}
                     hint="ชื่อเต็มตามใบอนุญาต ไม่ใช้ตัวย่อ เพราะจะแสดงบนใบเชิญและรายงาน">
                     <Input name="schoolName" maxLength={120} placeholder="เช่น โรงเรียนบ้านสวน" />
@@ -132,7 +132,7 @@ export default function RegisterSchoolPage() {
                     </Select>
                   </FormField>
 
-                  <h2 className="mt-2 text-card-title text-text sm:col-span-2">ผู้ติดต่อ</h2>
+                  <h2 className="mt-3 flex items-center gap-2.5 border-t border-border pt-5 font-display text-lg font-medium text-text sm:col-span-2"><span aria-hidden="true" className="grid size-7 place-items-center rounded-full bg-primary-soft font-display text-sm font-semibold text-primary-text">2</span>ผู้ติดต่อ</h2>
                   {profile ? (
                     <p className="rounded-control bg-surface-muted px-3 py-2 text-sm text-text-muted sm:col-span-2">
                       <strong className="text-text">{contactName}</strong> ·{" "}

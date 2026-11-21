@@ -7,7 +7,7 @@ import {
 import SchoolGuardianMembers from "@/components/layout/SchoolGuardianMembers";
 import { AddStudentDialog, EditStudentDialog, ImportStudentsDialog } from "./StudentDialogs";
 import {
-  Badge, Button, ButtonLink, Checkbox, ConfirmDialog, DataLoadError, DropdownMenu, EmptyState, FilterBar, FormField, Input,
+  Avatar, Badge, Button, ButtonLink, Checkbox, ConfirmDialog, DataLoadError, DropdownMenu, EmptyState, FilterBar, FormField, Input,
   LoadingState, ResponsiveDataView, Select, Sheet, toast, type DataColumn, type MenuItem,
 } from "@/components/ui";
 import { issueJoinCode } from "@/lib/joinCodes";
@@ -147,9 +147,17 @@ export function ClassroomRoster({ classroomId, classroomName, archived = false, 
     { key: "number", header: "เลขที่", cell: (student) => <NumberCell key={`${student.child_id}:${student.student_number}`} classroomId={classroomId} student={student} onChanged={refresh} /> },
     {
       key: "name", header: "ชื่อ-นามสกุล", hideOnMobile: true,
-      cell: (student) => <span className="font-medium">{student.name}{student.nickname && <span className="text-text-muted"> ({student.nickname})</span>}</span>,
+      cell: (student) => (
+        <span className="flex items-center gap-3">
+          <Avatar name={student.name} size="sm" />
+          <span className="min-w-0">
+            <span className="block truncate font-display font-medium text-text">{student.name}</span>
+            {student.nickname && <span className="block text-caption text-text-muted">{student.nickname}</span>}
+          </span>
+        </span>
+      ),
     },
-    { key: "code", header: "รหัส", cell: (student) => student.student_code ?? <span className="text-text-muted">—</span> },
+    { key: "code", header: "รหัส", cell: (student) => student.student_code ? <span className="font-mono text-[0.8125rem] tracking-wide tabular-nums">{student.student_code}</span> : <span className="text-text-muted">—</span> },
     {
       key: "guardians", header: "ผู้ปกครอง",
       cell: (student) => (
@@ -160,7 +168,9 @@ export function ClassroomRoster({ classroomId, classroomName, archived = false, 
     },
     {
       key: "practice", header: "ฝึกล่าสุด",
-      cell: (student) => student.last_practice_at ? formatRelativeTime(student.last_practice_at) : <span className="text-text-muted">ยังไม่เคยฝึก</span>,
+      cell: (student) => student.last_practice_at
+        ? <span className="inline-flex items-center gap-1.5"><span aria-hidden="true" className="size-2 rounded-full bg-info" />{formatRelativeTime(student.last_practice_at)}</span>
+        : <span className="text-text-muted">ยังไม่เคยฝึก</span>,
     },
     {
       key: "actions", header: <span className="sr-only">ตัวเลือก</span>, align: "right", hideOnMobile: true,

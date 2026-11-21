@@ -52,13 +52,13 @@ export function PageHeader({ title, description, icon, back, actions, className 
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-3">
           {icon && (
-            <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-control bg-primary-soft text-primary-text">
+            <span aria-hidden="true" className="mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-[0.9rem] bg-primary-soft text-primary-text ring-1 ring-inset ring-primary/10">
               {icon}
             </span>
           )}
           <div className="min-w-0">
             <h1 className="text-page-title break-words text-text">{title}</h1>
-            {description && <p className="mt-1 text-sm text-text-muted">{description}</p>}
+            {description && <p className="mt-1.5 text-[0.9375rem] text-text-muted">{description}</p>}
           </div>
         </div>
         {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
