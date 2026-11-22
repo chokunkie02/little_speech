@@ -17,7 +17,7 @@ function outcomeOf(attempt: Attempt): RoundOutcome {
 }
 
 /**
- * "คำแนะนำจาก Claude" on the round summary. Shown only when an admin switched round summaries on and
+ * "คำแนะนำจาก Speech Adventure" on the round summary (written by Claude; parents see the app's name). Shown only when an admin switched round summaries on and
  * the server has a Claude key. Sends ids and outcomes only; the server looks the round up itself.
  */
 export default function RoundAdvice({ session }: { session: Session }) {
@@ -75,13 +75,13 @@ export default function RoundAdvice({ session }: { session: Session }) {
 
   const pending = attempts.some((attempt) => outcomeOf(attempt) === "needs_review");
   return (
-    <section className="panel advice-card" aria-label="คำแนะนำจาก Claude">
+    <section className="panel advice-card" aria-label="คำแนะนำจาก Speech Adventure">
       <header className="advice-head">
         <span className="advice-icon" aria-hidden="true">
           <Sparkles size={20} />
         </span>
         <div>
-          <h2>คำแนะนำจาก Claude</h2>
+          <h2>คำแนะนำจาก Speech Adventure</h2>
           <p>สรุปรอบนี้สำหรับผู้ใหญ่ ใช้ประกอบการฝึกกับน้อง</p>
         </div>
       </header>
@@ -89,14 +89,14 @@ export default function RoundAdvice({ session }: { session: Session }) {
       {!summary && (
         <div className="advice-intro">
           <p>
-            ให้ Claude ช่วยสรุปว่ารอบนี้ทำอะไรได้ดี ควรฝึกอะไรต่อ และมีกิจกรรมสั้น ๆ ให้เล่นที่บ้าน
+            ให้ Speech Adventure ช่วยสรุปว่ารอบนี้ทำอะไรได้ดี ควรฝึกอะไรต่อ และมีกิจกรรมสั้น ๆ ให้เล่นที่บ้าน
             {pending && " ตรวจข้อพูดให้เสร็จก่อน คำแนะนำจะตรงขึ้น"}
           </p>
           <button type="button" className="button primary" disabled={busy} onClick={() => void ask()}>
             <Sparkles size={16} aria-hidden="true" />
-            {busy ? "กำลังเขียนคำแนะนำ… (ประมาณ 20 วินาที)" : "ขอคำแนะนำจาก Claude"}
+            {busy ? "กำลังเขียนคำแนะนำ… (ประมาณ 20 วินาที)" : "ขอคำแนะนำ"}
           </button>
-          <small>Claude ได้รับเฉพาะขั้น คำเป้าหมาย และผลแต่ละข้อ ไม่ได้รับชื่อเด็กหรือเสียง</small>
+          <small>คำแนะนำเขียนโดยผู้ช่วย AI ซึ่งได้รับเฉพาะขั้น คำเป้าหมาย และผลแต่ละข้อ ไม่ได้รับชื่อเด็กหรือเสียง</small>
         </div>
       )}
       {error && (

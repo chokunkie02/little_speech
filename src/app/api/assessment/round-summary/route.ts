@@ -20,11 +20,12 @@ export const runtime = "nodejs";
 /** New summaries one account may ask Claude for per minute (stored ones are free). */
 const PER_MINUTE = 5;
 
+// Parents see these, so they name the feature, not the AI vendor (admins see "Claude" on the admin page).
 const FAILURES: Record<string, [string, number]> = {
-  provider_not_configured: ["ยังไม่ได้ตั้งค่าคีย์ Claude บนเซิร์ฟเวอร์", 503],
-  provider_auth_failed: ["คีย์ Claude ใช้ไม่ได้ ให้แอดมินตรวจการตั้งค่า", 503],
-  provider_rate_limited: ["บริการ Claude ไม่ว่างหรือเครดิตหมด ลองใหม่ภายหลัง", 503],
-  provider_failed: ["ติดต่อ Claude ไม่สำเร็จ ลองใหม่ภายหลัง", 503],
+  provider_not_configured: ["ระบบคำแนะนำยังไม่ได้ตั้งค่า ให้แอดมินตรวจการตั้งค่า", 503],
+  provider_auth_failed: ["ระบบคำแนะนำยังใช้งานไม่ได้ ให้แอดมินตรวจการตั้งค่า", 503],
+  provider_rate_limited: ["ระบบคำแนะนำไม่ว่างในตอนนี้ ลองใหม่ภายหลัง", 503],
+  provider_failed: ["ติดต่อระบบคำแนะนำไม่สำเร็จ ลองใหม่ภายหลัง", 503],
   no_summary: ["รอบนี้ยังเขียนสรุปไม่ได้ ลองใหม่ภายหลัง", 502],
 };
 
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
     const snapshot = await activePolicy();
     const judged = await childPolicy(snapshot.config, input.childId);
     if (!judged.config.roundSummary)
-      throw new AssessmentError("แอดมินยังไม่ได้เปิดสรุปรอบด้วย Claude", 409);
+      throw new AssessmentError("แอดมินยังไม่ได้เปิดคำแนะนำหลังจบรอบ", 409);
     if (!claudeConnection().ready) throw new AssessmentError(FAILURES.provider_not_configured[0], 503);
     const facts = roundFacts(input);
     if (!facts) throw new AssessmentError("ไม่พบกิจกรรมของรอบนี้ในหลักสูตร");
