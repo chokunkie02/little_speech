@@ -1,5 +1,7 @@
 # Speech Adventure · Design Board
 
+> **ใหม่ (22 พ.ย. 2569):** [ไวร์เฟรมหน้าฝึกสำหรับเด็ก เทียบก่อน/หลัง](wireframes/kid-practice.html) ทำตามฟีดแบ็กประชุมทีม เรื่องตัวหนังสือและปุ่มเยอะ ฟอนต์แบบเด็ก ตัวการ์ตูนพี่ปู และเกมโต้ตอบ 6 ขั้น พร้อมโหมด "เล่นด้วยกัน / เล่นเอง" ตามวัย ยังไม่ได้แก้เว็บจริง ภาพ "ปัจจุบัน" อยู่ใน `wireframes/before/` ถ่ายใหม่ได้ด้วย `node scripts/design/capture-practice-screens.mjs` (ต้องเปิดเว็บไว้)
+
 เปิด [Speech-Adventure-PC-Design-Board.html](Speech-Adventure-PC-Design-Board.html) ในเบราว์เซอร์จากโฟลเดอร์นี้ เก็บโฟลเดอร์ `board/` ไว้ข้างไฟล์ HTML เพื่อให้ภาพและเมนูโหลดครบ บอร์ดเปิดได้จากไฟล์ในเครื่องและไม่ต้องรันตัวเว็บหรือฐานข้อมูล
 
 - ดูชุดสีสว่าง สีมืด สีประจำขั้น และตัวอักษรจาก `src/app/globals.css` ห้องฝึกใช้สีจากระบบหลักผ่าน `src/features/learning-studio/host-theme.css`

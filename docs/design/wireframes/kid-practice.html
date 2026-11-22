@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Speech Adventure · ไวร์เฟรมหน้าฝึกสำหรับเด็ก (เทียบก่อน/หลัง)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Itim&family=Kanit:wght@400;600&family=Mali:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{--ink:#1f2433;--muted:#6b7280;--line:#d9dbe3;--paper:#f6f5f1;--card:#fff;--accent:#6c5ce7;--accent-soft:#ece9ff;--good:#3fa877;--warm:#f2a03d;--kid:'Itim','Mali','Kanit',sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Sarabun','Kanit',Tahoma,sans-serif;line-height:1.6}
+  header.page{padding:32px 40px 8px;max-width:1280px;margin:0 auto}
+  header.page h1{margin:0 0 4px;font-family:'Kanit',sans-serif;font-weight:600;font-size:28px}
+  header.page p{margin:4px 0;color:var(--muted)}
+  nav.toc{max-width:1280px;margin:12px auto 0;padding:0 40px;display:flex;flex-wrap:wrap;gap:8px}
+  nav.toc a{font-size:13px;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink);text-decoration:none}
+  section.block{max-width:1280px;margin:28px auto;padding:24px 40px;background:#fff;border:1px solid var(--line);border-radius:20px}
+  section.block>h2{margin:0 0 4px;font-family:'Kanit',sans-serif;font-weight:600;font-size:22px}
+  section.block>.lead{margin:0 0 18px;color:var(--muted)}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:6px}
+  .legend b{color:var(--ink)}
+  /* compare row */
+  .compare{display:grid;grid-template-columns:300px 1fr 280px;gap:24px;align-items:start}
+  /* storyboard phones a bit smaller so 2–3 fit side by side */
+  .phones .phone{zoom:.8}
+  .phones .frame-label{max-width:240px}
+  @media (max-width:1100px){.compare{grid-template-columns:1fr}}
+  .col-title{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:600}
+  .col-title.now{color:#b4443f}.col-title.new{color:var(--accent)}
+  .phones{display:flex;gap:16px;flex-wrap:wrap}
+  /* phone frame */
+  .phone{width:300px;height:620px;border:10px solid #1d2030;border-radius:38px;background:#fdfcf8;position:relative;overflow:hidden;flex:none;box-shadow:0 10px 30px #0001}
+  .phone.before{overflow-y:auto;background:#0c0f24}
+  .phone.before img{width:100%;display:block}
+  .phone .cap{position:absolute;left:0;right:0;bottom:0;padding:6px 10px;background:#1d2030;color:#fff;font-size:11px;text-align:center}
+  .frame-label{font-size:12px;color:var(--muted);margin:6px 0 0;max-width:300px}
+  /* new-design wireframe parts */
+  .wf{position:absolute;inset:0;display:flex;flex-direction:column;font-family:var(--kid);color:var(--ink)}
+  .wf-top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px}
+  .icon-btn{width:40px;height:40px;border-radius:14px;border:2px solid var(--line);display:grid;place-items:center;font-size:18px;background:#fff}
+  .dots{display:flex;gap:6px}.dots i{width:10px;height:10px;border-radius:50%;background:var(--line);display:block}.dots i.on{background:var(--accent)}
+  .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:8px 18px}
+  .mascot{display:flex;align-items:flex-end;gap:8px;align-self:stretch}
+  .crab{width:64px;height:64px;border-radius:50%;background:#ffe3d6;display:grid;place-items:center;font-size:36px;flex:none;border:2px dashed #f0a98a}
+  .crab.big{width:110px;height:110px;font-size:62px}
+  .bubble{background:#fff;border:2px solid var(--line);border-radius:18px 18px 18px 4px;padding:8px 12px;font-size:17px;line-height:1.35;position:relative}
+  .bubble .spk{font-size:13px;color:var(--accent)}
+  .word{font-size:56px;line-height:1.1;font-family:'Sarabun',sans-serif;font-weight:600}
+  .word small{display:block;font-size:12px;color:var(--muted);font-family:var(--kid);font-weight:400;text-align:center}
+  .pics{display:flex;gap:12px;width:100%}
+  .pic{flex:1;aspect-ratio:1/1.1;border:3px solid var(--line);border-radius:22px;display:grid;place-items:center;font-size:60px;background:#fff;position:relative}
+  .pic.hit{border-color:var(--good);box-shadow:0 0 0 6px #3fa87722}
+  .pic.dim{opacity:.35}
+  .pic .tag{position:absolute;bottom:8px;font-size:16px}
+  .big-btn{width:120px;height:120px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:44px;box-shadow:0 8px 0 #4b3fc0;border:none}
+  .big-btn.hold{box-shadow:0 0 0 12px #6c5ce733,0 8px 0 #4b3fc0}
+  .btn-row{display:flex;gap:12px;justify-content:center;width:100%}
+  .pill{border-radius:999px;padding:12px 20px;font-size:18px;border:2px solid var(--line);background:#fff;display:inline-flex;align-items:center;gap:8px}
+  .pill.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .adult{position:absolute;right:12px;bottom:12px;font-family:'Sarabun',sans-serif;font-size:11px;color:var(--muted);border:1px dashed #b9bccb;border-radius:999px;padding:4px 10px;background:#fff}
+  .adult-bar{margin:0 12px 12px;border:1px dashed #b9bccb;border-radius:14px;padding:8px 10px;font-family:'Sarabun',sans-serif;font-size:12px;color:var(--muted);background:#fff}
+  .adult-bar .faces{display:flex;gap:6px;margin-top:6px}
+  .adult-bar .faces span{flex:1;text-align:center;border:1px solid var(--line);border-radius:10px;padding:4px 0;color:var(--ink);font-size:12px}
+  .meter{width:100%;height:16px;border-radius:999px;background:#eceef4;overflow:hidden;border:2px solid var(--line)}
+  .meter b{display:block;height:100%;background:linear-gradient(90deg,#8fd3ff,#6c5ce7)}
+  .sea{width:100%;height:170px;border-radius:22px;background:linear-gradient(#e9f6ff 0 55%,#bfe3fb 55%);position:relative;overflow:hidden;border:2px solid var(--line)}
+  .sea .boat{position:absolute;bottom:52px;font-size:40px}
+  .sea .island{position:absolute;right:8px;bottom:40px;font-size:40px}
+  .sea .wind{position:absolute;bottom:72px;font-size:22px;color:#6aa9d8}
+  .stones{display:flex;gap:6px;width:100%;justify-content:space-between;align-items:flex-end}
+  .stone{flex:1;height:54px;border-radius:50% 50% 40% 40%;background:#dfe2ea;display:grid;place-items:center;font-family:'Sarabun',sans-serif;font-size:18px;font-weight:600;position:relative}
+  .stone.on{background:#cfeedd}
+  .stone .hop{position:absolute;top:-38px;font-size:30px}
+  .card-flip{width:170px;height:200px;border-radius:22px;border:3px solid var(--line);display:grid;place-items:center;font-size:72px;background:repeating-linear-gradient(45deg,#f1f0fb 0 12px,#e7e4fb 12px 24px)}
+  .card-flip.open{background:#fff}
+  .stars{font-size:34px;letter-spacing:6px}
+  .kid-title{font-size:26px;text-align:center;line-height:1.3}
+  .kid-sub{font-size:16px;color:var(--muted);text-align:center}
+  /* notes */
+  .notes h3{margin:0 0 6px;font-size:15px;font-family:'Kanit',sans-serif;font-weight:600}
+  .notes ul{margin:0 0 12px;padding-left:18px;font-size:14px}
+  .notes li{margin:3px 0}
+  .tag-cut{color:#b4443f;font-weight:600}.tag-move{color:#a06a00;font-weight:600}.tag-add{color:var(--good);font-weight:600}
+  .numbers{display:flex;gap:10px;margin:8px 0 14px}
+  .numbers div{flex:1;border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center;font-size:12px;color:var(--muted)}
+  .numbers b{display:block;font-size:20px;color:var(--ink);font-family:'Kanit',sans-serif}
+  /* principles & modes */
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media (max-width:900px){.grid2{grid-template-columns:1fr}}
+  .box{border:1px solid var(--line);border-radius:16px;padding:16px 18px;background:#fcfcfd}
+  .box h3{margin:0 0 6px;font-family:'Kanit',sans-serif;font-weight:600;font-size:17px}
+  .box ul,.box ol{margin:6px 0 0;padding-left:20px;font-size:14px}
+  table.games{width:100%;border-collapse:collapse;font-size:14px}
+  table.games th,table.games td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:top}
+  table.games th{font-size:12px;color:var(--muted);font-weight:600}
+  table.games td:first-child{font-weight:600;white-space:nowrap}
+  .fonts{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media (max-width:1000px){.fonts{grid-template-columns:1fr 1fr}}
+  .font-card{border:1px solid var(--line);border-radius:16px;padding:14px}
+  .font-card .name{font-size:12px;color:var(--muted)}
+  .font-card .sample{font-size:28px;line-height:1.35;margin:6px 0}
+  .font-card .letters{font-size:40px;letter-spacing:6px}
+  .font-card .verdict{font-size:13px;margin-top:6px}
+  .ok{color:var(--good)}.warn{color:#a06a00}.no{color:#b4443f}
+  footer{max-width:1280px;margin:0 auto 40px;padding:0 40px;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+
+<header class="page">
+  <h1>หน้าฝึกสำหรับเด็ก · ไวร์เฟรมเทียบก่อน/หลัง</h1>
+  <p>จากฟีดแบ็กประชุมทีม: ตัวหนังสือและปุ่มบนหน้าฝึกเยอะเกินไปสำหรับเด็ก ตัวอักษรควรดูเป็นเด็ก ๆ และ (ข้อเสนอพี่บาส) ให้มีตัวการ์ตูนกับเกมที่โต้ตอบได้</p>
+  <p><b>นี่คือไวร์เฟรมเพื่อคุยกันก่อน ยังไม่ได้แก้เว็บจริง</b> · ภาพ "ปัจจุบัน" ถ่ายจากเว็บจริงขนาดมือถือ (390×844) โหมดทดลองใช้ · 22 พ.ย. 2569</p>
+  <div class="legend"><span><b>ซ้าย</b> หน้าจอปัจจุบัน (เลื่อนดูได้)</span><span><b>กลาง</b> แบบใหม่</span><span><b>ขวา</b> สิ่งที่ <span class="tag-cut">ตัด</span> / <span class="tag-move">ย้าย</span> / <span class="tag-add">เพิ่ม</span></span><span>กรอบเส้นประ = ส่วนของผู้ใหญ่</span></div>
+</header>
+<nav class="toc">
+  <a href="#principles">หลักการ</a><a href="#modes">โหมดตามวัย</a><a href="#fonts">ตัวอักษร</a><a href="#games">เกม 6 ขั้น</a>
+  <a href="#s1">1 เริ่มรอบ</a><a href="#s2">2 เลือกภาพ</a><a href="#s3">3 ดูปาก·พูดตาม</a><a href="#s4">4 พยางค์</a><a href="#s5">5 คำ</a><a href="#s6">6 หลังพูด</a><a href="#s7">7 จบรอบ</a><a href="#s8">8 ประตูผู้ใหญ่</a>
+</nav>
+
+<section class="block" id="principles">
+  <h2>หลักการออกแบบ</h2>
+  <p class="lead">หน้าฝึกตอนนี้เป็น "หน้าของผู้ใหญ่ที่มีเด็กอยู่ข้างใน" แบบใหม่กลับกันเป็น "หน้าของเด็ก ที่มีมุมเล็ก ๆ ให้ผู้ใหญ่"</p>
+  <div class="grid2">
+    <div class="box"><h3>1 · หนึ่งหน้า หนึ่งเรื่อง</h3><ul><li>เห็นแค่ภาพใหญ่ คำใหญ่ และปุ่มหลักปุ่มเดียว</li><li>ไม่เกิน 3 ปุ่มบนจอ ทุกอย่างอยู่ในจอเดียวไม่ต้องเลื่อน</li></ul></div>
+    <div class="box"><h3>2 · พี่ปูพาเล่น ใช้เสียงแทนตัวหนังสือ</h3><ul><li>เข้าข้อแล้วพี่ปูพูดคำสั่งเอง (เสียง Sulafat ที่เลือกไว้) แตะพี่ปูเพื่อฟังซ้ำ</li><li>ตัวหนังสือบนจอ ≤ 1 ประโยคสั้น สำหรับผู้ใหญ่ที่นั่งข้าง ๆ</li></ul></div>
+    <div class="box"><h3>3 · เล่นเป็นเกม ให้รางวัลกับความพยายาม</h3><ul><li>แต่ละขั้นมีเกมของตัวเอง (ตาราง "เกม 6 ขั้น")</li><li>ไม่มีการแพ้ ไม่มีของพัง ทำไม่ได้ พี่ปูชวนลองอีกครั้ง</li><li>ไมค์วัด "ส่งเสียงไหม ดังพอไหม นานพอไหม" ในเครื่อง ไม่ตัดสินถูก/ผิด</li></ul></div>
+    <div class="box"><h3>4 · เรื่องของผู้ใหญ่อยู่ในกรอบผู้ใหญ่</h3><ul><li>ข้อความเรื่อง AI ความเป็นส่วนตัว เกณฑ์ ไปอยู่หลังปุ่ม "👤 ผู้ใหญ่" หรือหน้าตั้งค่าครั้งแรก</li><li>ตอนฝึกซ่อนเมนูแอปบน/ล่าง (โหมดเต็มจอ) เหลือ ⏸ พัก กับจุดบอกความคืบหน้า</li></ul></div>
+  </div>
+</section>
+
+<section class="block" id="modes">
+  <h2>โหมดตามวัย: เล่นด้วยกัน / เล่นเอง</h2>
+  <p class="lead">ตอบคำถาม "เด็กใช้เองหรือผู้ใหญ่นั่งด้วย": ขึ้นกับวัย จึงใช้หน้าจอเดียวกันแต่สลับ "ที่อยู่ของปุ่มผู้ใหญ่" และ "เวลาที่ผู้ใหญ่ตรวจ" ตามระดับเนื้อหาที่มีอยู่แล้ว</p>
+  <div class="grid2">
+    <div class="box"><h3>🧑‍🧒 เล่นด้วยกัน · ค่าเริ่มต้นระดับ 1–2 (อนุบาล 3–6 ปี)</h3>
+      <ul>
+        <li>เด็กยังอ่านไม่คล่อง ผู้ใหญ่ถือเครื่องหรือนั่งข้าง ๆ</li>
+        <li>มี <b>แถบผู้ใหญ่</b> เล็ก ๆ ด้านล่างจอ (กรอบเส้นประ) ตลอดเวลา</li>
+        <li>หลังเด็กพูดแต่ละข้อ ผู้ใหญ่แตะ 1 ครั้งว่า "ทำได้ / ฝึกอีก / ข้าม" ไม่มีงานค้างให้ตรวจทีหลัง</li>
+      </ul></div>
+    <div class="box"><h3>🧒 เล่นเอง · ค่าเริ่มต้นระดับ 3–4 (ป.1–6)</h3>
+      <ul>
+        <li>เด็กอ่านคำสั้น ๆ ได้ ใช้เครื่องเองได้</li>
+        <li>เมนูผู้ใหญ่อยู่หลัง <b>ประตูผู้ใหญ่</b> (กดค้าง 3 วินาที + คำถามง่ายสำหรับผู้ใหญ่) ดูหน้า 8</li>
+        <li>ข้อพูดเก็บเป็น "รอผู้ใหญ่ตรวจ" ไปตรวจที่หน้าสรุปหรือคิวครู เหมือนระบบปัจจุบัน</li>
+      </ul></div>
+  </div>
+  <div class="box" style="margin-top:16px"><h3>กติกาที่ใช้ทั้งสองโหมด</h3>
+    <ol>
+      <li>ระบบเลือกโหมดให้ตามระดับที่ตั้งไว้ ผู้ใหญ่สลับเองได้ตลอดในเมนูผู้ใหญ่ เพราะเด็กแต่ละคนพร้อมไม่เท่ากัน</li>
+      <li>เรื่องที่ต้องให้ผู้ใหญ่ทำเสมอ แม้ในโหมดเล่นเอง: ขอสิทธิ์ไมค์ครั้งแรก, ยินยอมส่งเสียงให้ AI, ตั้งค่า, ดูผลและยืนยันผล</li>
+      <li>ปุ่มทั้งหมดใหญ่พอสำหรับนิ้วเด็ก (≥ 64 px) และมีทางเล่นแบบแตะจอเมื่อไม่มีไมค์</li>
+    </ol></div>
+</section>
+
+<section class="block" id="fonts">
+  <h2>ตัวอักษร: ดูเป็นเด็ก แต่ต้องไม่สอนรูปตัวอักษรผิด</h2>
+  <p class="lead">ตอนนี้ใช้ Kanit (ไม่มีหัว ทางการ) · เด็กเล็กเรียนอ่านจากตัวอักษรแบบมีหัวในหนังสือเรียน จึงแยกฟอนต์ตามหน้าที่ (ฟอนต์ฟรีจาก Google Fonts · เปิดไฟล์นี้ตอนต่อเน็ตเพื่อเห็นฟอนต์จริง)</p>
+  <div class="fonts">
+    <div class="font-card"><div class="name">ปัจจุบัน · Kanit</div><div class="sample" style="font-family:'Kanit'">ดูแล้วลองพูดตาม</div><div class="letters" style="font-family:'Kanit'">ก ป ม</div><div class="verdict warn">เหมาะกับหน้าผู้ใหญ่ ไม่มีหัว ดูเป็นทางการ</div></div>
+    <div class="font-card"><div class="name">เสนอ · Itim (หัวข้อ/ปุ่มในหน้าเด็ก)</div><div class="sample" style="font-family:'Itim'">ดูแล้วลองพูดตาม</div><div class="letters" style="font-family:'Itim'">ก ป ม</div><div class="verdict ok">โค้งมน มีหัว ดูเป็นมิตร อ่านง่าย</div></div>
+    <div class="font-card"><div class="name">ทางเลือก · Mali</div><div class="sample" style="font-family:'Mali'">ดูแล้วลองพูดตาม</div><div class="letters" style="font-family:'Mali'">ก ป ม</div><div class="verdict warn">น่ารัก แบบลายมือ ใช้กับคำชม/หัวข้อได้ ไม่ใช้กับตัวอักษรที่สอน</div></div>
+    <div class="font-card"><div class="name">เสนอ · Sarabun (คำฝึกและตัวอักษรที่สอน)</div><div class="sample" style="font-family:'Sarabun'">ปู · ปลา · กระเป๋า</div><div class="letters" style="font-family:'Sarabun'">ก ป ม</div><div class="verdict ok">ทรงหนังสือเรียน มีหัวชัด สำหรับสิ่งที่เด็กต้องจำรูป</div></div>
+  </div>
+</section>
+
+<section class="block" id="games">
+  <h2>เกม 6 ขั้นของ "ฝึกออกเสียง" (พี่ปูพาเล่นทุกขั้น)</h2>
+  <p class="lead">ทุกเกมให้รางวัลกับการลองทำ ไม่มีการแพ้ · ไมค์ใช้วัดในเครื่องเท่านั้น (ดัง/นาน/มีเสียง) · ผลถูก/ผิดของการพูดยังมาจากผู้ใหญ่ หรือ AI เมื่อเปิดใช้</p>
+  <table class="games">
+    <tr><th>ขั้น</th><th>เกม</th><th>เด็กทำอะไร</th><th>ระบบรับรู้จาก</th><th>เมื่อยังไม่สำเร็จ</th></tr>
+    <tr><td>1 ฟังแยกเสียง</td><td>🦀 ป้อนอาหารพี่ปู</td><td>ฟังคำ แล้วแตะภาพที่ได้ยิน พี่ปูกินแล้วเต้นดีใจ</td><td>ภาพที่แตะ (เทียบเฉลย)</td><td>พี่ปูส่ายหัวเบา ๆ "ฟังอีกทีนะ" เล่นเสียงซ้ำ</td></tr>
+    <tr><td>2 ดูปากและพูดตาม</td><td>⛵ เป่าเรือใบ</td><td>ดูพี่ปูทำปาก แล้วพูด "ปา" มีลมออกจากปาก เรือแล่นไปเกาะ</td><td>ความดังและความยาวของเสียง</td><td>เรือหยุดรอกลางทาง พี่ปู "ลมอีกนิดนะ" ไม่มีการจม</td></tr>
+    <tr><td>3 ฝึกพยางค์</td><td>🪨 กระโดดหินข้ามลำธาร</td><td>พูดทีละพยางค์ "ปา ปี ปู" พูดหนึ่งครั้ง พี่ปูกระโดดหนึ่งก้อน</td><td>จำนวนช่วงเสียง (เสียงขึ้น-เงียบ)</td><td>พี่ปูยืนรอบนหิน ชวนพูดพยางค์เดิมอีกครั้ง</td></tr>
+    <tr><td>4 ฝึกคำ</td><td>🃏 การ์ดสติกเกอร์</td><td>เห็นภาพ เรียกชื่อ การ์ดพลิกเป็นสติกเกอร์ เก็บเข้าสมุด</td><td>มีเสียงพูดยาวพอ</td><td>พี่ปูกระซิบใบ้คำแรก แล้วให้ลองอีกครั้ง</td></tr>
+    <tr><td>5 วลีและประโยค</td><td>🚂 รถไฟคำ</td><td>พูดประโยค รถไฟต่อโบกี้ตามจำนวนคำที่พูด</td><td>ช่วงเสียงต่อเนื่อง</td><td>รถไฟจอดรอที่สถานี เล่นตัวอย่างให้ฟัง</td></tr>
+    <tr><td>6 ลองใช้จริง</td><td>💬 คุยกับพี่ปู</td><td>เล่นบทบาทกับผู้ใหญ่ เช่น ขอของจากพี่ปู</td><td>ผู้ใหญ่กดให้ผล</td><td>ผู้ใหญ่เลือก "ฝึกอีก" ได้ ไม่มีตัวเลขคะแนนบนจอเด็ก</td></tr>
+  </table>
+  <p class="frame-label" style="max-width:none">ผู้ใหญ่ปรับ "ความไวไมค์" ได้ในเมนูผู้ใหญ่ (เด็กเสียงเบาหรือห้องมีเสียงดัง) และทุกเกมมีโหมดแตะจอแทนไมค์</p>
+</section>
+
+<!-- 1 START -->
+<section class="block" id="s1">
+  <h2>1 · เริ่มรอบ</h2>
+  <p class="lead">ตอนนี้เป็นหน้าต่างอธิบายสำหรับผู้ใหญ่ · แบบใหม่เป็นฉากเปิดเกมที่พี่ปูชวนเล่น</p>
+  <div class="compare">
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/02-start-round.png" alt="หน้าต่างเตรียมตัวก่อนเริ่มกัน"></div></div>
+    <div><p class="col-title new">แบบใหม่</p>
+      <div class="phones">
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i></i><i></i><i></i></span><span class="icon-btn">🔊</span></div>
+          <div class="stage">
+            <div class="crab big">🦀</div>
+            <div class="kid-title">ไปล่องเรือกับพี่ปูกัน!</div>
+            <div class="kid-sub">🔊 พี่ปูพูดให้ฟังเอง</div>
+            <button class="big-btn" style="width:140px;height:140px;font-size:22px;font-family:var(--kid)">▶<br>เริ่ม</button>
+          </div>
+          <div class="adult-bar">👤 ผู้ใหญ่: เปิดไมค์ครั้งแรก · ตั้งค่า · โหมดเล่นด้วยกัน ▾</div>
+        </div></div><p class="frame-label">ปุ่มเดียว · เรื่องไมค์/AI/ความเป็นส่วนตัวพับเก็บในแถบผู้ใหญ่</p></div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="numbers"><div><b>6 → 1</b>บรรทัดข้อความ</div><div><b>3 → 1</b>ปุ่มหลัก</div></div>
+      <h3>เปลี่ยนอะไร</h3>
+      <ul>
+        <li><span class="tag-cut">ตัด</span> คำอธิบาย 6 บรรทัด (สิทธิ์ไมค์, ไม่เก็บไฟล์เสียง, ผู้ใหญ่ช่วยสังเกต, เสียงหายเมื่อเปลี่ยนข้อ…)</li>
+        <li><span class="tag-move">ย้าย</span> ข้อความเหล่านั้นไปแถบผู้ใหญ่ และหน้าตั้งค่าครั้งแรก (แสดงครั้งเดียว)</li>
+        <li><span class="tag-cut">ตัด</span> ปุ่ม "ยังไม่เริ่ม" กับ ✕ ซ้ำกัน เหลือ ⏸ มุมซ้ายบน</li>
+        <li><span class="tag-add">เพิ่ม</span> พี่ปูพูดคำชวนเล่นเป็นเสียง เด็กไม่ต้องอ่าน</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 2 CHOICE -->
+<section class="block" id="s2">
+  <h2>2 · ฟังแยกเสียง → ป้อนอาหารพี่ปู</h2>
+  <p class="lead">หน้านี้ชัดที่สุดในปัจจุบันอยู่แล้ว · ตัดขั้น "บันทึกคำตอบ" และเพิ่มตัวการ์ตูนตอบสนอง</p>
+  <div class="compare">
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/05-choice-item.png" alt="ข้อเลือกภาพ"><img src="before/06-choice-answered.png" alt="หลังเลือกภาพ"></div><p class="frame-label">เลื่อนลงเพื่อดูหลังเลือก (ต้องกด "บันทึกคำตอบ" แล้ว "ภารกิจถัดไป")</p></div>
+    <div><p class="col-title new">แบบใหม่</p>
+      <div class="phones">
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span></span></div>
+          <div class="stage">
+            <div class="mascot"><div class="crab">🦀</div><div class="bubble"><span class="spk">🔊 แตะเพื่อฟังซ้ำ</span><br>พี่ปูหิว อยากกิน… "ปู"</div></div>
+            <div class="pics"><div class="pic">🦀<span class="tag">ปู</span></div><div class="pic">🐍<span class="tag">งู</span></div></div>
+          </div>
+          <span class="adult">👤</span>
+        </div></div><p class="frame-label">ก · ฟังคำ แล้วแตะภาพ</p></div>
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span></span></div>
+          <div class="stage">
+            <div class="mascot"><div class="crab">😋</div><div class="bubble">อร่อยจัง! ถูกต้อง ✨</div></div>
+            <div class="pics"><div class="pic hit">🦀<span class="tag">ปู</span></div><div class="pic dim">🐍<span class="tag">งู</span></div></div>
+            <div class="stars">⭐</div>
+            <div class="kid-sub">ไปข้อต่อไปเองใน 2 วินาที</div>
+          </div>
+          <span class="adult">👤</span>
+        </div></div><p class="frame-label">ข · แตะถูก: พี่ปูกิน ได้ดาว ไปข้อต่อไปเอง · แตะผิด: พี่ปู "ฟังอีกทีนะ" เล่นเสียงซ้ำ</p></div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="numbers"><div><b>4 → 1</b>ครั้งที่ต้องแตะต่อข้อ</div><div><b>~12 → 3</b>สิ่งที่แตะได้บนจอ</div></div>
+      <ul>
+        <li><span class="tag-cut">ตัด</span> หัวแอป "ฝึกและเรียน", เมนูล่าง, "1 · เริ่มคุ้นเสียง · ภารกิจของเรา"</li>
+        <li><span class="tag-cut">ตัด</span> ปุ่ม "บันทึกคำตอบ" และ "ภารกิจถัดไป" ระบบบันทึกเมื่อแตะภาพ</li>
+        <li><span class="tag-move">ย้าย</span> "ฟังเสียงอีกครั้ง" ไปเป็นการแตะที่พี่ปู/ลูกโป่งคำพูด</li>
+        <li><span class="tag-add">เพิ่ม</span> พี่ปูตอบสนองทันที (กิน/เต้น/ส่ายหัว) และดาว</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 3 IMITATE -->
+<section class="block" id="s3">
+  <h2>3 · ดูปากและพูดตาม → เกมเป่าเรือใบ</h2>
+  <p class="lead">หน้าที่ข้อความเยอะที่สุด (สูงราว 2 จอ ปุ่ม "บันทึก" อยู่ใต้จอ) · แบบใหม่เป็นเกม 4 ฉาก ใช้เสียง ป ที่มีลมออกจากปากเป็นแรงพาเรือ</p>
+  <div class="compare">
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/03-speech-item.png" alt="ข้อดูปากและพูดตาม"></div><p class="frame-label">เลื่อนดูได้: ข้อความ ~20 บรรทัด จุดที่แตะได้ ~15 จุด</p></div>
+    <div><p class="col-title new">แบบใหม่ (สตอรีบอร์ด)</p>
+      <div class="phones">
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span></span></div>
+          <div class="stage">
+            <div class="mascot"><div class="crab">🦀</div><div class="bubble">ดูปากพี่ปูนะ ปิดปาก… แล้วปล่อย "ปา!"</div></div>
+            <div class="big-card" style="width:100%;height:190px;border:3px solid var(--line);border-radius:22px;display:grid;place-items:center;background:#fff;font-family:'Sarabun';color:var(--muted);font-size:13px;text-align:center">👄 ภาพปาก 3 จังหวะ<br>เล่นต่อกันอัตโนมัติ<br>(ไม่มีปุ่มจังหวะให้กด)</div>
+            <div class="word">ปา</div>
+          </div>
+          <div class="adult-bar">👤 ภาพปากสร้างด้วย AI · ดูทีละจังหวะ · ขยาย ▾</div>
+        </div></div><p class="frame-label">ก · พี่ปูสาธิต (เสียง + ภาพปากเล่นเอง)</p></div>
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span></span></div>
+          <div class="stage">
+            <div class="sea"><span class="boat" style="left:16px">⛵</span><span class="island">🏝️</span></div>
+            <div class="kid-sub">กดค้างแล้วพูด "ปา" ให้ลมพาเรือไป</div>
+            <button class="big-btn hold">🎤</button>
+            <div class="meter"><b style="width:15%"></b></div>
+          </div>
+        </div></div><p class="frame-label">ข · กดค้างไมค์ (ปุ่มเดียว) แถบลมโชว์ความดัง</p></div>
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span></span></div>
+          <div class="stage">
+            <div class="sea"><span class="wind" style="left:70px">〰️〰️</span><span class="boat" style="left:110px">⛵</span><span class="island">🏝️</span></div>
+            <div class="mascot"><div class="crab">🦀</div><div class="bubble">เรือหยุดรอแล้ว ลมอีกนิดนะ!</div></div>
+            <button class="big-btn">🎤</button>
+            <div class="meter"><b style="width:55%"></b></div>
+          </div>
+        </div></div><p class="frame-label">ค · เสียงเบา/สั้น: เรือแล่นไปได้บ้างแล้วหยุดรอ ไม่มีการจม พูดอีกครั้งได้เลย</p></div>
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span></span></div>
+          <div class="stage">
+            <div class="sea"><span class="boat" style="right:44px">⛵</span><span class="island">🏝️</span></div>
+            <div class="stars">⭐⭐</div>
+            <div class="kid-title">ถึงเกาะแล้ว เก่งมาก!</div>
+            <div class="btn-row"><span class="pill">🔁 ฟังเสียงหนู</span><span class="pill primary">ไปต่อ ➜</span></div>
+          </div>
+          <div class="adult-bar">👤 ผู้ใหญ่ฟังแล้ว เด็กพูดเป็นอย่างไร
+            <div class="faces"><span>😊 ทำได้</span><span>🙂 ฝึกอีก</span><span>⏭ ข้าม</span></div></div>
+        </div></div><p class="frame-label">ง · ถึงเกาะ บันทึกเอง · โหมดเล่นด้วยกัน: ผู้ใหญ่แตะผล 1 ครั้ง · โหมดเล่นเอง: ไม่มีแถบนี้ เก็บรอผู้ใหญ่ตรวจ</p></div>
+      </div>
+    </div>
+    <div class="notes">
+      <div class="numbers"><div><b>~20 → 2</b>บรรทัดข้อความบนจอเด็ก</div><div><b>~15 → 2</b>สิ่งที่แตะได้</div><div><b>2 จอ → 1</b>ความสูงหน้า</div></div>
+      <ul>
+        <li><span class="tag-cut">ตัด</span> หัวข้อซ้อน 4 ชั้น (ฝึกและเรียน / ขั้น / ระดับ·ภารกิจ / ชื่อข้อ) เหลือคำฝึกคำเดียว</li>
+        <li><span class="tag-cut">ตัด</span> ปุ่มจังหวะปาก 1·2·3, ‹ › และ "ดูทีละจังหวะอัตโนมัติ" ภาพเล่นต่อกันเอง</li>
+        <li><span class="tag-cut">ตัด</span> ขั้น อัด → หยุด → บันทึก → ถัดไป เหลือ "กดค้างแล้วพูด" แล้วบันทึกเอง</li>
+        <li><span class="tag-move">ย้าย</span> "ภาพคนสร้างด้วย AI…", "ดาวให้กับการลองทำ…", ขยายภาพปาก, "ทดลองตอบโดยไม่อัดเสียง", "ขอคำใบ้" ไปแถบผู้ใหญ่</li>
+        <li><span class="tag-add">เพิ่ม</span> เกมเรือใบ ใช้ความดังและความยาวเสียงในเครื่อง ไม่ตัดสินถูก/ผิด</li>
+        <li><span class="tag-add">เพิ่ม</span> ปุ่ม "ฟังเสียงหนู" ให้เด็กฟังเสียงตัวเองหลังพูด</li>
+      </ul>
+      <h3>ทำไมเรือใบเข้ากับขั้นนี้</h3>
+      <ul><li>เสียง ป เป็นเสียงที่ปิดริมฝีปากแล้วปล่อยลม ภาพ "ลมพาเรือ" จึงเชื่อมกับวิธีออกเสียงจริง ส่วน ก และ ม ใช้ธีมอื่นได้ เช่น ม = ฮัมเพลงให้ผึ้งบิน</li></ul>
+    </div>
+  </div>
+</section>
+
+<!-- 4 SYLLABLES -->
+<section class="block" id="s4">
+  <h2>4 · ฝึกพยางค์ → กระโดดหินข้ามลำธาร</h2>
+  <p class="lead">หนึ่งพยางค์ = หนึ่งก้าว ทำให้เด็กเห็นจังหวะพยางค์เป็นภาพ</p>
+  <div class="compare">
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/08-syllable-item.png" alt="ข้อฝึกพยางค์"></div></div>
+    <div><p class="col-title new">แบบใหม่</p>
+      <div class="phones">
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span></span></div>
+          <div class="stage">
+            <div class="mascot"><div class="crab">🦀</div><div class="bubble">พูดทีละก้อนนะ ปา… ปี… ปู</div></div>
+            <div style="width:100%;height:150px;border-radius:22px;background:#d9f0fb;border:2px solid var(--line);display:flex;align-items:flex-end;padding:0 10px 18px">
+              <div class="stones"><div class="stone on">ปา<span class="hop">🦀</span></div><div class="stone">ปี</div><div class="stone">ปู</div><div class="stone">🏁</div></div>
+            </div>
+            <button class="big-btn hold">🎤</button>
+          </div>
+          <span class="adult">👤</span>
+        </div></div><p class="frame-label">พูดหนึ่งครั้ง พี่ปูกระโดดหนึ่งก้อน (นับช่วงเสียงขึ้น-เงียบในเครื่อง) · ถึงธง = จบข้อ</p></div>
+      </div>
+    </div>
+    <div class="notes">
+      <ul>
+        <li><span class="tag-cut">ตัด</span> หัวข้อซ้อนและข้อความอธิบายเหมือนหน้า 3</li>
+        <li><span class="tag-add">เพิ่ม</span> หินแต่ละก้อนมีพยางค์ ตัวอักษรใช้ฟอนต์ทรงหนังสือเรียน</li>
+        <li>ถ้าพูดติดกันเร็วเกิน ระบบนับเป็นก้าวเดียว พี่ปูชวน "ช้า ๆ ทีละก้อน"</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 5 WORDS -->
+<section class="block" id="s5">
+  <h2>5 · ฝึกคำ → การ์ดสติกเกอร์</h2>
+  <p class="lead">เรียกชื่อภาพ แล้วได้สติกเกอร์สะสม ให้เด็กอยากเล่นต่อ</p>
+  <div class="compare">
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/09-word-item.png" alt="ข้อฝึกคำ"></div></div>
+    <div><p class="col-title new">แบบใหม่</p>
+      <div class="phones">
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span class="icon-btn">📒</span></div>
+          <div class="stage">
+            <div class="mascot"><div class="crab">🦀</div><div class="bubble">นี่คืออะไรเอ่ย? บอกพี่ปูหน่อย</div></div>
+            <div class="card-flip">🎒</div>
+            <button class="big-btn hold">🎤</button>
+            <div class="kid-sub">ติดอยู่? แตะพี่ปู ให้กระซิบใบ้</div>
+          </div>
+          <span class="adult">👤</span>
+        </div></div><p class="frame-label">ก · เห็นภาพ กดค้างแล้วเรียกชื่อ</p></div>
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span class="icon-btn">📒</span></div>
+          <div class="stage">
+            <div class="card-flip open">🎒</div>
+            <div class="word">กระเป๋า<small>ได้สติกเกอร์ใหม่! เก็บในสมุดแล้ว</small></div>
+            <div class="btn-row"><span class="pill">🔁 ฟังเสียงหนู</span><span class="pill primary">ไปต่อ ➜</span></div>
+          </div>
+          <span class="adult">👤</span>
+        </div></div><p class="frame-label">ข · การ์ดพลิก โชว์คำ (ฟอนต์หนังสือเรียน) ได้สติกเกอร์ · 📒 = สมุดสะสม</p></div>
+      </div>
+    </div>
+    <div class="notes">
+      <ul>
+        <li><span class="tag-move">ย้าย</span> "ขอคำใบ้" เป็นการแตะพี่ปูให้กระซิบ</li>
+        <li><span class="tag-add">เพิ่ม</span> สมุดสติกเกอร์สะสม (เชื่อมกับหน้า "รางวัล" ที่มีอยู่แล้วได้)</li>
+        <li>วลีและประโยค (ขั้น 5) ใช้รูปแบบเดียวกัน แต่เป็นรถไฟต่อโบกี้ตามจำนวนคำ</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 6 AFTER SPEAKING -->
+<section class="block" id="s6">
+  <h2>6 · หลังพูดจบ: สองโหมดต่างกันตรงไหน</h2>
+  <p class="lead">หน้าจอเด็กเหมือนกัน ต่างกันแค่ "ผู้ใหญ่ตรวจตอนไหน"</p>
+  <div class="compare">
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/04-speech-answered.png" alt="หลังตอบข้อพูด"></div><p class="frame-label">ข้อความ "รอบนี้เป็นการจำลองคำตอบ · ผลการพูดยังรอผู้ใหญ่ช่วยตรวจ" และปุ่มถัดไป</p></div>
+    <div><p class="col-title new">แบบใหม่</p>
+      <div class="phones">
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span></span></div>
+          <div class="stage"><div class="crab big">🥳</div><div class="kid-title">เก่งมาก!</div><div class="stars">⭐</div></div>
+          <div class="adult-bar">👤 เล่นด้วยกัน · ผู้ใหญ่ฟังแล้วเด็กพูดเป็นอย่างไร
+            <div class="faces"><span>😊 ทำได้</span><span>🙂 ฝึกอีก</span><span>⏭ ข้าม</span></div></div>
+        </div></div><p class="frame-label">เล่นด้วยกัน (ระดับ 1–2): แตะผล 1 ครั้งต่อข้อ ไม่มีงานค้าง</p></div>
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span></span></div>
+          <div class="stage"><div class="crab big">🥳</div><div class="kid-title">เก่งมาก!</div><div class="stars">⭐</div><div class="kid-sub">ไปข้อต่อไปเอง…</div></div>
+          <span class="adult">👤</span>
+        </div></div><p class="frame-label">เล่นเอง (ระดับ 3–4): ไม่มีแถบผู้ใหญ่ ข้อพูดเก็บ "รอผู้ใหญ่ตรวจ" ไปตรวจที่หน้าจบรอบหรือคิวครู</p></div>
+      </div>
+    </div>
+    <div class="notes">
+      <ul>
+        <li><span class="tag-cut">ตัด</span> ข้อความสถานะเชิงระบบบนจอเด็ก</li>
+        <li><span class="tag-add">เพิ่ม</span> ผลตรวจแบบใบหน้า 3 ปุ่มสำหรับผู้ใหญ่ ส่งเข้าระบบกลางเหมือน "ผู้ใหญ่ยืนยันผล" ที่มีอยู่</li>
+        <li>เมื่อเปิด AI ตรวจเสียงในอนาคต ใบหน้าที่ AI แนะนำจะถูกเลือกไว้ให้ ผู้ใหญ่แค่ยืนยัน</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 7 SUMMARY -->
+<section class="block" id="s7">
+  <h2>7 · จบรอบ: ฉลองสำหรับเด็ก แยกจากผลสำหรับผู้ใหญ่</h2>
+  <p class="lead">ตอนนี้ดาว รายการผล และคำอธิบายผู้ใหญ่อยู่หน้าเดียวกัน · แบบใหม่แยกเป็นสองชั้น</p>
+  <div class="compare">
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/07-round-summary.png" alt="หน้าสรุปรอบ"></div></div>
+    <div><p class="col-title new">แบบใหม่</p>
+      <div class="phones">
+        <div><div class="phone"><div class="wf">
+          <div class="wf-top"><span></span><span></span><span class="icon-btn">🔊</span></div>
+          <div class="stage">
+            <div class="crab big">🦀</div>
+            <div class="stars">⭐⭐⭐</div>
+            <div class="kid-title">ภารกิจสำเร็จ!</div>
+            <div class="kid-sub">ได้สติกเกอร์ 3 ดวง</div>
+            <div class="btn-row"><span class="pill">🔁 เล่นอีก</span><span class="pill primary">ด่านต่อไป ➜</span></div>
+          </div>
+          <div class="adult-bar" style="text-align:center">👤 ผู้ใหญ่: ดูผลรอบนี้และคำแนะนำ ›</div>
+        </div></div><p class="frame-label">ก · จอเด็ก: ฉลอง ปุ่มใหญ่ 2 ปุ่ม</p></div>
+        <div><div class="phone"><div class="wf" style="font-family:'Sarabun',sans-serif">
+          <div class="wf-top"><span class="icon-btn">‹</span><b style="font-size:15px">ผลรอบนี้ (ผู้ใหญ่)</b><span></span></div>
+          <div style="padding:6px 16px;display:flex;flex-direction:column;gap:10px;font-size:13px">
+            <div class="box" style="padding:10px 12px">ฟังเลือกถูก 3/3 · ข้อพูดรอตรวจ 2 ข้อ <span style="float:right;color:var(--accent)">ตรวจ ›</span></div>
+            <div class="box" style="padding:10px 12px"><b>✨ คำแนะนำจาก Speech Adventure</b><br>ทำได้ดี · ฝึกต่อ · เล่นที่บ้าน 2 อย่าง<br><span style="color:var(--accent)">ขอคำแนะนำ ›</span></div>
+            <div class="box" style="padding:10px 12px">ดูความก้าวหน้า › · รายงาน ›</div>
+            <div style="color:var(--muted);font-size:11px">ข้อความเรื่องการเก็บข้อมูลและ "ไม่ใช่การวินิจฉัย" อยู่หน้านี้</div>
+          </div>
+        </div></div><p class="frame-label">ข · หน้าผู้ใหญ่: ตรวจข้อพูด คำแนะนำ ความก้าวหน้า (ฟอนต์ผู้ใหญ่)</p></div>
+      </div>
+    </div>
+    <div class="notes">
+      <ul>
+        <li><span class="tag-move">ย้าย</span> "สิ่งที่ผู้ใหญ่ดูต่อได้", รายการผลรายข้อ, การ์ดคำแนะนำ ไปหน้าผู้ใหญ่</li>
+        <li><span class="tag-cut">ตัด</span> "ครบแล้ว · สถานะการทำกิจกรรม", "3/3 ฟังและเลือกถูก" ออกจากจอเด็ก (เด็กเห็นดาวแทน)</li>
+        <li><span class="tag-add">เพิ่ม</span> ปุ่ม "เล่นอีก" สำหรับเด็กที่อยากเล่นซ้ำ</li>
+        <li>โหมดเล่นเอง: "👤 ผู้ใหญ่" ต้องผ่านประตูผู้ใหญ่ก่อน</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 8 PARENT GATE -->
+<section class="block" id="s8">
+  <h2>8 · ประตูผู้ใหญ่ (โหมดเล่นเอง)</h2>
+  <p class="lead">กันเด็กเข้าเมนูตั้งค่า ส่งเสียงให้ AI หรือกดยืนยันผลเอง · ใช้วิธีที่ผู้ใหญ่ทำได้ง่าย แต่เด็กเล็กทำได้ยาก</p>
+  <div class="compare">
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone" style="display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center;padding:20px">ไม่มี<br>เมนูทุกอย่างเปิดได้จากหน้าฝึกโดยตรง</div></div>
+    <div><p class="col-title new">แบบใหม่</p>
+      <div class="phones">
+        <div><div class="phone"><div class="wf" style="font-family:'Sarabun',sans-serif">
+          <div class="stage" style="gap:16px">
+            <div style="font-size:40px">👤</div>
+            <b style="font-size:18px">สำหรับผู้ใหญ่</b>
+            <div style="font-size:14px;text-align:center;color:var(--muted)">กดค้างที่ปุ่มด้านล่าง 3 วินาที<br>แล้วตอบ: <b style="color:var(--ink)">สิบสอง ลบ ห้า</b> เท่ากับเท่าไร</div>
+            <div class="btn-row"><span class="pill">5</span><span class="pill">7</span><span class="pill">9</span></div>
+            <div style="width:220px;height:14px;border-radius:999px;background:#eceef4;overflow:hidden"><b style="display:block;width:60%;height:100%;background:var(--accent)"></b></div>
+            <span class="pill" style="font-size:14px">กลับไปเล่น</span>
+          </div>
+        </div></div><p class="frame-label">ตัวเลขเขียนเป็นคำ เด็กเล็กอ่านไม่ออก · ผู้ใหญ่ปิดประตูนี้ได้ในโหมดเล่นด้วยกัน</p></div>
+      </div>
+    </div>
+    <div class="notes">
+      <ul>
+        <li><span class="tag-add">เพิ่ม</span> ใช้กับ: ตั้งค่า, สลับโหมด, ความไวไมค์, ยินยอมส่งเสียงให้ AI, ดูผล/ยืนยันผล, ออกจากระบบ</li>
+        <li>ไม่ต้องใช้รหัสผ่าน จึงไม่ทำให้ผู้ปกครองลำบาก</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>ไฟล์นี้: <code>docs/design/wireframes/kid-practice.html</code> · ภาพปัจจุบัน: <code>docs/design/wireframes/before/</code> ถ่ายใหม่ได้ด้วย <code>node scripts/design/capture-practice-screens.mjs</code> (ต้องเปิดเว็บไว้)</p>
+  <p>ภาพตัวการ์ตูนในไวร์เฟรมเป็นอีโมจิแทนชั่วคราว งานจริงใช้ภาพพี่ปูชุดเดิมของแอปและทำท่าเพิ่ม · ตัวเลขข้อความ/ปุ่มเป็นค่าประมาณจากหน้าจอจริง</p>
+</footer>
+</body>
+</html>
