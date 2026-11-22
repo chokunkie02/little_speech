@@ -221,6 +221,38 @@
   .gate .gate-title{font-family:var(--font-display);font-size:30px;font-weight:600}
   .gate .row{width:420px;font-family:var(--font-display)}.gate .btn{font-family:inherit;font-size:28px}
   .gate .meter{width:420px}.gate .meter b{width:60%;background:linear-gradient(90deg,#7B6CF6,#C3BBFF)}
+
+  /* ── Magic mirror game ── */
+  .mirrors{display:flex;gap:18px;align-items:flex-end;justify-content:center;width:100%}
+  .mirror{position:relative;width:120px;aspect-ratio:3/4;border-radius:50%/42%;padding:7px;flex:none;
+          background:linear-gradient(160deg,#FFE7B0 0%,#F2B23A 50%,#C98B1C 100%);box-shadow:0 10px 20px -10px #000}
+  .mirror::before{content:"";position:absolute;left:50%;top:-9px;width:22px;height:22px;transform:translateX(-50%) rotate(45deg);border-radius:5px;background:linear-gradient(135deg,#FFE7B0,#F2B23A)}
+  .mirror .glass{position:relative;width:100%;height:100%;border-radius:inherit;overflow:hidden;display:grid;place-items:center;
+          background:radial-gradient(circle at 30% 22%,rgb(255 255 255 / .35),transparent 38%),linear-gradient(160deg,#4A3FC0,#1A1452)}
+  .mirror .glass img{width:130%;max-width:none}
+  .mirror .glass .q{font-family:var(--font-kid);font-size:46px;color:rgb(255 255 255 / .55)}
+  .mirror .name{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);white-space:nowrap;font-family:var(--font-kid);font-size:14px;color:#2A1D05;
+          background:linear-gradient(180deg,var(--gold-1),var(--gold-2));border-radius:999px;padding:1px 11px;box-shadow:0 2px 0 var(--gold-edge)}
+  .mirror.on{box-shadow:0 0 0 5px rgb(255 213 138 / .22),0 0 34px 6px rgb(255 213 138 / .45)}
+  .mirror.off{filter:saturate(.35) brightness(.6)}
+  .mirror .sparkle{position:absolute;inset:0;pointer-events:none;background:
+          radial-gradient(3px 3px at 22% 30%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 75% 22%,#fff 50%,transparent 51%),radial-gradient(2.5px 2.5px at 68% 72%,#fff 50%,transparent 51%)}
+  .mirror .lips{position:absolute;right:-6px;top:10px;font-family:var(--font-ui);font-size:10px;font-weight:600;color:#fff;background:var(--primary);border-radius:999px;padding:2px 7px}
+  .turn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-ui);font-size:13px;color:var(--muted);background:rgb(255 255 255 / .06);border:1px solid rgb(255 255 255 / .12);border-radius:999px;padding:4px 12px}
+  .turn i{width:10px;height:10px;border-radius:50%;background:rgb(255 255 255 / .25)}
+  .turn.go{color:#fff;border-color:rgb(255 213 138 / .5)}.turn.go i{background:var(--gold-1);box-shadow:0 0 10px var(--gold-1)}
+  .heard{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-ui);font-size:13px;color:var(--success-text);background:rgb(76 175 130 / .16);border:1px solid rgb(76 175 130 / .45);border-radius:999px;padding:3px 12px}
+  .pieces{display:flex;gap:8px;align-items:center;font-family:var(--font-ui);font-size:12px;color:var(--muted)}
+  .pieces i{width:16px;height:16px;transform:rotate(45deg);border-radius:4px;background:rgb(255 255 255 / .14)}
+  .pieces i.on{background:linear-gradient(135deg,var(--gold-1),var(--gold-2));box-shadow:0 0 10px rgb(255 213 138 / .6)}
+  .desk .mirrors{gap:34px}
+  .desk .mirror{width:190px;padding:10px}
+  .desk .mirror::before{width:30px;height:30px;top:-13px}
+  .desk .mirror .glass .q{font-size:72px}
+  .desk .mirror .name{font-size:20px;bottom:-17px;padding:2px 16px}
+  .desk .mirror .lips{font-size:14px;padding:3px 10px}
+  .desk .turn,.desk .heard{font-size:17px;padding:6px 16px}.desk .turn i{width:13px;height:13px}
+  .desk .pieces{font-size:16px}.desk .pieces i{width:22px;height:22px}
 </style>
 </head>
 <body>
@@ -239,11 +271,8 @@
     <symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></symbol>
     <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></symbol>
     <linearGradient id="g-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2C2185"/><stop offset="1" stop-color="#5A4FD6"/></linearGradient>
-    <linearGradient id="g-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3BA7D8"/><stop offset="1" stop-color="#1E5FA8"/></linearGradient>
     <linearGradient id="g-river" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F7FC0"/><stop offset="1" stop-color="#22508F"/></linearGradient>
     <radialGradient id="g-sun"><stop offset="0" stop-color="#FFE7B0"/><stop offset=".55" stop-color="#FFD58A"/><stop offset="1" stop-color="#FFD58A" stop-opacity="0"/></radialGradient>
-    <symbol id="boat" viewBox="0 0 60 56"><path d="M29 4v34" stroke="#F1F0FA" stroke-width="2.5"/><path d="M31 6 52 36H31Z" fill="#FFD58A"/><path d="M27 12 10 36h17Z" fill="#C3BBFF"/><path d="M4 40h52l-7 12H11Z" fill="#E8735A"/><path d="M4 40h52" stroke="#B95542" stroke-width="2"/></symbol>
-    <symbol id="island" viewBox="0 0 80 60"><ellipse cx="40" cy="54" rx="38" ry="10" fill="#F5C77A"/><path d="M42 50c-2-14 0-26 6-34" stroke="#8B5A2B" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M48 16c-10-6-20-4-26 2 9-1 16 0 26-2Zm0 0c4-9 14-12 22-10-8 3-14 6-22 10Zm0 0c8-2 18 2 22 10-8-5-15-7-22-10Zm0 0c-4 6-4 14-2 20 1-8 0-14 2-20Z" fill="#4CAF82"/></symbol>
   </defs>
 </svg>
 
@@ -266,7 +295,7 @@
   <div class="grid2">
     <div class="box"><h3>1 · หนึ่งหน้า หนึ่งเรื่อง</h3><ul><li>ภาพใหญ่ คำใหญ่ ปุ่มหลักปุ่มเดียว (ปุ่มทอง)</li><li>ไม่เกิน 3 ปุ่ม ทุกอย่างอยู่ในจอเดียวไม่ต้องเลื่อน</li></ul></div>
     <div class="box"><h3>2 · พี่ปูพาเล่น ใช้เสียงแทนตัวหนังสือ</h3><ul><li>เข้าข้อแล้วพี่ปูพูดคำสั่งเอง (เสียง Sulafat ที่เลือกไว้) แตะลูกโป่งคำพูดเพื่อฟังซ้ำ</li><li>ตัวหนังสือบนจอเด็ก ≤ 1 ประโยคสั้น</li></ul></div>
-    <div class="box"><h3>3 · เล่นเป็นเกม ให้รางวัลกับความพยายาม</h3><ul><li>แต่ละขั้นมีเกมของตัวเอง ไม่มีการแพ้</li><li>ไมค์วัดในเครื่องแค่ "มีเสียงไหม ดังพอไหม นานพอไหม" ไม่ตัดสินถูก/ผิด</li></ul></div>
+    <div class="box"><h3>3 · เล่นเป็นเกม ให้รางวัลกับความพยายาม</h3><ul><li>แต่ละขั้นมีเกมของตัวเอง ไม่มีการแพ้</li><li>ไมค์วัดในเครื่องแค่ "มีเสียงไหม พูดตอนถึงตาไหม นานพอไหม" ไม่ตัดสินถูก/ผิด และไม่ให้รางวัลกับเสียงดัง</li></ul></div>
     <div class="box"><h3>4 · เข้ากับเว็บเดิม</h3><ul><li>ใช้สี การ์ด ปุ่ม และไอคอนชุดเดียวกับธีม midnight purple ของเว็บ</li><li>ตอนฝึกซ่อนเมนูแอปบน/ล่าง เหลือ ⏸ พัก กับแถบความคืบหน้า · เรื่องของผู้ใหญ่อยู่ในกรอบเส้นประ</li></ul></div>
     <div class="box wide"><h3>5 · บนคอมพิวเตอร์ (และแท็บเล็ตแนวนอน)</h3><ul>
       <li>ตอนนี้ระหว่างฝึกยังเห็นเมนูซ้ายและหัวเว็บ เด็กกดออกไปหน้าอื่นได้ และเนื้อหาอยู่คอลัมน์แคบกลางจอ · แบบใหม่เปิดจอเกมเต็มหน้าต่าง</li>
@@ -305,7 +334,7 @@
   <table class="games">
     <tr><th>ขั้น</th><th>เกม</th><th>เด็กทำอะไร</th><th>ระบบรับรู้จาก</th><th>เมื่อยังไม่สำเร็จ</th></tr>
     <tr><td>1 ฟังแยกเสียง</td><td class="g">ป้อนอาหารพี่ปู</td><td>ฟังคำ แตะภาพที่ได้ยิน พี่ปูกินแล้วเต้นดีใจ</td><td>ภาพที่แตะ (เทียบเฉลย)</td><td>พี่ปู "ฟังอีกทีนะ" เล่นเสียงซ้ำ</td></tr>
-    <tr><td>2 ดูปากและพูดตาม</td><td class="g">เป่าเรือใบ</td><td>ดูพี่ปูทำปาก พูด "ปา" มีลมออกจากปาก เรือแล่นไปเกาะ</td><td>ความดังและความยาวของเสียง</td><td>เรือหยุดรอกลางทาง "ลมอีกนิดนะ" ไม่มีการจม</td></tr>
+    <tr><td>2 ดูปากและพูดตาม</td><td class="g">กระจกวิเศษ</td><td>ดูพี่ปูทำปากในกระจก ถึงตาหนูพูดตาม เพื่อนในกระจกขยับปากตามเสียง แล้วฟังเสียงพี่ปูกับเสียงหนูเทียบกัน</td><td>พูดตอนถึงตาไหม · เสียงยาวพอเป็นคำไหม (ไม่วัดความดัง)</td><td>กระจกพี่ปูทำให้ดูอีกครั้งช้า ๆ</td></tr>
     <tr><td>3 ฝึกพยางค์</td><td class="g">กระโดดหินข้ามลำธาร</td><td>พูดทีละพยางค์ พูดหนึ่งครั้ง พี่ปูกระโดดหนึ่งก้อน</td><td>จำนวนช่วงเสียง</td><td>พี่ปูรอบนหิน ชวนพูดพยางค์เดิม</td></tr>
     <tr><td>4 ฝึกคำ</td><td class="g">การ์ดสติกเกอร์</td><td>เห็นภาพ เรียกชื่อ การ์ดพลิกเป็นสติกเกอร์ เก็บเข้าสมุด</td><td>มีเสียงพูดยาวพอ</td><td>พี่ปูกระซิบใบ้คำแรก</td></tr>
     <tr><td>5 วลีและประโยค</td><td class="g">รถไฟคำ</td><td>พูดประโยค รถไฟต่อโบกี้ตามจำนวนคำ</td><td>ช่วงเสียงต่อเนื่อง</td><td>รถไฟจอดรอ เล่นตัวอย่างให้ฟัง</td></tr>
@@ -320,12 +349,12 @@
   <p class="lead">ตอนนี้เป็นหน้าต่างอธิบายสำหรับผู้ใหญ่ 6 บรรทัด · แบบใหม่เป็นฉากเปิดเกมที่พี่ปูชวนเล่น</p>
   <div class="compare">
     <div><p class="col-title now">ปัจจุบัน</p><div class="desk before pc-only"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="shot"><img src="before/pc/02-start-round.png" alt=""></div></div><div class="phone before phone-only"><img src="before/02-start-round.png" alt="หน้าต่างเตรียมตัวก่อนเริ่มกัน"></div></div>
-    <div><p class="col-title new">แบบใหม่</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span class="ibtn"><svg><use href="#i-vol"/></svg></span></div><div class="split"><div class="col"><div class="scene"><svg viewBox="0 0 260 160"><rect width="260" height="160" fill="url(#g-sky)"/><circle cx="214" cy="30" r="32" fill="url(#g-sun)"/><path d="M0 122q30-8 65 0t65 0 65 0 65 0V160H0Z" fill="url(#g-sea)"/><use href="#island" x="176" y="92" width="80" height="60"/><use href="#boat" x="34" y="82" width="58" height="54"/></svg></div></div><div class="col"><div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble"><span class="spk"><svg><use href="#i-vol"/></svg>พี่ปูพูดให้ฟัง</span>ไปล่องเรือกับพี่ปูกัน!</div></div><span class="btn gold big"><svg><use href="#i-play"/></svg>เริ่มเลย</span><div class="kbd">หรือกด <span class="key">Enter</span></div></div></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ผู้ใหญ่ · เปิดไมค์ครั้งแรก · ตั้งค่า · เล่นด้วยกัน ▾</div></div></div></div><p class="frame-label">จอเกมเต็มหน้าต่าง ไม่มีเมนูของเว็บ · เรื่องไมค์/AI/ความเป็นส่วนตัวพับในแถบผู้ใหญ่</p></div></div><div class="phones phone-only">
+    <div><p class="col-title new">แบบใหม่</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span class="ibtn"><svg><use href="#i-vol"/></svg></span></div><div class="split"><div class="col"><div class="mirrors"><div class="mirror on"><div class="glass"><img src="art/crab.svg" alt="" style="width:110%"><span class="sparkle"></span></div><span class="name">พี่ปู</span></div><div class="mirror "><div class="glass"><span class="q">?</span></div><span class="name">หนู</span></div></div></div><div class="col"><div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble"><span class="spk"><svg><use href="#i-vol"/></svg>พี่ปูพูดให้ฟัง</span>มาเล่นกระจกวิเศษกับพี่ปูกัน!</div></div><span class="btn gold big"><svg><use href="#i-play"/></svg>เริ่มเลย</span><div class="kbd">หรือกด <span class="key">Enter</span></div></div></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ผู้ใหญ่ · เปิดไมค์ครั้งแรก · ตั้งค่า · เล่นด้วยกัน ▾</div></div></div></div><p class="frame-label">จอเกมเต็มหน้าต่าง ไม่มีเมนูของเว็บ · เรื่องไมค์/AI/ความเป็นส่วนตัวพับในแถบผู้ใหญ่</p></div></div><div class="phones phone-only">
       <div><div class="phone"><div class="kid">
         <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span class="ibtn"><svg><use href="#i-vol"/></svg></span></div>
         <div class="stage">
-          <div class="scene"><svg viewBox="0 0 260 120"><rect width="260" height="120" fill="url(#g-sky)"/><circle cx="210" cy="30" r="34" fill="url(#g-sun)"/><path d="M0 84q30-8 65 0t65 0 65 0 65 0V120H0Z" fill="url(#g-sea)"/><use href="#island" x="170" y="54" width="80" height="60"/><use href="#boat" x="34" y="44" width="58" height="54"/></svg></div>
-          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble"><span class="spk"><svg><use href="#i-vol"/></svg>พี่ปูพูดให้ฟัง</span>ไปล่องเรือกับพี่ปูกัน!</div></div>
+          <div class="mirrors"><div class="mirror on"><div class="glass"><img src="art/crab.svg" alt="" style="width:110%"><span class="sparkle"></span></div><span class="name">พี่ปู</span></div><div class="mirror "><div class="glass"><span class="q">?</span></div><span class="name">หนู</span></div></div>
+          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble"><span class="spk"><svg><use href="#i-vol"/></svg>พี่ปูพูดให้ฟัง</span>มาเล่นกระจกวิเศษกับพี่ปูกัน!</div></div>
           <span class="btn gold" style="flex:none;width:200px;font-size:24px;padding:16px"><svg><use href="#i-play"/></svg>เริ่มเลย</span>
         </div>
         <div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ผู้ใหญ่ · เปิดไมค์ครั้งแรก · ตั้งค่า · เล่นด้วยกัน ▾</div></div>
@@ -384,61 +413,39 @@
 
 <!-- 3 IMITATE -->
 <section class="block" id="s3">
-  <h2>3 · ดูปากและพูดตาม → เกมเป่าเรือใบ</h2>
-  <p class="lead">หน้าที่ข้อความเยอะที่สุด (สูงราว 2 จอ ปุ่มบันทึกอยู่ใต้จอ) · แบบใหม่ 4 ฉาก ใช้เสียง ป ที่มีลมออกจากปากเป็นแรงพาเรือ</p>
+  <h2>3 · ดูปากและพูดตาม → กระจกวิเศษ</h2>
+  <p class="lead">หน้าที่ข้อความเยอะที่สุด (สูงราว 2 จอ ปุ่มบันทึกอยู่ใต้จอ) · แบบใหม่ 3 ฉากต่อข้อ: พี่ปูทำในกระจก → ถึงตาหนู → ฟังเสียงสะท้อน</p>
   <div class="compare">
     <div><p class="col-title now">ปัจจุบัน</p><div class="desk before pc-only"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="shot"><img src="before/pc/03-speech-item.png" alt=""></div></div><div class="phone before phone-only"><img src="before/03-speech-item.png" alt="ข้อดูปากและพูดตาม"></div><p class="frame-label">ข้อความ ~20 บรรทัด จุดที่แตะได้ ~15 จุด</p></div>
-    <div><p class="col-title new">แบบใหม่ (สตอรีบอร์ด)</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:52px"></span></div><div class="split"><div class="col"><div class="mouth-card"><img src="art/mouth.svg" alt="ปาก"><div class="steps"><i class="on"></i><i></i><i></i></div><small>ภาพปากเล่นต่อกันเอง 3 จังหวะ</small></div></div><div class="col"><div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">ดูปากพี่ปูนะ ปิดปาก… แล้วปล่อย!</div></div><div class="word" style="font-size:84px">ปา</div><span class="mic" style="width:140px;height:140px"><svg><use href="#i-mic"/></svg></span><div class="kbd">หรือกด <span class="key">Space</span> ค้างไว้</div></div></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ภาพปากสร้างด้วย AI · ตัวเลือกผู้ใหญ่ ▾</div></div></div></div><p class="frame-label">ก · ดูปากและกดพูดในจอเดียว (มือถือแยกเป็น 2 ฉาก)</p></div><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:52px"></span></div><div class="split"><div class="col"><div class="scene"><svg viewBox="0 0 260 160"><rect width="260" height="160" fill="url(#g-sky)"/><circle cx="214" cy="30" r="32" fill="url(#g-sun)"/><path d="M0 122q30-8 65 0t65 0 65 0 65 0V160H0Z" fill="url(#g-sea)"/><use href="#island" x="176" y="92" width="80" height="60"/><path d="M44 94q10-6 20 0M38 104q10-6 20 0" stroke="#C3E8FF" stroke-width="3" fill="none" stroke-linecap="round"/><use href="#boat" x="78" y="82" width="58" height="54"/></svg></div><div class="meter"><b style="width:55%"></b></div></div><div class="col"><div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">เรือรอแล้วนะ ลมอีกนิด!</div></div><span class="mic hold"><svg><use href="#i-mic"/></svg></span><div class="mic-label">กดค้างแล้วพูด "ปา"</div><div class="kbd">หรือกด <span class="key">Space</span> ค้างไว้</div></div></div></div></div><p class="frame-label">ข · เรือแล่นตามแรงเสียง · เบาหรือสั้นไป เรือหยุดรอ ไม่มีการจม</p></div><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:52px"></span></div><div class="split"><div class="col"><div class="scene"><svg viewBox="0 0 260 160"><rect width="260" height="160" fill="url(#g-sky)"/><circle cx="214" cy="30" r="32" fill="url(#g-sun)"/><path d="M0 122q30-8 65 0t65 0 65 0 65 0V160H0Z" fill="url(#g-sea)"/><use href="#island" x="176" y="92" width="80" height="60"/><g fill="#FFD58A"><circle cx="40" cy="34" r="3"/><circle cx="70" cy="20" r="2"/><circle cx="120" cy="40" r="2.5"/><circle cx="150" cy="16" r="2"/></g><use href="#boat" x="140" y="82" width="58" height="54"/></svg></div></div><div class="col"><div class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div><div class="kid-title">ถึงเกาะแล้ว เก่งมาก!</div><div class="row"><span class="btn"><svg><use href="#i-replay"/></svg>ฟังเสียงหนู</span><span class="btn go">ไปต่อ<svg><use href="#i-next"/></svg></span></div></div></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ผู้ใหญ่ฟังแล้ว เด็กพูดเป็นอย่างไร</div><div class="faces"><span class="yes">😊 ทำได้</span><span>🙂 ฝึกอีก</span><span>⏭ ข้าม</span></div></div></div></div><p class="frame-label">ค · ถึงเกาะ บันทึกเอง · เล่นด้วยกัน: ผู้ใหญ่แตะผล 1 ครั้ง (หรือกด 1 / 2 / 3)</p></div></div><div class="phones phone-only">
-      <div><div class="phone"><div class="kid">
-        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:42px"></span></div>
-        <div class="stage">
-          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">ดูปากพี่ปูนะ ปิดปาก… แล้วปล่อย!</div></div>
-          <div class="mouth-card"><img src="art/mouth.svg" alt="ปาก"><div class="steps"><i class="on"></i><i></i><i></i></div><small>ภาพปากเล่นต่อกันเอง 3 จังหวะ</small></div>
-          <div class="word">ปา</div>
-        </div>
-        <div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ภาพปากสร้างด้วย AI · ตัวเลือกผู้ใหญ่ ▾</div></div>
-      </div></div><p class="frame-label">ก · พี่ปูสาธิต (เสียง + ภาพปากเล่นเอง)</p></div>
-      <div><div class="phone"><div class="kid">
-        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:42px"></span></div>
-        <div class="stage">
-          <div class="scene"><svg viewBox="0 0 260 130"><rect width="260" height="130" fill="url(#g-sky)"/><circle cx="214" cy="28" r="30" fill="url(#g-sun)"/><path d="M0 92q30-8 65 0t65 0 65 0 65 0V130H0Z" fill="url(#g-sea)"/><use href="#island" x="176" y="62" width="80" height="60"/><use href="#boat" x="12" y="52" width="58" height="54"/></svg></div>
-          <span class="mic hold"><svg><use href="#i-mic"/></svg></span>
-          <div class="mic-label">กดค้างแล้วพูด "ปา"</div>
-          <div class="meter"><b style="width:18%"></b></div>
-        </div>
-      </div></div><p class="frame-label">ข · กดค้างปุ่มทองปุ่มเดียว แถบลมโชว์ความดัง</p></div>
-      <div><div class="phone"><div class="kid">
-        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:42px"></span></div>
-        <div class="stage">
-          <div class="scene"><svg viewBox="0 0 260 130"><rect width="260" height="130" fill="url(#g-sky)"/><circle cx="214" cy="28" r="30" fill="url(#g-sun)"/><path d="M0 92q30-8 65 0t65 0 65 0 65 0V130H0Z" fill="url(#g-sea)"/><use href="#island" x="176" y="62" width="80" height="60"/><path d="M44 64q10-6 20 0M38 74q10-6 20 0" stroke="#C3E8FF" stroke-width="3" fill="none" stroke-linecap="round"/><use href="#boat" x="78" y="52" width="58" height="54"/></svg></div>
-          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">เรือรอแล้วนะ ลมอีกนิด!</div></div>
-          <span class="mic"><svg><use href="#i-mic"/></svg></span>
-          <div class="meter"><b style="width:55%"></b></div>
-        </div>
-      </div></div><p class="frame-label">ค · เสียงเบา/สั้น: เรือไปได้บ้างแล้วหยุดรอ ไม่มีการจม พูดอีกครั้งได้เลย</p></div>
-      <div><div class="phone"><div class="kid">
-        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span style="width:42px"></span></div>
-        <div class="stage">
-          <div class="scene"><svg viewBox="0 0 260 130"><rect width="260" height="130" fill="url(#g-sky)"/><circle cx="214" cy="28" r="30" fill="url(#g-sun)"/><path d="M0 92q30-8 65 0t65 0 65 0 65 0V130H0Z" fill="url(#g-sea)"/><use href="#island" x="176" y="62" width="80" height="60"/><use href="#boat" x="140" y="52" width="58" height="54"/><g fill="#FFD58A"><circle cx="40" cy="30" r="3"/><circle cx="70" cy="18" r="2"/><circle cx="120" cy="34" r="2.5"/></g></svg></div>
-          <div class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div>
-          <div class="kid-title">ถึงเกาะแล้ว เก่งมาก!</div>
-          <div class="row"><span class="btn"><svg><use href="#i-replay"/></svg>ฟังเสียงหนู</span><span class="btn go">ไปต่อ<svg><use href="#i-next"/></svg></span></div>
-        </div>
-        <div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ผู้ใหญ่ฟังแล้ว เด็กพูดเป็นอย่างไร</div><div class="faces"><span class="yes">😊 ทำได้</span><span>🙂 ฝึกอีก</span><span>⏭ ข้าม</span></div></div>
-      </div></div><p class="frame-label">ง · ถึงเกาะ บันทึกเอง · เล่นด้วยกัน: ผู้ใหญ่แตะผล 1 ครั้ง · เล่นเอง: ไม่มีแถบนี้</p></div>
+    <div><p class="col-title new">แบบใหม่ (สตอรีบอร์ด)</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:52px"></span></div><div class="split"><div class="col"><div class="mirrors"><div class="mirror on"><div class="glass"><img src="art/mouth.svg" alt=""></div><span class="lips">ปิดปาก → ปล่อย</span><span class="name">พี่ปู</span></div><div class="mirror off"><div class="glass"><span class="q">?</span></div><span class="name">หนู</span></div></div><div class="mouth-card" style="background:none;box-shadow:none;padding:0"><div class="steps"><i class="on"></i><i></i><i></i></div></div></div><div class="col"><div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">ดูกระจกพี่ปูนะ ปิดปาก… แล้วปล่อย!</div></div><div class="word" style="font-size:96px">ปา</div><span class="turn"><i></i>ฟังพี่ปูก่อน…</span></div></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ภาพปากสร้างด้วย AI · ตัวเลือกผู้ใหญ่ ▾</div></div></div></div><p class="frame-label">ก · พี่ปูทำให้ดู: กระจกพี่ปูสว่าง เล่นภาพปาก 3 จังหวะพร้อมเสียง กระจกหนูรออยู่</p></div><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:52px"></span></div><div class="split"><div class="col"><div class="mirrors"><div class="mirror off"><div class="glass"><img src="art/mouth.svg" alt=""></div><span class="name">พี่ปู</span></div><div class="mirror on"><div class="glass"><img src="art/mouth.svg" alt=""></div><span class="lips">ขยับตามเสียงหนู</span><span class="name">หนู</span></div></div></div><div class="col"><span class="turn go"><i></i>ถึงตาหนู!</span><div class="word" style="font-size:84px">ปา</div><span class="mic hold" style="width:140px;height:140px"><svg><use href="#i-mic"/></svg></span><span class="heard">✓ ได้ยินแล้ว</span><div class="kbd">หรือกด <span class="key">Space</span> ค้างไว้</div></div></div></div></div><p class="frame-label">ข · ถึงตาหนู: เพื่อนในกระจกขยับปากตามเสียงหนูทันที · วงไมค์บอกแค่ "ได้ยินแล้ว" ไม่ใช่ความดัง</p></div><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:52px"></span></div><div class="split"><div class="col"><div class="mirrors"><div class="mirror on"><div class="glass"><img src="art/mouth.svg" alt=""><span class="sparkle"></span></div><span class="name">พี่ปู</span></div><div class="mirror on"><div class="glass"><img src="art/mouth.svg" alt=""><span class="sparkle"></span></div><span class="name">หนู</span></div></div></div><div class="col"><div class="kid-title">กระจกวิ้ง!</div><div class="pieces"><i class="on"></i><i></i><i></i><span>ชิ้นกระจก 1/3</span></div><div class="row"><span class="btn"><svg><use href="#i-play"/></svg>ฟังพี่ปู</span><span class="btn"><svg><use href="#i-play"/></svg>ฟังหนู</span></div><span class="btn go" style="flex:none;width:170px">ไปต่อ<svg><use href="#i-next"/></svg></span></div></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ผู้ใหญ่ฟังแล้ว เด็กพูดเป็นอย่างไร</div><div class="faces"><span class="yes">😊 ทำได้</span><span>🙂 ฝึกอีก</span><span>⏭ ข้าม</span></div></div></div></div><p class="frame-label">ค · เสียงสะท้อน: เล่นเสียงพี่ปูแล้วต่อด้วยเสียงหนู ได้ชิ้นกระจก · ผู้ใหญ่แตะผล 1 ครั้ง (หรือกด 1 / 2 / 3)</p></div></div><div class="phones phone-only">
+      <div><div class="phone"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:42px"></span></div><div class="stage"><div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">ดูกระจกพี่ปูนะ ปิดปาก… แล้วปล่อย!</div></div><div class="mirrors"><div class="mirror on"><div class="glass"><img src="art/mouth.svg" alt=""></div><span class="lips">ปิดปาก → ปล่อย</span><span class="name">พี่ปู</span></div><div class="mirror off"><div class="glass"><span class="q">?</span></div><span class="name">หนู</span></div></div><div class="mouth-card" style="background:none;box-shadow:none;padding:0"><div class="steps"><i class="on"></i><i></i><i></i></div></div><div class="word" style="font-size:50px">ปา</div><span class="turn"><i></i>ฟังพี่ปูก่อน…</span></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ภาพปากสร้างด้วย AI · ตัวเลือกผู้ใหญ่ ▾</div></div></div></div><p class="frame-label">ก · พี่ปูทำให้ดู: กระจกพี่ปูสว่าง เล่นภาพปาก 3 จังหวะพร้อมเสียง</p></div>
+      <div><div class="phone"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:42px"></span></div><div class="stage"><div class="mirrors"><div class="mirror off"><div class="glass"><img src="art/mouth.svg" alt=""></div><span class="name">พี่ปู</span></div><div class="mirror on"><div class="glass"><img src="art/mouth.svg" alt=""></div><span class="lips">ขยับตามเสียงหนู</span><span class="name">หนู</span></div></div><span class="turn go" style="margin:4px 0 14px"><i></i>ถึงตาหนู!</span><span class="mic hold"><svg><use href="#i-mic"/></svg></span><div class="mic-label">กดค้างแล้วพูด "ปา"</div><span class="heard">✓ ได้ยินแล้ว</span></div></div></div><p class="frame-label">ข · ถึงตาหนู: เพื่อนในกระจกขยับปากตามเสียงหนู · บอกแค่ "ได้ยินแล้ว" ไม่ใช่ความดัง</p></div>
+      <div><div class="phone"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:42px"></span></div><div class="stage"><div class="mirrors"><div class="mirror on"><div class="glass"><img src="art/mouth.svg" alt=""><span class="sparkle"></span></div><span class="name">พี่ปู</span></div><div class="mirror on"><div class="glass"><img src="art/mouth.svg" alt=""><span class="sparkle"></span></div><span class="name">หนู</span></div></div><div class="kid-title" style="margin-top:6px">กระจกวิ้ง!</div><div class="pieces"><i class="on"></i><i></i><i></i><span>ชิ้นกระจก 1/3</span></div><div class="row"><span class="btn"><svg><use href="#i-play"/></svg>ฟังพี่ปู</span><span class="btn"><svg><use href="#i-play"/></svg>ฟังหนู</span></div><span class="btn go" style="flex:none;width:170px">ไปต่อ<svg><use href="#i-next"/></svg></span></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ผู้ใหญ่ฟังแล้ว เด็กพูดเป็นอย่างไร</div><div class="faces"><span class="yes">😊 ทำได้</span><span>🙂 ฝึกอีก</span><span>⏭ ข้าม</span></div></div></div></div><p class="frame-label">ค · เสียงสะท้อน: ฟังพี่ปูแล้วฟังหนูต่อกัน ได้ชิ้นกระจก · เล่นด้วยกัน: ผู้ใหญ่แตะผล 1 ครั้ง · เล่นเอง: ไม่มีแถบนี้</p></div>
     </div></div>
-    <div class="notes"><p class="pc-note pc-only"><b>บนคอม:</b> จอกว้างพอให้ภาพปากกับปุ่มพูดอยู่จอเดียวกัน จึงลดจาก 4 ฉากเหลือ 3 · <span class="key">Space</span> ค้าง = กดไมค์ค้าง</p>
-      <div class="numbers"><div><b>~20 → 2</b>บรรทัดบนจอเด็ก</div><div><b>~15 → 2</b>สิ่งที่แตะได้</div><div><b>2 → 1</b>จอ</div></div>
+    <div class="notes"><p class="pc-note pc-only"><b>บนคอม:</b> กระจกสองบานอยู่ซ้ายเห็นพร้อมกัน คำและปุ่มพูดอยู่ขวา · <span class="key">Space</span> ค้าง = กดไมค์ค้าง</p>
+      <div class="numbers"><div><b>~20 → 2</b>บรรทัดบนจอเด็ก</div><div><b>~15 → 3</b>สิ่งที่แตะได้</div><div><b>2 → 1</b>จอ</div></div>
       <ul>
         <li><span class="t-cut">ตัด</span> หัวข้อซ้อน 4 ชั้น เหลือคำฝึกคำเดียว</li>
-        <li><span class="t-cut">ตัด</span> ปุ่มจังหวะปาก 1·2·3, ‹ ›, "ดูทีละจังหวะอัตโนมัติ" ภาพเล่นเอง</li>
+        <li><span class="t-cut">ตัด</span> ปุ่มจังหวะปาก 1·2·3, ‹ ›, "ดูทีละจังหวะอัตโนมัติ" ภาพในกระจกเล่นเอง</li>
         <li><span class="t-cut">ตัด</span> อัด → หยุด → บันทึก → ถัดไป เหลือ "กดค้างแล้วพูด"</li>
         <li><span class="t-move">ย้าย</span> "ภาพคนสร้างด้วย AI…", ขยายภาพปาก, "ทดลองตอบโดยไม่อัดเสียง", "ขอคำใบ้" ไปแถบผู้ใหญ่</li>
-        <li><span class="t-add">เพิ่ม</span> เกมเรือใบ ใช้ความดังและความยาวเสียงในเครื่อง</li>
-        <li><span class="t-add">เพิ่ม</span> "ฟังเสียงหนู" ให้เด็กฟังเสียงตัวเอง</li>
+        <li><span class="t-add">เพิ่ม</span> เกมกระจกวิเศษ: พี่ปูทำ → หนูทำ → ฟังเสียงสะท้อน ครบ 3 ข้อได้กรอบกระจกครบ พี่ปูเต้นฉลอง</li>
+        <li><span class="t-add">เพิ่ม</span> "ฟังพี่ปู · ฟังหนู" ให้ฟังเทียบเสียงตัวเองกับตัวอย่าง</li>
       </ul>
-      <h3>ทำไมเรือใบเข้ากับขั้นนี้</h3>
-      <ul><li>เสียง ป ปิดริมฝีปากแล้วปล่อยลม ภาพ "ลมพาเรือ" จึงเชื่อมกับวิธีออกเสียงจริง · ก และ ม ใช้ธีมอื่นได้ เช่น ม = ฮัมเพลงให้ผึ้งบิน</li></ul>
+      <h3>ไมค์วัดอะไร (ในเครื่อง)</h3>
+      <ul>
+        <li>หนูพูดตอนถึงตาไหม และเสียงยาวพอเป็นคำไหม</li>
+        <li>ไม่ให้รางวัลกับความดัง ได้ยินแล้วพอ</li>
+        <li>เพื่อนในกระจกใช้ภาพปาก 3 จังหวะของข้อนั้น: เงียบ = เตรียม, มีเสียง = ช่วงสระ, จบเสียง = ผ่อนคลาย ไม่ต้องวาดใหม่ และไม่ใช้กล้อง</li>
+        <li>ถูก/ผิดยังมาจากผู้ใหญ่ หรือ AI เมื่อเปิดใช้</li>
+      </ul>
+      <h3>ทำไมไม่ใช้เกมเป่าเรือ</h3>
+      <ul>
+        <li>เรือให้รางวัลกับเสียงดังและแรงลม เด็กจะตะโกนหรือเป่าแทนการทำปากให้ถูก</li>
+        <li>ใช้ได้แค่เสียงที่มีลมออก เช่น ป แต่ไม่เข้ากับ ม หรือ ก</li>
+        <li>งานวิจัยส่วนใหญ่ไม่พบว่าการฝึกเป่าช่วยให้ออกเสียงดีขึ้น (ให้นักแก้ไขการพูดในทีมยืนยัน)</li>
+        <li>กระจกใช้ได้กับทุกเสียงและทุกคำ และใช้จังหวะ "พี่ปูทำ → หนูทำ" เดียวกับเกมกระโดดหิน</li>
+      </ul>
     </div>
   </div>
 </section>
@@ -624,7 +631,7 @@
 
 <footer>
   <p>ไฟล์: <code>docs/design/wireframes/kid-practice.html</code> · ภาพปัจจุบัน: <code>before/</code> และ <code>before/pc/</code> (<code>node scripts/design/capture-practice-screens.mjs</code> และ <code>VIEW=pc node scripts/design/capture-practice-screens.mjs</code> ต้องเปิดเว็บไว้) · ภาพประกอบจริงของแอป: <code>art/</code> (<code>node scripts/design/export-art.mjs</code>)</p>
-  <p>ฉากเกม (ทะเล เรือ เกาะ ลำธาร) วาดใหม่ในไวร์เฟรมให้เข้าธีม งานจริงควรวาดในชุดเดียวกับภาพพี่ปู · ภาพปากในงานจริงใช้ภาพจังหวะปากชุดเดิมของแอป · ตัวเลขข้อความ/ปุ่มเป็นค่าประมาณจากหน้าจอจริง</p>
+  <p>ฉากเกม (กระจกวิเศษ ลำธาร) วาดใหม่ในไวร์เฟรมให้เข้าธีม งานจริงควรวาดในชุดเดียวกับภาพพี่ปู · ภาพปากในงานจริงใช้ภาพจังหวะปากชุดเดิมของแอป · ตัวเลขข้อความ/ปุ่มเป็นค่าประมาณจากหน้าจอจริง</p>
 </footer>
 <script>
 (() => {
