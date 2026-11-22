@@ -359,6 +359,28 @@
   .desk.light{background:#F6F6FA}
   .desk.light .chrome{background:#fff;border-color:#E8E7F0;color:#625F7C}.desk.light .chrome .url{background:#F2F1F8}.desk.light .chrome i{background:#E8E7F0}
   .phone.light-frame{box-shadow:0 0 0 1px #CFCBEA,0 24px 40px -18px #000}
+
+  /* ── Mouth photo vs cartoon ── */
+  .sub{margin:24px 0 10px;font-family:var(--font-display);font-weight:600;font-size:17px}
+  .sub small{font:400 13px var(--font-ui);color:var(--muted);margin-left:8px}
+  .cmp3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:1000px){.cmp3{grid-template-columns:1fr}}
+  .cmp-col{background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:14px}
+  .cmp-col.pick{border-color:var(--primary);box-shadow:0 0 0 3px rgb(85 72 212 / .25)}
+  .cmp-col .col-title{margin-bottom:8px}
+  .trio{display:flex;gap:8px;align-items:flex-end}
+  .trio figure{margin:0;flex:1;text-align:center;font-size:12px;color:var(--muted)}
+  .trio img{width:100%;border-radius:12px;display:block;margin-bottom:4px;object-fit:cover}
+  .trio.full img{aspect-ratio:1}.trio.tight img{aspect-ratio:3/4}.trio.toon img{aspect-ratio:1}
+  .cmp-col p.say{margin:10px 0 0;color:#DCDAF0;font-size:13px}
+  .mouths.photos img{aspect-ratio:3/4;object-fit:cover}
+  .mirror .glass img.p{width:100%;height:100%;object-fit:cover;object-position:50% 62%;transform:scale(1.35)}
+  .mstrip.photo img{object-fit:cover}
+  table.decide td,table.decide th{text-align:center}
+  table.decide td:first-child,table.decide th:first-child{text-align:left;white-space:normal}
+  table.decide .y{color:var(--success-text);font-weight:600}.table-n{color:var(--warning)}
+  table.decide .n{color:var(--error)}
+  table.decide th.pick{color:var(--primary-text)}
 </style>
 </head>
 <body>
@@ -445,8 +467,51 @@
 </section>
 
 <section class="block" id="mouths">
-  <h2>ภาพปากการ์ตูน: เห็นรูปปากชัด</h2>
-  <p class="lead">ภาพปากในแอปตอนนี้เป็นรูปถ่ายคนจริงขนาดเล็ก ดูยากว่าอ้าแบบไหน · ชุดใหม่วาดเป็นการ์ตูนหน้าเดียวกันทุกภาพ ขยายเฉพาะริมฝีปาก ฟัน และลิ้น ให้รูปปากต่างกันชัด</p>
+  <h2>ภาพปาก: รูปจริงหรือการ์ตูน</h2>
+  <p class="lead">ภาพปากในแอปตอนนี้เป็นรูปคนจริงที่เห็นทั้งหน้าล่าง ปากจึงเล็ก · เทียบ 3 แบบ: ภาพเดิม, รูปจริงครอปเฉพาะปาก, การ์ตูน แล้วดูในเกมจริง</p>
+  <h3 class="sub">เทียบ 3 แบบ · เสียง "ปา" 3 จังหวะ <small>ขนาดเท่ากัน</small></h3>
+  <div class="cmp3">
+    <div class="cmp-col"><p class="col-title now">ภาพเดิมในแอป</p><div class="trio full"><figure><img src="art/photo-full-closed.jpg" alt="">1 · ปิดปาก</figure><figure><img src="art/photo-full-open.jpg" alt="">2 · อ้า "า"</figure><figure><img src="art/photo-full-relax.jpg" alt="">3 · ผ่อน</figure></div><p class="say">เห็นตั้งแต่จมูกถึงคอ ปากกินพื้นที่ราวหนึ่งในสามของภาพ บนมือถือภาพจึงเล็กจนแยกจังหวะยาก</p></div>
+    <div class="cmp-col pick"><p class="col-title new">รูปจริง ครอปเฉพาะปาก (เสนอ)</p><div class="trio tight"><figure><img src="art/photo-closed.jpg" alt="">1 · ปิดปาก</figure><figure><img src="art/photo-open.jpg" alt="">2 · อ้า "า"</figure><figure><img src="art/photo-relax.jpg" alt="">3 · ผ่อน</figure></div><p class="say">ภาพชุดเดิมของแอป ครอปใหม่ให้ปากเต็มภาพ เห็นริมฝีปาก ฟัน และระยะอ้าชัด ตรงกับปากคนจริง</p></div>
+    <div class="cmp-col"><p class="col-title">การ์ตูน</p><div class="trio toon"><figure><img src="art/mouth-closed.svg" alt="">1 · ปิดปาก</figure><figure><img src="art/mouth-open.svg" alt="">2 · อ้า "า"</figure><figure><img src="art/mouth-relax.svg" alt="">3 · ผ่อน</figure></div><p class="say">รูปปากใหญ่ ๆ ดูออกทันที แต่ไม่เห็นรายละเอียด เช่น ริมฝีปากกดแน่นแค่ไหน</p></div>
+  </div>
+
+  <h3 class="sub">ในเกมกระจกวิเศษ <small>สลับโทรศัพท์/คอมที่มุมขวาล่าง</small></h3>
+  <div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:52px"></span></div><div class="split"><div class="col"><div class="mirrors"><div class="mirror on"><div class="glass"><img class="p" src="art/photo-closed.jpg" alt=""></div><span class="name">พี่ปู</span></div><div class="mirror off"><div class="glass"><span class="q">?</span></div><span class="name">หนู</span></div></div><div class="mstrip"><figure class="on"><img src="art/mouth-closed.svg" alt="">ปิดปาก</figure><span class="arr">›</span><figure class=""><img src="art/mouth-open.svg" alt="">อ้า "า"</figure><span class="arr">›</span><figure class=""><img src="art/mouth-relax.svg" alt="">ผ่อน</figure></div></div><div class="col"><div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">ดูกระจกพี่ปูนะ ปิดปาก… แล้วปล่อย!</div></div><div class="word" style="font-size:96px">ปา</div><span class="turn"><i></i>ฟังพี่ปูก่อน…</span></div></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ภาพปากสร้างด้วย AI · ตัวเลือกผู้ใหญ่ ▾</div></div></div></div><p class="frame-label">แบบผสม (เสนอ) · กระจกพี่ปูเป็นรูปจริงครอปปาก แถบจังหวะเป็นไอคอนการ์ตูน</p></div><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:52px"></span></div><div class="split"><div class="col"><div class="mirrors"><div class="mirror on"><div class="glass"><img class="m" src="art/mouth-closed.svg" alt=""></div><span class="name">พี่ปู</span></div><div class="mirror off"><div class="glass"><span class="q">?</span></div><span class="name">หนู</span></div></div><div class="mstrip"><figure class="on"><img src="art/mouth-closed.svg" alt="">ปิดปาก</figure><span class="arr">›</span><figure class=""><img src="art/mouth-open.svg" alt="">อ้า "า"</figure><span class="arr">›</span><figure class=""><img src="art/mouth-relax.svg" alt="">ผ่อน</figure></div></div><div class="col"><div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">ดูกระจกพี่ปูนะ ปิดปาก… แล้วปล่อย!</div></div><div class="word" style="font-size:96px">ปา</div><span class="turn"><i></i>ฟังพี่ปูก่อน…</span></div></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ภาพปากสร้างด้วย AI · ตัวเลือกผู้ใหญ่ ▾</div></div></div></div><p class="frame-label">การ์ตูนทั้งหมด (แบบในหน้า 4 ตอนนี้)</p></div></div>
+  <div class="phones phone-only"><div><div class="phone"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:42px"></span></div><div class="stage"><div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">ดูกระจกพี่ปูนะ ปิดปาก… แล้วปล่อย!</div></div><div class="mirrors"><div class="mirror on"><div class="glass"><img class="p" src="art/photo-closed.jpg" alt=""></div><span class="name">พี่ปู</span></div><div class="mirror off"><div class="glass"><span class="q">?</span></div><span class="name">หนู</span></div></div><div class="mstrip"><figure class="on"><img src="art/mouth-closed.svg" alt="">ปิดปาก</figure><span class="arr">›</span><figure class=""><img src="art/mouth-open.svg" alt="">อ้า "า"</figure><span class="arr">›</span><figure class=""><img src="art/mouth-relax.svg" alt="">ผ่อน</figure></div><div class="word" style="font-size:46px">ปา</div><span class="turn"><i></i>ฟังพี่ปูก่อน…</span></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ภาพปากสร้างด้วย AI · ตัวเลือกผู้ใหญ่ ▾</div></div></div></div><p class="frame-label">แบบผสม (เสนอ) · พี่ปูทำให้ดู: กระจกพี่ปูเป็นรูปจริงครอปปาก</p></div><div><div class="phone"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:42px"></span></div><div class="stage"><div class="mirrors"><div class="mirror off"><div class="glass"><img class="p" src="art/photo-relax.jpg" alt=""></div><span class="name">พี่ปู</span></div><div class="mirror on"><div class="glass"><img class="m" src="art/mouth-open.svg" alt=""></div><span class="lips">ขยับตามเสียงหนู</span><span class="name">หนู</span></div></div><span class="turn go" style="margin:4px 0 14px"><i></i>ถึงตาหนู!</span><span class="mic hold"><svg><use href="#i-mic"/></svg></span><div class="mic-label">กดค้างแล้วพูด "ปา"</div><span class="heard">✓ ได้ยินแล้ว</span></div></div></div><p class="frame-label">แบบผสม (เสนอ) · ถึงตาหนู: กระจกหนูยังเป็นการ์ตูนที่ขยับตามเสียง</p></div><div><div class="phone"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span style="width:42px"></span></div><div class="stage"><div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">ดูกระจกพี่ปูนะ ปิดปาก… แล้วปล่อย!</div></div><div class="mirrors"><div class="mirror on"><div class="glass"><img class="m" src="art/mouth-closed.svg" alt=""></div><span class="name">พี่ปู</span></div><div class="mirror off"><div class="glass"><span class="q">?</span></div><span class="name">หนู</span></div></div><div class="mstrip"><figure class="on"><img src="art/mouth-closed.svg" alt="">ปิดปาก</figure><span class="arr">›</span><figure class=""><img src="art/mouth-open.svg" alt="">อ้า "า"</figure><span class="arr">›</span><figure class=""><img src="art/mouth-relax.svg" alt="">ผ่อน</figure></div><div class="word" style="font-size:46px">ปา</div><span class="turn"><i></i>ฟังพี่ปูก่อน…</span></div><div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ภาพปากสร้างด้วย AI · ตัวเลือกผู้ใหญ่ ▾</div></div></div></div><p class="frame-label">การ์ตูนทั้งหมด (แบบในหน้า 4 ตอนนี้)</p></div></div>
+
+  <h3 class="sub">เลือกแบบไหนดี</h3>
+  <table class="games decide">
+    <tr><th>เรื่องที่ดู</th><th>ภาพเดิมในแอป</th><th class="pick">รูปจริง ครอปปาก</th><th>การ์ตูน</th></tr>
+    <tr><td>เห็นรูปปากชัดบนมือถือ</td><td class="table-n">พอใช้ ปากเล็ก</td><td class="y">ชัด</td><td class="y">ชัดเฉพาะรูปใหญ่ ๆ</td></tr>
+    <tr><td>ตรงกับปากคนจริงที่เด็กเห็นทุกวัน</td><td class="y">ตรง</td><td class="y">ตรง</td><td class="n">ย่อรายละเอียด</td></tr>
+    <tr><td>เห็นริมฝีปากกด ฟัน และระยะอ้า</td><td class="table-n">เห็นแต่เล็ก</td><td class="y">เห็นชัด</td><td class="n">เห็นน้อย</td></tr>
+    <tr><td>ใช้เป็น "เพื่อนในกระจก" ที่ขยับตามเสียงเด็ก</td><td class="n">ดูแปลก หน้าคนอื่นพูดแทน</td><td class="n">ดูแปลก</td><td class="y">เหมาะ</td></tr>
+    <tr><td>เห็นตำแหน่งลิ้น (ต ด น ล ก ง)</td><td class="n">ไม่เห็น</td><td class="n">ไม่เห็น</td><td class="n">ไม่เห็น</td></tr>
+    <tr><td>งานที่ต้องทำเพิ่ม</td><td>ไม่มี</td><td>ครอปจากภาพเดิม 6 ท่า (ทำในไวร์เฟรมแล้ว)</td><td>วาดชุดใหม่ 8–10 รูป</td></tr>
+  </table>
+  <div class="grid2" style="margin-top:16px">
+    <div class="box hero"><h3>ที่เสนอ: แบบผสม</h3><ul>
+      <li>กระจกพี่ปู (ตัวอย่างให้ดูตาม) ใช้รูปจริงครอปเฉพาะปาก</li>
+      <li>แถบจังหวะใต้กระจก และกระจกของหนูที่ขยับตามเสียง ใช้การ์ตูน</li>
+      <li>เสียงที่ใช้ลิ้นต้องมีภาพด้านข้างเพิ่ม ไม่ว่าจะเลือกแบบไหน</li>
+    </ul></div>
+    <div class="box"><h3>ถ้าทีมยังเลือกไม่ได้</h3><ul>
+      <li>ใส่ไว้ในการทดสอบกับเด็ก: ครึ่งหนึ่งเห็นรูปจริงในกระจกพี่ปู อีกครึ่งเห็นการ์ตูน</li>
+      <li>ให้นักแก้ไขการพูดดูว่าเด็กทำปากตามได้ใกล้ตัวอย่างแค่ไหน</li>
+      <li>รูปชุดนี้เป็นภาพสร้างด้วย AI ตามที่แอปบอกไว้เดิม ยังต้องแจ้งผู้ใหญ่เหมือนเดิม</li>
+    </ul></div>
+  </div>
+
+  <h3 class="sub">ชุดรูปจริง ครอปจากภาพเดิมของแอป</h3>
+  <div class="mouths photos">
+    <figure><img src="art/photo-closed.jpg" alt=""><b>ปิดปากสนิท</b><small>ป บ พ ม</small></figure>
+    <figure><img src="art/photo-open.jpg" alt=""><b>อ้ากว้าง</b><small>อา</small></figure>
+    <figure><img src="art/photo-relax.jpg" alt=""><b>ผ่อนปาก</b><small>ท้ายเสียง</small></figure>
+    <figure><img src="art/photo-teeth.jpg" alt=""><b>ยิ้มกว้าง</b><small>อี เอ</small></figure>
+    <figure><img src="art/photo-round.jpg" alt=""><b>ห่อปาก</b><small>อู โอ</small></figure>
+  </div>
+  <h3 class="sub">ชุดการ์ตูน</h3>
   <div class="mouths">
     <figure><img src="art/mouth-closed.svg" alt=""><b>ปิดปากสนิท</b><small>ป บ พ ม</small></figure>
     <figure><img src="art/mouth-open.svg" alt=""><b>อ้ากว้าง</b><small>อา</small></figure>
@@ -901,7 +966,7 @@
     <tr><td>3 · ครบทุกขั้น</td><td>รถไฟคำ, พี่ปูซ่อนแอบ, โหมดเล่นเอง, หน้าพักและตั้งเวลา, โหมดสว่าง</td><td>เด็กโตเล่นเองโดยไม่มีผู้ใหญ่ช่วย</td></tr>
   </table>
   <div class="grid2" style="margin-top:18px">
-    <div class="box hero"><h3>แผนทดสอบ</h3><ul><li>เด็ก 6–8 คน: อนุบาล 3–4 คน (เล่นด้วยกัน) และ ป.1–3 อีก 3–4 คน (เล่นเอง) พร้อมผู้ใหญ่ที่มาด้วย</li><li>แต่ละคนเล่นแบบเดิมและแบบใหม่อย่างละ 1 รอบ สลับลำดับครึ่งหนึ่ง</li><li>ผู้ปกครองยินยอมก่อน ไม่อัดวิดีโอเด็ก จดเวลาและสิ่งที่เห็น</li></ul></div>
+    <div class="box hero"><h3>แผนทดสอบ</h3><ul><li>เด็ก 6–8 คน: อนุบาล 3–4 คน (เล่นด้วยกัน) และ ป.1–3 อีก 3–4 คน (เล่นเอง) พร้อมผู้ใหญ่ที่มาด้วย</li><li>แต่ละคนเล่นแบบเดิมและแบบใหม่อย่างละ 1 รอบ สลับลำดับครึ่งหนึ่ง</li><li>ผู้ปกครองยินยอมก่อน ไม่อัดวิดีโอเด็ก จดเวลาและสิ่งที่เห็น</li><li>เทียบภาพปาก: ครึ่งหนึ่งเห็นรูปจริงในกระจกพี่ปู อีกครึ่งเห็นการ์ตูน</li></ul></div>
     <div class="box"><h3>วัดอะไร และผ่านเมื่อไร</h3><ul><li>เวลาจนเด็กพูดครั้งแรกในข้อ · ผ่าน: ส่วนใหญ่ภายใน 10 วินาที</li><li>ข้อที่เด็กทำจบเองโดยไม่ต้องช่วยกด · ผ่าน: ≥ 80% ในโหมดเล่นเอง</li><li>ผู้ใหญ่แตะกี่ครั้งต่อข้อ · ผ่าน: ไม่เกิน 1 ครั้ง</li><li>เด็กหลุดออกจากหน้าฝึกกี่ครั้ง · ผ่าน: 0</li><li>ถามเด็ก "สนุกไหม" (หน้ายิ้ม 3 แบบ) และถามผู้ใหญ่ 3 ข้อ: ใช้ง่ายไหม เข้าใจผลไหม จะใช้ต่อไหม</li></ul></div>
   </div>
   <div class="box" style="margin-top:18px"><h3>ให้ทีมช่วยยืนยันก่อนเริ่มเฟส 1</h3><ul>
