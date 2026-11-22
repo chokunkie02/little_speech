@@ -1,0 +1,57 @@
+{
+  "01-path": {
+    "tappable": 27,
+    "chars": 1155,
+    "screens": 1.4
+  },
+  "02-start-round": {
+    "tappable": 30,
+    "chars": 1472,
+    "screens": 1.4
+  },
+  "03-speech-item": {
+    "tappable": 27,
+    "chars": 777,
+    "screens": 1.4
+  },
+  "04-speech-answered": {
+    "tappable": 29,
+    "chars": 801,
+    "screens": 1.4
+  },
+  "05-choice-item": {
+    "tappable": 19,
+    "chars": 436,
+    "screens": 1.2
+  },
+  "06-choice-answered": {
+    "tappable": 22,
+    "chars": 523,
+    "screens": 1.3
+  },
+  "07-round-summary": {
+    "tappable": 23,
+    "chars": 834,
+    "screens": 1.4
+  },
+  "08-syllable-item": {
+    "tappable": 20,
+    "chars": 484,
+    "screens": 1.4
+  },
+  "09-word-item": {
+    "tappable": 20,
+    "chars": 480,
+    "screens": 1.2
+  },
+  "10-phrase-item": {
+    "tappable": 20,
+    "chars": 504,
+    "screens": 1.3
+  },
+  "11-real-item": {
+    "tappable": 22,
+    "chars": 589,
+    "screens": 1.4
+  }
+}

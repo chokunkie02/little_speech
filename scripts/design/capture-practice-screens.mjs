@@ -5,7 +5,9 @@
 //   node scripts/design/capture-practice-screens.mjs            (phone, 390 × 844)
 //   VIEW=pc node scripts/design/capture-practice-screens.mjs    (computer, 1440 × 900)
 //
-// Writes docs/design/wireframes/before/*.png (phone) or before/pc/*.png (computer)
+// Writes docs/design/wireframes/before/*.png (phone) or before/pc/*.png (computer), plus metrics.json:
+// per screen, what is on the page in total (scrolled or not): tappable controls, visible text characters
+// (spaces excluded) and page height in screens.
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdir, rm, writeFile } from "node:fs/promises";
@@ -117,7 +119,24 @@ async function startStage(n) {
   const dialog = await evaluate(`[...document.querySelectorAll("button")].some((b) => b.innerText.includes("พร้อมแล้ว เริ่มเลย"))`);
   return dialog;
 }
+const metrics = {};
+async function measure(name) {
+  metrics[name] = await evaluate(`(() => {
+    const visible = (el) => { const r = el.getBoundingClientRect(); const st = getComputedStyle(el); return r.width > 0 && r.height > 0 && r.right > 0 && r.left < innerWidth && !el.closest("[inert], [aria-hidden=true]") && st.visibility !== "hidden" && st.opacity !== "0"; };
+    const tappable = [...document.querySelectorAll("button, a[href], [role=button], input, select, summary")].filter((el) => visible(el) && !el.disabled).length;
+    let chars = 0;
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    while (walker.nextNode()) {
+      const node = walker.currentNode;
+      const text = node.textContent.replace(/\\s+/g, "");
+      if (text && node.parentElement && node.parentElement.closest("script, style") === null && visible(node.parentElement)) chars += text.length;
+    }
+    const screens = Math.round((document.documentElement.scrollHeight / innerHeight) * 10) / 10;
+    return { tappable, chars, screens };
+  })()`);
+}
 async function shot(name, { full = false } = {}) {
+  await measure(name);
   await evaluate("window.scrollTo(0, 0)");
   await sleep(300);
   let params = { format: "png" };
@@ -154,10 +173,12 @@ try {
   await shot("07-round-summary", { full: true });
 
   // Syllables (stage 3) and words (stage 4)
-  for (const [stage, name] of [[3, "08-syllable-item"], [4, "09-word-item"]]) {
+  for (const [stage, name] of [[3, "08-syllable-item"], [4, "09-word-item"], [5, "10-phrase-item"], [6, "11-real-item"]]) {
     if (await startStage(stage)) await click("พร้อมแล้ว เริ่มเลย");
     await shot(name, { full: true });
   }
+  await writeFile(path.join(OUT, "metrics.json"), `${JSON.stringify(metrics, null, 2)}\n`);
+  console.log("saved metrics.json");
 } finally {
   socket.close();
   // Edge starts helper processes; end the whole tree so the throwaway profile is released.
