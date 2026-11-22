@@ -3,116 +3,178 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Speech Adventure · ไวร์เฟรมหน้าฝึกสำหรับเด็ก (เทียบก่อน/หลัง)</title>
+<title>Speech Adventure · หน้าฝึกสำหรับเด็ก (เทียบก่อน/หลัง)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Itim&family=Kanit:wght@400;600&family=Mali:wght@400;600;700&family=Sarabun:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Itim&family=Kanit:wght@400;500;600&family=Mali:wght@400;600&family=Sarabun:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--ink:#1f2433;--muted:#6b7280;--line:#d9dbe3;--paper:#f6f5f1;--card:#fff;--accent:#6c5ce7;--accent-soft:#ece9ff;--good:#3fa877;--warm:#f2a03d;--kid:'Itim','Mali','Kanit',sans-serif}
+  /* Tokens copied from src/app/globals.css (.dark) so the mockups match the live site. */
+  :root{
+    --bg:#0E0C22;--surface:#17143A;--surface-2:#1F1B48;--line:#2A2654;
+    --text:#F1F0FA;--muted:#A7A4C8;
+    --primary:#5548D4;--primary-text:#C3BBFF;--primary-soft:#262064;
+    --success:#4CAF82;--success-text:#7DDBB0;--warning:#FBBF24;--info:#5BC0EB;--error:#FF939E;
+    --gold-1:#FFD58A;--gold-2:#F2B23A;--gold-edge:#C98B1C;
+    --hero:radial-gradient(520px 260px at 92% 0%,rgb(255 200 97 / .14),transparent 60%),linear-gradient(135deg,#231A6E 0%,#4337B8 75%,#5A4FD6 100%);
+    --font-ui:'IBM Plex Sans Thai','Kanit',sans-serif;--font-display:'Kanit',sans-serif;
+    --font-kid:'Itim','Kanit',sans-serif;--font-letter:'Sarabun',sans-serif;
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Sarabun','Kanit',Tahoma,sans-serif;line-height:1.6}
-  header.page{padding:32px 40px 8px;max-width:1280px;margin:0 auto}
-  header.page h1{margin:0 0 4px;font-family:'Kanit',sans-serif;font-weight:600;font-size:28px}
+  body{margin:0;background:radial-gradient(900px 500px at 100% -10%,rgb(85 72 212 / .25),transparent 60%),var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.6}
+  a{color:var(--primary-text)}
+  header.page{padding:36px 40px 8px;max-width:1320px;margin:0 auto}
+  header.page h1{margin:0 0 4px;font-family:var(--font-display);font-weight:600;font-size:30px;letter-spacing:-.01em}
   header.page p{margin:4px 0;color:var(--muted)}
-  nav.toc{max-width:1280px;margin:12px auto 0;padding:0 40px;display:flex;flex-wrap:wrap;gap:8px}
-  nav.toc a{font-size:13px;padding:6px 12px;border-radius:999px;background:#fff;border:1px solid var(--line);color:var(--ink);text-decoration:none}
-  section.block{max-width:1280px;margin:28px auto;padding:24px 40px;background:#fff;border:1px solid var(--line);border-radius:20px}
-  section.block>h2{margin:0 0 4px;font-family:'Kanit',sans-serif;font-weight:600;font-size:22px}
-  section.block>.lead{margin:0 0 18px;color:var(--muted)}
-  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-bottom:6px}
-  .legend b{color:var(--ink)}
-  /* compare row */
-  .compare{display:grid;grid-template-columns:300px 1fr 280px;gap:24px;align-items:start}
-  /* storyboard phones a bit smaller so 2–3 fit side by side */
-  .phones .phone{zoom:.8}
-  .phones .frame-label{max-width:240px}
+  header.page p b{color:var(--text)}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--primary-soft);color:var(--primary-text);font-size:12px;font-weight:500}
+  nav.toc{max-width:1320px;margin:14px auto 0;padding:0 40px;display:flex;flex-wrap:wrap;gap:8px}
+  nav.toc a{font-size:13px;padding:6px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--text);text-decoration:none}
+  nav.toc a:hover{border-color:var(--primary)}
+  section.block{max-width:1320px;margin:26px auto;padding:26px 40px;background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:0 24px 48px -30px #000}
+  section.block>h2{margin:0 0 4px;font-family:var(--font-display);font-weight:600;font-size:22px}
+  section.block>.lead{margin:0 0 20px;color:var(--muted)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:8px}
+  .legend b{color:var(--text)}
+  .compare{display:grid;grid-template-columns:300px 1fr 280px;gap:26px;align-items:start}
   @media (max-width:1100px){.compare{grid-template-columns:1fr}}
-  .col-title{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;font-weight:600}
-  .col-title.now{color:#b4443f}.col-title.new{color:var(--accent)}
-  .phones{display:flex;gap:16px;flex-wrap:wrap}
-  /* phone frame */
-  .phone{width:300px;height:620px;border:10px solid #1d2030;border-radius:38px;background:#fdfcf8;position:relative;overflow:hidden;flex:none;box-shadow:0 10px 30px #0001}
+  .col-title{font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px;font-weight:600;color:var(--muted)}
+  .col-title.now{color:var(--error)}.col-title.new{color:var(--primary-text)}
+  .phones{display:flex;gap:18px;flex-wrap:wrap}
+  .phones .phone{zoom:.8}
+  .frame-label{font-size:12px;color:var(--muted);margin:8px 0 0;max-width:240px}
+  .phone{width:300px;height:620px;border:10px solid #05040f;border-radius:40px;position:relative;overflow:hidden;flex:none;box-shadow:0 0 0 1px #2A2654,0 24px 40px -18px #000}
   .phone.before{overflow-y:auto;background:#0c0f24}
   .phone.before img{width:100%;display:block}
-  .phone .cap{position:absolute;left:0;right:0;bottom:0;padding:6px 10px;background:#1d2030;color:#fff;font-size:11px;text-align:center}
-  .frame-label{font-size:12px;color:var(--muted);margin:6px 0 0;max-width:300px}
-  /* new-design wireframe parts */
-  .wf{position:absolute;inset:0;display:flex;flex-direction:column;font-family:var(--kid);color:var(--ink)}
-  .wf-top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 6px}
-  .icon-btn{width:40px;height:40px;border-radius:14px;border:2px solid var(--line);display:grid;place-items:center;font-size:18px;background:#fff}
-  .dots{display:flex;gap:6px}.dots i{width:10px;height:10px;border-radius:50%;background:var(--line);display:block}.dots i.on{background:var(--accent)}
-  .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:8px 18px}
-  .mascot{display:flex;align-items:flex-end;gap:8px;align-self:stretch}
-  .crab{width:64px;height:64px;border-radius:50%;background:#ffe3d6;display:grid;place-items:center;font-size:36px;flex:none;border:2px dashed #f0a98a}
-  .crab.big{width:110px;height:110px;font-size:62px}
-  .bubble{background:#fff;border:2px solid var(--line);border-radius:18px 18px 18px 4px;padding:8px 12px;font-size:17px;line-height:1.35;position:relative}
-  .bubble .spk{font-size:13px;color:var(--accent)}
-  .word{font-size:56px;line-height:1.1;font-family:'Sarabun',sans-serif;font-weight:600}
-  .word small{display:block;font-size:12px;color:var(--muted);font-family:var(--kid);font-weight:400;text-align:center}
+
+  /* ── New design: the kid world, in the site's dark theme ── */
+  .kid{position:absolute;inset:0;display:flex;flex-direction:column;color:var(--text);font-family:var(--font-kid);
+       background:radial-gradient(260px 200px at 85% -5%,rgb(255 200 97 / .18),transparent 70%),radial-gradient(240px 220px at -10% 30%,rgb(85 72 212 / .35),transparent 70%),linear-gradient(180deg,#1A1452 0%,#0E0C22 70%)}
+  .kid::before{content:"";position:absolute;inset:0;background-image:radial-gradient(1.4px 1.4px at 20% 12%,#fff8 50%,transparent 51%),radial-gradient(1.2px 1.2px at 70% 8%,#fff6 50%,transparent 51%),radial-gradient(1px 1px at 40% 22%,#fff5 50%,transparent 51%),radial-gradient(1.3px 1.3px at 88% 26%,#fff6 50%,transparent 51%);pointer-events:none}
+  .top{display:flex;justify-content:space-between;align-items:center;padding:16px 16px 6px;position:relative;z-index:1}
+  .ibtn{width:42px;height:42px;border-radius:14px;background:rgb(255 255 255 / .07);border:1px solid rgb(255 255 255 / .12);display:grid;place-items:center;color:#fff}
+  .ibtn svg{width:20px;height:20px}
+  .dots{display:flex;gap:7px}.dots i{width:24px;height:8px;border-radius:999px;background:rgb(255 255 255 / .14);display:block}.dots i.on{background:linear-gradient(90deg,var(--gold-1),var(--gold-2))}
+  .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:6px 18px 14px;position:relative;z-index:1}
+  .mascot{display:flex;align-items:flex-end;gap:6px;align-self:stretch}
+  .pu{width:76px;flex:none;filter:drop-shadow(0 8px 10px rgb(0 0 0 / .35))}
+  .pu.big{width:150px}
+  .bubble{background:#fff;color:#1E1A4A;border-radius:20px 20px 20px 6px;padding:9px 13px;font-size:17px;line-height:1.35;box-shadow:0 10px 20px -10px #000}
+  .bubble .spk{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--primary);font-family:var(--font-ui);font-weight:600}
+  .bubble .spk svg{width:14px;height:14px}
+  .word{font-family:var(--font-letter);font-weight:700;font-size:58px;line-height:1.05;letter-spacing:.02em;text-shadow:0 4px 18px rgb(85 72 212 / .7)}
+  .kid-title{font-size:28px;text-align:center;line-height:1.25}
+  .kid-sub{font-size:16px;color:var(--muted);text-align:center;line-height:1.35}
   .pics{display:flex;gap:12px;width:100%}
-  .pic{flex:1;aspect-ratio:1/1.1;border:3px solid var(--line);border-radius:22px;display:grid;place-items:center;font-size:60px;background:#fff;position:relative}
-  .pic.hit{border-color:var(--good);box-shadow:0 0 0 6px #3fa87722}
+  .pic{flex:1;border-radius:24px;background:var(--surface);border:2px solid var(--line);padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 6px 0 #0a0820}
+  .pic img{width:100%;height:96px;object-fit:contain}
+  .pic span{font-family:var(--font-letter);font-weight:700;font-size:24px}
+  .pic.hit{border-color:var(--success);box-shadow:0 6px 0 #1d5c43,0 0 0 6px rgb(76 175 130 / .22)}
   .pic.dim{opacity:.35}
-  .pic .tag{position:absolute;bottom:8px;font-size:16px}
-  .big-btn{width:120px;height:120px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:44px;box-shadow:0 8px 0 #4b3fc0;border:none}
-  .big-btn.hold{box-shadow:0 0 0 12px #6c5ce733,0 8px 0 #4b3fc0}
-  .btn-row{display:flex;gap:12px;justify-content:center;width:100%}
-  .pill{border-radius:999px;padding:12px 20px;font-size:18px;border:2px solid var(--line);background:#fff;display:inline-flex;align-items:center;gap:8px}
-  .pill.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
-  .adult{position:absolute;right:12px;bottom:12px;font-family:'Sarabun',sans-serif;font-size:11px;color:var(--muted);border:1px dashed #b9bccb;border-radius:999px;padding:4px 10px;background:#fff}
-  .adult-bar{margin:0 12px 12px;border:1px dashed #b9bccb;border-radius:14px;padding:8px 10px;font-family:'Sarabun',sans-serif;font-size:12px;color:var(--muted);background:#fff}
-  .adult-bar .faces{display:flex;gap:6px;margin-top:6px}
-  .adult-bar .faces span{flex:1;text-align:center;border:1px solid var(--line);border-radius:10px;padding:4px 0;color:var(--ink);font-size:12px}
-  .meter{width:100%;height:16px;border-radius:999px;background:#eceef4;overflow:hidden;border:2px solid var(--line)}
-  .meter b{display:block;height:100%;background:linear-gradient(90deg,#8fd3ff,#6c5ce7)}
-  .sea{width:100%;height:170px;border-radius:22px;background:linear-gradient(#e9f6ff 0 55%,#bfe3fb 55%);position:relative;overflow:hidden;border:2px solid var(--line)}
-  .sea .boat{position:absolute;bottom:52px;font-size:40px}
-  .sea .island{position:absolute;right:8px;bottom:40px;font-size:40px}
-  .sea .wind{position:absolute;bottom:72px;font-size:22px;color:#6aa9d8}
-  .stones{display:flex;gap:6px;width:100%;justify-content:space-between;align-items:flex-end}
-  .stone{flex:1;height:54px;border-radius:50% 50% 40% 40%;background:#dfe2ea;display:grid;place-items:center;font-family:'Sarabun',sans-serif;font-size:18px;font-weight:600;position:relative}
-  .stone.on{background:#cfeedd}
-  .stone .hop{position:absolute;top:-38px;font-size:30px}
-  .card-flip{width:170px;height:200px;border-radius:22px;border:3px solid var(--line);display:grid;place-items:center;font-size:72px;background:repeating-linear-gradient(45deg,#f1f0fb 0 12px,#e7e4fb 12px 24px)}
-  .card-flip.open{background:#fff}
-  .stars{font-size:34px;letter-spacing:6px}
-  .kid-title{font-size:26px;text-align:center;line-height:1.3}
-  .kid-sub{font-size:16px;color:var(--muted);text-align:center}
-  /* notes */
-  .notes h3{margin:0 0 6px;font-size:15px;font-family:'Kanit',sans-serif;font-weight:600}
-  .notes ul{margin:0 0 12px;padding-left:18px;font-size:14px}
-  .notes li{margin:3px 0}
-  .tag-cut{color:#b4443f;font-weight:600}.tag-move{color:#a06a00;font-weight:600}.tag-add{color:var(--good);font-weight:600}
-  .numbers{display:flex;gap:10px;margin:8px 0 14px}
-  .numbers div{flex:1;border:1px solid var(--line);border-radius:12px;padding:8px;text-align:center;font-size:12px;color:var(--muted)}
-  .numbers b{display:block;font-size:20px;color:var(--ink);font-family:'Kanit',sans-serif}
-  /* principles & modes */
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  .mic{width:124px;height:124px;border-radius:50%;display:grid;place-items:center;color:#2A1D05;border:none;
+       background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 100%);box-shadow:inset 0 2px 0 rgb(255 255 255 / .6),0 7px 0 var(--gold-edge),0 18px 30px -10px rgb(242 178 58 / .8)}
+  .mic svg{width:50px;height:50px}
+  .mic.hold{box-shadow:inset 0 2px 0 rgb(255 255 255 / .6),0 7px 0 var(--gold-edge),0 0 0 14px rgb(255 213 138 / .18),0 0 0 28px rgb(255 213 138 / .08)}
+  .mic-label{font-size:15px;color:var(--muted);margin-top:-4px}
+  .meter{width:100%;height:14px;border-radius:999px;background:rgb(255 255 255 / .1);overflow:hidden}
+  .meter b{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#7DD3FC,var(--gold-1))}
+  .row{display:flex;gap:10px;justify-content:center;width:100%}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;border-radius:18px;padding:13px 12px;font-family:var(--font-kid);font-size:17px;color:#fff;background:rgb(255 255 255 / .08);border:1px solid rgb(255 255 255 / .14);flex:1}
+  .btn svg{width:20px;height:20px}
+  .btn.go{background:linear-gradient(180deg,#7B6CF6 0%,#5548D4 100%);border:none;box-shadow:inset 0 1px 0 rgb(255 255 255 / .3),0 5px 0 #3A2EA8}
+  .btn.gold{background:linear-gradient(180deg,var(--gold-1),var(--gold-2));color:#2A1D05;border:none;box-shadow:inset 0 2px 0 rgb(255 255 255 / .6),0 6px 0 var(--gold-edge)}
+  .stars{display:flex;gap:8px}.stars svg{width:38px;height:38px;fill:var(--gold-1);filter:drop-shadow(0 0 10px rgb(255 213 138 / .6))}
+  .stars.dim svg:last-child{fill:rgb(255 255 255 / .15);filter:none}
+  .scene{width:100%;border-radius:24px;overflow:hidden;border:1px solid rgb(255 255 255 / .12);box-shadow:0 14px 30px -16px #000}
+  .scene svg{display:block;width:100%;height:auto}
+  .card3d{width:180px;height:200px;border-radius:26px;display:grid;place-items:center;background:var(--hero);border:1px solid rgb(255 255 255 / .14);box-shadow:0 8px 0 #1b1456,0 20px 30px -14px #000;position:relative;overflow:hidden}
+  .card3d::after{content:"?";font-family:var(--font-kid);font-size:84px;color:rgb(255 255 255 / .85)}
+  .card3d.open{background:#FFFDF6;border-color:#fff}
+  .card3d.open::after{content:none}
+  .card3d img{width:150px}
+  .sticker{position:absolute;top:10px;right:10px;font-family:var(--font-ui);font-size:11px;font-weight:600;color:#2A1D05;background:linear-gradient(180deg,var(--gold-1),var(--gold-2));border-radius:999px;padding:3px 9px}
+  .mouth-card{width:100%;border-radius:24px;background:var(--hero);padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 18px 30px -16px #000}
+  .mouth-card img{width:170px;background:#FFF5EE;border-radius:18px;padding:8px}
+  .mouth-card .steps{display:flex;gap:6px}.mouth-card .steps i{width:28px;height:6px;border-radius:999px;background:rgb(255 255 255 / .3)}.mouth-card .steps i.on{background:#fff}
+  .mouth-card small{font-family:var(--font-ui);font-size:11px;color:rgb(255 255 255 / .75)}
+  .adult{position:absolute;right:14px;bottom:14px;z-index:2;display:inline-flex;align-items:center;gap:5px;font-family:var(--font-ui);font-size:11px;color:var(--muted);border:1px dashed rgb(255 255 255 / .25);border-radius:999px;padding:5px 10px;background:rgb(14 12 34 / .7)}
+  .adult svg{width:13px;height:13px}
+  .adult-bar{position:relative;z-index:1;margin:0 12px 12px;border:1px dashed rgb(255 255 255 / .22);border-radius:16px;padding:9px 11px;font-family:var(--font-ui);font-size:12px;color:var(--muted);background:rgb(14 12 34 / .72)}
+  .adult-bar .head{display:flex;align-items:center;gap:6px}
+  .adult-bar svg{width:13px;height:13px}
+  .faces{display:flex;gap:6px;margin-top:7px}
+  .faces span{flex:1;text-align:center;border-radius:12px;padding:6px 0;color:var(--text);font-size:12px;background:rgb(255 255 255 / .06);border:1px solid rgb(255 255 255 / .1)}
+  .faces span.yes{background:rgb(76 175 130 / .18);border-color:rgb(76 175 130 / .5);color:var(--success-text)}
+  /* adult screen inside a phone: the site's normal UI */
+  .adult-screen{position:absolute;inset:0;background:var(--bg);font-family:var(--font-ui);color:var(--text);display:flex;flex-direction:column}
+  .adult-screen .hdr{background:var(--hero);padding:18px 16px 16px}
+  .adult-screen .hdr b{font-family:var(--font-display);font-size:18px;font-weight:600}
+  .adult-screen .hdr small{display:block;color:rgb(255 255 255 / .75)}
+  .adult-screen .list{padding:12px;display:flex;flex-direction:column;gap:10px;font-size:13px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:11px 13px}
+  .card .lnk{color:var(--primary-text);font-weight:600;float:right}
+  .card b{font-weight:600}
+
+  /* notes column */
+  .notes h3{margin:0 0 6px;font-size:15px;font-family:var(--font-display);font-weight:600}
+  .notes ul{margin:0 0 12px;padding-left:18px;font-size:14px;color:#DCDAF0}
+  .notes li{margin:4px 0}
+  .t-cut{color:var(--error);font-weight:600}.t-move{color:var(--warning);font-weight:600}.t-add{color:var(--success-text);font-weight:600}
+  .numbers{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
+  .numbers div{flex:1;min-width:76px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:8px 6px;text-align:center;font-size:11px;color:var(--muted);line-height:1.3}
+  .numbers b{display:block;font-size:17px;color:var(--text);font-family:var(--font-display);font-weight:600;margin-bottom:2px}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
   @media (max-width:900px){.grid2{grid-template-columns:1fr}}
-  .box{border:1px solid var(--line);border-radius:16px;padding:16px 18px;background:#fcfcfd}
-  .box h3{margin:0 0 6px;font-family:'Kanit',sans-serif;font-weight:600;font-size:17px}
-  .box ul,.box ol{margin:6px 0 0;padding-left:20px;font-size:14px}
+  .box{background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+  .box h3{margin:0 0 6px;font-family:var(--font-display);font-weight:600;font-size:17px}
+  .box ul,.box ol{margin:6px 0 0;padding-left:20px;font-size:14px;color:#DCDAF0}
+  .box.hero{background:var(--hero);border-color:transparent}
+  .box.hero ul{color:#fff}
   table.games{width:100%;border-collapse:collapse;font-size:14px}
-  table.games th,table.games td{border-bottom:1px solid var(--line);padding:10px 8px;text-align:left;vertical-align:top}
+  table.games th,table.games td{border-bottom:1px solid var(--line);padding:12px 8px;text-align:left;vertical-align:top}
   table.games th{font-size:12px;color:var(--muted);font-weight:600}
   table.games td:first-child{font-weight:600;white-space:nowrap}
+  table.games td.g{white-space:nowrap;color:var(--primary-text);font-weight:600}
   .fonts{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
   @media (max-width:1000px){.fonts{grid-template-columns:1fr 1fr}}
-  .font-card{border:1px solid var(--line);border-radius:16px;padding:14px}
+  .font-card{background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:16px}
+  .font-card.pick{border-color:var(--primary);box-shadow:0 0 0 3px rgb(85 72 212 / .25)}
   .font-card .name{font-size:12px;color:var(--muted)}
-  .font-card .sample{font-size:28px;line-height:1.35;margin:6px 0}
-  .font-card .letters{font-size:40px;letter-spacing:6px}
+  .font-card .sample{font-size:26px;line-height:1.35;margin:6px 0}
+  .font-card .letters{font-size:42px;letter-spacing:8px}
   .font-card .verdict{font-size:13px;margin-top:6px}
-  .ok{color:var(--good)}.warn{color:#a06a00}.no{color:#b4443f}
-  footer{max-width:1280px;margin:0 auto 40px;padding:0 40px;color:var(--muted);font-size:13px}
+  .ok{color:var(--success-text)}.warn{color:var(--warning)}
+  footer{max-width:1320px;margin:0 auto 40px;padding:0 40px;color:var(--muted);font-size:13px}
+  code{background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12px}
 </style>
 </head>
 <body>
+<!-- Icon set (Lucide paths, same family as the site's icons) and scene parts -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></symbol>
+    <symbol id="i-vol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.4 18.4a9 9 0 0 0 0-12.8"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="14" y="4" width="4" height="16" rx="1.5"/><rect x="6" y="4" width="4" height="16" rx="1.5"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="i-replay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></symbol>
+    <linearGradient id="g-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2C2185"/><stop offset="1" stop-color="#5A4FD6"/></linearGradient>
+    <linearGradient id="g-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3BA7D8"/><stop offset="1" stop-color="#1E5FA8"/></linearGradient>
+    <linearGradient id="g-river" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F7FC0"/><stop offset="1" stop-color="#22508F"/></linearGradient>
+    <radialGradient id="g-sun"><stop offset="0" stop-color="#FFE7B0"/><stop offset=".55" stop-color="#FFD58A"/><stop offset="1" stop-color="#FFD58A" stop-opacity="0"/></radialGradient>
+    <symbol id="boat" viewBox="0 0 60 56"><path d="M29 4v34" stroke="#F1F0FA" stroke-width="2.5"/><path d="M31 6 52 36H31Z" fill="#FFD58A"/><path d="M27 12 10 36h17Z" fill="#C3BBFF"/><path d="M4 40h52l-7 12H11Z" fill="#E8735A"/><path d="M4 40h52" stroke="#B95542" stroke-width="2"/></symbol>
+    <symbol id="island" viewBox="0 0 80 60"><ellipse cx="40" cy="54" rx="38" ry="10" fill="#F5C77A"/><path d="M42 50c-2-14 0-26 6-34" stroke="#8B5A2B" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M48 16c-10-6-20-4-26 2 9-1 16 0 26-2Zm0 0c4-9 14-12 22-10-8 3-14 6-22 10Zm0 0c8-2 18 2 22 10-8-5-15-7-22-10Zm0 0c-4 6-4 14-2 20 1-8 0-14 2-20Z" fill="#4CAF82"/></symbol>
+  </defs>
+</svg>
 
 <header class="page">
-  <h1>หน้าฝึกสำหรับเด็ก · ไวร์เฟรมเทียบก่อน/หลัง</h1>
+  <span class="chip">ไวร์เฟรมเพื่อคุยกัน · ยังไม่แก้เว็บจริง</span>
+  <h1>หน้าฝึกสำหรับเด็ก · เทียบก่อน/หลัง</h1>
   <p>จากฟีดแบ็กประชุมทีม: ตัวหนังสือและปุ่มบนหน้าฝึกเยอะเกินไปสำหรับเด็ก ตัวอักษรควรดูเป็นเด็ก ๆ และ (ข้อเสนอพี่บาส) ให้มีตัวการ์ตูนกับเกมที่โต้ตอบได้</p>
-  <p><b>นี่คือไวร์เฟรมเพื่อคุยกันก่อน ยังไม่ได้แก้เว็บจริง</b> · ภาพ "ปัจจุบัน" ถ่ายจากเว็บจริงขนาดมือถือ (390×844) โหมดทดลองใช้ · 22 พ.ย. 2569</p>
-  <div class="legend"><span><b>ซ้าย</b> หน้าจอปัจจุบัน (เลื่อนดูได้)</span><span><b>กลาง</b> แบบใหม่</span><span><b>ขวา</b> สิ่งที่ <span class="tag-cut">ตัด</span> / <span class="tag-move">ย้าย</span> / <span class="tag-add">เพิ่ม</span></span><span>กรอบเส้นประ = ส่วนของผู้ใหญ่</span></div>
+  <p>แบบใหม่ใช้ <b>ธีมเดียวกับเว็บ</b> (สีกลางคืนม่วง การ์ดไล่สี "hero-night" ปุ่มทอง และไอคอนชุดเดียวกัน) กับภาพ <b>พี่ปูและภาพประกอบจริงของแอป</b> · ภาพ "ปัจจุบัน" ถ่ายจากเว็บจริงขนาดมือถือ 390×844 · 22 พ.ย. 2569</p>
+  <div class="legend"><span><b>ซ้าย</b> หน้าจอปัจจุบัน (เลื่อนดูได้)</span><span><b>กลาง</b> แบบใหม่</span><span><b>ขวา</b> <span class="t-cut">ตัด</span> / <span class="t-move">ย้าย</span> / <span class="t-add">เพิ่ม</span></span><span>กรอบเส้นประ = ส่วนของผู้ใหญ่</span></div>
 </header>
 <nav class="toc">
   <a href="#principles">หลักการ</a><a href="#modes">โหมดตามวัย</a><a href="#fonts">ตัวอักษร</a><a href="#games">เกม 6 ขั้น</a>
@@ -121,94 +183,77 @@
 
 <section class="block" id="principles">
   <h2>หลักการออกแบบ</h2>
-  <p class="lead">หน้าฝึกตอนนี้เป็น "หน้าของผู้ใหญ่ที่มีเด็กอยู่ข้างใน" แบบใหม่กลับกันเป็น "หน้าของเด็ก ที่มีมุมเล็ก ๆ ให้ผู้ใหญ่"</p>
+  <p class="lead">หน้าฝึกตอนนี้เป็น "หน้าของผู้ใหญ่ที่มีเด็กอยู่ข้างใน" แบบใหม่กลับกันเป็น "หน้าของเด็ก ที่มีมุมเล็ก ๆ ให้ผู้ใหญ่" แต่ยังเป็นเว็บเดียวกัน</p>
   <div class="grid2">
-    <div class="box"><h3>1 · หนึ่งหน้า หนึ่งเรื่อง</h3><ul><li>เห็นแค่ภาพใหญ่ คำใหญ่ และปุ่มหลักปุ่มเดียว</li><li>ไม่เกิน 3 ปุ่มบนจอ ทุกอย่างอยู่ในจอเดียวไม่ต้องเลื่อน</li></ul></div>
-    <div class="box"><h3>2 · พี่ปูพาเล่น ใช้เสียงแทนตัวหนังสือ</h3><ul><li>เข้าข้อแล้วพี่ปูพูดคำสั่งเอง (เสียง Sulafat ที่เลือกไว้) แตะพี่ปูเพื่อฟังซ้ำ</li><li>ตัวหนังสือบนจอ ≤ 1 ประโยคสั้น สำหรับผู้ใหญ่ที่นั่งข้าง ๆ</li></ul></div>
-    <div class="box"><h3>3 · เล่นเป็นเกม ให้รางวัลกับความพยายาม</h3><ul><li>แต่ละขั้นมีเกมของตัวเอง (ตาราง "เกม 6 ขั้น")</li><li>ไม่มีการแพ้ ไม่มีของพัง ทำไม่ได้ พี่ปูชวนลองอีกครั้ง</li><li>ไมค์วัด "ส่งเสียงไหม ดังพอไหม นานพอไหม" ในเครื่อง ไม่ตัดสินถูก/ผิด</li></ul></div>
-    <div class="box"><h3>4 · เรื่องของผู้ใหญ่อยู่ในกรอบผู้ใหญ่</h3><ul><li>ข้อความเรื่อง AI ความเป็นส่วนตัว เกณฑ์ ไปอยู่หลังปุ่ม "👤 ผู้ใหญ่" หรือหน้าตั้งค่าครั้งแรก</li><li>ตอนฝึกซ่อนเมนูแอปบน/ล่าง (โหมดเต็มจอ) เหลือ ⏸ พัก กับจุดบอกความคืบหน้า</li></ul></div>
+    <div class="box"><h3>1 · หนึ่งหน้า หนึ่งเรื่อง</h3><ul><li>ภาพใหญ่ คำใหญ่ ปุ่มหลักปุ่มเดียว (ปุ่มทอง)</li><li>ไม่เกิน 3 ปุ่ม ทุกอย่างอยู่ในจอเดียวไม่ต้องเลื่อน</li></ul></div>
+    <div class="box"><h3>2 · พี่ปูพาเล่น ใช้เสียงแทนตัวหนังสือ</h3><ul><li>เข้าข้อแล้วพี่ปูพูดคำสั่งเอง (เสียง Sulafat ที่เลือกไว้) แตะลูกโป่งคำพูดเพื่อฟังซ้ำ</li><li>ตัวหนังสือบนจอเด็ก ≤ 1 ประโยคสั้น</li></ul></div>
+    <div class="box"><h3>3 · เล่นเป็นเกม ให้รางวัลกับความพยายาม</h3><ul><li>แต่ละขั้นมีเกมของตัวเอง ไม่มีการแพ้</li><li>ไมค์วัดในเครื่องแค่ "มีเสียงไหม ดังพอไหม นานพอไหม" ไม่ตัดสินถูก/ผิด</li></ul></div>
+    <div class="box"><h3>4 · เข้ากับเว็บเดิม</h3><ul><li>ใช้สี การ์ด ปุ่ม และไอคอนชุดเดียวกับธีม midnight purple ของเว็บ</li><li>ตอนฝึกซ่อนเมนูแอปบน/ล่าง เหลือ ⏸ พัก กับแถบความคืบหน้า · เรื่องของผู้ใหญ่อยู่ในกรอบเส้นประ</li></ul></div>
   </div>
 </section>
 
 <section class="block" id="modes">
   <h2>โหมดตามวัย: เล่นด้วยกัน / เล่นเอง</h2>
-  <p class="lead">ตอบคำถาม "เด็กใช้เองหรือผู้ใหญ่นั่งด้วย": ขึ้นกับวัย จึงใช้หน้าจอเดียวกันแต่สลับ "ที่อยู่ของปุ่มผู้ใหญ่" และ "เวลาที่ผู้ใหญ่ตรวจ" ตามระดับเนื้อหาที่มีอยู่แล้ว</p>
+  <p class="lead">หน้าจอเด็กเหมือนกัน ต่างกันแค่ "ปุ่มผู้ใหญ่อยู่ตรงไหน" และ "ผู้ใหญ่ตรวจตอนไหน" · ระบบเลือกให้ตามระดับเนื้อหา ผู้ใหญ่สลับเองได้ตลอด</p>
   <div class="grid2">
-    <div class="box"><h3>🧑‍🧒 เล่นด้วยกัน · ค่าเริ่มต้นระดับ 1–2 (อนุบาล 3–6 ปี)</h3>
-      <ul>
-        <li>เด็กยังอ่านไม่คล่อง ผู้ใหญ่ถือเครื่องหรือนั่งข้าง ๆ</li>
-        <li>มี <b>แถบผู้ใหญ่</b> เล็ก ๆ ด้านล่างจอ (กรอบเส้นประ) ตลอดเวลา</li>
-        <li>หลังเด็กพูดแต่ละข้อ ผู้ใหญ่แตะ 1 ครั้งว่า "ทำได้ / ฝึกอีก / ข้าม" ไม่มีงานค้างให้ตรวจทีหลัง</li>
-      </ul></div>
-    <div class="box"><h3>🧒 เล่นเอง · ค่าเริ่มต้นระดับ 3–4 (ป.1–6)</h3>
-      <ul>
-        <li>เด็กอ่านคำสั้น ๆ ได้ ใช้เครื่องเองได้</li>
-        <li>เมนูผู้ใหญ่อยู่หลัง <b>ประตูผู้ใหญ่</b> (กดค้าง 3 วินาที + คำถามง่ายสำหรับผู้ใหญ่) ดูหน้า 8</li>
-        <li>ข้อพูดเก็บเป็น "รอผู้ใหญ่ตรวจ" ไปตรวจที่หน้าสรุปหรือคิวครู เหมือนระบบปัจจุบัน</li>
-      </ul></div>
+    <div class="box hero"><h3>🧑‍🧒 เล่นด้วยกัน · ระดับ 1–2 (อนุบาล 3–6 ปี)</h3>
+      <ul><li>ผู้ใหญ่ถือเครื่องหรือนั่งข้าง ๆ เด็กยังอ่านไม่คล่อง</li><li>แถบผู้ใหญ่เล็ก ๆ อยู่ล่างจอตลอด</li><li>หลังเด็กพูด ผู้ใหญ่แตะ 1 ครั้ง "ทำได้ / ฝึกอีก / ข้าม" ไม่มีงานค้าง</li></ul></div>
+    <div class="box"><h3>🧒 เล่นเอง · ระดับ 3–4 (ป.1–6)</h3>
+      <ul><li>เด็กใช้เครื่องเองได้ อ่านคำสั้น ๆ ได้</li><li>เมนูผู้ใหญ่อยู่หลังประตูผู้ใหญ่ (หน้า 8)</li><li>ข้อพูดเก็บ "รอผู้ใหญ่ตรวจ" ตรวจที่หน้าจบรอบหรือคิวครู เหมือนระบบปัจจุบัน</li></ul></div>
   </div>
-  <div class="box" style="margin-top:16px"><h3>กติกาที่ใช้ทั้งสองโหมด</h3>
-    <ol>
-      <li>ระบบเลือกโหมดให้ตามระดับที่ตั้งไว้ ผู้ใหญ่สลับเองได้ตลอดในเมนูผู้ใหญ่ เพราะเด็กแต่ละคนพร้อมไม่เท่ากัน</li>
-      <li>เรื่องที่ต้องให้ผู้ใหญ่ทำเสมอ แม้ในโหมดเล่นเอง: ขอสิทธิ์ไมค์ครั้งแรก, ยินยอมส่งเสียงให้ AI, ตั้งค่า, ดูผลและยืนยันผล</li>
-      <li>ปุ่มทั้งหมดใหญ่พอสำหรับนิ้วเด็ก (≥ 64 px) และมีทางเล่นแบบแตะจอเมื่อไม่มีไมค์</li>
-    </ol></div>
+  <p class="frame-label" style="max-width:none;margin-top:12px">ผู้ใหญ่ทำเสมอแม้ในโหมดเล่นเอง: ขอสิทธิ์ไมค์ครั้งแรก · ยินยอมส่งเสียงให้ AI · ตั้งค่า · ยืนยันผล</p>
 </section>
 
 <section class="block" id="fonts">
   <h2>ตัวอักษร: ดูเป็นเด็ก แต่ต้องไม่สอนรูปตัวอักษรผิด</h2>
-  <p class="lead">ตอนนี้ใช้ Kanit (ไม่มีหัว ทางการ) · เด็กเล็กเรียนอ่านจากตัวอักษรแบบมีหัวในหนังสือเรียน จึงแยกฟอนต์ตามหน้าที่ (ฟอนต์ฟรีจาก Google Fonts · เปิดไฟล์นี้ตอนต่อเน็ตเพื่อเห็นฟอนต์จริง)</p>
+  <p class="lead">เว็บใช้ Kanit / IBM Plex Sans Thai (ไม่มีหัว) · เด็กเล็กเรียนอ่านจากตัวมีหัวแบบหนังสือเรียน จึงแยกตามหน้าที่ (ฟอนต์ฟรีจาก Google Fonts)</p>
   <div class="fonts">
-    <div class="font-card"><div class="name">ปัจจุบัน · Kanit</div><div class="sample" style="font-family:'Kanit'">ดูแล้วลองพูดตาม</div><div class="letters" style="font-family:'Kanit'">ก ป ม</div><div class="verdict warn">เหมาะกับหน้าผู้ใหญ่ ไม่มีหัว ดูเป็นทางการ</div></div>
-    <div class="font-card"><div class="name">เสนอ · Itim (หัวข้อ/ปุ่มในหน้าเด็ก)</div><div class="sample" style="font-family:'Itim'">ดูแล้วลองพูดตาม</div><div class="letters" style="font-family:'Itim'">ก ป ม</div><div class="verdict ok">โค้งมน มีหัว ดูเป็นมิตร อ่านง่าย</div></div>
-    <div class="font-card"><div class="name">ทางเลือก · Mali</div><div class="sample" style="font-family:'Mali'">ดูแล้วลองพูดตาม</div><div class="letters" style="font-family:'Mali'">ก ป ม</div><div class="verdict warn">น่ารัก แบบลายมือ ใช้กับคำชม/หัวข้อได้ ไม่ใช้กับตัวอักษรที่สอน</div></div>
-    <div class="font-card"><div class="name">เสนอ · Sarabun (คำฝึกและตัวอักษรที่สอน)</div><div class="sample" style="font-family:'Sarabun'">ปู · ปลา · กระเป๋า</div><div class="letters" style="font-family:'Sarabun'">ก ป ม</div><div class="verdict ok">ทรงหนังสือเรียน มีหัวชัด สำหรับสิ่งที่เด็กต้องจำรูป</div></div>
+    <div class="font-card"><div class="name">ปัจจุบัน · Kanit</div><div class="sample" style="font-family:'Kanit'">ดูแล้วลองพูดตาม</div><div class="letters" style="font-family:'Kanit'">ก ป ม</div><div class="verdict warn">คงไว้กับหน้าผู้ใหญ่ ไม่มีหัว ดูทางการ</div></div>
+    <div class="font-card pick"><div class="name">เสนอ · Itim (คำพูดพี่ปู หัวข้อ ปุ่มในหน้าเด็ก)</div><div class="sample" style="font-family:'Itim'">ดูแล้วลองพูดตาม</div><div class="letters" style="font-family:'Itim'">ก ป ม</div><div class="verdict ok">โค้งมน มีหัว เป็นมิตร อ่านง่าย</div></div>
+    <div class="font-card"><div class="name">ทางเลือก · Mali</div><div class="sample" style="font-family:'Mali'">ดูแล้วลองพูดตาม</div><div class="letters" style="font-family:'Mali'">ก ป ม</div><div class="verdict warn">น่ารักแบบลายมือ ใช้กับคำชมได้ ไม่ใช้กับตัวอักษรที่สอน</div></div>
+    <div class="font-card pick"><div class="name">เสนอ · Sarabun (คำฝึกและตัวอักษรที่สอน)</div><div class="sample" style="font-family:'Sarabun';font-weight:700">ปู · ปลา · กระเป๋า</div><div class="letters" style="font-family:'Sarabun';font-weight:700">ก ป ม</div><div class="verdict ok">ทรงหนังสือเรียน มีหัวชัด สำหรับสิ่งที่เด็กต้องจำรูป</div></div>
   </div>
 </section>
 
 <section class="block" id="games">
-  <h2>เกม 6 ขั้นของ "ฝึกออกเสียง" (พี่ปูพาเล่นทุกขั้น)</h2>
-  <p class="lead">ทุกเกมให้รางวัลกับการลองทำ ไม่มีการแพ้ · ไมค์ใช้วัดในเครื่องเท่านั้น (ดัง/นาน/มีเสียง) · ผลถูก/ผิดของการพูดยังมาจากผู้ใหญ่ หรือ AI เมื่อเปิดใช้</p>
+  <h2>เกม 6 ขั้นของ "ฝึกออกเสียง" · พี่ปูพาเล่นทุกขั้น</h2>
+  <p class="lead">ทุกเกมให้รางวัลกับการลองทำ ไม่มีการแพ้ · ไมค์วัดในเครื่องเท่านั้น · ถูก/ผิดของการพูดยังมาจากผู้ใหญ่ หรือ AI เมื่อเปิดใช้</p>
   <table class="games">
     <tr><th>ขั้น</th><th>เกม</th><th>เด็กทำอะไร</th><th>ระบบรับรู้จาก</th><th>เมื่อยังไม่สำเร็จ</th></tr>
-    <tr><td>1 ฟังแยกเสียง</td><td>🦀 ป้อนอาหารพี่ปู</td><td>ฟังคำ แล้วแตะภาพที่ได้ยิน พี่ปูกินแล้วเต้นดีใจ</td><td>ภาพที่แตะ (เทียบเฉลย)</td><td>พี่ปูส่ายหัวเบา ๆ "ฟังอีกทีนะ" เล่นเสียงซ้ำ</td></tr>
-    <tr><td>2 ดูปากและพูดตาม</td><td>⛵ เป่าเรือใบ</td><td>ดูพี่ปูทำปาก แล้วพูด "ปา" มีลมออกจากปาก เรือแล่นไปเกาะ</td><td>ความดังและความยาวของเสียง</td><td>เรือหยุดรอกลางทาง พี่ปู "ลมอีกนิดนะ" ไม่มีการจม</td></tr>
-    <tr><td>3 ฝึกพยางค์</td><td>🪨 กระโดดหินข้ามลำธาร</td><td>พูดทีละพยางค์ "ปา ปี ปู" พูดหนึ่งครั้ง พี่ปูกระโดดหนึ่งก้อน</td><td>จำนวนช่วงเสียง (เสียงขึ้น-เงียบ)</td><td>พี่ปูยืนรอบนหิน ชวนพูดพยางค์เดิมอีกครั้ง</td></tr>
-    <tr><td>4 ฝึกคำ</td><td>🃏 การ์ดสติกเกอร์</td><td>เห็นภาพ เรียกชื่อ การ์ดพลิกเป็นสติกเกอร์ เก็บเข้าสมุด</td><td>มีเสียงพูดยาวพอ</td><td>พี่ปูกระซิบใบ้คำแรก แล้วให้ลองอีกครั้ง</td></tr>
-    <tr><td>5 วลีและประโยค</td><td>🚂 รถไฟคำ</td><td>พูดประโยค รถไฟต่อโบกี้ตามจำนวนคำที่พูด</td><td>ช่วงเสียงต่อเนื่อง</td><td>รถไฟจอดรอที่สถานี เล่นตัวอย่างให้ฟัง</td></tr>
-    <tr><td>6 ลองใช้จริง</td><td>💬 คุยกับพี่ปู</td><td>เล่นบทบาทกับผู้ใหญ่ เช่น ขอของจากพี่ปู</td><td>ผู้ใหญ่กดให้ผล</td><td>ผู้ใหญ่เลือก "ฝึกอีก" ได้ ไม่มีตัวเลขคะแนนบนจอเด็ก</td></tr>
+    <tr><td>1 ฟังแยกเสียง</td><td class="g">ป้อนอาหารพี่ปู</td><td>ฟังคำ แตะภาพที่ได้ยิน พี่ปูกินแล้วเต้นดีใจ</td><td>ภาพที่แตะ (เทียบเฉลย)</td><td>พี่ปู "ฟังอีกทีนะ" เล่นเสียงซ้ำ</td></tr>
+    <tr><td>2 ดูปากและพูดตาม</td><td class="g">เป่าเรือใบ</td><td>ดูพี่ปูทำปาก พูด "ปา" มีลมออกจากปาก เรือแล่นไปเกาะ</td><td>ความดังและความยาวของเสียง</td><td>เรือหยุดรอกลางทาง "ลมอีกนิดนะ" ไม่มีการจม</td></tr>
+    <tr><td>3 ฝึกพยางค์</td><td class="g">กระโดดหินข้ามลำธาร</td><td>พูดทีละพยางค์ พูดหนึ่งครั้ง พี่ปูกระโดดหนึ่งก้อน</td><td>จำนวนช่วงเสียง</td><td>พี่ปูรอบนหิน ชวนพูดพยางค์เดิม</td></tr>
+    <tr><td>4 ฝึกคำ</td><td class="g">การ์ดสติกเกอร์</td><td>เห็นภาพ เรียกชื่อ การ์ดพลิกเป็นสติกเกอร์ เก็บเข้าสมุด</td><td>มีเสียงพูดยาวพอ</td><td>พี่ปูกระซิบใบ้คำแรก</td></tr>
+    <tr><td>5 วลีและประโยค</td><td class="g">รถไฟคำ</td><td>พูดประโยค รถไฟต่อโบกี้ตามจำนวนคำ</td><td>ช่วงเสียงต่อเนื่อง</td><td>รถไฟจอดรอ เล่นตัวอย่างให้ฟัง</td></tr>
+    <tr><td>6 ลองใช้จริง</td><td class="g">คุยกับพี่ปู</td><td>เล่นบทบาทกับผู้ใหญ่ เช่น ขอของจากพี่ปู</td><td>ผู้ใหญ่กดให้ผล</td><td>เลือก "ฝึกอีก" ได้ ไม่มีคะแนนบนจอเด็ก</td></tr>
   </table>
-  <p class="frame-label" style="max-width:none">ผู้ใหญ่ปรับ "ความไวไมค์" ได้ในเมนูผู้ใหญ่ (เด็กเสียงเบาหรือห้องมีเสียงดัง) และทุกเกมมีโหมดแตะจอแทนไมค์</p>
+  <p class="frame-label" style="max-width:none">ผู้ใหญ่ปรับความไวไมค์ได้ (เด็กเสียงเบา/ห้องเสียงดัง) และทุกเกมมีโหมดแตะจอแทนไมค์</p>
 </section>
 
 <!-- 1 START -->
 <section class="block" id="s1">
   <h2>1 · เริ่มรอบ</h2>
-  <p class="lead">ตอนนี้เป็นหน้าต่างอธิบายสำหรับผู้ใหญ่ · แบบใหม่เป็นฉากเปิดเกมที่พี่ปูชวนเล่น</p>
+  <p class="lead">ตอนนี้เป็นหน้าต่างอธิบายสำหรับผู้ใหญ่ 6 บรรทัด · แบบใหม่เป็นฉากเปิดเกมที่พี่ปูชวนเล่น</p>
   <div class="compare">
     <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/02-start-round.png" alt="หน้าต่างเตรียมตัวก่อนเริ่มกัน"></div></div>
-    <div><p class="col-title new">แบบใหม่</p>
-      <div class="phones">
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i></i><i></i><i></i></span><span class="icon-btn">🔊</span></div>
-          <div class="stage">
-            <div class="crab big">🦀</div>
-            <div class="kid-title">ไปล่องเรือกับพี่ปูกัน!</div>
-            <div class="kid-sub">🔊 พี่ปูพูดให้ฟังเอง</div>
-            <button class="big-btn" style="width:140px;height:140px;font-size:22px;font-family:var(--kid)">▶<br>เริ่ม</button>
-          </div>
-          <div class="adult-bar">👤 ผู้ใหญ่: เปิดไมค์ครั้งแรก · ตั้งค่า · โหมดเล่นด้วยกัน ▾</div>
-        </div></div><p class="frame-label">ปุ่มเดียว · เรื่องไมค์/AI/ความเป็นส่วนตัวพับเก็บในแถบผู้ใหญ่</p></div>
-      </div>
-    </div>
+    <div><p class="col-title new">แบบใหม่</p><div class="phones">
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i></i><i></i><i></i></span><span class="ibtn"><svg><use href="#i-vol"/></svg></span></div>
+        <div class="stage">
+          <div class="scene"><svg viewBox="0 0 260 120"><rect width="260" height="120" fill="url(#g-sky)"/><circle cx="210" cy="30" r="34" fill="url(#g-sun)"/><path d="M0 84q30-8 65 0t65 0 65 0 65 0V120H0Z" fill="url(#g-sea)"/><use href="#island" x="170" y="54" width="80" height="60"/><use href="#boat" x="34" y="44" width="58" height="54"/></svg></div>
+          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble"><span class="spk"><svg><use href="#i-vol"/></svg>พี่ปูพูดให้ฟัง</span>ไปล่องเรือกับพี่ปูกัน!</div></div>
+          <span class="btn gold" style="flex:none;width:200px;font-size:24px;padding:16px"><svg><use href="#i-play"/></svg>เริ่มเลย</span>
+        </div>
+        <div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ผู้ใหญ่ · เปิดไมค์ครั้งแรก · ตั้งค่า · เล่นด้วยกัน ▾</div></div>
+      </div></div><p class="frame-label">ฉากเกมของขั้นนี้ + ปุ่มทองปุ่มเดียว · เรื่องไมค์/AI/ความเป็นส่วนตัวพับในแถบผู้ใหญ่</p></div>
+    </div></div>
     <div class="notes">
       <div class="numbers"><div><b>6 → 1</b>บรรทัดข้อความ</div><div><b>3 → 1</b>ปุ่มหลัก</div></div>
-      <h3>เปลี่ยนอะไร</h3>
       <ul>
-        <li><span class="tag-cut">ตัด</span> คำอธิบาย 6 บรรทัด (สิทธิ์ไมค์, ไม่เก็บไฟล์เสียง, ผู้ใหญ่ช่วยสังเกต, เสียงหายเมื่อเปลี่ยนข้อ…)</li>
-        <li><span class="tag-move">ย้าย</span> ข้อความเหล่านั้นไปแถบผู้ใหญ่ และหน้าตั้งค่าครั้งแรก (แสดงครั้งเดียว)</li>
-        <li><span class="tag-cut">ตัด</span> ปุ่ม "ยังไม่เริ่ม" กับ ✕ ซ้ำกัน เหลือ ⏸ มุมซ้ายบน</li>
-        <li><span class="tag-add">เพิ่ม</span> พี่ปูพูดคำชวนเล่นเป็นเสียง เด็กไม่ต้องอ่าน</li>
+        <li><span class="t-cut">ตัด</span> คำอธิบาย 6 บรรทัด (สิทธิ์ไมค์, ไม่เก็บไฟล์เสียง, ผู้ใหญ่ช่วยสังเกต…)</li>
+        <li><span class="t-move">ย้าย</span> ข้อความเหล่านั้นไปแถบผู้ใหญ่ และหน้าตั้งค่าครั้งแรก</li>
+        <li><span class="t-cut">ตัด</span> "ยังไม่เริ่ม" กับ ✕ ที่ซ้ำกัน เหลือ ⏸</li>
+        <li><span class="t-add">เพิ่ม</span> ฉากเกมของขั้นนั้น และพี่ปูพูดชวนเป็นเสียง</li>
       </ul>
     </div>
   </div>
@@ -217,38 +262,37 @@
 <!-- 2 CHOICE -->
 <section class="block" id="s2">
   <h2>2 · ฟังแยกเสียง → ป้อนอาหารพี่ปู</h2>
-  <p class="lead">หน้านี้ชัดที่สุดในปัจจุบันอยู่แล้ว · ตัดขั้น "บันทึกคำตอบ" และเพิ่มตัวการ์ตูนตอบสนอง</p>
+  <p class="lead">หน้านี้ชัดที่สุดอยู่แล้ว · ตัดขั้น "บันทึกคำตอบ" และให้พี่ปูตอบสนอง</p>
   <div class="compare">
-    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/05-choice-item.png" alt="ข้อเลือกภาพ"><img src="before/06-choice-answered.png" alt="หลังเลือกภาพ"></div><p class="frame-label">เลื่อนลงเพื่อดูหลังเลือก (ต้องกด "บันทึกคำตอบ" แล้ว "ภารกิจถัดไป")</p></div>
-    <div><p class="col-title new">แบบใหม่</p>
-      <div class="phones">
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span></span></div>
-          <div class="stage">
-            <div class="mascot"><div class="crab">🦀</div><div class="bubble"><span class="spk">🔊 แตะเพื่อฟังซ้ำ</span><br>พี่ปูหิว อยากกิน… "ปู"</div></div>
-            <div class="pics"><div class="pic">🦀<span class="tag">ปู</span></div><div class="pic">🐍<span class="tag">งู</span></div></div>
-          </div>
-          <span class="adult">👤</span>
-        </div></div><p class="frame-label">ก · ฟังคำ แล้วแตะภาพ</p></div>
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span></span></div>
-          <div class="stage">
-            <div class="mascot"><div class="crab">😋</div><div class="bubble">อร่อยจัง! ถูกต้อง ✨</div></div>
-            <div class="pics"><div class="pic hit">🦀<span class="tag">ปู</span></div><div class="pic dim">🐍<span class="tag">งู</span></div></div>
-            <div class="stars">⭐</div>
-            <div class="kid-sub">ไปข้อต่อไปเองใน 2 วินาที</div>
-          </div>
-          <span class="adult">👤</span>
-        </div></div><p class="frame-label">ข · แตะถูก: พี่ปูกิน ได้ดาว ไปข้อต่อไปเอง · แตะผิด: พี่ปู "ฟังอีกทีนะ" เล่นเสียงซ้ำ</p></div>
-      </div>
-    </div>
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/05-choice-item.png" alt="ข้อเลือกภาพ"><img src="before/06-choice-answered.png" alt="หลังเลือกภาพ"></div><p class="frame-label">เลื่อนลงดูหลังเลือก: ต้องกด "บันทึกคำตอบ" แล้ว "ภารกิจถัดไป"</p></div>
+    <div><p class="col-title new">แบบใหม่</p><div class="phones">
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:42px"></span></div>
+        <div class="stage">
+          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble"><span class="spk"><svg><use href="#i-vol"/></svg>แตะเพื่อฟังซ้ำ</span>พี่ปูหิว อยากกิน… "ปู"</div></div>
+          <div class="pics"><div class="pic"><img src="art/crab.svg" alt=""><span>ปู</span></div><div class="pic"><img src="art/snake.svg" alt=""><span>งู</span></div></div>
+          <div class="kid-sub">แตะภาพที่ได้ยิน</div>
+        </div>
+        <span class="adult"><svg><use href="#i-user"/></svg>ผู้ใหญ่</span>
+      </div></div><p class="frame-label">ก · ฟังคำ แล้วแตะภาพ</p></div>
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span style="width:42px"></span></div>
+        <div class="stage">
+          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">อร่อยจัง! ใช่เลย ✨</div></div>
+          <div class="pics"><div class="pic hit"><img src="art/crab.svg" alt=""><span>ปู</span></div><div class="pic dim"><img src="art/snake.svg" alt=""><span>งู</span></div></div>
+          <div class="stars"><svg><use href="#i-star"/></svg></div>
+          <div class="kid-sub">ไปข้อต่อไปเอง…</div>
+        </div>
+        <span class="adult"><svg><use href="#i-user"/></svg>ผู้ใหญ่</span>
+      </div></div><p class="frame-label">ข · แตะถูก: พี่ปูกิน ได้ดาว ไปต่อเอง · แตะผิด: "ฟังอีกทีนะ" เล่นเสียงซ้ำ</p></div>
+    </div></div>
     <div class="notes">
-      <div class="numbers"><div><b>4 → 1</b>ครั้งที่ต้องแตะต่อข้อ</div><div><b>~12 → 3</b>สิ่งที่แตะได้บนจอ</div></div>
+      <div class="numbers"><div><b>4 → 1</b>ครั้งที่แตะต่อข้อ</div><div><b>~12 → 3</b>สิ่งที่แตะได้</div></div>
       <ul>
-        <li><span class="tag-cut">ตัด</span> หัวแอป "ฝึกและเรียน", เมนูล่าง, "1 · เริ่มคุ้นเสียง · ภารกิจของเรา"</li>
-        <li><span class="tag-cut">ตัด</span> ปุ่ม "บันทึกคำตอบ" และ "ภารกิจถัดไป" ระบบบันทึกเมื่อแตะภาพ</li>
-        <li><span class="tag-move">ย้าย</span> "ฟังเสียงอีกครั้ง" ไปเป็นการแตะที่พี่ปู/ลูกโป่งคำพูด</li>
-        <li><span class="tag-add">เพิ่ม</span> พี่ปูตอบสนองทันที (กิน/เต้น/ส่ายหัว) และดาว</li>
+        <li><span class="t-cut">ตัด</span> หัวแอป, เมนูล่าง, "1 · เริ่มคุ้นเสียง · ภารกิจของเรา"</li>
+        <li><span class="t-cut">ตัด</span> "บันทึกคำตอบ" และ "ภารกิจถัดไป" ระบบบันทึกเมื่อแตะภาพ</li>
+        <li><span class="t-move">ย้าย</span> "ฟังเสียงอีกครั้ง" ไปที่ลูกโป่งคำพูดพี่ปู</li>
+        <li><span class="t-add">เพิ่ม</span> พี่ปูตอบสนองทันที และดาว</li>
       </ul>
     </div>
   </div>
@@ -257,63 +301,60 @@
 <!-- 3 IMITATE -->
 <section class="block" id="s3">
   <h2>3 · ดูปากและพูดตาม → เกมเป่าเรือใบ</h2>
-  <p class="lead">หน้าที่ข้อความเยอะที่สุด (สูงราว 2 จอ ปุ่ม "บันทึก" อยู่ใต้จอ) · แบบใหม่เป็นเกม 4 ฉาก ใช้เสียง ป ที่มีลมออกจากปากเป็นแรงพาเรือ</p>
+  <p class="lead">หน้าที่ข้อความเยอะที่สุด (สูงราว 2 จอ ปุ่มบันทึกอยู่ใต้จอ) · แบบใหม่ 4 ฉาก ใช้เสียง ป ที่มีลมออกจากปากเป็นแรงพาเรือ</p>
   <div class="compare">
-    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/03-speech-item.png" alt="ข้อดูปากและพูดตาม"></div><p class="frame-label">เลื่อนดูได้: ข้อความ ~20 บรรทัด จุดที่แตะได้ ~15 จุด</p></div>
-    <div><p class="col-title new">แบบใหม่ (สตอรีบอร์ด)</p>
-      <div class="phones">
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span></span></div>
-          <div class="stage">
-            <div class="mascot"><div class="crab">🦀</div><div class="bubble">ดูปากพี่ปูนะ ปิดปาก… แล้วปล่อย "ปา!"</div></div>
-            <div class="big-card" style="width:100%;height:190px;border:3px solid var(--line);border-radius:22px;display:grid;place-items:center;background:#fff;font-family:'Sarabun';color:var(--muted);font-size:13px;text-align:center">👄 ภาพปาก 3 จังหวะ<br>เล่นต่อกันอัตโนมัติ<br>(ไม่มีปุ่มจังหวะให้กด)</div>
-            <div class="word">ปา</div>
-          </div>
-          <div class="adult-bar">👤 ภาพปากสร้างด้วย AI · ดูทีละจังหวะ · ขยาย ▾</div>
-        </div></div><p class="frame-label">ก · พี่ปูสาธิต (เสียง + ภาพปากเล่นเอง)</p></div>
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span></span></div>
-          <div class="stage">
-            <div class="sea"><span class="boat" style="left:16px">⛵</span><span class="island">🏝️</span></div>
-            <div class="kid-sub">กดค้างแล้วพูด "ปา" ให้ลมพาเรือไป</div>
-            <button class="big-btn hold">🎤</button>
-            <div class="meter"><b style="width:15%"></b></div>
-          </div>
-        </div></div><p class="frame-label">ข · กดค้างไมค์ (ปุ่มเดียว) แถบลมโชว์ความดัง</p></div>
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span></span></div>
-          <div class="stage">
-            <div class="sea"><span class="wind" style="left:70px">〰️〰️</span><span class="boat" style="left:110px">⛵</span><span class="island">🏝️</span></div>
-            <div class="mascot"><div class="crab">🦀</div><div class="bubble">เรือหยุดรอแล้ว ลมอีกนิดนะ!</div></div>
-            <button class="big-btn">🎤</button>
-            <div class="meter"><b style="width:55%"></b></div>
-          </div>
-        </div></div><p class="frame-label">ค · เสียงเบา/สั้น: เรือแล่นไปได้บ้างแล้วหยุดรอ ไม่มีการจม พูดอีกครั้งได้เลย</p></div>
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span></span></div>
-          <div class="stage">
-            <div class="sea"><span class="boat" style="right:44px">⛵</span><span class="island">🏝️</span></div>
-            <div class="stars">⭐⭐</div>
-            <div class="kid-title">ถึงเกาะแล้ว เก่งมาก!</div>
-            <div class="btn-row"><span class="pill">🔁 ฟังเสียงหนู</span><span class="pill primary">ไปต่อ ➜</span></div>
-          </div>
-          <div class="adult-bar">👤 ผู้ใหญ่ฟังแล้ว เด็กพูดเป็นอย่างไร
-            <div class="faces"><span>😊 ทำได้</span><span>🙂 ฝึกอีก</span><span>⏭ ข้าม</span></div></div>
-        </div></div><p class="frame-label">ง · ถึงเกาะ บันทึกเอง · โหมดเล่นด้วยกัน: ผู้ใหญ่แตะผล 1 ครั้ง · โหมดเล่นเอง: ไม่มีแถบนี้ เก็บรอผู้ใหญ่ตรวจ</p></div>
-      </div>
-    </div>
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/03-speech-item.png" alt="ข้อดูปากและพูดตาม"></div><p class="frame-label">ข้อความ ~20 บรรทัด จุดที่แตะได้ ~15 จุด</p></div>
+    <div><p class="col-title new">แบบใหม่ (สตอรีบอร์ด)</p><div class="phones">
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:42px"></span></div>
+        <div class="stage">
+          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">ดูปากพี่ปูนะ ปิดปาก… แล้วปล่อย!</div></div>
+          <div class="mouth-card"><img src="art/mouth.svg" alt="ปาก"><div class="steps"><i class="on"></i><i></i><i></i></div><small>ภาพปากเล่นต่อกันเอง 3 จังหวะ</small></div>
+          <div class="word">ปา</div>
+        </div>
+        <div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ภาพปากสร้างด้วย AI · ตัวเลือกผู้ใหญ่ ▾</div></div>
+      </div></div><p class="frame-label">ก · พี่ปูสาธิต (เสียง + ภาพปากเล่นเอง)</p></div>
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:42px"></span></div>
+        <div class="stage">
+          <div class="scene"><svg viewBox="0 0 260 130"><rect width="260" height="130" fill="url(#g-sky)"/><circle cx="214" cy="28" r="30" fill="url(#g-sun)"/><path d="M0 92q30-8 65 0t65 0 65 0 65 0V130H0Z" fill="url(#g-sea)"/><use href="#island" x="176" y="62" width="80" height="60"/><use href="#boat" x="12" y="52" width="58" height="54"/></svg></div>
+          <span class="mic hold"><svg><use href="#i-mic"/></svg></span>
+          <div class="mic-label">กดค้างแล้วพูด "ปา"</div>
+          <div class="meter"><b style="width:18%"></b></div>
+        </div>
+      </div></div><p class="frame-label">ข · กดค้างปุ่มทองปุ่มเดียว แถบลมโชว์ความดัง</p></div>
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:42px"></span></div>
+        <div class="stage">
+          <div class="scene"><svg viewBox="0 0 260 130"><rect width="260" height="130" fill="url(#g-sky)"/><circle cx="214" cy="28" r="30" fill="url(#g-sun)"/><path d="M0 92q30-8 65 0t65 0 65 0 65 0V130H0Z" fill="url(#g-sea)"/><use href="#island" x="176" y="62" width="80" height="60"/><path d="M44 64q10-6 20 0M38 74q10-6 20 0" stroke="#C3E8FF" stroke-width="3" fill="none" stroke-linecap="round"/><use href="#boat" x="78" y="52" width="58" height="54"/></svg></div>
+          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">เรือรอแล้วนะ ลมอีกนิด!</div></div>
+          <span class="mic"><svg><use href="#i-mic"/></svg></span>
+          <div class="meter"><b style="width:55%"></b></div>
+        </div>
+      </div></div><p class="frame-label">ค · เสียงเบา/สั้น: เรือไปได้บ้างแล้วหยุดรอ ไม่มีการจม พูดอีกครั้งได้เลย</p></div>
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span style="width:42px"></span></div>
+        <div class="stage">
+          <div class="scene"><svg viewBox="0 0 260 130"><rect width="260" height="130" fill="url(#g-sky)"/><circle cx="214" cy="28" r="30" fill="url(#g-sun)"/><path d="M0 92q30-8 65 0t65 0 65 0 65 0V130H0Z" fill="url(#g-sea)"/><use href="#island" x="176" y="62" width="80" height="60"/><use href="#boat" x="140" y="52" width="58" height="54"/><g fill="#FFD58A"><circle cx="40" cy="30" r="3"/><circle cx="70" cy="18" r="2"/><circle cx="120" cy="34" r="2.5"/></g></svg></div>
+          <div class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div>
+          <div class="kid-title">ถึงเกาะแล้ว เก่งมาก!</div>
+          <div class="row"><span class="btn"><svg><use href="#i-replay"/></svg>ฟังเสียงหนู</span><span class="btn go">ไปต่อ<svg><use href="#i-next"/></svg></span></div>
+        </div>
+        <div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>ผู้ใหญ่ฟังแล้ว เด็กพูดเป็นอย่างไร</div><div class="faces"><span class="yes">😊 ทำได้</span><span>🙂 ฝึกอีก</span><span>⏭ ข้าม</span></div></div>
+      </div></div><p class="frame-label">ง · ถึงเกาะ บันทึกเอง · เล่นด้วยกัน: ผู้ใหญ่แตะผล 1 ครั้ง · เล่นเอง: ไม่มีแถบนี้</p></div>
+    </div></div>
     <div class="notes">
-      <div class="numbers"><div><b>~20 → 2</b>บรรทัดข้อความบนจอเด็ก</div><div><b>~15 → 2</b>สิ่งที่แตะได้</div><div><b>2 จอ → 1</b>ความสูงหน้า</div></div>
+      <div class="numbers"><div><b>~20 → 2</b>บรรทัดบนจอเด็ก</div><div><b>~15 → 2</b>สิ่งที่แตะได้</div><div><b>2 → 1</b>จอ</div></div>
       <ul>
-        <li><span class="tag-cut">ตัด</span> หัวข้อซ้อน 4 ชั้น (ฝึกและเรียน / ขั้น / ระดับ·ภารกิจ / ชื่อข้อ) เหลือคำฝึกคำเดียว</li>
-        <li><span class="tag-cut">ตัด</span> ปุ่มจังหวะปาก 1·2·3, ‹ › และ "ดูทีละจังหวะอัตโนมัติ" ภาพเล่นต่อกันเอง</li>
-        <li><span class="tag-cut">ตัด</span> ขั้น อัด → หยุด → บันทึก → ถัดไป เหลือ "กดค้างแล้วพูด" แล้วบันทึกเอง</li>
-        <li><span class="tag-move">ย้าย</span> "ภาพคนสร้างด้วย AI…", "ดาวให้กับการลองทำ…", ขยายภาพปาก, "ทดลองตอบโดยไม่อัดเสียง", "ขอคำใบ้" ไปแถบผู้ใหญ่</li>
-        <li><span class="tag-add">เพิ่ม</span> เกมเรือใบ ใช้ความดังและความยาวเสียงในเครื่อง ไม่ตัดสินถูก/ผิด</li>
-        <li><span class="tag-add">เพิ่ม</span> ปุ่ม "ฟังเสียงหนู" ให้เด็กฟังเสียงตัวเองหลังพูด</li>
+        <li><span class="t-cut">ตัด</span> หัวข้อซ้อน 4 ชั้น เหลือคำฝึกคำเดียว</li>
+        <li><span class="t-cut">ตัด</span> ปุ่มจังหวะปาก 1·2·3, ‹ ›, "ดูทีละจังหวะอัตโนมัติ" ภาพเล่นเอง</li>
+        <li><span class="t-cut">ตัด</span> อัด → หยุด → บันทึก → ถัดไป เหลือ "กดค้างแล้วพูด"</li>
+        <li><span class="t-move">ย้าย</span> "ภาพคนสร้างด้วย AI…", ขยายภาพปาก, "ทดลองตอบโดยไม่อัดเสียง", "ขอคำใบ้" ไปแถบผู้ใหญ่</li>
+        <li><span class="t-add">เพิ่ม</span> เกมเรือใบ ใช้ความดังและความยาวเสียงในเครื่อง</li>
+        <li><span class="t-add">เพิ่ม</span> "ฟังเสียงหนู" ให้เด็กฟังเสียงตัวเอง</li>
       </ul>
       <h3>ทำไมเรือใบเข้ากับขั้นนี้</h3>
-      <ul><li>เสียง ป เป็นเสียงที่ปิดริมฝีปากแล้วปล่อยลม ภาพ "ลมพาเรือ" จึงเชื่อมกับวิธีออกเสียงจริง ส่วน ก และ ม ใช้ธีมอื่นได้ เช่น ม = ฮัมเพลงให้ผึ้งบิน</li></ul>
+      <ul><li>เสียง ป ปิดริมฝีปากแล้วปล่อยลม ภาพ "ลมพาเรือ" จึงเชื่อมกับวิธีออกเสียงจริง · ก และ ม ใช้ธีมอื่นได้ เช่น ม = ฮัมเพลงให้ผึ้งบิน</li></ul>
     </div>
   </div>
 </section>
@@ -321,29 +362,33 @@
 <!-- 4 SYLLABLES -->
 <section class="block" id="s4">
   <h2>4 · ฝึกพยางค์ → กระโดดหินข้ามลำธาร</h2>
-  <p class="lead">หนึ่งพยางค์ = หนึ่งก้าว ทำให้เด็กเห็นจังหวะพยางค์เป็นภาพ</p>
+  <p class="lead">หนึ่งพยางค์ = หนึ่งก้าว ให้เด็กเห็นจังหวะพยางค์เป็นภาพ</p>
   <div class="compare">
     <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/08-syllable-item.png" alt="ข้อฝึกพยางค์"></div></div>
-    <div><p class="col-title new">แบบใหม่</p>
-      <div class="phones">
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span></span></div>
-          <div class="stage">
-            <div class="mascot"><div class="crab">🦀</div><div class="bubble">พูดทีละก้อนนะ ปา… ปี… ปู</div></div>
-            <div style="width:100%;height:150px;border-radius:22px;background:#d9f0fb;border:2px solid var(--line);display:flex;align-items:flex-end;padding:0 10px 18px">
-              <div class="stones"><div class="stone on">ปา<span class="hop">🦀</span></div><div class="stone">ปี</div><div class="stone">ปู</div><div class="stone">🏁</div></div>
-            </div>
-            <button class="big-btn hold">🎤</button>
-          </div>
-          <span class="adult">👤</span>
-        </div></div><p class="frame-label">พูดหนึ่งครั้ง พี่ปูกระโดดหนึ่งก้อน (นับช่วงเสียงขึ้น-เงียบในเครื่อง) · ถึงธง = จบข้อ</p></div>
-      </div>
-    </div>
+    <div><p class="col-title new">แบบใหม่</p><div class="phones">
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span style="width:42px"></span></div>
+        <div class="stage">
+          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู" style="visibility:hidden;width:10px"><div class="bubble">พูดทีละก้อนนะ ปา… ปี… ปู</div></div>
+          <div class="scene"><svg viewBox="0 0 260 140"><rect width="260" height="140" fill="url(#g-sky)"/><rect y="62" width="260" height="78" fill="url(#g-river)"/><path d="M0 70q20-5 40 0t40 0 40 0 40 0 40 0 40 0 40 0" stroke="#7DC3F0" stroke-width="2" fill="none" opacity=".6"/>
+            <g font-family="Sarabun" font-weight="700" font-size="17" text-anchor="middle" fill="#1E1A4A">
+              <ellipse cx="38" cy="108" rx="28" ry="13" fill="#7DDBB0"/><text x="38" y="113">ปา</text>
+              <ellipse cx="100" cy="104" rx="28" ry="13" fill="#E1E4F2"/><text x="100" y="109">ปี</text>
+              <ellipse cx="162" cy="108" rx="28" ry="13" fill="#E1E4F2"/><text x="162" y="113">ปู</text>
+              <ellipse cx="222" cy="104" rx="26" ry="12" fill="#F5C77A"/></g>
+            <path d="M222 70v26" stroke="#F1F0FA" stroke-width="2.5"/><path d="M223 71l18 7-18 7Z" fill="#FFD58A"/>
+            <image href="art/crab.svg" x="8" y="58" width="60" height="45"/></svg></div>
+          <span class="mic hold"><svg><use href="#i-mic"/></svg></span>
+          <div class="mic-label">พูดหนึ่งครั้ง พี่ปูกระโดดหนึ่งก้อน</div>
+        </div>
+        <span class="adult"><svg><use href="#i-user"/></svg>ผู้ใหญ่</span>
+      </div></div><p class="frame-label">นับช่วงเสียงขึ้น-เงียบในเครื่อง · ถึงธง = จบข้อ</p></div>
+    </div></div>
     <div class="notes">
       <ul>
-        <li><span class="tag-cut">ตัด</span> หัวข้อซ้อนและข้อความอธิบายเหมือนหน้า 3</li>
-        <li><span class="tag-add">เพิ่ม</span> หินแต่ละก้อนมีพยางค์ ตัวอักษรใช้ฟอนต์ทรงหนังสือเรียน</li>
-        <li>ถ้าพูดติดกันเร็วเกิน ระบบนับเป็นก้าวเดียว พี่ปูชวน "ช้า ๆ ทีละก้อน"</li>
+        <li><span class="t-cut">ตัด</span> หัวข้อซ้อนและข้อความอธิบายเหมือนหน้า 3</li>
+        <li><span class="t-add">เพิ่ม</span> หินแต่ละก้อนมีพยางค์ ใช้ฟอนต์ทรงหนังสือเรียน</li>
+        <li>พูดติดกันเร็วเกิน ระบบนับเป็นก้าวเดียว พี่ปูชวน "ช้า ๆ ทีละก้อน"</li>
       </ul>
     </div>
   </div>
@@ -352,37 +397,36 @@
 <!-- 5 WORDS -->
 <section class="block" id="s5">
   <h2>5 · ฝึกคำ → การ์ดสติกเกอร์</h2>
-  <p class="lead">เรียกชื่อภาพ แล้วได้สติกเกอร์สะสม ให้เด็กอยากเล่นต่อ</p>
+  <p class="lead">เรียกชื่อภาพ แล้วได้สติกเกอร์สะสม ให้อยากเล่นต่อ</p>
   <div class="compare">
     <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/09-word-item.png" alt="ข้อฝึกคำ"></div></div>
-    <div><p class="col-title new">แบบใหม่</p>
-      <div class="phones">
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i></i><i></i></span><span class="icon-btn">📒</span></div>
-          <div class="stage">
-            <div class="mascot"><div class="crab">🦀</div><div class="bubble">นี่คืออะไรเอ่ย? บอกพี่ปูหน่อย</div></div>
-            <div class="card-flip">🎒</div>
-            <button class="big-btn hold">🎤</button>
-            <div class="kid-sub">ติดอยู่? แตะพี่ปู ให้กระซิบใบ้</div>
-          </div>
-          <span class="adult">👤</span>
-        </div></div><p class="frame-label">ก · เห็นภาพ กดค้างแล้วเรียกชื่อ</p></div>
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span class="icon-btn">📒</span></div>
-          <div class="stage">
-            <div class="card-flip open">🎒</div>
-            <div class="word">กระเป๋า<small>ได้สติกเกอร์ใหม่! เก็บในสมุดแล้ว</small></div>
-            <div class="btn-row"><span class="pill">🔁 ฟังเสียงหนู</span><span class="pill primary">ไปต่อ ➜</span></div>
-          </div>
-          <span class="adult">👤</span>
-        </div></div><p class="frame-label">ข · การ์ดพลิก โชว์คำ (ฟอนต์หนังสือเรียน) ได้สติกเกอร์ · 📒 = สมุดสะสม</p></div>
-      </div>
-    </div>
+    <div><p class="col-title new">แบบใหม่</p><div class="phones">
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i></i><i></i></span><span class="ibtn"><svg><use href="#i-book"/></svg></span></div>
+        <div class="stage">
+          <div class="mascot"><img class="pu" src="art/crab.svg" alt="พี่ปู"><div class="bubble">นี่คืออะไรเอ่ย? บอกพี่ปูหน่อย</div></div>
+          <div class="card3d open" style="background:#FFFDF6"><img src="art/backpack.svg" alt="กระเป๋า"></div>
+          <span class="mic hold"><svg><use href="#i-mic"/></svg></span>
+          <div class="mic-label">นึกไม่ออก? แตะพี่ปูให้กระซิบใบ้</div>
+        </div>
+        <span class="adult"><svg><use href="#i-user"/></svg>ผู้ใหญ่</span>
+      </div></div><p class="frame-label">ก · เห็นภาพ กดค้างแล้วเรียกชื่อ</p></div>
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span class="ibtn"><svg><use href="#i-book"/></svg></span></div>
+        <div class="stage">
+          <div class="card3d open"><img src="art/backpack.svg" alt="กระเป๋า"><span class="sticker">สติกเกอร์ใหม่!</span></div>
+          <div class="word" style="font-size:46px">กระเป๋า</div>
+          <div class="kid-sub">เก็บในสมุดสติกเกอร์แล้ว</div>
+          <div class="row"><span class="btn"><svg><use href="#i-replay"/></svg>ฟังเสียงหนู</span><span class="btn go">ไปต่อ<svg><use href="#i-next"/></svg></span></div>
+        </div>
+        <span class="adult"><svg><use href="#i-user"/></svg>ผู้ใหญ่</span>
+      </div></div><p class="frame-label">ข · โชว์คำ (ฟอนต์หนังสือเรียน) ได้สติกเกอร์ · ไอคอนสมุด = สติกเกอร์สะสม</p></div>
+    </div></div>
     <div class="notes">
       <ul>
-        <li><span class="tag-move">ย้าย</span> "ขอคำใบ้" เป็นการแตะพี่ปูให้กระซิบ</li>
-        <li><span class="tag-add">เพิ่ม</span> สมุดสติกเกอร์สะสม (เชื่อมกับหน้า "รางวัล" ที่มีอยู่แล้วได้)</li>
-        <li>วลีและประโยค (ขั้น 5) ใช้รูปแบบเดียวกัน แต่เป็นรถไฟต่อโบกี้ตามจำนวนคำ</li>
+        <li><span class="t-move">ย้าย</span> "ขอคำใบ้" เป็นการแตะพี่ปูให้กระซิบ</li>
+        <li><span class="t-add">เพิ่ม</span> สมุดสติกเกอร์สะสม (ต่อกับหน้า "รางวัล" ที่มีอยู่)</li>
+        <li>ขั้นวลีและประโยคใช้รูปแบบเดียวกัน แต่เป็นรถไฟต่อโบกี้ตามจำนวนคำ</li>
       </ul>
     </div>
   </div>
@@ -393,27 +437,24 @@
   <h2>6 · หลังพูดจบ: สองโหมดต่างกันตรงไหน</h2>
   <p class="lead">หน้าจอเด็กเหมือนกัน ต่างกันแค่ "ผู้ใหญ่ตรวจตอนไหน"</p>
   <div class="compare">
-    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/04-speech-answered.png" alt="หลังตอบข้อพูด"></div><p class="frame-label">ข้อความ "รอบนี้เป็นการจำลองคำตอบ · ผลการพูดยังรอผู้ใหญ่ช่วยตรวจ" และปุ่มถัดไป</p></div>
-    <div><p class="col-title new">แบบใหม่</p>
-      <div class="phones">
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span></span></div>
-          <div class="stage"><div class="crab big">🥳</div><div class="kid-title">เก่งมาก!</div><div class="stars">⭐</div></div>
-          <div class="adult-bar">👤 เล่นด้วยกัน · ผู้ใหญ่ฟังแล้วเด็กพูดเป็นอย่างไร
-            <div class="faces"><span>😊 ทำได้</span><span>🙂 ฝึกอีก</span><span>⏭ ข้าม</span></div></div>
-        </div></div><p class="frame-label">เล่นด้วยกัน (ระดับ 1–2): แตะผล 1 ครั้งต่อข้อ ไม่มีงานค้าง</p></div>
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span class="icon-btn">⏸</span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span></span></div>
-          <div class="stage"><div class="crab big">🥳</div><div class="kid-title">เก่งมาก!</div><div class="stars">⭐</div><div class="kid-sub">ไปข้อต่อไปเอง…</div></div>
-          <span class="adult">👤</span>
-        </div></div><p class="frame-label">เล่นเอง (ระดับ 3–4): ไม่มีแถบผู้ใหญ่ ข้อพูดเก็บ "รอผู้ใหญ่ตรวจ" ไปตรวจที่หน้าจบรอบหรือคิวครู</p></div>
-      </div>
-    </div>
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/04-speech-answered.png" alt="หลังตอบข้อพูด"></div><p class="frame-label">ข้อความสถานะ "รอบนี้เป็นการจำลองคำตอบ · ผลการพูดยังรอผู้ใหญ่ช่วยตรวจ"</p></div>
+    <div><p class="col-title new">แบบใหม่</p><div class="phones">
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span style="width:42px"></span></div>
+        <div class="stage"><img class="pu big" src="art/crab.svg" alt="พี่ปู"><div class="kid-title">เก่งมาก!</div><div class="stars"><svg><use href="#i-star"/></svg></div></div>
+        <div class="adult-bar"><div class="head"><svg><use href="#i-user"/></svg>เล่นด้วยกัน · ผู้ใหญ่ฟังแล้วเด็กพูดเป็นอย่างไร</div><div class="faces"><span>😊 ทำได้</span><span>🙂 ฝึกอีก</span><span>⏭ ข้าม</span></div></div>
+      </div></div><p class="frame-label">เล่นด้วยกัน (ระดับ 1–2): แตะผล 1 ครั้งต่อข้อ</p></div>
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span class="dots"><i class="on"></i><i class="on"></i><i></i></span><span style="width:42px"></span></div>
+        <div class="stage"><img class="pu big" src="art/crab.svg" alt="พี่ปู"><div class="kid-title">เก่งมาก!</div><div class="stars"><svg><use href="#i-star"/></svg></div><div class="kid-sub">ไปข้อต่อไปเอง…</div></div>
+        <span class="adult"><svg><use href="#i-user"/></svg>ผู้ใหญ่</span>
+      </div></div><p class="frame-label">เล่นเอง (ระดับ 3–4): เก็บ "รอผู้ใหญ่ตรวจ" ไปตรวจที่หน้าจบรอบหรือคิวครู</p></div>
+    </div></div>
     <div class="notes">
       <ul>
-        <li><span class="tag-cut">ตัด</span> ข้อความสถานะเชิงระบบบนจอเด็ก</li>
-        <li><span class="tag-add">เพิ่ม</span> ผลตรวจแบบใบหน้า 3 ปุ่มสำหรับผู้ใหญ่ ส่งเข้าระบบกลางเหมือน "ผู้ใหญ่ยืนยันผล" ที่มีอยู่</li>
-        <li>เมื่อเปิด AI ตรวจเสียงในอนาคต ใบหน้าที่ AI แนะนำจะถูกเลือกไว้ให้ ผู้ใหญ่แค่ยืนยัน</li>
+        <li><span class="t-cut">ตัด</span> ข้อความสถานะเชิงระบบบนจอเด็ก</li>
+        <li><span class="t-add">เพิ่ม</span> ผลแบบใบหน้า 3 ปุ่ม ส่งเข้าระบบกลางเหมือน "ผู้ใหญ่ยืนยันผล" ที่มีอยู่</li>
+        <li>เมื่อเปิด AI ตรวจเสียง ใบหน้าที่ AI แนะนำถูกเลือกไว้ให้ ผู้ใหญ่แค่ยืนยัน</li>
       </ul>
     </div>
   </div>
@@ -425,36 +466,35 @@
   <p class="lead">ตอนนี้ดาว รายการผล และคำอธิบายผู้ใหญ่อยู่หน้าเดียวกัน · แบบใหม่แยกเป็นสองชั้น</p>
   <div class="compare">
     <div><p class="col-title now">ปัจจุบัน</p><div class="phone before"><img src="before/07-round-summary.png" alt="หน้าสรุปรอบ"></div></div>
-    <div><p class="col-title new">แบบใหม่</p>
-      <div class="phones">
-        <div><div class="phone"><div class="wf">
-          <div class="wf-top"><span></span><span></span><span class="icon-btn">🔊</span></div>
-          <div class="stage">
-            <div class="crab big">🦀</div>
-            <div class="stars">⭐⭐⭐</div>
-            <div class="kid-title">ภารกิจสำเร็จ!</div>
-            <div class="kid-sub">ได้สติกเกอร์ 3 ดวง</div>
-            <div class="btn-row"><span class="pill">🔁 เล่นอีก</span><span class="pill primary">ด่านต่อไป ➜</span></div>
-          </div>
-          <div class="adult-bar" style="text-align:center">👤 ผู้ใหญ่: ดูผลรอบนี้และคำแนะนำ ›</div>
-        </div></div><p class="frame-label">ก · จอเด็ก: ฉลอง ปุ่มใหญ่ 2 ปุ่ม</p></div>
-        <div><div class="phone"><div class="wf" style="font-family:'Sarabun',sans-serif">
-          <div class="wf-top"><span class="icon-btn">‹</span><b style="font-size:15px">ผลรอบนี้ (ผู้ใหญ่)</b><span></span></div>
-          <div style="padding:6px 16px;display:flex;flex-direction:column;gap:10px;font-size:13px">
-            <div class="box" style="padding:10px 12px">ฟังเลือกถูก 3/3 · ข้อพูดรอตรวจ 2 ข้อ <span style="float:right;color:var(--accent)">ตรวจ ›</span></div>
-            <div class="box" style="padding:10px 12px"><b>✨ คำแนะนำจาก Speech Adventure</b><br>ทำได้ดี · ฝึกต่อ · เล่นที่บ้าน 2 อย่าง<br><span style="color:var(--accent)">ขอคำแนะนำ ›</span></div>
-            <div class="box" style="padding:10px 12px">ดูความก้าวหน้า › · รายงาน ›</div>
-            <div style="color:var(--muted);font-size:11px">ข้อความเรื่องการเก็บข้อมูลและ "ไม่ใช่การวินิจฉัย" อยู่หน้านี้</div>
-          </div>
-        </div></div><p class="frame-label">ข · หน้าผู้ใหญ่: ตรวจข้อพูด คำแนะนำ ความก้าวหน้า (ฟอนต์ผู้ใหญ่)</p></div>
-      </div>
-    </div>
+    <div><p class="col-title new">แบบใหม่</p><div class="phones">
+      <div><div class="phone"><div class="kid">
+        <div class="top"><span style="width:42px"></span><span></span><span class="ibtn"><svg><use href="#i-vol"/></svg></span></div>
+        <div class="stage">
+          <img class="pu big" src="art/crab.svg" alt="พี่ปู">
+          <div class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div>
+          <div class="kid-title">ภารกิจสำเร็จ!</div>
+          <div class="kid-sub">ได้สติกเกอร์ 3 ดวง</div>
+          <div class="row"><span class="btn"><svg><use href="#i-replay"/></svg>เล่นอีก</span><span class="btn gold">ด่านต่อไป<svg><use href="#i-next"/></svg></span></div>
+        </div>
+        <div class="adult-bar" style="text-align:center"><div class="head" style="justify-content:center"><svg><use href="#i-user"/></svg>ผู้ใหญ่: ดูผลรอบนี้และคำแนะนำ ›</div></div>
+      </div></div><p class="frame-label">ก · จอเด็ก: ฉลอง ปุ่มใหญ่ 2 ปุ่ม</p></div>
+      <div><div class="phone"><div class="adult-screen">
+        <div class="hdr"><b>ผลรอบนี้</b><small>ฟังแยกเสียง · เสียง ป · สำหรับผู้ใหญ่</small></div>
+        <div class="list">
+          <div class="card">ฟังเลือกถูก <b>3/3</b> · ข้อพูดรอตรวจ <b>2</b><span class="lnk">ตรวจ ›</span></div>
+          <div class="card"><b>✨ คำแนะนำจาก Speech Adventure</b><br><span style="color:var(--muted)">ทำได้ดี · ฝึกต่อ · เล่นที่บ้าน 2 อย่าง</span><br><span class="lnk" style="float:none">ขอคำแนะนำ ›</span></div>
+          <div class="card">ดูความก้าวหน้า<span class="lnk">›</span></div>
+          <div class="card">รายงาน<span class="lnk">›</span></div>
+          <div style="color:var(--muted);font-size:11px">ข้อความเรื่องการเก็บข้อมูลและ "ไม่ใช่การวินิจฉัย" อยู่หน้านี้</div>
+        </div>
+      </div></div><p class="frame-label">ข · หน้าผู้ใหญ่: หน้าตาเหมือนส่วนอื่นของเว็บ (ฟอนต์และการ์ดผู้ใหญ่)</p></div>
+    </div></div>
     <div class="notes">
       <ul>
-        <li><span class="tag-move">ย้าย</span> "สิ่งที่ผู้ใหญ่ดูต่อได้", รายการผลรายข้อ, การ์ดคำแนะนำ ไปหน้าผู้ใหญ่</li>
-        <li><span class="tag-cut">ตัด</span> "ครบแล้ว · สถานะการทำกิจกรรม", "3/3 ฟังและเลือกถูก" ออกจากจอเด็ก (เด็กเห็นดาวแทน)</li>
-        <li><span class="tag-add">เพิ่ม</span> ปุ่ม "เล่นอีก" สำหรับเด็กที่อยากเล่นซ้ำ</li>
-        <li>โหมดเล่นเอง: "👤 ผู้ใหญ่" ต้องผ่านประตูผู้ใหญ่ก่อน</li>
+        <li><span class="t-move">ย้าย</span> "สิ่งที่ผู้ใหญ่ดูต่อได้", รายการผลรายข้อ, การ์ดคำแนะนำ ไปหน้าผู้ใหญ่</li>
+        <li><span class="t-cut">ตัด</span> "ครบแล้ว · สถานะการทำกิจกรรม", "3/3 ฟังและเลือกถูก" ออกจากจอเด็ก (เห็นดาวแทน)</li>
+        <li><span class="t-add">เพิ่ม</span> ปุ่ม "เล่นอีก"</li>
+        <li>โหมดเล่นเอง: "ผู้ใหญ่" ต้องผ่านประตูผู้ใหญ่ก่อน</li>
       </ul>
     </div>
   </div>
@@ -463,35 +503,31 @@
 <!-- 8 PARENT GATE -->
 <section class="block" id="s8">
   <h2>8 · ประตูผู้ใหญ่ (โหมดเล่นเอง)</h2>
-  <p class="lead">กันเด็กเข้าเมนูตั้งค่า ส่งเสียงให้ AI หรือกดยืนยันผลเอง · ใช้วิธีที่ผู้ใหญ่ทำได้ง่าย แต่เด็กเล็กทำได้ยาก</p>
+  <p class="lead">กันเด็กเข้าตั้งค่า ส่งเสียงให้ AI หรือกดยืนยันผลเอง · ผู้ใหญ่ทำได้ง่าย เด็กเล็กทำได้ยาก</p>
   <div class="compare">
-    <div><p class="col-title now">ปัจจุบัน</p><div class="phone" style="display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center;padding:20px">ไม่มี<br>เมนูทุกอย่างเปิดได้จากหน้าฝึกโดยตรง</div></div>
-    <div><p class="col-title new">แบบใหม่</p>
-      <div class="phones">
-        <div><div class="phone"><div class="wf" style="font-family:'Sarabun',sans-serif">
-          <div class="stage" style="gap:16px">
-            <div style="font-size:40px">👤</div>
-            <b style="font-size:18px">สำหรับผู้ใหญ่</b>
-            <div style="font-size:14px;text-align:center;color:var(--muted)">กดค้างที่ปุ่มด้านล่าง 3 วินาที<br>แล้วตอบ: <b style="color:var(--ink)">สิบสอง ลบ ห้า</b> เท่ากับเท่าไร</div>
-            <div class="btn-row"><span class="pill">5</span><span class="pill">7</span><span class="pill">9</span></div>
-            <div style="width:220px;height:14px;border-radius:999px;background:#eceef4;overflow:hidden"><b style="display:block;width:60%;height:100%;background:var(--accent)"></b></div>
-            <span class="pill" style="font-size:14px">กลับไปเล่น</span>
-          </div>
-        </div></div><p class="frame-label">ตัวเลขเขียนเป็นคำ เด็กเล็กอ่านไม่ออก · ผู้ใหญ่ปิดประตูนี้ได้ในโหมดเล่นด้วยกัน</p></div>
-      </div>
-    </div>
+    <div><p class="col-title now">ปัจจุบัน</p><div class="phone" style="display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center;padding:20px;background:var(--bg)">ไม่มี<br>เมนูทุกอย่างเปิดได้จากหน้าฝึกโดยตรง</div></div>
+    <div><p class="col-title new">แบบใหม่</p><div class="phones">
+      <div><div class="phone"><div class="adult-screen" style="justify-content:center;align-items:center;gap:14px;padding:22px;text-align:center">
+        <span class="ibtn" style="width:56px;height:56px;border-radius:18px;background:var(--hero)"><svg style="width:26px;height:26px"><use href="#i-user"/></svg></span>
+        <b style="font-family:var(--font-display);font-size:20px">สำหรับผู้ใหญ่</b>
+        <div style="font-size:14px;color:var(--muted)">กดค้างปุ่มด้านล่าง 3 วินาที<br>แล้วตอบ: <b style="color:var(--text)">สิบสอง ลบ ห้า</b> เท่ากับเท่าไร</div>
+        <div class="row" style="font-family:var(--font-display)"><span class="btn" style="font-family:inherit">5</span><span class="btn go" style="font-family:inherit">7</span><span class="btn" style="font-family:inherit">9</span></div>
+        <div class="meter" style="width:220px"><b style="width:60%;background:linear-gradient(90deg,#7B6CF6,#C3BBFF)"></b></div>
+        <span style="font-size:13px;color:var(--primary-text)">กลับไปเล่น</span>
+      </div></div><p class="frame-label">ตัวเลขเขียนเป็นคำ เด็กเล็กอ่านไม่ออก · ปิดประตูนี้ได้ในโหมดเล่นด้วยกัน</p></div>
+    </div></div>
     <div class="notes">
       <ul>
-        <li><span class="tag-add">เพิ่ม</span> ใช้กับ: ตั้งค่า, สลับโหมด, ความไวไมค์, ยินยอมส่งเสียงให้ AI, ดูผล/ยืนยันผล, ออกจากระบบ</li>
-        <li>ไม่ต้องใช้รหัสผ่าน จึงไม่ทำให้ผู้ปกครองลำบาก</li>
+        <li><span class="t-add">เพิ่ม</span> ใช้กับ: ตั้งค่า, สลับโหมด, ความไวไมค์, ยินยอมส่งเสียงให้ AI, ดู/ยืนยันผล, ออกจากระบบ</li>
+        <li>ไม่ต้องใช้รหัสผ่าน ผู้ปกครองไม่ลำบาก</li>
       </ul>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>ไฟล์นี้: <code>docs/design/wireframes/kid-practice.html</code> · ภาพปัจจุบัน: <code>docs/design/wireframes/before/</code> ถ่ายใหม่ได้ด้วย <code>node scripts/design/capture-practice-screens.mjs</code> (ต้องเปิดเว็บไว้)</p>
-  <p>ภาพตัวการ์ตูนในไวร์เฟรมเป็นอีโมจิแทนชั่วคราว งานจริงใช้ภาพพี่ปูชุดเดิมของแอปและทำท่าเพิ่ม · ตัวเลขข้อความ/ปุ่มเป็นค่าประมาณจากหน้าจอจริง</p>
+  <p>ไฟล์: <code>docs/design/wireframes/kid-practice.html</code> · ภาพปัจจุบัน: <code>before/</code> (<code>node scripts/design/capture-practice-screens.mjs</code> ต้องเปิดเว็บไว้) · ภาพประกอบจริงของแอป: <code>art/</code> (<code>node scripts/design/export-art.mjs</code>)</p>
+  <p>ฉากเกม (ทะเล เรือ เกาะ ลำธาร) วาดใหม่ในไวร์เฟรมให้เข้าธีม งานจริงควรวาดในชุดเดียวกับภาพพี่ปู · ภาพปากในงานจริงใช้ภาพจังหวะปากชุดเดิมของแอป · ตัวเลขข้อความ/ปุ่มเป็นค่าประมาณจากหน้าจอจริง</p>
 </footer>
 </body>
 </html>
