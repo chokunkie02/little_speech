@@ -2,16 +2,19 @@
 // kid-friendly wireframes. Drives a headless Edge/Chrome through the DevTools protocol; no packages.
 //
 //   npm run dev                                   (in another window)
-//   node scripts/design/capture-practice-screens.mjs
+//   node scripts/design/capture-practice-screens.mjs            (phone, 390 × 844)
+//   VIEW=pc node scripts/design/capture-practice-screens.mjs    (computer, 1440 × 900)
 //
-// Writes docs/design/wireframes/before/*.png
+// Writes docs/design/wireframes/before/*.png (phone) or before/pc/*.png (computer)
 import { spawn } from "node:child_process";
 import { existsSync } from "node:fs";
 import { mkdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 const SITE = process.env.SITE ?? "http://localhost:3000";
-const OUT = "docs/design/wireframes/before";
+const PC = process.env.VIEW === "pc";
+const VIEWPORT = PC ? { width: 1440, height: 900, deviceScaleFactor: 1, mobile: false } : { width: 390, height: 844, deviceScaleFactor: 2, mobile: true };
+const OUT = PC ? "docs/design/wireframes/before/pc" : "docs/design/wireframes/before";
 const PORT = 9333;
 const PROFILE = path.resolve(`.learning-runtime/capture-profile-${Date.now()}`);
 const BROWSERS = [
@@ -72,7 +75,7 @@ const evaluate = async (expression) =>
 
 await send("Page.enable");
 await send("Runtime.enable");
-await send("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 2, mobile: true });
+await send("Emulation.setDeviceMetricsOverride", VIEWPORT);
 await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-color-scheme", value: "dark" }] });
 
 async function go(url) {
@@ -96,13 +99,31 @@ async function click(text, nth = 0) {
   }
   await sleep(1500);
 }
+/** Open stage n from the path page, whatever its button says (เริ่มตรงนี้ / ฝึกอีกครั้ง). */
+async function startStage(n) {
+  await go("/training#path");
+  const ok = await evaluate(`(() => {
+    const label = [...document.querySelectorAll("*")].find((el) => el.childElementCount === 0 && el.textContent.trim() === "ขั้นที่ ${n}");
+    let card = label;
+    while (card && !card.querySelector("button")) card = card.parentElement;
+    const button = card?.querySelector("button");
+    if (!button) return false;
+    button.scrollIntoView({ block: "center" });
+    button.click();
+    return true;
+  })()`);
+  if (!ok) throw new Error(`Stage ${n} not found on the path page`);
+  await sleep(1500);
+  const dialog = await evaluate(`[...document.querySelectorAll("button")].some((b) => b.innerText.includes("พร้อมแล้ว เริ่มเลย"))`);
+  return dialog;
+}
 async function shot(name, { full = false } = {}) {
   await evaluate("window.scrollTo(0, 0)");
   await sleep(300);
   let params = { format: "png" };
   if (full) {
     const height = await evaluate("Math.min(document.documentElement.scrollHeight, 4000)");
-    params = { format: "png", captureBeyondViewport: true, clip: { x: 0, y: 0, width: 390, height, scale: 1 } };
+    params = { format: "png", captureBeyondViewport: true, clip: { x: 0, y: 0, width: VIEWPORT.width, height, scale: 1 } };
   }
   const { data } = await send("Page.captureScreenshot", params);
   await writeFile(path.join(OUT, `${name}.png`), Buffer.from(data, "base64"));
@@ -114,7 +135,7 @@ try {
   await shot("01-path", { full: true });
 
   // Speech item: ดูปากและพูดตาม (stage 2)
-  await click("เริ่มตรงนี้", 1);
+  await startStage(2);
   await shot("02-start-round");
   await click("พร้อมแล้ว เริ่มเลย");
   await shot("03-speech-item", { full: true });
@@ -122,10 +143,7 @@ try {
   await shot("04-speech-answered", { full: true });
 
   // Picture choice: ฟังแยกเสียง (stage 1), then finish the round for the summary
-  await go("/training#path");
-  await click("เริ่มตรงนี้", 0);
-  const dialog = await evaluate(`[...document.querySelectorAll("button")].some((b) => b.innerText.includes("พร้อมแล้ว เริ่มเลย"))`);
-  if (dialog) await click("พร้อมแล้ว เริ่มเลย");
+  if (await startStage(1)) await click("พร้อมแล้ว เริ่มเลย");
   await shot("05-choice-item", { full: true });
   for (let item = 0; item < 3; item++) {
     await click("เลือก ");
@@ -136,11 +154,8 @@ try {
   await shot("07-round-summary", { full: true });
 
   // Syllables (stage 3) and words (stage 4)
-  for (const [index, name] of [[2, "08-syllable-item"], [3, "09-word-item"]]) {
-    await go("/training#path");
-    await click("เริ่มตรงนี้", index);
-    const start = await evaluate(`[...document.querySelectorAll("button")].some((b) => b.innerText.includes("พร้อมแล้ว เริ่มเลย"))`);
-    if (start) await click("พร้อมแล้ว เริ่มเลย");
+  for (const [stage, name] of [[3, "08-syllable-item"], [4, "09-word-item"]]) {
+    if (await startStage(stage)) await click("พร้อมแล้ว เริ่มเลย");
     await shot(name, { full: true });
   }
 } finally {
