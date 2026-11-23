@@ -8,6 +8,13 @@ export function useStudioResultSync(childId: string | undefined, accountId: stri
   const savedReviews = useRef(new Map<string, string>());
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [revision, setRevision] = useState(0);
+  /**
+   * Whether this account may confirm results for this child centrally. For a school child the school
+   * decides (class teacher only, by default); then the adult's taps stay on this device and are not
+   * re-sent (and refused) on every visit.
+   */
+  const canReview = useRef<{ childId: string; allowed: boolean } | null>(null);
+  const [teacherConfirms, setTeacherConfirms] = useState(false);
 
   useEffect(() => {
     if (!childId || !accountId) return;
@@ -52,7 +59,16 @@ export function useStudioResultSync(childId: string | undefined, accountId: stri
           if (error) throw error;
           if (active) batch.forEach(({ session_id }) => saved.current.add(session_id));
         }
-        for (let offset = 0; offset < reviews.length && active; offset += 25) {
+        if (reviews.length && canReview.current?.childId !== childId) {
+          // Not in the generated Database type (same loose call as src/lib/schoolAdmin.ts).
+          const { data, error } = await (client.rpc as unknown as (fn: string, params: Record<string, unknown>) =>
+            PromiseLike<{ data: unknown; error: { message: string } | null }>)("can_review_assessment", { p_child_id: childId });
+          if (error) throw error;
+          canReview.current = { childId: childId!, allowed: data === true };
+        }
+        const allowed = canReview.current?.allowed ?? true;
+        if (active) setTeacherConfirms(!allowed);
+        for (let offset = 0; allowed && offset < reviews.length && active; offset += 25) {
           const batch = reviews.slice(offset, offset + 25);
           await assessmentRequest("/api/assessment/review", {
             method: "POST", headers: { "Content-Type": "application/json" },
@@ -70,5 +86,5 @@ export function useStudioResultSync(childId: string | undefined, accountId: stri
     return () => { active = false; };
   }, [childId, accountId, sessions, revision]);
 
-  return { status, retry: () => setRevision((value) => value + 1) };
+  return { status, teacherConfirms, retry: () => setRevision((value) => value + 1) };
 }
