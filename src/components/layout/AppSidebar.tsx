@@ -15,6 +15,8 @@ import { useSpeechProgress } from "@/hooks/useSpeechProgress";
 import { useChildProfile } from "@/hooks/useChildProfile";
 import { useAuth } from "@/hooks/useAuth";
 import { mockTrainingStages } from "@/data/speechAdventureMockData";
+import { useStudioState } from "@/features/learning-studio/useStudioState";
+import { DEMO_CHILD_ID } from "@/features/learning-studio/integration";
 import { ROLE_LABELS, appRole, isNavActive, navGroups, type NavGroup } from "./navigation";
 
 function Logo({ withText }: { withText: boolean }) {
@@ -90,10 +92,20 @@ function NavList({ groups, collapsed, pending, onNavigate }: {
 /** Child switcher, target sound, stars and "continue" — parents with a linked child only. */
 function ChildContext({ compact, onNavigate }: { compact: boolean; onNavigate?: () => void }) {
   const pathname = usePathname();
-  const { summary, isHydrated, selectedSoundId } = useSpeechProgress();
+  const { summary, isHydrated, selectedSoundId: legacySound } = useSpeechProgress();
   const { profile } = useChildProfile();
+  const { user } = useAuth();
+  // The practice studio is the source of truth: the sound in its plan and the stars of its rounds (the same
+  // numbers the kid map shows). The older progress store is only a fallback before the first studio visit.
+  // Without a profile the studio practises with its demo child; read that same record.
+  const studio = useStudioState(user?.id, profile?.id ?? DEMO_CHILD_ID);
   const isSpeechMode = !isHydrated || profile?.trainingMode !== "kindergarten_phonics";
-  const stars = isHydrated ? summary.starsEarned : 0;
+  const selectedSoundId = studio?.plan.sound ?? legacySound;
+  const stars = studio
+    ? studio.sessions
+        .filter((s) => s.status === "completed" && s.childId === studio.plan.childId)
+        .reduce((n, s) => n + s.attempts.length, 0)
+    : isHydrated ? summary.starsEarned : 0;
   const currentStage = mockTrainingStages.find((stage) => stage.id === (isHydrated ? summary.currentStageId : null));
 
   if (compact) return <div className="flex justify-center border-b border-border px-3 py-3"><ChildSelector collapsed /></div>;

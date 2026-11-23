@@ -11,8 +11,10 @@ export interface StudioChild {
   targetSound?: string;
 }
 export const STUDIO_STATE_EVENT = "speech-adventure:studio-state";
+/** Child id the studio uses when no child profile is selected (guest demo). */
+export const DEMO_CHILD_ID = "demo-child-meena";
 export function studioStorageKey(accountId?: string, childId?: string): string {
-  return `speech-adventure:studio:v1:${encodeURIComponent(accountId || "anonymous")}:${encodeURIComponent(childId || "demo-child-meena")}`;
+  return `speech-adventure:studio:v1:${encodeURIComponent(accountId || "anonymous")}:${encodeURIComponent(childId || DEMO_CHILD_ID)}`;
 }
 /** Content band suggestion only; adults can select any level. */
 export function suggestedLevel(age?: number): LearningLevelId {

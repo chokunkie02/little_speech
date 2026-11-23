@@ -1008,9 +1008,8 @@ export function LearningStudio({
               stages={stages}
               done={finishedStages}
               next={mapNext}
-              stars={completed
-                .filter((x) => x.planId === state.plan.id)
-                .reduce((n, x) => n + x.attempts.length, 0)}
+              // All rounds this child finished, not only this plan's: changing level must not empty the jar.
+              stars={completed.reduce((n, x) => n + x.attempts.length, 0)}
               sound={state.plan.sound}
               onPick={(stage) => begin(stage)}
               onGo={() => (active ? go("practice") : begin(mapNext))}
