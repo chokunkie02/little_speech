@@ -18,7 +18,7 @@ const STONES = ["ปา", "ปี", "ปู"];
  * "ดูพี่ปูสอนเล่น": four short scenes drawn with the real game parts (the stepping stones are the game's
  * own scene), so the guide always matches the screens. Plays by itself; chapters jump to a scene.
  */
-export function GuideWalkthrough({ onTry }: { onTry: () => void }) {
+export function GuideWalkthrough({ onTry, onShowTips }: { onTry: () => void; onShowTips: () => void }) {
   const [scene, setScene] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [hops, setHops] = useState(0);
@@ -115,10 +115,15 @@ export function GuideWalkthrough({ onTry }: { onTry: () => void }) {
           </div>
         </div>
       </div>
-      <button type="button" className="guide-try" onClick={onTry}>
-        <Play size={18} />
-        ลองเล่น 1 ข้อ <small>(ไม่บันทึกผล)</small>
-      </button>
+      <div className="guide-actions">
+        <button type="button" className="guide-try" onClick={onTry}>
+          <Play size={18} />
+          ลองเล่น 1 ข้อ <small>(ไม่บันทึกผล)</small>
+        </button>
+        <button type="button" className="guide-link" onClick={onShowTips}>
+          ดูป้ายแนะนำบนแผนที่อีกครั้ง
+        </button>
+      </div>
     </section>
   );
 }

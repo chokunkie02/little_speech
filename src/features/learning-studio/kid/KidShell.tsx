@@ -46,6 +46,7 @@ export function KidShell({
   progress,
   onPause,
   back = "pause",
+  spot,
   right,
   adultActions = [],
   adultNote,
@@ -56,6 +57,8 @@ export function KidShell({
   onPause?: () => void;
   /** What the top-left button looks like: pause (in a game) or back to the map (book, round end). */
   back?: "pause" | "map";
+  /** First-visit tips: light up the adult corner or the home button. */
+  spot?: "adult" | "home";
   right?: ReactNode;
   adultActions?: AdultAction[];
   adultNote?: ReactNode;
@@ -127,7 +130,7 @@ export function KidShell({
           ) : (
             <span />
           )}
-          <span className="kw-top-right">
+          <span className={`kw-top-right${spot === "home" ? " kw-spot" : ""}`}>
             {right}
             {goHome ? (
               <button type="button" className="kw-ibtn" onClick={goHome} aria-label="กลับหน้าหลัก">
@@ -140,7 +143,7 @@ export function KidShell({
         </div>
         {children}
         {bars === 0 && adultActions.length > 0 && (
-          <button type="button" className="kw-adult-chip" onClick={() => setMenu(true)}>
+          <button type="button" className={`kw-adult-chip${spot === "adult" ? " kw-spot" : ""}`} onClick={() => setMenu(true)}>
             <UserRound />
             ผู้ใหญ่
           </button>

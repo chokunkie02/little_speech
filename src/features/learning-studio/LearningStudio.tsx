@@ -5,7 +5,7 @@ import { useStudioResultSync } from "./useStudioResultSync";
 import { CENTRAL_CHILD_ID, usePracticeItem } from "./usePracticeItem";
 import { KidPractice } from "./kid/KidPractice";
 import { usePracticeUi } from "./kid/preferences";
-import { KidFinale, KidMap, KidRoundEnd, KidStart, KidTravel } from "./kid/KidScreens";
+import { KidFinale, KidMap, KidRoundEnd, KidStart, KidTravel, MAP_TIPS_KEY } from "./kid/KidScreens";
 import { KidHomeContext } from "./kid/KidShell";
 import { KidStickerBook, readSeenStickers } from "./kid/StickerBook";
 import { stickerBook, stickersOfRound } from "./kid/stickers";
@@ -1048,7 +1048,18 @@ export function LearningStudio({
               onStart={() => go("path")}
             />
           )}
-          {route === "guide" && <Guide onReset={() => setResetOpen(true)} onTry={() => go("demo")} />}
+          {route === "guide" && <Guide
+              onReset={() => setResetOpen(true)}
+              onTry={() => go("demo")}
+              onShowTips={() => {
+                try {
+                  localStorage.removeItem(MAP_TIPS_KEY);
+                } catch {
+                  // Storage blocked: tips cannot be remembered either way.
+                }
+                go("play");
+              }}
+            />}
           {route === "demo" && demoSession && (
             <KidPractice
               key="guide-demo"
@@ -2711,8 +2722,11 @@ function ReviewModal({
 function Guide({
   onReset,
   onTry,
+  onShowTips,
 }: {
   onReset: () => void;
+  /** Show the map's first-visit tips again. */
+  onShowTips: () => void;
   /** "ลองเล่น 1 ข้อ": one real game item that saves nothing. */
   onTry: () => void;
 }) {
@@ -2725,7 +2739,7 @@ function Guide({
       />
       <div className="guide-layout">
         <div className="flex min-w-0 flex-col gap-5">
-        <GuideWalkthrough onTry={onTry} />
+        <GuideWalkthrough onTry={onTry} onShowTips={onShowTips} />
         <GuideFaq />
         <section className="panel prose">
           <details>

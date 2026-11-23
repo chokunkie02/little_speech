@@ -153,6 +153,21 @@ function firstVisit() {
   return true;
 }
 
+/** First visit on this device: three tips on the map, one at a time (the guide can show them again). */
+export const MAP_TIPS_KEY = "speech-adventure:map-tips";
+const TIPS = [
+  { spot: "go", text: "ปุ่มทอง = เริ่มเล่นด่านต่อไป" },
+  { spot: "adult", text: "ผู้ใหญ่: วิธีเล่น การตั้งค่า และผล อยู่ตรงนี้" },
+  { spot: "top", text: "สมุด = ดูสติกเกอร์ที่เก็บได้ · บ้าน = กลับหน้าหลัก" },
+] as const;
+function tipsSeen() {
+  try {
+    return localStorage.getItem(MAP_TIPS_KEY) === "done";
+  } catch {
+    return true;
+  }
+}
+
 /**
  * Adventure map: the kid's home. Stations already played carry a star, พี่ปู stands on the next one.
  * Every station can be played (adults skip ahead as before); the gold button goes to the next one.
@@ -189,9 +204,24 @@ export function KidMap({
   });
   useEffect(() => greet(), []);
   const nextGame = GAME_INFO[stageGame(next)];
+  const [tip, setTip] = useState<number | null>(() => (tipsSeen() ? null : 0));
+  const tipSpot = tip === null ? null : TIPS[tip].spot;
+  const finishTips = () => {
+    try {
+      localStorage.setItem(MAP_TIPS_KEY, "done");
+    } catch {
+      // Storage blocked: the tips show again next visit.
+    }
+    setTip(null);
+  };
+  const nextTip = () => {
+    if (tip !== null && tip + 1 < TIPS.length) setTip(tip + 1);
+    else finishTips();
+  };
   return (
     <KidShell
       label="แผนที่ผจญภัย"
+      spot={tipSpot === "adult" ? "adult" : tipSpot === "top" ? "home" : undefined}
       right={
         <>
           <span className="kw-count" aria-label={`ดาวสะสม ${stars} ดวง`}>
@@ -214,11 +244,36 @@ export function KidMap({
         </div>
         <Mascot text={`วันนี้ไป${nextGame.name}กัน!`} onReplay={() => say.say(VOICE_CUES.welcome)} replayLabel="พี่ปูพูดให้ฟัง" />
         <MapBoard stages={stages} done={done} here={next.id} glow={next.id} onPick={onPick} />
-        <button type="button" className="kw-btn gold big" onClick={onGo}>
+        <button type="button" className={`kw-btn gold big${tipSpot === "go" ? " kw-spot" : ""}`} onClick={onGo}>
           <Play />
           ไปต่อ
         </button>
       </div>
+      {tip !== null && (
+        <div className="kw-tips" onClick={nextTip} role="dialog" aria-modal="true" aria-label="แนะนำการใช้งาน">
+          <div className={`kw-tip at-${TIPS[tip].spot}`}>
+            <small>
+              {tip + 1} / {TIPS.length}
+            </small>
+            <p>{TIPS[tip].text}</p>
+            <span className="kw-tip-row">
+              <button
+                type="button"
+                className="kw-link"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  finishTips();
+                }}
+              >
+                ข้าม
+              </button>
+              <button type="button" className="kw-btn go" autoFocus>
+                {tip + 1 < TIPS.length ? "ต่อไป" : "เข้าใจแล้ว"}
+              </button>
+            </span>
+          </div>
+        </div>
+      )}
     </KidShell>
   );
 }

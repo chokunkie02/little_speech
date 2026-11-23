@@ -458,6 +458,23 @@
 .kid-world .kw-total svg { width: 30px; height: 30px; }
 .kid-world .kw-total svg.lucide-book-open { fill: none; color: var(--kw-primary-text); }
 
+/* ── First-visit tips on the map: the lit control darkens everything else with one huge shadow ── */
+.kid-world:has(.kw-spot) .kw-top, .kid-world:has(.kw-spot) .kw-map-wrap { z-index: auto; }
+.kid-world .kw-spot { z-index: 9; border-radius: 18px; box-shadow: 0 0 0 4px var(--kw-gold-1), 0 0 26px 8px rgb(255 213 138 / 0.55), 0 0 0 200vmax rgb(8 6 24 / 0.64) !important; }
+.kid-world .kw-spot:not(.kw-adult-chip) { position: relative; }
+.kid-world .kw-top-right.kw-spot { padding: 4px; }
+.kid-world .kw-tips { position: absolute; inset: 0; z-index: 11; cursor: pointer; }
+.kid-world .kw-tip { position: absolute; left: 50%; transform: translateX(-50%); width: min(340px, calc(100% - 32px)); display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; border-radius: 22px; background: #FFFFFF; color: #1E1A4A; box-shadow: 0 16px 30px -12px rgb(0 0 0 / 0.6); cursor: default; animation: kw-pop 0.3s cubic-bezier(0.3, 1.5, 0.5, 1) !important; }
+.kid-world .kw-tip.at-go { bottom: 170px; }
+.kid-world .kw-tip.at-adult { bottom: 90px; }
+.kid-world .kw-tip.at-top { top: 96px; }
+.kid-world .kw-tip small { font: 12px var(--kw-font-ui); color: #6B6790; }
+.kid-world .kw-tip p { margin: 0; font-size: 20px; line-height: 1.35; }
+.kid-world .kw-tip-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.kid-world .kw-tip .kw-link { color: #5548D4; }
+.kid-world .kw-tip .kw-btn { flex: none; min-height: 44px; font-size: 17px; padding: 8px 18px; }
+@media (min-width: 820px) { .kid-world .kw-tip.at-go { bottom: 130px; } }
+
 /* Reduced motion (also on when Windows animations are off for performance): the short, one-off moves
    that ARE the game's answer to the child (jump, fly to the basket, couple a car, the train trip) are
    marked !important above so the site-wide "motion off" rules don't remove them; everything that loops
