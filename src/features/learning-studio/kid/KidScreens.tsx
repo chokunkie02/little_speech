@@ -1,14 +1,15 @@
-import { useEffect, useEffectEvent, useState, type CSSProperties } from "react";
-import { ArrowRight, BookOpen, Check, LogOut, Mic, Play, RotateCcw, Star } from "lucide-react";
+import { useEffect, useEffectEvent, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { ArrowRight, BookOpen, ChartColumn, Check, LogOut, Map as MapIcon, Mic, Play, RotateCcw, Star } from "lucide-react";
 import { Art } from "../Art";
-import type { Session, Stage } from "../types";
+import type { Attempt, Session, Stage } from "../types";
 import { VOICE_CUES, useSpeaker } from "../useSpeaker";
 import { GAME_INFO, gameFor, type KidGame } from "./games";
 import { AdultBar, KidShell, Mascot } from "./KidShell";
 import { MouthCartoon } from "./mouths";
 import { useSay } from "./useSay";
 import { useTapMode } from "./preferences";
-import { Basket } from "./games/Scenes";
+import { Basket, Burst } from "./games/Scenes";
+import { sfx, unlockSfx } from "./sfx";
 
 /** Small picture for a station on the map and on the start screen. */
 export function GameIcon({ game }: { game: KidGame }) {
@@ -71,6 +72,87 @@ const trail = (n: number, wide: boolean) =>
   }).join("");
 
 /**
+ * The trail and its stations. `here` is where พี่ปู stands (left out while the cutscene moves him);
+ * `onPick` makes stations tappable.
+ */
+function MapBoard({
+  stages,
+  done,
+  here,
+  glow,
+  onPick,
+  children,
+}: {
+  stages: Stage[];
+  done: Set<string>;
+  here?: string;
+  /** Station to light up as the next one. */
+  glow?: string;
+  onPick?: (stage: Stage) => void;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="kw-map">
+      <svg className="kw-trail kw-trail-p" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d={trail(stages.length, false)} />
+      </svg>
+      <svg className="kw-trail kw-trail-d" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <path d={trail(stages.length, true)} />
+      </svg>
+      {stages.map((stage, i) => {
+        const isNext = stage.id === glow;
+        const finished = done.has(stage.id);
+        const name = GAME_INFO[stageGame(stage)].name;
+        const inner = (
+          <>
+            {stage.id === here && <Art kind="crab" className="kw-here" label="" />}
+            <span className="kw-disc">
+              <GameIcon game={stageGame(stage)} />
+              {finished && (
+                <span className="kw-badge">
+                  <Star />
+                </span>
+              )}
+            </span>
+            <span className="kw-node-name">{name}</span>
+          </>
+        );
+        const className = `kw-node${finished ? " done" : ""}${isNext ? " now" : ""}`;
+        return onPick ? (
+          <button
+            key={stage.id}
+            type="button"
+            className={className}
+            style={place(i, stages.length)}
+            onClick={() => onPick(stage)}
+            aria-label={`${name}${finished ? " เล่นแล้ว" : ""}${isNext ? " ด่านต่อไป" : ""}`}
+          >
+            {inner}
+          </button>
+        ) : (
+          <span key={stage.id} className={className} style={place(i, stages.length)}>
+            {inner}
+          </span>
+        );
+      })}
+      {children}
+    </div>
+  );
+}
+
+/** The welcome plays once per visit, not every time the child comes back to the map. */
+const GREETED_KEY = "speech-adventure:map-greeted";
+function firstVisit() {
+  try {
+    if (sessionStorage.getItem(GREETED_KEY) === "1") return false;
+    sessionStorage.setItem(GREETED_KEY, "1");
+  } catch {
+    // Storage blocked: greet every time, as before.
+  }
+  return true;
+}
+
+/**
  * Adventure map: the kid's home. Stations already played carry a star, พี่ปู stands on the next one.
  * Every station can be played (adults skip ahead as before); the gold button goes to the next one.
  */
@@ -96,7 +178,9 @@ export function KidMap({
 }) {
   const speaker = useSpeaker();
   const say = useSay(speaker);
-  const greet = useEffectEvent(() => void say.say(VOICE_CUES.welcome));
+  const greet = useEffectEvent(() => {
+    if (firstVisit()) void say.say(VOICE_CUES.welcome);
+  });
   useEffect(() => greet(), []);
   const nextGame = GAME_INFO[stageGame(next)];
   return (
@@ -117,39 +201,7 @@ export function KidMap({
           <small>เสียงที่ฝึก</small>
         </div>
         <Mascot text={`วันนี้ไป${nextGame.name}กัน!`} onReplay={() => say.say(VOICE_CUES.welcome)} replayLabel="พี่ปูพูดให้ฟัง" />
-        <div className="kw-map">
-          <svg className="kw-trail kw-trail-p" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <path d={trail(stages.length, false)} />
-          </svg>
-          <svg className="kw-trail kw-trail-d" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-            <path d={trail(stages.length, true)} />
-          </svg>
-          {stages.map((stage, i) => {
-            const isNext = stage.id === next.id;
-            const finished = done.has(stage.id);
-            return (
-              <button
-                key={stage.id}
-                type="button"
-                className={`kw-node${finished ? " done" : ""}${isNext ? " now" : ""}`}
-                style={place(i, stages.length)}
-                onClick={() => onPick(stage)}
-                aria-label={`${GAME_INFO[stageGame(stage)].name}${finished ? " เล่นแล้ว" : ""}${isNext ? " ด่านต่อไป" : ""}`}
-              >
-                {isNext && <Art kind="crab" className="kw-here" label="" />}
-                <span className="kw-disc">
-                  <GameIcon game={stageGame(stage)} />
-                  {finished && (
-                    <span className="kw-badge">
-                      <Star />
-                    </span>
-                  )}
-                </span>
-                <span className="kw-node-name">{GAME_INFO[stageGame(stage)].name}</span>
-              </button>
-            );
-          })}
-        </div>
+        <MapBoard stages={stages} done={done} here={next.id} glow={next.id} onPick={onPick} />
         <button type="button" className="kw-btn gold big" onClick={onGo}>
           <Play />
           ไปต่อ
@@ -290,6 +342,230 @@ export function KidRoundEnd({
           <button type="button" onClick={onAdult}>
             <BookOpen />
             ดูผลรอบนี้
+          </button>
+        </div>
+      </AdultBar>
+    </KidShell>
+  );
+}
+
+/* ─────────────── Between stages: พี่ปู hops along the trail ─────────────── */
+
+/** Timings of the cutscene, in ms from the start. */
+const TRAVEL = { hop: 500, land: 1700, enter: 3300, done: 3900 };
+
+/**
+ * Cutscene between two stages: the map with พี่ปู on the stage just played; he hops along the trail to
+ * the next station, the station lights up with its name, the map zooms in and the next game opens.
+ * A tap anywhere skips straight in.
+ */
+export function KidTravel({
+  stages,
+  done,
+  from,
+  to,
+  onArrive,
+  onMap,
+}: {
+  stages: Stage[];
+  done: Set<string>;
+  from: Stage;
+  to: Stage;
+  onArrive: () => void;
+  onMap: () => void;
+}) {
+  const [step, setStep] = useState<"wait" | "hop" | "land" | "enter">("wait");
+  const left = useRef(false);
+  const enter = () => {
+    if (left.current) return;
+    left.current = true;
+    onArrive();
+  };
+  const arrive = useEffectEvent(enter);
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => {
+        setStep("hop");
+        sfx("hop");
+        timers.push(setTimeout(() => sfx("hop"), 380), setTimeout(() => sfx("hop"), 760));
+      }, TRAVEL.hop),
+      setTimeout(() => {
+        setStep("land");
+        sfx("fanfare");
+      }, TRAVEL.land),
+      setTimeout(() => setStep("enter"), TRAVEL.enter),
+      setTimeout(() => arrive(), TRAVEL.done),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
+  const at = step === "wait" ? from : to;
+  const index = Math.max(
+    0,
+    stages.findIndex((s) => s.id === at.id),
+  );
+  const target = Math.max(
+    0,
+    stages.findIndex((s) => s.id === to.id),
+  );
+  const game = GAME_INFO[stageGame(to)];
+  return (
+    <KidShell label={`ไปด่านต่อไป ${game.name}`} onPause={onMap}>
+      <div
+        className={`kw-map-wrap kw-travel ${step}`}
+        style={place(target, stages.length)}
+        onClick={() => {
+          unlockSfx();
+          enter();
+        }}
+      >
+        <Mascot text={step === "wait" ? "ไปด่านต่อไปกัน!" : step === "hop" ? "ฮึบ ฮึบ ฮึบ!" : `ถึงแล้ว! ${game.name}`} />
+        <MapBoard stages={stages} done={done} glow={step === "land" || step === "enter" ? to.id : undefined}>
+          <span className="kw-traveller" style={place(index, stages.length)} aria-hidden="true">
+            <span key={step === "hop" ? "hop" : "still"} className={step === "hop" ? "kw-triple-hop" : ""}>
+              <Art kind="crab" label="" />
+            </span>
+            {step === "land" && <Burst count={14} />}
+          </span>
+        </MapBoard>
+        <div className="kw-sub">{step === "land" || step === "enter" ? game.line : "แตะเพื่อเข้าด่านเลย"}</div>
+      </div>
+    </KidShell>
+  );
+}
+
+/* ─────────────── End of the whole adventure ─────────────── */
+
+const achieved = (a: Attempt) => a.review === "achieved" || a.choiceCorrect === true;
+
+/** Gold cup for the end of the adventure. */
+function Trophy() {
+  return (
+    <svg className="kw-trophy" viewBox="0 0 160 170" aria-hidden="true">
+      <path d="M40 30 H20 Q8 30 10 46 Q14 74 46 80" fill="none" stroke="#E8A325" strokeWidth="9" strokeLinecap="round" />
+      <path d="M120 30 H140 Q152 30 150 46 Q146 74 114 80" fill="none" stroke="#E8A325" strokeWidth="9" strokeLinecap="round" />
+      <path d="M36 18 H124 V52 Q124 98 80 104 Q36 98 36 52 Z" fill="#FFD25E" stroke="#C98B1C" strokeWidth="4" strokeLinejoin="round" />
+      <path d="M50 26 V54 Q50 78 66 88" fill="none" stroke="#FFF1C2" strokeWidth="7" strokeLinecap="round" opacity=".8" />
+      <rect x="70" y="102" width="20" height="26" fill="#E8A325" stroke="#C98B1C" strokeWidth="4" />
+      <path d="M46 128 H114 L120 154 H40 Z" fill="#7B6CF6" stroke="#4A3DC8" strokeWidth="4" strokeLinejoin="round" />
+      <rect x="62" y="136" width="36" height="10" rx="3" fill="#FFD25E" />
+      <polygon points="80 36 86 50 101 51 89 61 93 76 80 67 67 76 71 61 59 51 74 50" fill="#FFF6D8" stroke="#E8A325" strokeWidth="2" />
+    </svg>
+  );
+}
+
+/**
+ * After the last stage: the whole adventure at a glance. The child sees the trophy and every station
+ * with its stars; the adult sees how each stage went (done well / still practising / waiting for review)
+ * and can open the full results.
+ */
+export function KidFinale({
+  stages,
+  latest,
+  onAgain,
+  onPick,
+  onMap,
+  onAdult,
+}: {
+  stages: Stage[];
+  /** Most recent finished round of each stage in this plan. */
+  latest: Map<string, Session>;
+  onAgain: () => void;
+  /** Play a station that was skipped. */
+  onPick: (stage: Stage) => void;
+  onMap: () => void;
+  onAdult: () => void;
+}) {
+  const speaker = useSpeaker();
+  const say = useSay(speaker);
+  const cheer = useEffectEvent(() => {
+    sfx("fanfare");
+    window.dispatchEvent(new CustomEvent("speech-adventure:chime", { detail: "complete" }));
+    void say.say(VOICE_CUES.complete);
+  });
+  useEffect(() => cheer(), []);
+  const rows = stages.map((stage) => {
+    const round = latest.get(stage.id);
+    const attempts = round?.attempts ?? [];
+    return {
+      stage,
+      played: !!round,
+      stars: round ? Math.max(1, Math.min(3, attempts.length)) : 0,
+      good: attempts.filter(achieved).length,
+      waiting: attempts.filter((a) => !achieved(a) && a.review === "pending").length,
+      total: attempts.length,
+    };
+  });
+  const missed = rows.filter((r) => !r.played).length;
+  const all = [...latest.values()].flatMap((s) => s.attempts);
+  const totals = {
+    stars: rows.reduce((n, r) => n + r.stars, 0),
+    good: all.filter(achieved).length,
+    practice: all.filter((a) => !achieved(a) && a.review !== "pending").length,
+    pending: all.filter((a) => !achieved(a) && a.review === "pending").length,
+    total: all.length,
+  };
+  return (
+    <KidShell label="จบการผจญภัย" onPause={onMap}>
+      <div className="kw-split kw-finale">
+        <div className="kw-col">
+          <div className="kw-trophy-wrap">
+            <Trophy />
+            <Burst count={20} />
+          </div>
+          <div className="kw-total" aria-label={`ดาวทั้งหมด ${totals.stars} ดวง`}>
+            <Star />
+            {totals.stars}
+          </div>
+        </div>
+        <div className="kw-col">
+          <div className="kw-title">{missed ? "ถึงด่านสุดท้ายแล้ว!" : "ผจญภัยครบทุกด่านแล้ว!"}</div>
+          {missed > 0 && <div className="kw-sub">ยังมีอีก {missed} ด่านที่ยังไม่ได้เล่น แตะเพื่อไปเล่นได้เลย</div>}
+          <ol className="kw-journey">
+            {rows.map((r, i) => (
+              <li key={r.stage.id} className={r.played ? "" : "skip"} style={{ "--i": i } as CSSProperties}>
+                {!r.played && (
+                  <button type="button" className="kw-journey-go" onClick={() => onPick(r.stage)} aria-label={`เล่น ${GAME_INFO[stageGame(r.stage)].name}`} />
+                )}
+                <span className="kw-disc">
+                  <GameIcon game={stageGame(r.stage)} />
+                </span>
+                <span className="kw-journey-name">
+                  {GAME_INFO[stageGame(r.stage)].name}
+                  <small>
+                    {!r.played
+                      ? "ยังไม่ได้เล่น · แตะเพื่อเล่น"
+                      : r.waiting
+                        ? `ทำได้ ${r.good} · รอผู้ใหญ่ฟัง ${r.waiting} (จาก ${r.total} ข้อ)`
+                        : `ทำได้ ${r.good} จาก ${r.total} ข้อ`}
+                  </small>
+                </span>
+                <span className="kw-journey-stars" aria-label={`${r.stars} ดาว`}>
+                  {Array.from({ length: 3 }, (_, k) => (
+                    <Star key={k} className={k < r.stars ? "on" : ""} />
+                  ))}
+                </span>
+              </li>
+            ))}
+          </ol>
+          <div className="kw-row">
+            <button type="button" className="kw-btn" onClick={onAgain}>
+              <RotateCcw />
+              เล่นใหม่
+            </button>
+            <button type="button" className="kw-btn gold" onClick={onMap}>
+              <MapIcon />
+              กลับแผนที่
+            </button>
+          </div>
+        </div>
+      </div>
+      <AdultBar
+        head={`ผู้ใหญ่: ทั้งการผจญภัย ทำได้ ${totals.good} · ยังต้องฝึก ${totals.practice} · รอผู้ใหญ่ฟัง ${totals.pending} (จาก ${totals.total} ข้อ)`}
+      >
+        <div className="kw-faces">
+          <button type="button" onClick={onAdult}>
+            <ChartColumn />
+            ดูผลการฝึกทั้งหมด
           </button>
         </div>
       </AdultBar>

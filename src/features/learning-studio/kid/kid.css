@@ -87,6 +87,12 @@
   .kid-world .kw-col { max-width: 520px; gap: 20px; }
 }
 
+/* Centre the column only when it fits: taller content starts at the top and scrolls, instead of
+   spilling above the screen where it cannot be reached (plain justify-content: center does that). */
+.kid-world .kw-stage, .kid-world .kw-split { justify-content: flex-start; }
+.kid-world .kw-stage > :first-child, .kid-world .kw-split > :first-child { margin-top: auto; }
+.kid-world .kw-stage > :last-child, .kid-world .kw-split > :last-child { margin-bottom: auto; }
+
 /* ── พี่ปู and speech bubble ── */
 .kid-world .kw-mascot { display: flex; align-items: flex-end; gap: 8px; align-self: stretch; max-width: 420px; margin: 0 auto; }
 .kid-world svg.kw-pu { width: 78px; height: auto; flex: none; filter: drop-shadow(0 8px 10px rgb(0 0 0 / 0.3)); }
@@ -350,6 +356,45 @@
 
 /* Notices inside the kid world stay calm and small */
 .kid-world .kw-note { font: 13px var(--kw-font-ui); color: var(--kw-muted); text-align: center; max-width: 360px; }
+
+/* ── Between stages: พี่ปู hops along the trail, then the map zooms into the next station ── */
+.kid-world .kw-travel { cursor: pointer; }
+.kid-world .kw-traveller { position: absolute; z-index: 3; left: var(--x-p); top: var(--y-p); width: 60px; transform: translate(-50%, calc(-100% - 18px)); transition: left 1.15s linear, top 1.15s linear !important; }
+.kid-world .kw-traveller > span { display: block; transform-origin: 50% 100%; }
+.kid-world .kw-traveller svg { display: block; width: 100%; height: auto; filter: drop-shadow(0 6px 6px rgb(0 0 0 / 0.35)); }
+.kid-world .kw-triple-hop { animation: kw-triple-hop 1.15s ease-in-out !important; }
+@keyframes kw-triple-hop {
+  0%, 33%, 66%, 100% { transform: translateY(0) scale(1.06, 0.92); }
+  16%, 49%, 83% { transform: translateY(-55%) scale(0.95, 1.06); }
+}
+.kid-world .kw-travel .kw-map { transition: transform 0.6s ease-in, opacity 0.6s ease-in !important; transform-origin: var(--x-p) var(--y-p); }
+.kid-world .kw-travel.enter .kw-map { transform: scale(2.6); opacity: 0; }
+.kid-world .kw-travel.land .kw-node.now .kw-disc, .kid-world .kw-travel.enter .kw-node.now .kw-disc { animation: kw-pop 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) !important; }
+@media (min-width: 820px) and (min-aspect-ratio: 1/1) {
+  .kid-world .kw-traveller { left: var(--x-d); top: var(--y-d); width: 84px; transform: translate(-50%, calc(-100% - 28px)); }
+  .kid-world .kw-travel .kw-map { transform-origin: var(--x-d) var(--y-d); }
+}
+
+/* ── End of the whole adventure ── */
+.kid-world .kw-trophy-wrap { position: relative; width: min(190px, 40vw); }
+.kid-world .kw-trophy { display: block; width: 100%; height: auto; filter: drop-shadow(0 0 26px rgb(255 213 138 / 0.55)); animation: kw-trophy-in 0.8s cubic-bezier(0.3, 1.5, 0.5, 1) !important; }
+@keyframes kw-trophy-in { from { transform: scale(0) rotate(-25deg); } }
+.kid-world .kw-trophy-wrap .kw-burst i { animation-delay: calc(var(--t) + 0.5s) !important; }
+.kid-world .kw-total { display: inline-flex; align-items: center; gap: 8px; font-size: 36px; padding: 4px 20px; border-radius: 999px; background: var(--kw-chip); border: 1px solid var(--kw-chip-line); }
+.kid-world .kw-total svg { width: 34px; height: 34px; fill: var(--kw-gold-1); color: var(--kw-gold-2); }
+.kid-world .kw-journey { list-style: none; margin: 0; padding: 0; width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.kid-world .kw-journey li { display: flex; align-items: center; gap: 12px; padding: 7px 12px; border-radius: 18px; background: var(--kw-surface); border: 1px solid var(--kw-line); animation: kw-row-in 0.4s calc(var(--i) * 140ms + 300ms) both !important; }
+.kid-world .kw-journey li { position: relative; }
+.kid-world .kw-journey li.skip { opacity: 0.6; border-style: dashed; }
+.kid-world .kw-journey li.skip:hover { opacity: 0.85; }
+.kid-world .kw-journey-go { position: absolute; inset: 0; border-radius: inherit; z-index: 1; }
+.kid-world .kw-journey .kw-disc { width: 44px; height: 44px; border-width: 2px; box-shadow: none; flex: none; }
+.kid-world .kw-journey-name { flex: 1; min-width: 0; display: flex; flex-direction: column; font-size: 18px; line-height: 1.25; }
+.kid-world .kw-journey-name small { font: 13px var(--kw-font-ui); color: var(--kw-muted); }
+.kid-world .kw-journey-stars { display: flex; gap: 2px; flex: none; }
+.kid-world .kw-journey-stars svg { width: 22px; height: 22px; fill: none; color: rgb(127 120 200 / 0.45); }
+.kid-world .kw-journey-stars svg.on { fill: var(--kw-gold-1); color: var(--kw-gold-2); }
+@keyframes kw-row-in { from { opacity: 0; transform: translateX(24px); } }
 
 /* Reduced motion (also on when Windows animations are off for performance): the short, one-off moves
    that ARE the game's answer to the child (jump, fly to the basket, couple a car, the train trip) are

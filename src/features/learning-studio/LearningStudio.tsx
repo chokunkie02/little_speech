@@ -5,7 +5,7 @@ import { useStudioResultSync } from "./useStudioResultSync";
 import { CENTRAL_CHILD_ID, usePracticeItem } from "./usePracticeItem";
 import { KidPractice } from "./kid/KidPractice";
 import { usePracticeUi } from "./kid/preferences";
-import { KidMap, KidRoundEnd, KidStart } from "./kid/KidScreens";
+import { KidFinale, KidMap, KidRoundEnd, KidStart, KidTravel } from "./kid/KidScreens";
 import AssessmentControls from "@/components/assessment/AssessmentControls";
 import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
 import RoundAdvice from "./RoundAdvice";
@@ -124,6 +124,7 @@ const routeFromHash = (): Route => {
     "guide",
     "play",
     "celebrate",
+    "finale",
   ].includes(s)
     ? (s as Route)
     : "home";
@@ -323,6 +324,8 @@ export function LearningStudio({
     /** Page it was asked from: the start screen only shows there (Back must not leave it on top). */
     route: Route;
   } | null>(null);
+  /** Cutscene from the stage just finished to the next one (kid screens), on the page it was asked from. */
+  const [travel, setTravel] = useState<{ from: Stage; to: Stage; route: Route } | null>(null);
   const [reviewId, setReviewId] = useState<string | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
   const [practiceUi, setPracticeUi] = usePracticeUi();
@@ -477,6 +480,13 @@ export function LearningStudio({
   );
   /** The round-end "ด่านต่อไป": the stage after the one just finished (none after the last stage). */
   const roundNext = sessionForSummary ? stageAfter(sessionForSummary.stageId) : undefined;
+  const roundStage = sessionForSummary ? stages.find((s) => s.id === sessionForSummary.stageId) : undefined;
+  /** Latest finished round of each stage in this plan, for the end-of-adventure summary. */
+  const latestRounds = new globalThis.Map<string, Session>();
+  for (const round of completed.filter((x) => x.planId === state.plan.id)) {
+    const seen = latestRounds.get(round.stageId);
+    if (!seen || (round.completedAt ?? "") > (seen.completedAt ?? "")) latestRounds.set(round.stageId, round);
+  }
   const reviewSession = state.sessions.find((s) => s.id === reviewId);
   const nav = [
     { id: "home", label: "แผนวันนี้" },
@@ -996,17 +1006,46 @@ export function LearningStudio({
               onExit={() => go("home")}
             />
           )}
+          {route === "celebrate" && travel && travel.route === route && (
+            <KidTravel
+              stages={stages}
+              done={finishedStages}
+              from={travel.from}
+              to={travel.to}
+              onArrive={() => {
+                setTravel(null);
+                start(travel.to);
+              }}
+              onMap={() => {
+                setTravel(null);
+                go("play");
+              }}
+            />
+          )}
+          {route === "finale" && (
+            <KidFinale
+              stages={stages}
+              latest={latestRounds}
+              onAgain={() => begin(stages[0])}
+              onPick={(stage) => begin(stage)}
+              onMap={() => go("play")}
+              onAdult={() => go("progress")}
+            />
+          )}
           {route === "celebrate" &&
+            !(travel && travel.route === route) &&
             (sessionForSummary ? (
               <KidRoundEnd
                 session={sessionForSummary}
-                nextLabel={roundNext ? "ด่านต่อไป" : "กลับแผนที่"}
+                nextLabel={roundNext ? "ด่านต่อไป" : "ดูสรุปการผจญภัย"}
                 onAgain={() => {
                   const stage = stages.find((s) => s.id === sessionForSummary.stageId);
                   if (stage) begin(stage);
                   else go("play");
                 }}
-                onNext={() => (roundNext ? begin(roundNext) : go("play"))}
+                onNext={() =>
+                  roundNext && roundStage ? setTravel({ from: roundStage, to: roundNext, route }) : go("finale")
+                }
                 onAdult={() => go("summary")}
                 onMap={() => go("play")}
               />
