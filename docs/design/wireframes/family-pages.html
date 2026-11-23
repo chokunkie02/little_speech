@@ -1,0 +1,827 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Speech Adventure · สมุดสติกเกอร์ พิมพ์ให้น้อง คู่มือ และหน้าผู้ใหญ่</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600&family=Itim&family=Kanit:wght@400;500;600&family=Mali:wght@400;600&family=Sarabun:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Tokens copied from src/app/globals.css (.dark) so the mockups match the live site. */
+  :root{
+    --bg:#0E0C22;--surface:#17143A;--surface-2:#1F1B48;--line:#2A2654;
+    --text:#F1F0FA;--muted:#A7A4C8;
+    --primary:#5548D4;--primary-text:#C3BBFF;--primary-soft:#262064;
+    --success:#4CAF82;--success-text:#7DDBB0;--warning:#FBBF24;--info:#5BC0EB;--error:#FF939E;
+    --gold-1:#FFD58A;--gold-2:#F2B23A;--gold-edge:#C98B1C;
+    --hero:radial-gradient(520px 260px at 92% 0%,rgb(255 200 97 / .14),transparent 60%),linear-gradient(135deg,#231A6E 0%,#4337B8 75%,#5A4FD6 100%);
+    --font-ui:'IBM Plex Sans Thai','Kanit',sans-serif;--font-display:'Kanit',sans-serif;
+    --font-kid:'Itim','Kanit',sans-serif;--font-letter:'Sarabun',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(900px 500px at 100% -10%,rgb(85 72 212 / .25),transparent 60%),var(--bg);color:var(--text);font-family:var(--font-ui);line-height:1.6}
+  a{color:var(--primary-text)}
+  header.page{padding:36px 40px 8px;max-width:1320px;margin:0 auto}
+  header.page h1{margin:0 0 4px;font-family:var(--font-display);font-weight:600;font-size:30px;letter-spacing:-.01em}
+  header.page p{margin:4px 0;color:var(--muted)}
+  header.page p b{color:var(--text)}
+  .chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--primary-soft);color:var(--primary-text);font-size:12px;font-weight:500}
+  nav.toc{max-width:1320px;margin:14px auto 0;padding:0 40px;display:flex;flex-wrap:wrap;gap:8px}
+  nav.toc a{font-size:13px;padding:6px 14px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--text);text-decoration:none}
+  nav.toc a:hover{border-color:var(--primary)}
+  section.block{max-width:1320px;margin:26px auto;padding:26px 40px;background:var(--surface);border:1px solid var(--line);border-radius:24px;box-shadow:0 24px 48px -30px #000}
+  section.block>h2{margin:0 0 4px;font-family:var(--font-display);font-weight:600;font-size:22px}
+  section.block>.lead{margin:0 0 20px;color:var(--muted)}
+  .legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin-top:8px}
+  .legend b{color:var(--text)}
+  .compare{display:grid;grid-template-columns:300px 1fr 280px;gap:26px;align-items:start}
+  @media (max-width:1100px){.compare{grid-template-columns:1fr}}
+  .col-title{font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin:0 0 10px;font-weight:600;color:var(--muted)}
+  .col-title.now{color:var(--error)}.col-title.new{color:var(--primary-text)}
+  .phones{display:flex;gap:18px;flex-wrap:wrap}
+  .phones .phone{zoom:.8}
+  .frame-label{font-size:12px;color:var(--muted);margin:8px 0 0;max-width:240px}
+  .phone{width:300px;height:620px;border:10px solid #05040f;border-radius:40px;position:relative;overflow:hidden;flex:none;box-shadow:0 0 0 1px #2A2654,0 24px 40px -18px #000}
+  .phone.before{overflow-y:auto;background:#0c0f24}
+  .phone.before img{width:100%;display:block}
+
+  /* ── New design: the kid world, in the site's dark theme ── */
+  .kid{position:absolute;inset:0;display:flex;flex-direction:column;color:var(--text);font-family:var(--font-kid);
+       background:radial-gradient(260px 200px at 85% -5%,rgb(255 200 97 / .18),transparent 70%),radial-gradient(240px 220px at -10% 30%,rgb(85 72 212 / .35),transparent 70%),linear-gradient(180deg,#1A1452 0%,#0E0C22 70%)}
+  .kid::before{content:"";position:absolute;inset:0;background-image:radial-gradient(1.4px 1.4px at 20% 12%,#fff8 50%,transparent 51%),radial-gradient(1.2px 1.2px at 70% 8%,#fff6 50%,transparent 51%),radial-gradient(1px 1px at 40% 22%,#fff5 50%,transparent 51%),radial-gradient(1.3px 1.3px at 88% 26%,#fff6 50%,transparent 51%);pointer-events:none}
+  .top{display:flex;justify-content:space-between;align-items:center;padding:16px 16px 6px;position:relative;z-index:1}
+  .ibtn{width:42px;height:42px;border-radius:14px;background:rgb(255 255 255 / .07);border:1px solid rgb(255 255 255 / .12);display:grid;place-items:center;color:#fff}
+  .ibtn svg{width:20px;height:20px}
+  .dots{display:flex;gap:7px}.dots i{width:24px;height:8px;border-radius:999px;background:rgb(255 255 255 / .14);display:block}.dots i.on{background:linear-gradient(90deg,var(--gold-1),var(--gold-2))}
+  .stage{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:6px 18px 14px;position:relative;z-index:1}
+  .mascot{display:flex;align-items:flex-end;gap:6px;align-self:stretch}
+  .pu{width:76px;flex:none;filter:drop-shadow(0 8px 10px rgb(0 0 0 / .35))}
+  .pu.big{width:150px}
+  .bubble{background:#fff;color:#1E1A4A;border-radius:20px 20px 20px 6px;padding:9px 13px;font-size:17px;line-height:1.35;box-shadow:0 10px 20px -10px #000}
+  .bubble .spk{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--primary);font-family:var(--font-ui);font-weight:600}
+  .bubble .spk svg{width:14px;height:14px}
+  .word{font-family:var(--font-letter);font-weight:700;font-size:58px;line-height:1.05;letter-spacing:.02em;text-shadow:0 4px 18px rgb(85 72 212 / .7)}
+  .kid-title{font-size:28px;text-align:center;line-height:1.25}
+  .kid-sub{font-size:16px;color:var(--muted);text-align:center;line-height:1.35}
+  .pics{display:flex;gap:12px;width:100%}
+  .pic{flex:1;border-radius:24px;background:var(--surface);border:2px solid var(--line);padding:10px 6px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:0 6px 0 #0a0820}
+  .pic img{width:100%;height:96px;object-fit:contain}
+  .pic span{font-family:var(--font-letter);font-weight:700;font-size:24px}
+  .pic.hit{border-color:var(--success);box-shadow:0 6px 0 #1d5c43,0 0 0 6px rgb(76 175 130 / .22)}
+  .pic.dim{opacity:.35}
+  .mic{width:124px;height:124px;border-radius:50%;display:grid;place-items:center;color:#2A1D05;border:none;
+       background:linear-gradient(180deg,var(--gold-1) 0%,var(--gold-2) 100%);box-shadow:inset 0 2px 0 rgb(255 255 255 / .6),0 7px 0 var(--gold-edge),0 18px 30px -10px rgb(242 178 58 / .8)}
+  .mic svg{width:50px;height:50px}
+  .mic.hold{box-shadow:inset 0 2px 0 rgb(255 255 255 / .6),0 7px 0 var(--gold-edge),0 0 0 14px rgb(255 213 138 / .18),0 0 0 28px rgb(255 213 138 / .08)}
+  .mic-label{font-size:15px;color:var(--muted);margin-top:-4px}
+  .meter{width:100%;height:14px;border-radius:999px;background:rgb(255 255 255 / .1);overflow:hidden}
+  .meter b{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#7DD3FC,var(--gold-1))}
+  .row{display:flex;gap:10px;justify-content:center;width:100%}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;border-radius:18px;padding:13px 12px;font-family:var(--font-kid);font-size:17px;color:#fff;background:rgb(255 255 255 / .08);border:1px solid rgb(255 255 255 / .14);flex:1}
+  .btn svg{width:20px;height:20px}
+  .btn.go{background:linear-gradient(180deg,#7B6CF6 0%,#5548D4 100%);border:none;box-shadow:inset 0 1px 0 rgb(255 255 255 / .3),0 5px 0 #3A2EA8}
+  .btn.gold{background:linear-gradient(180deg,var(--gold-1),var(--gold-2));color:#2A1D05;border:none;box-shadow:inset 0 2px 0 rgb(255 255 255 / .6),0 6px 0 var(--gold-edge)}
+  .stars{display:flex;gap:8px}.stars svg{width:38px;height:38px;fill:var(--gold-1);filter:drop-shadow(0 0 10px rgb(255 213 138 / .6))}
+  .stars.dim svg:last-child{fill:rgb(255 255 255 / .15);filter:none}
+  .scene{width:100%;border-radius:24px;overflow:hidden;border:1px solid rgb(255 255 255 / .12);box-shadow:0 14px 30px -16px #000}
+  .scene svg{display:block;width:100%;height:auto}
+  .card3d{width:180px;height:200px;border-radius:26px;display:grid;place-items:center;background:var(--hero);border:1px solid rgb(255 255 255 / .14);box-shadow:0 8px 0 #1b1456,0 20px 30px -14px #000;position:relative;overflow:hidden}
+  .card3d::after{content:"?";font-family:var(--font-kid);font-size:84px;color:rgb(255 255 255 / .85)}
+  .card3d.open{background:#FFFDF6;border-color:#fff}
+  .card3d.open::after{content:none}
+  .card3d img{width:150px}
+  .sticker{position:absolute;top:10px;right:10px;font-family:var(--font-ui);font-size:11px;font-weight:600;color:#2A1D05;background:linear-gradient(180deg,var(--gold-1),var(--gold-2));border-radius:999px;padding:3px 9px}
+  .mouth-card{width:100%;border-radius:24px;background:var(--hero);padding:14px;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 18px 30px -16px #000}
+  .mouth-card img{width:170px;background:#FFF5EE;border-radius:18px;padding:8px}
+  .mouth-card .steps{display:flex;gap:6px}.mouth-card .steps i{width:28px;height:6px;border-radius:999px;background:rgb(255 255 255 / .3)}.mouth-card .steps i.on{background:#fff}
+  .mouth-card small{font-family:var(--font-ui);font-size:11px;color:rgb(255 255 255 / .75)}
+  .adult{position:absolute;right:14px;bottom:14px;z-index:2;display:inline-flex;align-items:center;gap:5px;font-family:var(--font-ui);font-size:11px;color:var(--muted);border:1px dashed rgb(255 255 255 / .25);border-radius:999px;padding:5px 10px;background:rgb(14 12 34 / .7)}
+  .adult svg{width:13px;height:13px}
+  .adult-bar{position:relative;z-index:1;margin:0 12px 12px;border:1px dashed rgb(255 255 255 / .22);border-radius:16px;padding:9px 11px;font-family:var(--font-ui);font-size:12px;color:var(--muted);background:rgb(14 12 34 / .72)}
+  .adult-bar .head{display:flex;align-items:center;gap:6px}
+  .adult-bar svg{width:13px;height:13px}
+  .faces{display:flex;gap:6px;margin-top:7px}
+  .faces span{flex:1;text-align:center;border-radius:12px;padding:6px 0;color:var(--text);font-size:12px;background:rgb(255 255 255 / .06);border:1px solid rgb(255 255 255 / .1)}
+  .faces span.yes{background:rgb(76 175 130 / .18);border-color:rgb(76 175 130 / .5);color:var(--success-text)}
+  /* adult screen inside a phone: the site's normal UI */
+  .adult-screen{position:absolute;inset:0;background:var(--bg);font-family:var(--font-ui);color:var(--text);display:flex;flex-direction:column}
+  .adult-screen .hdr{background:var(--hero);padding:18px 16px 16px}
+  .adult-screen .hdr b{font-family:var(--font-display);font-size:18px;font-weight:600}
+  .adult-screen .hdr small{display:block;color:rgb(255 255 255 / .75)}
+  .adult-screen .list{padding:12px;display:flex;flex-direction:column;gap:10px;font-size:13px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:11px 13px}
+  .card .lnk{color:var(--primary-text);font-weight:600;float:right}
+  .card b{font-weight:600}
+
+  /* notes column */
+  .notes h3{margin:0 0 6px;font-size:15px;font-family:var(--font-display);font-weight:600}
+  .notes ul{margin:0 0 12px;padding-left:18px;font-size:14px;color:#DCDAF0}
+  .notes li{margin:4px 0}
+  .t-cut{color:var(--error);font-weight:600}.t-move{color:var(--warning);font-weight:600}.t-add{color:var(--success-text);font-weight:600}
+  .numbers{display:flex;gap:8px;margin:0 0 14px;flex-wrap:wrap}
+  .numbers div{flex:1;min-width:76px;background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:8px 6px;text-align:center;font-size:11px;color:var(--muted);line-height:1.3}
+  .numbers b{display:block;font-size:17px;color:var(--text);font-family:var(--font-display);font-weight:600;margin-bottom:2px}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media (max-width:900px){.grid2{grid-template-columns:1fr}}
+  .box{background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+  .box h3{margin:0 0 6px;font-family:var(--font-display);font-weight:600;font-size:17px}
+  .box ul,.box ol{margin:6px 0 0;padding-left:20px;font-size:14px;color:#DCDAF0}
+  .box.hero{background:var(--hero);border-color:transparent}
+  .box.hero ul{color:#fff}
+  table.games{width:100%;border-collapse:collapse;font-size:14px}
+  table.games th,table.games td{border-bottom:1px solid var(--line);padding:12px 8px;text-align:left;vertical-align:top}
+  table.games th{font-size:12px;color:var(--muted);font-weight:600}
+  table.games td:first-child{font-weight:600;white-space:nowrap}
+  table.games td.g{white-space:nowrap;color:var(--primary-text);font-weight:600}
+  .fonts{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media (max-width:1000px){.fonts{grid-template-columns:1fr 1fr}}
+  .font-card{background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:16px}
+  .font-card.pick{border-color:var(--primary);box-shadow:0 0 0 3px rgb(85 72 212 / .25)}
+  .font-card .name{font-size:12px;color:var(--muted)}
+  .font-card .sample{font-size:26px;line-height:1.35;margin:6px 0}
+  .font-card .letters{font-size:42px;letter-spacing:8px}
+  .font-card .verdict{font-size:13px;margin-top:6px}
+  .ok{color:var(--success-text)}.warn{color:var(--warning)}
+  footer{max-width:1320px;margin:0 auto 40px;padding:0 40px;color:var(--muted);font-size:13px}
+  code{background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;font-size:12px}
+
+  /* ── View switch ── */
+  nav.toc{position:sticky;top:0;z-index:10;padding:10px 40px;background:rgb(14 12 34 / .86);backdrop-filter:blur(10px);align-items:center}
+  .viewswitch{margin-left:auto;display:inline-flex;gap:4px;padding:4px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+  .viewswitch button{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:7px 16px;font:500 14px var(--font-ui);color:var(--muted);background:transparent;cursor:pointer}
+  .viewswitch button svg{width:17px;height:17px}
+  .viewswitch button[aria-pressed="true"]{background:linear-gradient(180deg,#7B6CF6,#5548D4);color:#fff;box-shadow:0 3px 0 #3A2EA8}
+  body:not(.pc) .pc-only{display:none!important}
+  body.pc .phone-only{display:none!important}
+  .pc-note{margin:0 0 12px;padding:10px 12px;border-radius:14px;background:var(--primary-soft);color:#E4E0FF;font-size:13px;line-height:1.5}
+  .pc-note b{color:#fff}
+  .box.wide{grid-column:1/-1}
+
+  /* ── Computer layout of each comparison ── */
+  body.pc .compare{grid-template-columns:minmax(0,1fr) 300px;grid-template-areas:"before notes" "after after"}
+  body.pc .compare>div:nth-child(1){grid-area:before}
+  body.pc .compare>div:nth-child(2){grid-area:after}
+  body.pc .compare>div:nth-child(3){grid-area:notes}
+  @media (max-width:1100px){body.pc .compare{grid-template-columns:1fr;grid-template-areas:"before" "notes" "after"}body.pc .desk.before,.desks .desk{zoom:.45}}
+
+  /* ── Desktop frame ── */
+  .desk{width:1000px;height:625px;border-radius:16px;overflow:hidden;position:relative;flex:none;background:var(--bg);box-shadow:0 0 0 1px #2A2654,0 30px 50px -24px #000}
+  .desk.before{zoom:.88}
+  .desks{display:flex;flex-wrap:wrap;gap:22px}
+  .desks .desk{zoom:.6}
+  .desks .frame-label{max-width:600px}
+  .chrome{height:34px;background:#141130;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:7px;padding:0 14px;font:12px var(--font-ui);color:var(--muted)}
+  .chrome i{width:11px;height:11px;border-radius:50%;background:#2E2960}
+  .chrome .url{margin-left:14px;background:var(--bg);border-radius:8px;padding:3px 14px;flex:0 1 360px}
+  .desk .kid,.desk .adult-screen{top:34px}
+  .desk.before .shot{position:absolute;inset:34px 0 0;overflow-y:auto}
+  .desk.before .shot img{width:100%;display:block}
+  .desk.empty{display:grid;place-items:center;color:var(--muted);font-size:20px;text-align:center}
+  .split{flex:1;display:grid;grid-template-columns:1.1fr 1fr;gap:48px;align-items:center;padding:0 64px 22px;position:relative;z-index:1}
+  .split .col{display:flex;flex-direction:column;align-items:center;gap:18px}
+  .desk .top{padding:18px 26px 6px}
+  .desk .ibtn{width:52px;height:52px;border-radius:16px}.desk .ibtn svg{width:24px;height:24px}
+  .desk .dots i{width:38px;height:10px}
+  .desk .pu{width:104px}.desk .pu.big{width:250px}
+  .desk .bubble{font-size:25px;padding:12px 20px;border-radius:24px 24px 24px 8px}
+  .desk .bubble .spk{font-size:15px}
+  .desk .word{font-size:116px}
+  .desk .kid-title{font-size:46px}
+  .desk .kid-sub{font-size:22px}
+  .desk .pics{gap:22px}.desk .pic{border-radius:28px;padding:16px 10px 12px}.desk .pic img{height:180px}.desk .pic span{font-size:40px}
+  .desk .mic{width:164px;height:164px}.desk .mic svg{width:66px;height:66px}
+  .desk .mic-label{font-size:22px;margin-top:0}
+  .desk .meter{height:18px}
+  .desk .btn{font-size:24px;padding:16px 24px;border-radius:20px}.desk .btn svg{width:24px;height:24px}
+  .desk .btn.big{flex:none;width:280px;font-size:32px;padding:20px}
+  .desk .stars svg{width:58px;height:58px}
+  .desk .card3d{width:300px;height:320px;border-radius:32px}.desk .card3d img{width:250px}.desk .sticker{font-size:15px;padding:5px 12px;top:14px;right:14px}
+  .desk .mouth-card{padding:20px;gap:12px}.desk .mouth-card img{width:280px}.desk .mouth-card small{font-size:15px}.desk .mouth-card .steps i{width:40px;height:8px}
+  .desk .scene{border-radius:30px}
+  .desk .adult{font-size:16px;right:24px;bottom:20px;padding:7px 14px}.desk .adult svg{width:17px;height:17px}
+  .desk .adult-bar{margin:0 26px 20px;display:flex;align-items:center;justify-content:space-between;gap:18px;font-size:17px;padding:12px 16px}
+  .desk .adult-bar svg{width:17px;height:17px}
+  .desk .faces{margin-top:0;width:440px}.desk .faces span{font-size:16px;padding:8px 0}
+  .kbd{font:17px var(--font-ui);color:var(--muted);display:flex;align-items:center;gap:6px}
+  .key{display:inline-block;font:600 15px var(--font-ui);color:var(--text);border:1px solid rgb(255 255 255 / .3);border-bottom-width:3px;border-radius:8px;padding:1px 10px}
+  /* adult pages on the computer keep the site's sidebar layout */
+  .desk-adult{flex-direction:row!important}
+  .desk-adult aside{width:220px;background:linear-gradient(180deg,#140E3A,#0A0724);border-right:1px solid var(--line);padding:20px 14px;display:flex;flex-direction:column;gap:4px;font-size:16px;color:var(--muted)}
+  .desk-adult aside b{color:var(--text);font-family:var(--font-display);font-size:19px;font-weight:600;margin:0 8px 14px}
+  .desk-adult aside span{padding:9px 12px;border-radius:12px}
+  .desk-adult aside span.on{background:var(--primary-soft);color:var(--text)}
+  .desk-adult main{flex:1;display:flex;flex-direction:column;min-width:0}
+  .desk-adult .hdr{margin:24px 30px 0;border-radius:22px;padding:24px 26px}
+  .desk-adult .hdr b{font-size:28px}.desk-adult .hdr small{font-size:16px}
+  .desk-adult .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:18px 30px;font-size:18px}
+  .desk .card{padding:18px 20px;border-radius:18px}
+  .gate{justify-content:center;align-items:center;gap:20px;text-align:center;font-size:21px}
+  .gate .gate-icon{width:78px;height:78px;border-radius:24px;background:var(--hero)}.gate .gate-icon svg{width:36px;height:36px}
+  .gate .gate-title{font-family:var(--font-display);font-size:30px;font-weight:600}
+  .gate .row{width:420px;font-family:var(--font-display)}.gate .btn{font-family:inherit;font-size:28px}
+  .gate .meter{width:420px}.gate .meter b{width:60%;background:linear-gradient(90deg,#7B6CF6,#C3BBFF)}
+
+  /* ── Magic mirror game ── */
+  .mirrors{display:flex;gap:18px;align-items:flex-end;justify-content:center;width:100%}
+  .mirror{position:relative;width:120px;aspect-ratio:3/4;border-radius:50%/42%;padding:7px;flex:none;
+          background:linear-gradient(160deg,#FFE7B0 0%,#F2B23A 50%,#C98B1C 100%);box-shadow:0 10px 20px -10px #000}
+  .mirror::before{content:"";position:absolute;left:50%;top:-9px;width:22px;height:22px;transform:translateX(-50%) rotate(45deg);border-radius:5px;background:linear-gradient(135deg,#FFE7B0,#F2B23A)}
+  .mirror .glass{position:relative;width:100%;height:100%;border-radius:inherit;overflow:hidden;display:grid;place-items:center;
+          background:radial-gradient(circle at 30% 22%,rgb(255 255 255 / .35),transparent 38%),linear-gradient(160deg,#4A3FC0,#1A1452)}
+  .mirror .glass img{width:130%;max-width:none}
+  .mirror .glass .q{font-family:var(--font-kid);font-size:46px;color:rgb(255 255 255 / .55)}
+  .mirror .name{position:absolute;left:50%;bottom:-13px;transform:translateX(-50%);white-space:nowrap;font-family:var(--font-kid);font-size:14px;color:#2A1D05;
+          background:linear-gradient(180deg,var(--gold-1),var(--gold-2));border-radius:999px;padding:1px 11px;box-shadow:0 2px 0 var(--gold-edge)}
+  .mirror.on{box-shadow:0 0 0 5px rgb(255 213 138 / .22),0 0 34px 6px rgb(255 213 138 / .45)}
+  .mirror.off{filter:saturate(.35) brightness(.6)}
+  .mirror .sparkle{position:absolute;inset:0;pointer-events:none;background:
+          radial-gradient(3px 3px at 22% 30%,#fff 50%,transparent 51%),radial-gradient(2px 2px at 75% 22%,#fff 50%,transparent 51%),radial-gradient(2.5px 2.5px at 68% 72%,#fff 50%,transparent 51%)}
+  .mirror .lips{position:absolute;right:-6px;top:10px;font-family:var(--font-ui);font-size:10px;font-weight:600;color:#fff;background:var(--primary);border-radius:999px;padding:2px 7px}
+  .turn{display:inline-flex;align-items:center;gap:7px;font-family:var(--font-ui);font-size:13px;color:var(--muted);background:rgb(255 255 255 / .06);border:1px solid rgb(255 255 255 / .12);border-radius:999px;padding:4px 12px}
+  .turn i{width:10px;height:10px;border-radius:50%;background:rgb(255 255 255 / .25)}
+  .turn.go{color:#fff;border-color:rgb(255 213 138 / .5)}.turn.go i{background:var(--gold-1);box-shadow:0 0 10px var(--gold-1)}
+  .heard{display:inline-flex;align-items:center;gap:6px;font-family:var(--font-ui);font-size:13px;color:var(--success-text);background:rgb(76 175 130 / .16);border:1px solid rgb(76 175 130 / .45);border-radius:999px;padding:3px 12px}
+  .pieces{display:flex;gap:8px;align-items:center;font-family:var(--font-ui);font-size:12px;color:var(--muted)}
+  .pieces i{width:16px;height:16px;transform:rotate(45deg);border-radius:4px;background:rgb(255 255 255 / .14)}
+  .pieces i.on{background:linear-gradient(135deg,var(--gold-1),var(--gold-2));box-shadow:0 0 10px rgb(255 213 138 / .6)}
+  .desk .mirrors{gap:34px}
+  .desk .mirror{width:190px;padding:10px}
+  .desk .mirror::before{width:30px;height:30px;top:-13px}
+  .desk .mirror .glass .q{font-size:72px}
+  .desk .mirror .name{font-size:20px;bottom:-17px;padding:2px 16px}
+  .desk .mirror .lips{font-size:14px;padding:3px 10px}
+  .desk .turn,.desk .heard{font-size:17px;padding:6px 16px}.desk .turn i{width:13px;height:13px}
+  .desk .pieces{font-size:16px}.desk .pieces i{width:22px;height:22px}
+
+  /* ── Round 3 ── */
+  nav.toc{position:static;background:none;backdrop-filter:none;padding:0 40px;row-gap:8px}
+  .toc-g{font-size:11px;letter-spacing:.06em;color:var(--muted);margin:0 2px 0 12px;font-weight:600}
+  .toc-g:first-child{margin-left:0}
+  .viewswitch{position:fixed;right:22px;bottom:22px;z-index:20;margin:0;box-shadow:0 14px 30px -10px #000}
+  .inl{width:1em;height:1em;vertical-align:-.15em;color:var(--gold-1);fill:currentColor}
+  .faces span{display:flex;align-items:center;justify-content:center;gap:4px}
+  .faces svg{width:14px;height:14px;flex:none}
+  .desk .faces svg{width:17px;height:17px}
+  .mirror .glass img.m{width:100%;height:100%;object-fit:cover}
+  .mstrip{display:flex;gap:6px;justify-content:center;align-items:flex-start}
+  .mstrip figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;font:11px var(--font-ui);color:var(--muted)}
+  .mstrip img{width:46px;height:46px;border-radius:12px;border:2px solid transparent;opacity:.55}
+  .mstrip figure.on img{border-color:var(--gold-1);opacity:1;box-shadow:0 0 12px rgb(255 213 138 / .5)}
+  .mstrip figure.on{color:var(--text);font-weight:600}
+  .mstrip .arr{color:var(--muted);font-size:13px;margin-top:14px}
+  .desk .mstrip{gap:10px}.desk .mstrip img{width:70px;height:70px;border-radius:16px}.desk .mstrip figure{font-size:15px}.desk .mstrip .arr{font-size:18px;margin-top:22px}
+  .slow{font:600 11px var(--font-ui);color:#2A1D05;background:var(--gold-1);border-radius:999px;padding:1px 8px}
+  .desk .slow{font-size:15px;padding:2px 12px}
+  .mouths{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+  @media (max-width:900px){.mouths{grid-template-columns:repeat(3,1fr)}}
+  .mouths figure{margin:0;background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:12px;text-align:center}
+  .mouths img{width:100%;max-width:150px;border-radius:14px}
+  .mouths b{display:block;font-family:var(--font-kid);font-size:19px;font-weight:400;margin-top:6px}
+  .mouths small{color:var(--muted);font-size:12px}
+  .seq{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px;padding:14px 16px;border-radius:18px;background:var(--hero)}
+  .seq figure{margin:0;text-align:center;font-size:13px;color:#E4E0FF}
+  .seq img{width:104px;border-radius:16px;display:block;margin-bottom:4px}
+  .seq .arrow{font-size:24px;color:var(--gold-1)}
+  .seq .what{flex:1;min-width:220px;color:#fff;font-size:14px}
+  .seq .what b{font-family:var(--font-letter);font-size:34px;display:block;line-height:1.1}
+  /* map */
+  .map{position:relative;width:100%;height:300px;flex:none;margin-top:30px}
+  .adult.inline{position:static}
+  .map svg.trail{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+  .trail path{stroke:rgb(255 213 138 / .55)}
+  .node{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:3px;font-family:var(--font-kid);font-size:12px;color:var(--muted);white-space:nowrap}
+  .node .disc{position:relative;width:48px;height:48px;border-radius:50%;background:var(--surface);border:3px solid #3A3478;display:grid;place-items:center;box-shadow:0 5px 0 #0a0820}
+  .node .disc>img{width:76%;border-radius:50%}
+  .node .disc>svg{width:62%;height:62%}
+  .node.done .disc{border-color:var(--gold-2)}
+  .node .badge{position:absolute;top:-6px;right:-8px;width:22px;height:22px;border-radius:50%;background:var(--gold-1);display:grid;place-items:center;box-shadow:0 2px 0 var(--gold-edge)}
+  .node .badge svg{width:13px;height:13px;fill:#2A1D05}
+  .node.now .disc{width:62px;height:62px;border-color:var(--gold-1);box-shadow:0 5px 0 #0a0820,0 0 0 8px rgb(255 213 138 / .18),0 0 26px 4px rgb(255 213 138 / .45)}
+  .node.now{color:#fff;font-size:14px}
+  .node .here{position:absolute;bottom:calc(100% - 6px);width:42px}
+  .chip-sound{display:inline-flex;align-items:center;gap:8px;height:42px;padding:0 14px;border-radius:14px;background:rgb(255 255 255 / .07);border:1px solid rgb(255 255 255 / .12);font-family:var(--font-letter);font-weight:700;font-size:22px}
+  .chip-sound small{font:12px var(--font-ui);color:var(--muted)}
+  .count{display:inline-flex;align-items:center;gap:6px;height:42px;padding:0 12px;border-radius:14px;background:rgb(255 255 255 / .07);border:1px solid rgb(255 255 255 / .12);font:600 15px var(--font-ui)}
+  .count svg{width:18px;height:18px;fill:var(--gold-1)}
+  .desk .map{height:330px;margin-top:40px}
+  .desk .node{font-size:18px}.desk .node .disc{width:82px;height:82px;border-width:4px}.desk .node.now .disc{width:104px;height:104px}.desk .node.now{font-size:22px}
+  .desk .node .here{width:76px}.desk .node .badge{width:32px;height:32px}.desk .node .badge svg{width:19px;height:19px}
+  .desk .chip-sound{height:52px;font-size:28px}.desk .chip-sound small{font-size:15px}.desk .count{height:52px;font-size:19px}
+  .bottom-row{display:flex;align-items:center;justify-content:center;gap:40px;width:100%}
+  /* timer, links, settings */
+  .timer{width:124px;height:124px;border-radius:50%;background:conic-gradient(var(--gold-1) 0 62%,rgb(255 255 255 / .1) 0);display:grid;place-items:center}
+  .timer b{width:98px;height:98px;border-radius:50%;background:#16123F;display:grid;place-items:center;font:600 26px var(--font-display)}
+  .desk .timer{width:176px;height:176px}.desk .timer b{width:142px;height:142px;font-size:38px}
+  .btn.wait{opacity:.5}
+  .link{font:14px var(--font-ui);color:var(--primary-text);text-decoration:underline;text-underline-offset:3px}
+  .desk .link{font-size:18px}
+  .opt{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+  .opt span{border:1px solid var(--line);border-radius:999px;padding:3px 12px;font-size:12px}
+  .opt span.on{background:var(--primary);border-color:var(--primary);color:#fff}
+  .desk .opt span{font-size:16px;padding:5px 16px}
+  .slider{height:8px;border-radius:999px;background:rgb(255 255 255 / .12);position:relative;margin:14px 6px 6px}
+  .slider b{position:absolute;left:0;top:0;bottom:0;width:65%;border-radius:999px;background:linear-gradient(90deg,#7B6CF6,#C3BBFF)}
+  .slider i{position:absolute;left:65%;top:50%;width:20px;height:20px;border-radius:50%;background:#fff;transform:translate(-50%,-50%)}
+  .slider em{position:absolute;left:40%;top:-6px;bottom:-6px;width:2px;background:var(--warning)}
+  .card.warn{border-color:rgb(251 191 36 / .5);background:rgb(251 191 36 / .09)}
+  .card small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+  .desk .card small{font-size:14px}
+  .card .row{margin-top:8px}
+  .adult-screen .list .btn{font-family:var(--font-ui);font-size:13px;padding:8px 10px}
+  .desk .adult-screen .btn{font-size:17px;padding:12px 14px}
+  .gallery-notes{margin-top:20px}
+  /* light theme for the kid world (site's light tokens) */
+  .kid.light{color:#15132E;background:radial-gradient(260px 200px at 85% -5%,rgb(255 200 97 / .35),transparent 70%),radial-gradient(240px 220px at -10% 30%,rgb(85 72 212 / .14),transparent 70%),linear-gradient(180deg,#E9E5FF 0%,#F6F6FA 70%)}
+  .kid.light::before{display:none}
+  .kid.light .ibtn,.kid.light .chip-sound,.kid.light .count{background:#fff;border-color:#E8E7F0;color:#15132E}
+  .kid.light .chip-sound small{color:#625F7C}
+  .kid.light .dots i{background:#DAD6F5}
+  .kid.light .bubble{border:1px solid #E8E7F0;box-shadow:0 8px 18px -10px rgb(44 33 133 / .35)}
+  .kid.light .word{color:#15132E;text-shadow:none}
+  .kid.light .kid-sub,.kid.light .mic-label,.kid.light .kbd{color:#625F7C}
+  .kid.light .key{color:#15132E;border-color:#CFCBEA}
+  .kid.light .pic{background:#fff;border-color:#E8E7F0;box-shadow:0 6px 0 #DAD6F5}
+  .kid.light .btn:not(.go):not(.gold){background:#fff;border-color:#E8E7F0;color:#15132E}
+  .kid.light .adult,.kid.light .adult-bar{background:rgb(255 255 255 / .9);border-color:#CFCBEA;color:#625F7C}
+  .kid.light .faces span{background:#F2F1F8;border-color:#E8E7F0;color:#15132E}
+  .kid.light .faces span.yes{background:#E8F6EF;border-color:#4CAF82;color:#1F6B47}
+  .kid.light .turn{background:#fff;border-color:#E8E7F0;color:#625F7C}.kid.light .turn.go{color:#15132E;border-color:#F2B23A}
+  .kid.light .heard{color:#1F6B47;background:#E8F6EF}
+  .kid.light .mirror .glass{background:radial-gradient(circle at 30% 22%,rgb(255 255 255 / .6),transparent 38%),linear-gradient(160deg,#D9D3FF,#9C92F2)}
+  .kid.light .mirror.off{filter:saturate(.5) opacity(.55)}
+  .kid.light .mstrip figure{color:#625F7C}.kid.light .mstrip figure.on{color:#15132E}
+  .kid.light .node{color:#625F7C}.kid.light .node.now{color:#15132E}
+  .kid.light .node .disc{background:#fff;border-color:#DAD6F5;box-shadow:0 5px 0 #DAD6F5}
+  .kid.light .node.done .disc,.kid.light .node.now .disc{border-color:#F2B23A}
+  .kid.light .trail path{stroke:#B9B0F5}
+  .kid.light .meter{background:#E8E7F0}
+  .desk.light{background:#F6F6FA}
+  .desk.light .chrome{background:#fff;border-color:#E8E7F0;color:#625F7C}.desk.light .chrome .url{background:#F2F1F8}.desk.light .chrome i{background:#E8E7F0}
+  .phone.light-frame{box-shadow:0 0 0 1px #CFCBEA,0 24px 40px -18px #000}
+
+  /* ── Mouth photo vs cartoon ── */
+  .sub{margin:24px 0 10px;font-family:var(--font-display);font-weight:600;font-size:17px}
+  .sub small{font:400 13px var(--font-ui);color:var(--muted);margin-left:8px}
+  .cmp3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:1000px){.cmp3{grid-template-columns:1fr}}
+  .cmp-col{background:var(--surface-2);border:1px solid var(--line);border-radius:18px;padding:14px}
+  .cmp-col.pick{border-color:var(--primary);box-shadow:0 0 0 3px rgb(85 72 212 / .25)}
+  .cmp-col .col-title{margin-bottom:8px}
+  .trio{display:flex;gap:8px;align-items:flex-end}
+  .trio figure{margin:0;flex:1;text-align:center;font-size:12px;color:var(--muted)}
+  .trio img{width:100%;border-radius:12px;display:block;margin-bottom:4px;object-fit:cover}
+  .trio.full img{aspect-ratio:1}.trio.tight img{aspect-ratio:3/4}.trio.toon img{aspect-ratio:1}
+  .cmp-col p.say{margin:10px 0 0;color:#DCDAF0;font-size:13px}
+  .mouths.photos img{aspect-ratio:3/4;object-fit:cover}
+  .mirror .glass img.p{width:100%;height:100%;object-fit:cover;object-position:50% 62%;transform:scale(1.35)}
+  .mstrip.photo img{object-fit:cover}
+  table.decide td,table.decide th{text-align:center}
+  table.decide td:first-child,table.decide th:first-child{text-align:left;white-space:normal}
+  table.decide .y{color:var(--success-text);font-weight:600}.table-n{color:var(--warning)}
+  table.decide .n{color:var(--error)}
+  table.decide th.pick{color:var(--primary-text)}
+
+  /* ── Reading order ── */
+  .summary{max-width:1320px;margin:22px auto 0;padding:28px 40px;border-radius:26px;background:var(--hero);box-shadow:0 30px 60px -30px #000}
+  .summary h2{margin:0 0 4px;font-family:var(--font-display);font-weight:600;font-size:24px}
+  .summary .lead{margin:0 0 18px;color:#E4E0FF}
+  .sum-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:18px}
+  @media (max-width:1000px){.sum-grid{grid-template-columns:1fr}}
+  .sum-card{background:rgb(14 12 34 / .45);border:1px solid rgb(255 255 255 / .12);border-radius:18px;padding:16px 18px}
+  .sum-card h3{margin:0 0 8px;font-family:var(--font-display);font-weight:600;font-size:16px;color:var(--gold-1)}
+  .sum-card ol,.sum-card ul{margin:0;padding-left:20px;font-size:14px;color:#F1F0FA}
+  .sum-card li{margin:5px 0}
+  .sum-card li a{color:var(--gold-1)}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 18px}
+  @media (max-width:1000px){.kpis{grid-template-columns:1fr 1fr}}
+  .kpi{background:rgb(14 12 34 / .45);border:1px solid rgb(255 255 255 / .12);border-radius:18px;padding:14px 16px}
+  .kpi b{display:block;font-family:var(--font-display);font-weight:600;font-size:26px;color:#fff;line-height:1.2}
+  .kpi b em{font-style:normal;color:var(--gold-1);font-size:15px;margin-left:6px}
+  .kpi span{font-size:13px;color:#E4E0FF}
+  .howto{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:16px;font-size:13px;color:#E4E0FF}
+  .howto b{color:#fff}
+  nav.toc{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;align-items:stretch;max-width:1320px;margin:22px auto 0;padding:0 40px}
+  @media (max-width:1100px){nav.toc{grid-template-columns:1fr 1fr}}
+  .toc-part{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px 14px;display:flex;flex-direction:column;gap:2px}
+  .toc-part b{font-family:var(--font-display);font-weight:600;font-size:15px;margin-bottom:4px}
+  .toc-part b small{display:block;font:600 11px var(--font-ui);color:var(--gold-1);letter-spacing:.06em}
+  nav.toc .toc-part a{background:none;border:0;padding:3px 0;border-radius:0;font-size:13px;color:#DCDAF0}
+  nav.toc .toc-part a:hover{color:#fff;text-decoration:underline}
+  .part{max-width:1320px;margin:56px auto 0;padding:0 40px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;scroll-margin-top:16px}
+  .part span{font:600 12px var(--font-ui);letter-spacing:.06em;color:#2A1D05;background:linear-gradient(180deg,var(--gold-1),var(--gold-2));border-radius:999px;padding:4px 14px}
+  .part h2{margin:0;font-family:var(--font-display);font-size:30px;font-weight:600}
+  .part p{margin:0;color:var(--muted);flex-basis:100%}
+  .floatbar{position:fixed;right:22px;bottom:22px;z-index:20;display:flex;gap:8px;align-items:center}
+  .floatbar .viewswitch{position:static;box-shadow:0 14px 30px -10px #000}
+  .floatbar .totop{display:inline-flex;align-items:center;height:44px;padding:0 16px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--text);text-decoration:none;font-size:14px;box-shadow:0 14px 30px -10px #000}
+  section.block{scroll-margin-top:16px}
+</style>
+<style>
+  /* ── Additions for this document (everything else comes from kid-practice.html) ── */
+  .desk.empty{height:200px;zoom:.88}
+  .empty-phone{display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center;padding:20px;background:var(--bg)}
+  .inl{width:15px;height:15px;vertical-align:-2px;display:inline-block}
+  .btn.wide{flex:none;width:100%}
+  /* Sticker book */
+  .sb-stage{justify-content:flex-start;gap:10px;padding-top:4px}
+  .sb-tabs{display:flex;gap:6px;width:100%;overflow:hidden}
+  .sb-tabs span{flex:1;display:flex;flex-direction:column;align-items:center;gap:1px;padding:5px 2px;border-radius:14px;background:rgb(255 255 255 / .06);border:1px solid rgb(255 255 255 / .1);font-size:12px;color:var(--muted)}
+  .sb-tabs span img{width:30px;height:22px;object-fit:contain}
+  .sb-tabs span b{font:600 10px var(--font-ui);color:var(--muted)}
+  .sb-tabs span.on{background:var(--primary-soft);border-color:var(--primary);color:var(--text)}
+  .sb-tabs.pc-tabs{margin-bottom:8px}
+  .sb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;width:100%}
+  .stk{position:relative;display:flex;flex-direction:column;align-items:center;gap:2px}
+  .stk-pic{width:100%;aspect-ratio:1;border-radius:22px;background:#FFFDF6;border:4px solid #fff;box-shadow:0 4px 0 rgb(0 0 0 / .25),0 0 0 1px rgb(0 0 0 / .08);display:grid;place-items:center;transform:rotate(-2deg)}
+  .stk:nth-child(even) .stk-pic{transform:rotate(2deg)}
+  .stk-pic img{width:86%;height:86%;object-fit:contain}
+  .stk small{font-size:12px;color:var(--text)}
+  .stk.locked .stk-pic{background:rgb(255 255 255 / .05);border:2px dashed rgb(255 255 255 / .18);box-shadow:none;transform:none}
+  .stk.locked img{filter:brightness(0) invert(1) opacity(.16)}
+  .stk.locked small{color:var(--muted)}
+  .stk.fresh .stk-pic{box-shadow:0 4px 0 rgb(0 0 0 / .25),0 0 0 4px var(--gold-1),0 0 20px 4px rgb(255 213 138 / .55)}
+  .stk em{position:absolute;top:-6px;right:-4px;font:normal 600 10px var(--font-ui);color:#2A1D05;background:var(--gold-1);border-radius:999px;padding:1px 7px;transform:rotate(8deg)}
+  .stk-zoom{width:150px}
+  .stk-zoom .stk small{display:none}
+  .book{display:grid;grid-template-columns:1fr 1fr 34px;gap:0;width:100%;height:100%;border-radius:22px;background:#2B2466;box-shadow:0 18px 30px -16px #000;padding:14px}
+  .book-page{background:linear-gradient(90deg,#1E1A4F,#25205C);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+  .book-page:first-child{border-radius:16px 4px 4px 16px;box-shadow:inset -10px 0 16px -10px #000}
+  .book-page:nth-child(2){border-radius:4px 16px 16px 4px;box-shadow:inset 10px 0 16px -10px #000}
+  .book-page h3{margin:0;font:400 22px var(--font-kid)}
+  .book .sb-grid{grid-template-columns:repeat(5,1fr);gap:10px}
+  .book .stk small{font-size:11px}
+  .ribbons{display:flex;flex-direction:column;gap:8px;padding-top:30px}
+  .ribbons span{height:46px;border-radius:0 12px 12px 0;background:#3A3180;display:grid;place-items:center}
+  .ribbons span.on{background:var(--gold-2)}
+  .ribbons img{width:26px;height:22px;object-fit:contain}
+  /* New sticker moment */
+  .earn{display:flex;align-items:center;gap:10px}
+  .earn-new{display:flex;gap:8px;width:150px}
+  .earn-new .stk{flex:1}
+  .earn.big .earn-new{width:320px}
+  .earn-arrow svg{width:26px;height:26px;color:var(--gold-1)}
+  .earn-book{position:relative;width:58px;height:58px;border-radius:16px;background:var(--primary);display:grid;place-items:center;color:#fff;box-shadow:0 5px 0 #3A2EA8}
+  .earn-book svg{width:28px;height:28px}
+  .earn-book b{position:absolute;top:-8px;right:-10px;font:600 12px var(--font-ui);background:var(--gold-1);color:#2A1D05;border-radius:999px;padding:1px 7px}
+  .stars{display:flex;gap:6px}.stars svg{width:36px;height:36px;fill:var(--gold-1)}
+  /* Adult site mock (computer) */
+  .site{position:absolute;inset:34px 0 0;display:grid;grid-template-columns:190px 1fr;font-family:var(--font-ui);background:var(--bg)}
+  .site-nav{background:#120F33;border-right:1px solid var(--line);padding:14px 10px;display:flex;flex-direction:column;gap:4px;font-size:14px;color:var(--muted)}
+  .site-nav span{padding:9px 12px;border-radius:12px}
+  .site-nav span.on{background:var(--surface-2);color:var(--text);font-weight:600}
+  .site-brand{display:flex;align-items:center;gap:8px;font:600 15px var(--font-display);color:var(--text);margin:0 0 12px;line-height:1}
+  .site-brand small{display:block;font-size:11px;color:var(--muted)}
+  .site-brand .logo{width:32px;height:32px;border-radius:10px;background:var(--primary);display:grid;place-items:center;color:#fff}
+  .site-brand .logo svg{width:17px;height:17px}
+  .site-main{padding:18px 26px;overflow:hidden;display:flex;flex-direction:column;gap:14px}
+  .site-title{display:grid;grid-template-columns:auto 1fr;column-gap:10px;align-items:center}
+  .site-title svg{width:34px;height:34px;padding:7px;border-radius:12px;background:var(--primary-soft);color:var(--primary-text);grid-row:span 2}
+  .site-title b{font:600 22px var(--font-display)}
+  .site-title small{color:var(--muted);font-size:13px}
+  /* Print */
+  .print-opts{display:flex;flex-direction:column;gap:8px}
+  .print-card{display:grid;grid-template-columns:62px 1fr;column-gap:10px;align-items:center;padding:8px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+  .print-card.on{border-color:var(--primary);box-shadow:0 0 0 3px rgb(85 72 212 / .3)}
+  .print-card .pc-thumb{grid-row:span 2;display:block}
+  .print-card b{font-size:14px}
+  .print-card small{color:var(--muted);font-size:11px;line-height:1.35}
+  .print-set{display:flex;justify-content:space-between;font-size:12px;padding:8px 10px;border-radius:12px;background:var(--surface-2);margin-top:6px}
+  .print-set span{color:var(--muted)}
+  .print-layout{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start}
+  .print-preview{display:flex;flex-direction:column;gap:10px;align-items:center}
+  .sheets{display:flex;gap:26px;flex-wrap:wrap}
+  .sheets>div{width:300px}
+  .a4{width:100%;aspect-ratio:210/297;background:#fff;color:#1E1A4A;border-radius:4px;box-shadow:0 18px 30px -14px #000;padding:7%;display:flex;flex-direction:column;gap:4%;font-family:var(--font-ui);overflow:hidden}
+  .a4.mini{width:62px;padding:5%;gap:4%;border-radius:2px;font-size:3px}
+  .a4.mini .a4-head small,.a4.mini .a4-foot,.a4.mini .cert-p,.a4.mini .cert-d,.a4.mini .cert-sign{display:none}
+  .a4-head{font:600 15px var(--font-display);text-align:center;line-height:1.2}
+  .a4.mini .a4-head{font-size:4px}
+  .a4-head small{display:block;font:400 9px var(--font-ui);color:#6B6790}
+  .a4-stickers{display:grid;grid-template-columns:repeat(4,1fr);gap:4%}
+  .a4-stickers span{aspect-ratio:1;border-radius:50%;border:1.5px dashed #B8B3D9;display:grid;place-items:center}
+  .a4-stickers img{width:78%;height:78%;object-fit:contain}
+  .a4-cards{display:grid;grid-template-columns:1fr 1fr;gap:3%}
+  .a4-cards span{border:1.5px dashed #B8B3D9;border-radius:8px;display:flex;flex-direction:column;align-items:center;padding:2% 2%}
+  .a4-cards img{width:54%;aspect-ratio:4/3;object-fit:contain}
+  .a4-cards b{font:700 14px/1.2 var(--font-letter);color:#1E1A4A}
+  .a4.mini .a4-cards b{font-size:4px}
+  .a4-cards .hl{font-style:normal;color:#E8574A}
+  .a4-foot{font-size:9px;color:#6B6790;text-align:center;margin-top:auto}
+  .a4.cert{padding:5%}
+  .cert-in{flex:1;border:3px double #C98B1C;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3%;text-align:center;background:radial-gradient(circle at 50% 30%,#FFF6D8,#fff 70%)}
+  .a4.mini .cert-in{border-width:1px}
+  .cert-cup{width:38%}
+  .cert-t{font:600 22px var(--font-display);color:#C98B1C}
+  .cert-s{font:400 15px var(--font-kid)}
+  .cert-n{font:700 24px var(--font-letter);border-bottom:1.5px solid #C9C5E8;padding:0 16px}
+  .a4.mini .cert-t,.a4.mini .cert-s,.a4.mini .cert-n{font-size:4px}
+  .cert-p,.cert-d{font-size:10px;color:#6B6790}
+  .cert-sign{display:flex;gap:30px;font-size:9px;color:#6B6790;margin-top:6%}
+  .cert-sign span{border-top:1px solid #C9C5E8;padding-top:3px;width:70px}
+  /* Guide */
+  .player{position:relative;width:100%;aspect-ratio:16/10;border-radius:16px;background:linear-gradient(180deg,#1A1452,#0E0C22);overflow:hidden;border:1px solid var(--line)}
+  .pf{position:absolute;inset:0 0 34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;opacity:0;animation:wf-scene 12s infinite;font-family:var(--font-kid);font-size:15px}
+  .pf b{font-weight:400}
+  .pf.f2{animation-delay:3s}.pf.f3{animation-delay:6s}.pf.f4{animation-delay:9s}
+  @keyframes wf-scene{0%,2%{opacity:0;transform:translateY(8px)}6%,22%{opacity:1;transform:none}25%,100%{opacity:0}}
+  .mini-mic{width:70px;height:70px;border-radius:50%;background:linear-gradient(180deg,var(--gold-1),var(--gold-2));display:grid;place-items:center;color:#2A1D05;box-shadow:0 0 0 10px rgb(255 213 138 / .2);animation:wf-pulse 1s infinite}
+  .mini-mic svg{width:32px;height:32px}
+  .finger{position:absolute;top:44%;left:56%;color:#fff}.finger svg{width:30px;height:30px}
+  @keyframes wf-pulse{50%{box-shadow:0 0 0 18px rgb(255 213 138 / .12)}}
+  .mini-river{position:relative;width:70%;height:70px;border-radius:14px;background:linear-gradient(180deg,#7FD3F2,#3C9BD6)}
+  .mini-river span{position:absolute;bottom:14px;width:40px;height:16px;border-radius:50%;background:#E1E4F2;box-shadow:0 4px 0 #6E7891}
+  .mini-river .s1{left:14%}.mini-river .s2{left:42%}.mini-river .s3{left:70%}
+  .mini-river img{position:absolute;bottom:24px;width:44px;left:12%;animation:wf-hop 3s infinite}
+  @keyframes wf-hop{0%,20%{left:12%;bottom:24px}30%{bottom:52px}40%,55%{left:40%;bottom:24px}65%{bottom:52px}75%,100%{left:68%;bottom:24px}}
+  .mini-faces{display:flex;gap:8px;font:13px var(--font-ui)}
+  .mini-faces span{display:flex;align-items:center;gap:5px;padding:9px 14px;border-radius:12px;background:var(--surface-2);border:1px solid var(--line)}
+  .mini-faces .yes{color:var(--success-text);border-color:rgb(76 175 130 / .6);background:rgb(76 175 130 / .16);animation:wf-tap 3s infinite}
+  .mini-faces svg{width:16px;height:16px}
+  @keyframes wf-tap{40%{transform:scale(1)}50%{transform:scale(.9)}60%{transform:scale(1.04)}}
+  .mini-book{width:90px}
+  .player-bar{position:absolute;left:0;right:0;bottom:0;height:34px;display:flex;align-items:center;gap:10px;padding:0 12px;background:rgb(0 0 0 / .35);font:11px var(--font-ui);color:var(--muted)}
+  .player-bar .play svg{width:16px;height:16px;color:#fff}
+  .player-bar i{flex:1;height:5px;border-radius:999px;background:rgb(255 255 255 / .15);overflow:hidden}
+  .player-bar i b{display:block;height:100%;width:0;background:var(--gold-1);animation:wf-progress 12s linear infinite}
+  @keyframes wf-progress{to{width:100%}}
+  .chapters{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .chapters span{font:12px var(--font-ui);padding:5px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line);color:var(--muted)}
+  .chapters span.on{border-color:var(--primary);color:var(--text)}
+  .faq{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .faq span{display:grid;grid-template-columns:auto 1fr;column-gap:8px;padding:10px;border-radius:14px;background:var(--surface);border:1px solid var(--line);font-size:12px}
+  .faq svg{width:20px;height:20px;color:var(--primary-text);grid-row:span 2}
+  .faq small{color:var(--muted);font-size:11px;line-height:1.35}
+  .guide-layout{display:grid;grid-template-columns:1.25fr 1fr;gap:22px;align-items:start}
+  .docs{margin-top:12px;font-size:12px;color:var(--muted)}
+  /* First-run tips */
+  .map-mini{position:relative;width:100%;flex:1;min-height:200px}
+  .map-mini span{position:absolute;width:46px;height:46px;margin:-23px;border-radius:50%;background:var(--surface);border:3px solid var(--line);display:grid;place-items:center}
+  .map-mini span svg{width:18px;height:18px;fill:var(--gold-1)}
+  .coach{position:absolute;inset:0;z-index:7;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:6px;padding:30px;pointer-events:none}
+  .coach p{margin:0;background:#fff;color:#1E1A4A;border-radius:16px;padding:10px 14px;font:15px var(--font-kid);text-align:center;box-shadow:0 10px 20px -10px #000}
+  .coach small{font:11px var(--font-ui);color:#fff}
+  /* The highlighted control darkens everything around it with one huge shadow. */
+  .kid:has(.spot) .stage,.kid:has(.spot) .top{z-index:auto}
+  .spot{z-index:6;box-shadow:0 0 0 4px var(--gold-1),0 0 24px 6px rgb(255 213 138 / .6),0 0 0 9999px rgb(8 6 24 / .62)!important}
+  .spot:not(.adult){position:relative}
+  /* Adult pages */
+  .tabrow{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .tabrow span{display:flex;align-items:center;gap:6px;padding:9px 12px;font:14px var(--font-ui);color:var(--muted);border-bottom:2px solid transparent}
+  .tabrow span.on{color:var(--text);border-color:var(--primary)}
+  .tabrow svg{width:16px;height:16px}
+  .help-dot{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:13px;color:var(--muted)}
+  .help-dot svg{width:16px;height:16px}
+  .hdr.today{display:flex;flex-direction:column;gap:2px}
+  .today-strip{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:12px;color:#E4E0FF}
+  .today-strip span{display:inline-flex;align-items:center;gap:4px}
+  .today-strip svg{width:14px;height:14px;fill:var(--gold-1);color:var(--gold-1)}
+  .todo{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+  .todo>svg{width:34px;height:34px;padding:7px;border-radius:11px;background:var(--primary-soft);color:var(--primary-text)}
+  .todo b{display:block;font-size:14px}.todo small{color:var(--muted);font-size:12px}
+  .todo em{font-style:normal;color:var(--muted);font-size:18px}
+  .week{padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:6px;font-size:13px}
+  .week span{display:flex;gap:5px}
+  .week i{flex:1;text-align:center;font-style:normal;font-size:11px;padding:6px 0;border-radius:9px;background:var(--surface-2);color:var(--muted)}
+  .week i.on{background:var(--gold-1);color:#2A1D05;font-weight:600}
+  .week small{color:var(--muted);font-size:11px}
+  .today-hero{display:grid;grid-template-columns:1fr 260px;gap:18px;padding:22px 24px;border-radius:20px;background:var(--hero)}
+  .today-hero>div:first-child{display:flex;flex-direction:column;gap:6px}
+  .today-hero b{font:600 28px var(--font-display)}
+  .today-hero small{color:#E4E0FF}
+  .today-map img{width:100%;border-radius:16px;background:#fff}
+  .today-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+  .review{display:flex;flex-direction:column;gap:8px}
+  .review-head b{display:block;font-size:15px}.review-head small{color:var(--muted);font-size:12px}
+  .rv{display:grid;grid-template-columns:44px 1fr auto auto;gap:8px;align-items:center;padding:8px 10px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+  .rv img{width:44px;height:34px;object-fit:contain;background:#fff;border-radius:8px}
+  .rv b{display:block;font:700 15px var(--font-letter)}.rv small{color:var(--muted);font-size:11px}
+  .rv-play svg{width:28px;height:28px;padding:6px;border-radius:50%;background:var(--primary);color:#fff}
+  .rv-faces{display:flex;gap:4px}
+  .rv-faces i{display:grid;place-items:center;width:30px;height:30px;border-radius:9px;background:var(--surface-2);border:1px solid var(--line)}
+  .rv-faces i.yes{color:var(--success-text);border-color:rgb(76 175 130 / .6)}
+  .rv-faces svg{width:15px;height:15px}
+  .phone .rv{grid-template-columns:34px 1fr auto auto;gap:6px;padding:6px 8px}
+  .phone .rv img{width:34px;height:28px}
+  .phone .rv-play svg{width:24px;height:24px;padding:5px}
+  .phone .rv-faces i{width:24px;height:24px}
+  .kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .kpi-row span{padding:10px;border-radius:14px;background:var(--surface);border:1px solid var(--line);font-size:11px;color:var(--muted)}
+  .kpi-row b{display:block;font:600 20px var(--font-display);color:var(--text)}
+  .results-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:20px;align-items:start}
+  .bars{display:flex;align-items:flex-end;gap:12px;height:120px;margin-top:14px;padding:12px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+  .bars span{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+  .bars i{width:100%;border-radius:6px;background:#B9AEFF}
+  .bars small{font-size:10px;color:var(--muted)}
+  .choice{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:center;padding:10px;border-radius:14px;background:var(--surface);border:1px solid var(--line);margin-bottom:8px}
+  .choice.on{border-color:var(--primary);box-shadow:0 0 0 3px rgb(85 72 212 / .3)}
+  .choice img{width:52px;height:40px;object-fit:contain;background:#fff;border-radius:10px}
+  .choice b{display:block;font-size:14px}.choice small{color:var(--muted);font-size:11px}
+  .choice .lv{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font:600 18px var(--font-display);background:var(--surface-2)}
+  .choice.on .lv{background:var(--primary);color:#fff}
+  .sound-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .sound-grid span{aspect-ratio:1;border-radius:16px;display:grid;place-items:center;align-content:center;font:700 38px var(--font-letter);background:var(--surface);border:1px solid var(--line)}
+  .sound-grid span.on{background:var(--primary);border-color:var(--primary)}
+  .sound-grid span.soon{opacity:.45;font-size:26px}
+  .sound-grid small{display:block;font:10px var(--font-ui);color:var(--muted)}
+  .hint{margin:8px 0;font-size:11px;color:var(--muted)}
+  .more{display:block;margin-top:8px;font-size:12px;color:var(--primary-text);text-align:center}
+  .setup-3{display:grid;grid-template-columns:1fr .8fr 1fr;gap:18px}
+  .setup-3 .sound-grid span{font-size:30px}
+  .setup-foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto}
+  .phase-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media (max-width:1100px){.phase-grid{grid-template-columns:1fr 1fr}}
+  @media (prefers-reduced-motion:reduce){.pf{animation:none;opacity:0}.pf.f2{opacity:1}.mini-river img,.mini-mic,.mini-faces .yes,.player-bar i b{animation:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="i-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></symbol>
+    <symbol id="i-vol" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5z"/><path d="M16 9a5 5 0 0 1 0 6"/><path d="M19.4 18.4a9 9 0 0 0 0-12.8"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24" fill="currentColor"><rect x="14" y="4" width="4" height="16" rx="1.5"/><rect x="6" y="4" width="4" height="16" rx="1.5"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="i-replay" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></symbol>
+    <symbol id="i-monitor" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/></symbol>
+    <symbol id="i-smile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" x2="9.01" y1="9" y2="9"/><line x1="15" x2="15.01" y1="9" y2="9"/></symbol>
+    <symbol id="i-skip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M11 2l2 5.6L18.6 9.6 13 11.6 11 17.2 9 11.6 3.4 9.6 9 7.6z"/><path d="M19 14l.9 2.6 2.6.9-2.6.9L19 21l-.9-2.6-2.6-.9 2.6-.9z"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-mic-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="2" x2="22" y1="2" y2="22"/><path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/><path d="M5 10v2a7 7 0 0 0 12 5"/><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12"/><line x1="12" x2="12" y1="19" y2="22"/></symbol>
+    <symbol id="i-hand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 11V6a2 2 0 0 0-4 0v5"/><path d="M14 10V4a2 2 0 0 0-4 0v6"/><path d="M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></symbol>
+    <symbol id="g-stones" viewBox="0 0 40 40"><ellipse cx="9" cy="28" rx="8" ry="5" fill="#7DDBB0"/><ellipse cx="22" cy="21" rx="8" ry="5" fill="#E1E4F2"/><ellipse cx="33" cy="13" rx="6" ry="4" fill="#F5C77A"/></symbol>
+    <symbol id="g-card" viewBox="0 0 40 40"><rect x="8" y="5" width="24" height="30" rx="5" fill="#5548D4"/><rect x="8" y="5" width="24" height="30" rx="5" fill="none" stroke="#C3BBFF" stroke-width="2"/><polygon points="20 12 22.4 17 27.8 17.6 23.8 21.2 24.9 26.6 20 23.9 15.1 26.6 16.2 21.2 12.2 17.6 17.6 17" fill="#FFD58A"/></symbol>
+    <symbol id="g-train" viewBox="0 0 40 40"><rect x="3" y="14" width="16" height="12" rx="3" fill="#E8735A"/><rect x="11" y="8" width="8" height="10" rx="2" fill="#D35F48"/><rect x="21" y="16" width="16" height="10" rx="3" fill="#FFD58A"/><circle cx="8" cy="28" r="3" fill="#C3BBFF"/><circle cx="16" cy="28" r="3" fill="#C3BBFF"/><circle cx="26" cy="28" r="3" fill="#C3BBFF"/><circle cx="33" cy="28" r="3" fill="#C3BBFF"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z"/></symbol>
+    <linearGradient id="g-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2C2185"/><stop offset="1" stop-color="#5A4FD6"/></linearGradient>
+    <linearGradient id="g-river" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2F7FC0"/><stop offset="1" stop-color="#22508F"/></linearGradient>
+    <radialGradient id="g-sun"><stop offset="0" stop-color="#FFE7B0"/><stop offset=".55" stop-color="#FFD58A"/><stop offset="1" stop-color="#FFD58A" stop-opacity="0"/></radialGradient>
+  </defs>
+</svg>
+<svg width="0" height="0" style="position:absolute"><defs>
+  <symbol id="i-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-map" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"/><path d="M15 5.764v15"/><path d="M9 3.236v15"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+  <symbol id="i-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/></symbol>
+  <symbol id="i-ear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8.5a6.5 6.5 0 1 1 13 0c0 6-6 6-6 10a3.5 3.5 0 1 1-7 0"/><path d="M15 8.5a2.5 2.5 0 0 0-5 0v1a2 2 0 1 1 0 4"/></symbol>
+  
+</defs></svg>
+<header class="page">
+  <span class="chip">ไวร์เฟรมเพื่อคุยกัน · ยังไม่แก้เว็บจริง · 23 พ.ย. 2569 · ต่อจากไวร์เฟรมหน้าฝึกเด็ก</span>
+  <h1>สมุดสติกเกอร์ · พิมพ์ให้น้อง · คู่มือ · หน้าผู้ใหญ่</h1>
+  <p>Speech Adventure · หน้าเกมของเด็กทำเสร็จแล้ว รอบนี้เสนอของสะสมให้เด็ก ของจับต้องได้ให้พ่อแม่ และหน้าผู้ใหญ่ที่เรียบขึ้น</p>
+</header>
+<section class="summary" id="summary">
+  <h2>สรุปใน 1 นาที</h2>
+  <p class="lead">ฝั่งเด็กเป็นเกมแล้ว แต่เล่นจบแล้วยังไม่มีอะไรให้เก็บ และฝั่งผู้ใหญ่มีหน้าที่ซ้ำกันจนไม่รู้จะดูตรงไหน · รอบนี้เพิ่มของสะสมที่พิมพ์ออกมาได้จริง และจัดหน้าผู้ใหญ่ให้เหลือเท่าที่ใช้</p>
+  <div class="kpis">
+    <div class="kpi"><b>25</b><span>สติกเกอร์ในชุดแรก จากภาพที่ใช้ในหลักสูตร</span></div>
+    <div class="kpi"><b>3</b><span>แบบที่พิมพ์ได้: สติกเกอร์ บัตรคำฝึกที่บ้าน ใบประกาศ</span></div>
+    <div class="kpi"><b>6 → 4</b><span>แท็บในห้องฝึก · คู่มือเป็นปุ่ม ? ทุกหน้า</span></div>
+    <div class="kpi"><b>3 → 0</b><span>เรื่องที่มีหน้าซ้ำ (เส้นทาง, ผล, เลือกระดับ)</span></div>
+  </div>
+  <div class="sum-grid">
+    <div class="sum-card"><h3>เปลี่ยนอะไร</h3><ol>
+      <li><a href="#book">สมุดสติกเกอร์</a>: ทุกภาพที่ได้ฝึกเป็นสติกเกอร์ 1 ดวง เก็บแยกหมวด ได้ตอน<a href="#earn">จบด่าน</a></li>
+      <li><a href="#print">พิมพ์ให้น้อง</a>: สติกเกอร์ บัตรคำฝึกเสียงที่บ้าน ใบประกาศ · <a href="#sheets">ดูตัวอย่าง A4</a></li>
+      <li><a href="#guide">คู่มือ</a>เป็นภาพเคลื่อนไหวพี่ปูสอนเล่น + ลองเล่น 1 ข้อ + <a href="#tips">ป้ายแนะนำครั้งแรก</a></li>
+      <li>หน้าผู้ใหญ่: <a href="#today">แผนวันนี้</a>บอกสิ่งที่ต้องทำต่อ, <a href="#results">ผลการฝึก</a>รวมเป็นหน้าเดียวและให้ผลข้อค้างได้ทันที, <a href="#setup">จัดชุดฝึก</a> 3 คำถาม</li>
+    </ol></div>
+    <div class="sum-card"><h3>ขอให้ช่วยตัดสินใจ</h3><ol>
+      <li>สติกเกอร์ได้จากการลองเล่น (เสนอ) หรือเฉพาะข้อที่ "ทำได้"</li>
+      <li>เก็บเสียงเด็กในเครื่องชั่วคราวให้ผู้ใหญ่ฟังย้อนหลังได้ไหม → <a href="#results">ข้อ 9</a></li>
+      <li>กระดาษสติกเกอร์แบบเต็มแผ่นหรือไดคัท → <a href="#sheets">ข้อ 4</a></li>
+      <li>ชื่อแท็บ "สติกเกอร์และพิมพ์" หรือ "ของรางวัล"</li>
+    </ol></div>
+  </div>
+  <div class="howto"><span><b>วิธีอ่าน:</b> ซ้าย = หน้าจริงตอนนี้ · กลาง = แบบใหม่ · ขวา = สิ่งที่ <span class="t-cut">ตัด</span> / <span class="t-move">ย้าย</span> / <span class="t-add">เพิ่ม</span></span><span><b>สลับมือถือ/คอม</b> ที่ปุ่มมุมขวาล่าง</span><span>ภาพเป็นชุดที่วาดใหม่ล่าสุด (เดียวกับในเกม)</span></div>
+</section>
+<nav class="toc" id="toc">
+  <div class="toc-part"><b><small>ส่วนที่ 1</small>ของสะสมของเด็ก</b><a href="#book">1 สมุดสติกเกอร์</a><a href="#earn">2 ได้สติกเกอร์ใหม่</a></div>
+  <div class="toc-part"><b><small>ส่วนที่ 2</small>พิมพ์ให้น้อง</b><a href="#print">3 ศูนย์พิมพ์</a><a href="#sheets">4 ตัวอย่าง A4</a></div>
+  <div class="toc-part"><b><small>ส่วนที่ 3</small>คู่มือ</b><a href="#guide">5 พี่ปูสอนเล่น</a><a href="#tips">6 ป้ายแนะนำครั้งแรก</a></div>
+  <div class="toc-part"><b><small>ส่วนที่ 4</small>หน้าผู้ใหญ่</b><a href="#tabs">7 เมนู 6 → 4</a><a href="#today">8 แผนวันนี้</a><a href="#results">9 ผลการฝึก</a><a href="#setup">10 จัดชุดฝึก</a></div>
+  <div class="toc-part"><b><small>ส่วนที่ 5</small>แผนงาน</b><a href="#plan">11 แผนทำจริง</a></div>
+</nav>
+<div class="floatbar"><a class="totop" href="#toc">↑ สารบัญ</a><div class="viewswitch" role="group" aria-label="ขนาดจอ"><button type="button" data-view="phone" aria-pressed="true"><svg><use href="#i-phone"/></svg>โทรศัพท์</button><button type="button" data-view="pc" aria-pressed="false"><svg><use href="#i-monitor"/></svg>คอมพิวเตอร์</button></div></div>
+<div class="part" id="part1"><span>ส่วนที่ 1</span><h2>ของสะสมของเด็ก</h2><p>สมุดสติกเกอร์ และช่วงได้สติกเกอร์ใหม่ตอนจบด่าน</p></div>
+<section class="block" id="book">
+  <h2>1 · สมุดสติกเกอร์ของหนู</h2>
+  <p class="lead">ทุกภาพที่ได้ฝึกในเกม (ส่งของ การ์ด รถไฟ …) กลายเป็นสติกเกอร์ 1 ดวง เก็บแยกหน้าตามหมวด · ช่องที่ยังไม่ได้เป็นเงา เด็กอยากเก็บให้ครบ · เปิดจากปุ่มสมุดบนแผนที่</p>
+  <div class="compare"><div><p class="col-title now">ปัจจุบัน</p><div class="desk empty pc-only">ไม่มี<br>ดาวรวมเป็นตัวเลขบนแผนที่อย่างเดียว</div><div class="phone phone-only empty-phone">ไม่มี<br>ดาวรวมเป็นตัวเลขบนแผนที่อย่างเดียว</div></div><div><p class="col-title new">แบบใหม่</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · สมุดสติกเกอร์</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-map"/></svg></span><span></span><span class="count"><svg><use href="#i-star"/></svg>14/25</span><span class="ibtn"><svg><use href="#i-home"/></svg></span></div><div class="stage" style="padding:0 40px 18px"><div class="book"><div class="book-page"><div class="sb-tabs pc-tabs"><span class="on"><img src="art/v2/chicken.svg" alt="">สัตว์<b>6/9</b></span><span class=""><img src="art/v2/banana.svg" alt="">ของกิน<b>3/6</b></span><span class=""><img src="art/v2/backpack.svg" alt="">ของใช้<b>3/6</b></span><span class=""><img src="art/v2/school.svg" alt="">สถานที่<b>2/4</b></span></div><h3>สัตว์</h3><div class="sb-grid"><div class="stk"><span class="stk-pic"><img src="art/v2/crab.svg" alt=""></span><small>ปู</small></div><div class="stk"><span class="stk-pic"><img src="art/v2/chicken.svg" alt=""></span><small>ไก่</small></div><div class="stk"><span class="stk-pic"><img src="art/v2/crow.svg" alt=""></span><small>กา</small></div><div class="stk locked"><span class="stk-pic"><img src="art/v2/horse.svg" alt=""></span><small>?</small></div><div class="stk"><span class="stk-pic"><img src="art/v2/cat.svg" alt=""></span><small>แมว</small></div><div class="stk"><span class="stk-pic"><img src="art/v2/fish.svg" alt=""></span><small>ปลา</small></div><div class="stk locked"><span class="stk-pic"><img src="art/v2/shrimp.svg" alt=""></span><small>?</small></div><div class="stk locked"><span class="stk-pic"><img src="art/v2/snake.svg" alt=""></span><small>?</small></div><div class="stk fresh"><span class="stk-pic"><img src="art/v2/crab-beach.svg" alt=""></span><em>ใหม่!</em><small>ปูที่ทะเล</small></div></div></div><div class="book-page"><h3>ของกิน</h3><div class="sb-grid"><div class="stk"><span class="stk-pic"><img src="art/v2/banana.svg" alt=""></span><small>กล้วย</small></div><div class="stk"><span class="stk-pic"><img src="art/v2/coconut.svg" alt=""></span><small>มะพร้าว</small></div><div class="stk locked"><span class="stk-pic"><img src="art/v2/mangosteen.svg" alt=""></span><small>?</small></div><div class="stk fresh"><span class="stk-pic"><img src="art/v2/rice.svg" alt=""></span><em>ใหม่!</em><small>ข้าว</small></div><div class="stk locked"><span class="stk-pic"><img src="art/v2/cup.svg" alt=""></span><small>?</small></div><div class="stk locked"><span class="stk-pic"><img src="art/v2/chicken-rice.svg" alt=""></span><small>?</small></div></div><div class="mascot" style="margin-top:auto"><img class="pu" src="art/v2/crab.svg" alt="พี่ปู"><div class="bubble">ได้ข้าวสวยมาใหม่ด้วย!</div></div></div><div class="ribbons"><span class="on"><img src="art/v2/chicken.svg" alt=""></span><span class="on"><img src="art/v2/banana.svg" alt=""></span><span class=""><img src="art/v2/backpack.svg" alt=""></span><span class=""><img src="art/v2/school.svg" alt=""></span></div></div></div></div></div><p class="frame-label">บนคอม: เปิดเป็นสมุด 2 หน้า ป้ายริบบิ้นด้านข้างพลิกไปหมวดอื่น</p></div></div><div class="phones phone-only"><div><div class="phone"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-map"/></svg></span><span></span><span class="count"><svg><use href="#i-star"/></svg>14/25</span><span class="ibtn"><svg><use href="#i-home"/></svg></span></div><div class="stage sb-stage"><div class="kid-title" style="font-size:24px">สมุดสติกเกอร์ของหนู</div><div class="sb-tabs"><span class="on"><img src="art/v2/chicken.svg" alt="">สัตว์<b>6/9</b></span><span class=""><img src="art/v2/banana.svg" alt="">ของกิน<b>3/6</b></span><span class=""><img src="art/v2/backpack.svg" alt="">ของใช้<b>3/6</b></span><span class=""><img src="art/v2/school.svg" alt="">สถานที่<b>2/4</b></span></div><div class="sb-grid"><div class="stk"><span class="stk-pic"><img src="art/v2/crab.svg" alt=""></span><small>ปู</small></div><div class="stk"><span class="stk-pic"><img src="art/v2/chicken.svg" alt=""></span><small>ไก่</small></div><div class="stk"><span class="stk-pic"><img src="art/v2/crow.svg" alt=""></span><small>กา</small></div><div class="stk locked"><span class="stk-pic"><img src="art/v2/horse.svg" alt=""></span><small>?</small></div><div class="stk"><span class="stk-pic"><img src="art/v2/cat.svg" alt=""></span><small>แมว</small></div><div class="stk"><span class="stk-pic"><img src="art/v2/fish.svg" alt=""></span><small>ปลา</small></div><div class="stk locked"><span class="stk-pic"><img src="art/v2/shrimp.svg" alt=""></span><small>?</small></div><div class="stk locked"><span class="stk-pic"><img src="art/v2/snake.svg" alt=""></span><small>?</small></div><div class="stk fresh"><span class="stk-pic"><img src="art/v2/crab-beach.svg" alt=""></span><em>ใหม่!</em><small>ปูที่ทะเล</small></div></div><div class="mascot"><img class="pu" src="art/v2/crab.svg" alt="พี่ปู"><div class="bubble"><span class="spk"><svg><use href="#i-vol"/></svg>แตะเพื่อฟัง</span>เก็บอีก 3 ดวง หน้านี้ครบเลย!</div></div></div></div></div><p class="frame-label">เปิดหน้าแรกที่มีสติกเกอร์ใหม่ · แตะสติกเกอร์ พี่ปูพูดชื่อภาพให้ฟัง</p></div><div><div class="phone"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-map"/></svg></span><span></span><span class="ibtn"><svg><use href="#i-home"/></svg></span></div><div class="stage"><div class="stk-zoom"><div class="stk locked"><span class="stk-pic"><img src="art/v2/horse.svg" alt=""></span><small>?</small></div></div><div class="kid-title" style="font-size:24px">ยังไม่ได้สติกเกอร์นี้</div><div class="kid-sub">ไปเล่น <b>การ์ดสติกเกอร์</b> แล้วจะได้ดวงนี้นะ</div><span class="btn gold" style="flex:none;width:200px"><svg><use href="#i-play"/></svg>ไปเล่นเลย</span></div></div></div><p class="frame-label">แตะช่องที่เป็นเงา: บอกว่าได้จากเกมไหน และพาไปเล่นได้เลย</p></div></div></div><div class="notes"><p class="pc-note pc-only"><b>บนคอม:</b> สมุดกาง 2 หน้า · ลูกศรซ้าย/ขวาพลิกหน้า</p>
+    <div class="numbers"><div><b>25</b>สติกเกอร์ในชุดแรก (จากภาพในหลักสูตร)</div><div><b>4</b>หมวด</div><div><b>0</b>ตัวเลขคะแนน</div></div>
+    <ul><li><span class="t-add">เพิ่ม</span> ปุ่มสมุด <svg class="inl"><use href="#i-book"/></svg> บนแผนที่ (ตำแหน่งเดียวกับไวร์เฟรมเดิม)</li><li>ได้สติกเกอร์จากการ<b>ลองเล่น</b> ไม่ต้องตอบถูก (เหมือนดาว: ให้รางวัลความพยายาม)</li><li>ข้อที่ไม่มีภาพ (ตัวอักษร รูปปาก) ได้สติกเกอร์ดาวหรือพี่ปูท่าต่าง ๆ แทน</li><li>ครบหน้า: หน้านั้นได้กรอบทอง และพี่ปูได้ของแต่งตัว 1 ชิ้น (หมวก แว่น) เห็นบนแผนที่</li><li>เก็บในเครื่องและในบัญชีเด็ก ใช้ข้อมูลรอบที่มีอยู่แล้ว ไม่เก็บข้อมูลใหม่</li></ul></div></div>
+</section>
+<section class="block" id="earn">
+  <h2>2 · ได้สติกเกอร์ใหม่ (จบด่าน)</h2>
+  <p class="lead">หน้าฉลองจบด่านที่มีอยู่แล้ว เพิ่มช่วงที่สติกเกอร์ของด่านนี้ลอยลงสมุด · เด็กรู้ว่าเล่นแล้วได้อะไรกลับไป</p>
+  <div class="compare"><div><p class="col-title now">ปัจจุบัน</p><div class="desk before pc-only"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span></span><span class="ibtn"><svg><use href="#i-home"/></svg></span></div><div class="stage"><img class="pu big" src="art/v2/crab.svg" alt=""><div class="kid-title">ภารกิจสำเร็จ!</div><div class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div><div class="row" style="width:520px"><span class="btn"><svg><use href="#i-replay"/></svg>เล่นอีก</span><span class="btn gold">ด่านต่อไป<svg><use href="#i-next"/></svg></span></div></div></div></div><div class="phone phone-only"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span></span><span class="ibtn"><svg><use href="#i-home"/></svg></span></div><div class="stage"><img class="pu big" src="art/v2/crab.svg" alt=""><div class="kid-title">ภารกิจสำเร็จ!</div><div class="stars"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></div><div class="row"><span class="btn"><svg><use href="#i-replay"/></svg>เล่นอีก</span><span class="btn gold">ด่านต่อไป</span></div></div></div></div></div><div><p class="col-title new">แบบใหม่</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span></span><span class="ibtn"><svg><use href="#i-home"/></svg></span></div><div class="split"><div class="col"><div class="earn big"><div class="earn-new"><div class="stk fresh"><span class="stk-pic"><img src="art/v2/banana.svg" alt=""></span><em>ใหม่!</em><small>กล้วย</small></div><div class="stk fresh"><span class="stk-pic"><img src="art/v2/rice.svg" alt=""></span><em>ใหม่!</em><small>ข้าว</small></div></div><span class="earn-arrow"><svg><use href="#i-next"/></svg></span><span class="earn-book"><svg><use href="#i-book"/></svg><b>+2</b></span></div></div><div class="col"><div class="kid-title">ภารกิจสำเร็จ!</div><div class="kid-sub">ได้สติกเกอร์ใหม่ 2 ดวง</div><div class="row"><span class="btn"><svg><use href="#i-book"/></svg>เปิดสมุด</span><span class="btn gold">ด่านต่อไป<svg><use href="#i-next"/></svg></span></div></div></div></div></div><p class="frame-label">บนคอม: ซ้ายสติกเกอร์ ขวาปุ่ม (แบบเดียวกับหน้าจบด่านตอนนี้)</p></div></div><div class="phones phone-only"><div><div class="phone"><div class="kid"><div class="top"><span class="ibtn"><svg><use href="#i-pause"/></svg></span><span></span><span class="ibtn"><svg><use href="#i-home"/></svg></span></div><div class="stage"><div class="kid-title">ภารกิจสำเร็จ!</div><div class="earn"><div class="earn-new"><div class="stk fresh"><span class="stk-pic"><img src="art/v2/banana.svg" alt=""></span><em>ใหม่!</em><small>กล้วย</small></div><div class="stk fresh"><span class="stk-pic"><img src="art/v2/rice.svg" alt=""></span><em>ใหม่!</em><small>ข้าว</small></div></div><span class="earn-arrow"><svg><use href="#i-next"/></svg></span><span class="earn-book"><svg><use href="#i-book"/></svg><b>+2</b></span></div><div class="kid-sub">ได้สติกเกอร์ใหม่ 2 ดวง!</div><div class="row"><span class="btn"><svg><use href="#i-book"/></svg>เปิดสมุด</span><span class="btn gold">ด่านต่อไป</span></div></div></div></div><p class="frame-label">สติกเกอร์เด้งขึ้น แล้วบินเข้าสมุดมุมขวา (+2)</p></div></div></div><div class="notes"><ul><li><span class="t-add">เพิ่ม</span> สติกเกอร์ของด่านนี้ และปุ่ม "เปิดสมุด"</li><li><span class="t-cut">ตัด</span> ดาว 3 ดวงที่ได้เท่ากันทุกรอบ (สติกเกอร์บอกได้ชัดกว่าว่าได้อะไร) · ดาวสะสมยังอยู่บนแผนที่</li><li>ได้ซ้ำ (เคยมีแล้ว) ขึ้น "เก็บไว้แล้ว" ไม่หายไปไหน</li><li>หน้าสรุปการผจญภัยบอกด้วยว่า "รอบนี้ได้สติกเกอร์ 9 ดวง"</li></ul></div></div>
+</section>
+<div class="part" id="part2"><span>ส่วนที่ 2</span><h2>พิมพ์ให้น้องที่บ้าน</h2><p>ศูนย์พิมพ์สำหรับผู้ใหญ่ และตัวอย่างกระดาษ A4 ทั้ง 3 แบบ</p></div>
+<section class="block" id="print">
+  <h2>3 · พิมพ์ให้น้อง (หน้าผู้ใหญ่)</h2>
+  <p class="lead">ผู้ใหญ่เลือก 1 ใน 3 แบบ ดูตัวอย่าง แล้วกดพิมพ์ (หรือบันทึกเป็น PDF จากหน้าต่างพิมพ์ของเครื่อง) · ไม่ต้องลงโปรแกรม</p>
+  <div class="compare"><div><p class="col-title now">ปัจจุบัน</p><div class="desk empty pc-only">ไม่มี<br>พิมพ์ได้เฉพาะรายงานผลการฝึก</div><div class="phone phone-only empty-phone">ไม่มี<br>พิมพ์ได้เฉพาะรายงานผลการฝึก</div></div><div><p class="col-title new">แบบใหม่</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · พิมพ์ให้น้อง</span></div><div class="site"><aside class="site-nav"><div class="site-brand"><span class="logo"><svg><use href="#i-mic"/></svg></span>Speech<small>Adventure</small></div><span class="">หน้าหลัก</span><span class="">ฝึกและเรียน</span><span class="">ผลการฝึก</span><span class="on">พิมพ์ให้น้อง</span><span class="">ข้อมูลลูก</span><span class="">ตั้งค่า</span></aside><main class="site-main"><div class="site-title"><svg><use href="#i-print"/></svg><b>พิมพ์ให้น้องที่บ้าน</b><small>เลือกแบบ ดูตัวอย่าง แล้วพิมพ์ได้เลย</small></div><div class="print-layout"><div><div class="print-opts">
+  <label class="print-card on"><span class="pc-thumb"><div class="a4 mini"><div class="a4-head">สติกเกอร์ของน้องฟ้า<small>Speech Adventure · ตัดตามเส้นประ</small></div><div class="a4-stickers"><span><img src="art/v2/crab.svg" alt=""></span><span><img src="art/v2/chicken.svg" alt=""></span><span><img src="art/v2/crow.svg" alt=""></span><span><img src="art/v2/cat.svg" alt=""></span><span><img src="art/v2/fish.svg" alt=""></span><span><img src="art/v2/crab-beach.svg" alt=""></span><span><img src="art/v2/banana.svg" alt=""></span><span><img src="art/v2/coconut.svg" alt=""></span><span><img src="art/v2/rice.svg" alt=""></span><span><img src="art/v2/backpack.svg" alt=""></span><span><img src="art/v2/clock.svg" alt=""></span><span><img src="art/v2/ball.svg" alt=""></span></div></div></span><b>แผ่นสติกเกอร์</b><small>สติกเกอร์ที่น้องเก็บได้ 14 ดวง · พิมพ์ลงกระดาษสติกเกอร์ A4</small></label>
+  <label class="print-card"><span class="pc-thumb"><div class="a4 mini"><div class="a4-head">บัตรคำฝึกเสียง ก<small>ตัดเป็นใบ · ให้น้องพูดคำละ 3 ครั้ง ชมทุกครั้งที่ลอง</small></div><div class="a4-cards"><span><img src="art/v2/clock.svg" alt=""><b>นา<i class="hl">ฬิ</i>กา</b></span><span><img src="art/v2/crow.svg" alt=""><b><i class="hl">ก</i>า</b></span><span><img src="art/v2/chicken.svg" alt=""><b>ไ<i class="hl">ก่</i></b></span><span><img src="art/v2/backpack.svg" alt=""><b><i class="hl">ก</i>ระเป๋า</b></span><span><img src="art/v2/banana.svg" alt=""><b><i class="hl">ก</i>ล้วย</b></span><span><img src="art/v2/cup.svg" alt=""><b>แ<i class="hl">ก้</i>ว</b></span><span><img src="art/v2/shrimp.svg" alt=""><b><i class="hl">กุ้</i>ง</b></span><span><img src="art/v2/ball.svg" alt=""><b>ลู<i class="hl">ก</i>บอล</b></span></div><div class="a4-foot">เกมที่บ้าน: วางบัตรคว่ำ เปิดทีละใบ พูดชื่อภาพ ได้เก็บบัตร</div></div></span><b>บัตรคำฝึกที่บ้าน</b><small>เสียง ก · 8 คำ พร้อมวิธีเล่นสั้น ๆ</small></label>
+  <label class="print-card"><span class="pc-thumb"><div class="a4 cert mini"><div class="cert-in"><img class="cert-cup" src="art/v2/crab.svg" alt=""><div class="cert-t">ใบประกาศ</div><div class="cert-s">นักผจญภัยเสียง ก</div><div class="cert-n">น้องฟ้า</div><div class="cert-p">ฝึกครบ 6 ด่าน · ได้ดาว 30 ดวง · สติกเกอร์ 14 ดวง</div><div class="cert-d">23 พฤศจิกายน 2569</div><div class="cert-sign"><span>ผู้ปกครอง</span><span>ครู</span></div></div></div></span><b>ใบประกาศ</b><small>นักผจญภัยเสียง ก · ใส่ชื่อเล่นได้</small></label></div><div class="print-set"><span>ชื่อบนใบประกาศ</span><b>น้องฟ้า ✎</b></div><div class="print-set"><span>กระดาษ</span><b>A4 · สติกเกอร์แบบเต็มแผ่น</b></div></div><div class="print-preview"><div class="a4"><div class="a4-head">สติกเกอร์ของน้องฟ้า<small>Speech Adventure · ตัดตามเส้นประ</small></div><div class="a4-stickers"><span><img src="art/v2/crab.svg" alt=""></span><span><img src="art/v2/chicken.svg" alt=""></span><span><img src="art/v2/crow.svg" alt=""></span><span><img src="art/v2/cat.svg" alt=""></span><span><img src="art/v2/fish.svg" alt=""></span><span><img src="art/v2/crab-beach.svg" alt=""></span><span><img src="art/v2/banana.svg" alt=""></span><span><img src="art/v2/coconut.svg" alt=""></span><span><img src="art/v2/rice.svg" alt=""></span><span><img src="art/v2/backpack.svg" alt=""></span><span><img src="art/v2/clock.svg" alt=""></span><span><img src="art/v2/ball.svg" alt=""></span><span><img src="art/v2/school.svg" alt=""></span><span><img src="art/v2/tree.svg" alt=""></span></div></div><span class="btn go wide"><svg><use href="#i-print"/></svg>พิมพ์ / บันทึก PDF</span></div></div></main></div></div><p class="frame-label">บนคอม: เลือกซ้าย ตัวอย่างขนาดจริงด้านขวา</p></div></div><div class="phones phone-only"><div><div class="phone"><div class="adult-screen"><div class="hdr"><b>พิมพ์ให้น้อง</b><small>น้องฟ้า · เสียง ก</small></div><div class="list"><div class="print-opts">
+  <label class="print-card on"><span class="pc-thumb"><div class="a4 mini"><div class="a4-head">สติกเกอร์ของน้องฟ้า<small>Speech Adventure · ตัดตามเส้นประ</small></div><div class="a4-stickers"><span><img src="art/v2/crab.svg" alt=""></span><span><img src="art/v2/chicken.svg" alt=""></span><span><img src="art/v2/crow.svg" alt=""></span><span><img src="art/v2/cat.svg" alt=""></span><span><img src="art/v2/fish.svg" alt=""></span><span><img src="art/v2/crab-beach.svg" alt=""></span><span><img src="art/v2/banana.svg" alt=""></span><span><img src="art/v2/coconut.svg" alt=""></span><span><img src="art/v2/rice.svg" alt=""></span><span><img src="art/v2/backpack.svg" alt=""></span><span><img src="art/v2/clock.svg" alt=""></span><span><img src="art/v2/ball.svg" alt=""></span></div></div></span><b>แผ่นสติกเกอร์</b><small>สติกเกอร์ที่น้องเก็บได้ 14 ดวง · พิมพ์ลงกระดาษสติกเกอร์ A4</small></label>
+  <label class="print-card"><span class="pc-thumb"><div class="a4 mini"><div class="a4-head">บัตรคำฝึกเสียง ก<small>ตัดเป็นใบ · ให้น้องพูดคำละ 3 ครั้ง ชมทุกครั้งที่ลอง</small></div><div class="a4-cards"><span><img src="art/v2/clock.svg" alt=""><b>นา<i class="hl">ฬิ</i>กา</b></span><span><img src="art/v2/crow.svg" alt=""><b><i class="hl">ก</i>า</b></span><span><img src="art/v2/chicken.svg" alt=""><b>ไ<i class="hl">ก่</i></b></span><span><img src="art/v2/backpack.svg" alt=""><b><i class="hl">ก</i>ระเป๋า</b></span><span><img src="art/v2/banana.svg" alt=""><b><i class="hl">ก</i>ล้วย</b></span><span><img src="art/v2/cup.svg" alt=""><b>แ<i class="hl">ก้</i>ว</b></span><span><img src="art/v2/shrimp.svg" alt=""><b><i class="hl">กุ้</i>ง</b></span><span><img src="art/v2/ball.svg" alt=""><b>ลู<i class="hl">ก</i>บอล</b></span></div><div class="a4-foot">เกมที่บ้าน: วางบัตรคว่ำ เปิดทีละใบ พูดชื่อภาพ ได้เก็บบัตร</div></div></span><b>บัตรคำฝึกที่บ้าน</b><small>เสียง ก · 8 คำ พร้อมวิธีเล่นสั้น ๆ</small></label>
+  <label class="print-card"><span class="pc-thumb"><div class="a4 cert mini"><div class="cert-in"><img class="cert-cup" src="art/v2/crab.svg" alt=""><div class="cert-t">ใบประกาศ</div><div class="cert-s">นักผจญภัยเสียง ก</div><div class="cert-n">น้องฟ้า</div><div class="cert-p">ฝึกครบ 6 ด่าน · ได้ดาว 30 ดวง · สติกเกอร์ 14 ดวง</div><div class="cert-d">23 พฤศจิกายน 2569</div><div class="cert-sign"><span>ผู้ปกครอง</span><span>ครู</span></div></div></div></span><b>ใบประกาศ</b><small>นักผจญภัยเสียง ก · ใส่ชื่อเล่นได้</small></label></div><div class="print-set"><span>ชื่อบนใบประกาศ</span><b>น้องฟ้า ✎</b></div><span class="btn go wide"><svg><use href="#i-print"/></svg>พิมพ์ / บันทึก PDF</span></div></div></div><p class="frame-label">เลือกแบบ (เลื่อนดูได้) · ตั้งค่าเฉพาะที่จำเป็น · ปุ่มพิมพ์ปุ่มเดียว</p></div></div></div><div class="notes"><ul><li><span class="t-add">เพิ่ม</span> เมนู "พิมพ์ให้น้อง" ในแถบผู้ใหญ่ (และปุ่มลัดจากสมุดสติกเกอร์ / หน้าสรุปการผจญภัย)</li><li>ใช้การพิมพ์ของเบราว์เซอร์ (กด Ctrl+P ได้ด้วย) จัดหน้า A4 ด้วย CSS ไม่ส่งข้อมูลออกนอกเครื่อง</li><li>ชื่อบนใบประกาศใช้ชื่อเล่น แก้ได้ หรือเว้นว่างไว้เขียนเอง</li><li>บัตรคำเลือกคำจากเสียงที่ฝึกและระดับของเด็ก ไฮไลต์ตัวที่ฝึกด้วยสี</li></ul></div></div>
+</section>
+<section class="block" id="sheets">
+  <h2>4 · ตัวอย่างกระดาษ A4 ทั้ง 3 แบบ</h2>
+  <p class="lead">หน้าตาตอนพิมพ์ออกมาจริง (พื้นขาว ประหยัดหมึก ภาพชุดเดียวกับในเกม)</p>
+  <div class="sheets">
+    <div><div class="a4"><div class="a4-head">สติกเกอร์ของน้องฟ้า<small>Speech Adventure · ตัดตามเส้นประ</small></div><div class="a4-stickers"><span><img src="art/v2/crab.svg" alt=""></span><span><img src="art/v2/chicken.svg" alt=""></span><span><img src="art/v2/crow.svg" alt=""></span><span><img src="art/v2/cat.svg" alt=""></span><span><img src="art/v2/fish.svg" alt=""></span><span><img src="art/v2/crab-beach.svg" alt=""></span><span><img src="art/v2/banana.svg" alt=""></span><span><img src="art/v2/coconut.svg" alt=""></span><span><img src="art/v2/rice.svg" alt=""></span><span><img src="art/v2/backpack.svg" alt=""></span><span><img src="art/v2/clock.svg" alt=""></span><span><img src="art/v2/ball.svg" alt=""></span><span><img src="art/v2/school.svg" alt=""></span><span><img src="art/v2/tree.svg" alt=""></span></div></div><p class="frame-label"><b>แผ่นสติกเกอร์</b> · เส้นประให้ตัด · พิมพ์ลงกระดาษสติกเกอร์ A4 แบบเต็มแผ่นแล้วตัดเอง</p></div>
+    <div><div class="a4"><div class="a4-head">บัตรคำฝึกเสียง ก<small>ตัดเป็นใบ · ให้น้องพูดคำละ 3 ครั้ง ชมทุกครั้งที่ลอง</small></div><div class="a4-cards"><span><img src="art/v2/clock.svg" alt=""><b>นา<i class="hl">ฬิ</i>กา</b></span><span><img src="art/v2/crow.svg" alt=""><b><i class="hl">ก</i>า</b></span><span><img src="art/v2/chicken.svg" alt=""><b>ไ<i class="hl">ก่</i></b></span><span><img src="art/v2/backpack.svg" alt=""><b><i class="hl">ก</i>ระเป๋า</b></span><span><img src="art/v2/banana.svg" alt=""><b><i class="hl">ก</i>ล้วย</b></span><span><img src="art/v2/cup.svg" alt=""><b>แ<i class="hl">ก้</i>ว</b></span><span><img src="art/v2/shrimp.svg" alt=""><b><i class="hl">กุ้</i>ง</b></span><span><img src="art/v2/ball.svg" alt=""><b>ลู<i class="hl">ก</i>บอล</b></span></div><div class="a4-foot">เกมที่บ้าน: วางบัตรคว่ำ เปิดทีละใบ พูดชื่อภาพ ได้เก็บบัตร</div></div><p class="frame-label"><b>บัตรคำฝึกที่บ้าน</b> · 8 ใบต่อแผ่น · ตัวที่ฝึกเป็นสี · มีเกมสั้น ๆ ให้พ่อแม่เล่นต่อ</p></div>
+    <div><div class="a4 cert"><div class="cert-in"><img class="cert-cup" src="art/v2/crab.svg" alt=""><div class="cert-t">ใบประกาศ</div><div class="cert-s">นักผจญภัยเสียง ก</div><div class="cert-n">น้องฟ้า</div><div class="cert-p">ฝึกครบ 6 ด่าน · ได้ดาว 30 ดวง · สติกเกอร์ 14 ดวง</div><div class="cert-d">23 พฤศจิกายน 2569</div><div class="cert-sign"><span>ผู้ปกครอง</span><span>ครู</span></div></div></div><p class="frame-label"><b>ใบประกาศ</b> · พิมพ์เมื่อจบการผจญภัย · มีที่เซ็นของผู้ปกครองและครู</p></div>
+  </div>
+  <div class="grid2" style="margin-top:18px"><div class="box"><h3>ทำไมบัตรคำสำคัญที่สุด</h3><p style="margin:0;color:var(--muted)">พาการฝึกออกจากจอไปอยู่ในชีวิตประจำวัน ซึ่งเป็นขั้น "ลองใช้จริง" ของหลักสูตรอยู่แล้ว และพ่อแม่รู้ว่าควรพูดคำไหนกับลูก</p></div><div class="box"><h3>ทางเลือกเพิ่มทีหลัง</h3><p style="margin:0;color:var(--muted)">ภาพระบายสี (เส้นขอบของสติกเกอร์), ตารางสะสมดาวรายสัปดาห์ติดตู้เย็น</p></div></div>
+</section>
+<div class="part" id="part3"><span>ส่วนที่ 3</span><h2>คู่มือที่ดูแล้วเข้าใจ</h2><p>พี่ปูสอนเล่นเป็นภาพเคลื่อนไหว และป้ายแนะนำครั้งแรก</p></div>
+<section class="block" id="guide">
+  <h2>5 · คู่มือ: ดูพี่ปูสอนเล่น</h2>
+  <p class="lead">แทนรายการข้อความ 5 ข้อ ด้วยภาพเคลื่อนไหวสั้น ๆ ที่ใช้หน้าจอเกมจริง (ในไวร์เฟรมนี้ขยับจริง) · แก้หน้าเกมเมื่อไร คู่มือก็ตรงตามเอง ไม่ต้องอัดคลิปใหม่</p>
+  <div class="compare"><div><p class="col-title now">ปัจจุบัน</p><div class="desk before pc-only"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · คู่มือ</span></div><div class="shot"><img src="before/pc/adult/guide.jpg" alt=""></div></div><div class="phone before phone-only"><img src="before/adult/guide.jpg" alt=""></div></div><div><p class="col-title new">แบบใหม่</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · คู่มือ</span></div><div class="site"><aside class="site-nav"><div class="site-brand"><span class="logo"><svg><use href="#i-mic"/></svg></span>Speech<small>Adventure</small></div><span class="">หน้าหลัก</span><span class="on">ฝึกและเรียน</span><span class="">ผลการฝึก</span><span class="">พิมพ์ให้น้อง</span><span class="">ข้อมูลลูก</span><span class="">ตั้งค่า</span></aside><main class="site-main"><div class="site-title"><svg><use href="#i-help"/></svg><b>คู่มือ</b><small>ดูพี่ปูสอนเล่น แล้วลองเล่นเองได้เลย</small></div><div class="guide-layout"><div><div class="player"><div class="pf f1"><div class="mini-mic"><svg><use href="#i-mic"/></svg></div><span class="finger"><svg><use href="#i-hand"/></svg></span><b>1 · กดค้างที่ไมค์ แล้วพูด</b></div><div class="pf f2"><div class="mini-river"><span class="s1"></span><span class="s2"></span><span class="s3"></span><img src="art/v2/crab.svg" alt=""></div><b>2 · ได้ยินเสียง 1 ครั้ง พี่ปูกระโดด 1 ก้าว</b></div><div class="pf f3"><div class="mini-faces"><span class="yes"><svg><use href="#i-smile"/></svg>ทำได้</span><span><svg><use href="#i-replay"/></svg>ฝึกอีก</span></div><b>3 · ผู้ใหญ่แตะผล 1 ครั้ง</b></div><div class="pf f4"><div class="mini-book"><div class="stk fresh"><span class="stk-pic"><img src="art/v2/banana.svg" alt=""></span><em>ใหม่!</em><small>กล้วย</small></div></div><b>4 · ได้สติกเกอร์ ดูผลได้ที่หน้าผลการฝึก</b></div><div class="player-bar"><span class="play"><svg><use href="#i-play"/></svg></span><i><b></b></i><small>0:40</small></div></div><div class="chapters"><span class="on">1 · เริ่มเล่น</span><span class="">2 · กดค้างพูด</span><span class="">3 · ผู้ใหญ่ให้ผล</span><span class="">4 · ดูผลและพิมพ์</span></div></div><div><span class="btn gold wide"><svg><use href="#i-play"/></svg>ลองเล่น 1 ข้อ (ไม่บันทึกผล)</span><div class="faq"><span><svg><use href="#i-mic-off"/></svg><b>ไมค์ไม่ทำงาน</b><small>เปิดสิทธิ์ไมค์ หรือเล่นแบบแตะจอ</small></span><span><svg><use href="#i-users"/></svg><b>เล่นด้วยกัน / เล่นเอง</b><small>ต่างกันยังไง เลือกแบบไหน</small></span><span><svg><use href="#i-chart"/></svg><b>ผลไปอยู่ไหน</b><small>ใครเห็นบ้าง ครูเห็นไหม</small></span><span><svg><use href="#i-shield"/></svg><b>เสียงลูกถูกเก็บไหม</b><small>ไม่เก็บถาวร ใช้ฟังในเครื่อง</small></span></div><div class="docs"><svg class="inl"><use href="#i-book"/></svg> เอกสารแนวคิดและแหล่งที่มา (สำหรับครูและผู้เชี่ยวชาญ) ›</div></div></div></main></div></div><p class="frame-label">บนคอม: วิดีโอซ้าย ลองเล่นและคำถามขวา</p></div></div><div class="phones phone-only"><div><div class="phone"><div class="adult-screen"><div class="hdr"><b>คู่มือ</b><small>ดูพี่ปูสอนเล่น 40 วินาที</small></div><div class="list"><div class="player"><div class="pf f1"><div class="mini-mic"><svg><use href="#i-mic"/></svg></div><span class="finger"><svg><use href="#i-hand"/></svg></span><b>1 · กดค้างที่ไมค์ แล้วพูด</b></div><div class="pf f2"><div class="mini-river"><span class="s1"></span><span class="s2"></span><span class="s3"></span><img src="art/v2/crab.svg" alt=""></div><b>2 · ได้ยินเสียง 1 ครั้ง พี่ปูกระโดด 1 ก้าว</b></div><div class="pf f3"><div class="mini-faces"><span class="yes"><svg><use href="#i-smile"/></svg>ทำได้</span><span><svg><use href="#i-replay"/></svg>ฝึกอีก</span></div><b>3 · ผู้ใหญ่แตะผล 1 ครั้ง</b></div><div class="pf f4"><div class="mini-book"><div class="stk fresh"><span class="stk-pic"><img src="art/v2/banana.svg" alt=""></span><em>ใหม่!</em><small>กล้วย</small></div></div><b>4 · ได้สติกเกอร์ ดูผลได้ที่หน้าผลการฝึก</b></div><div class="player-bar"><span class="play"><svg><use href="#i-play"/></svg></span><i><b></b></i><small>0:40</small></div></div><div class="chapters"><span class="on">1 · เริ่มเล่น</span><span class="">2 · กดค้างพูด</span><span class="">3 · ผู้ใหญ่ให้ผล</span><span class="">4 · ดูผลและพิมพ์</span></div><span class="btn gold wide"><svg><use href="#i-play"/></svg>ลองเล่น 1 ข้อ (ไม่บันทึกผล)</span><div class="faq"><span><svg><use href="#i-mic-off"/></svg><b>ไมค์ไม่ทำงาน</b><small>เปิดสิทธิ์ไมค์ หรือเล่นแบบแตะจอ</small></span><span><svg><use href="#i-users"/></svg><b>เล่นด้วยกัน / เล่นเอง</b><small>ต่างกันยังไง เลือกแบบไหน</small></span><span><svg><use href="#i-chart"/></svg><b>ผลไปอยู่ไหน</b><small>ใครเห็นบ้าง ครูเห็นไหม</small></span><span><svg><use href="#i-shield"/></svg><b>เสียงลูกถูกเก็บไหม</b><small>ไม่เก็บถาวร ใช้ฟังในเครื่อง</small></span></div></div></div></div><p class="frame-label">ภาพเคลื่อนไหวด้านบน (เปิดเสียงพี่ปูได้) · ลองเล่นจริง 1 ข้อ · คำถามที่เจอบ่อย</p></div></div></div><div class="notes"><div class="numbers"><div><b>5 ข้อความ → 4 ฉาก</b>วิธีเล่น</div><div><b>0</b>ไฟล์วิดีโอที่ต้องอัด</div></div>
+    <ul><li><span class="t-cut">ตัด</span> รายการข้อความวิธีใช้ 5 ข้อ</li><li><span class="t-add">เพิ่ม</span> ภาพเคลื่อนไหว 4 ฉาก + เสียงพี่ปู, ปุ่ม "ลองเล่น 1 ข้อ", คำถาม 4 ข้อ</li><li><span class="t-move">ย้าย</span> เอกสารแนวคิด / ไฟล์ดาวน์โหลด ไปล่างสุด (สำหรับครูและผู้เชี่ยวชาญ) · ล้างข้อมูลในเครื่อง ไปหน้าตั้งค่า</li><li>ทำจากหน้าจอจริงในโหมดสาธิต จึงไม่ต้องตัดต่อวิดีโอ ถ้าอยากได้คลิปจริงไว้แชร์ อัดจากตัวนี้ได้</li></ul></div></div>
+</section>
+<section class="block" id="tips">
+  <h2>6 · ป้ายแนะนำครั้งแรก</h2>
+  <p class="lead">เปิดแผนที่ครั้งแรกในเครื่องนี้: มืดลงเล็กน้อย ไฟส่อง 3 จุดทีละจุด แตะที่ไหนก็ได้เพื่อไปจุดถัดไป · ไม่ขึ้นอีกหลังจากนั้น (เปิดใหม่ได้จากคู่มือ)</p>
+  <div class="phones" style="gap:22px">
+    <div><div class="phone"><div class="kid"><div class="top"><span class="chip-sound">ก <small>เสียงที่ฝึก</small></span><span></span><span class="ibtn"><svg><use href="#i-book"/></svg></span><span class="ibtn"><svg><use href="#i-home"/></svg></span></div><div class="stage"><div class="mascot"><img class="pu" src="art/v2/crab.svg" alt="พี่ปู"><div class="bubble">วันนี้ไปกระโดดหินกัน!</div></div><div class="map-mini"><span style="left:28%;top:88%"><svg><use href="#i-star"/></svg></span><span style="left:70%;top:72%"><svg><use href="#i-star"/></svg></span><span style="left:28%;top:56%"></span><span style="left:70%;top:40%"></span><span style="left:28%;top:24%"></span><span style="left:70%;top:8%"></span></div><span class="btn gold spot" style="flex:none;width:180px"><svg><use href="#i-play"/></svg>ไปต่อ</span></div><span class="adult"><svg><use href="#i-user"/></svg>ผู้ใหญ่</span><div class="coach"><p>1 / 3 · ปุ่มทอง = เริ่มเล่นด่านต่อไป</p><small>แตะเพื่อไปต่อ</small></div></div></div><p class="frame-label">1 / 3 · ปุ่มทอง = เริ่มเล่นด่านต่อไป</p></div><div><div class="phone"><div class="kid"><div class="top"><span class="chip-sound">ก <small>เสียงที่ฝึก</small></span><span></span><span class="ibtn"><svg><use href="#i-book"/></svg></span><span class="ibtn"><svg><use href="#i-home"/></svg></span></div><div class="stage"><div class="mascot"><img class="pu" src="art/v2/crab.svg" alt="พี่ปู"><div class="bubble">วันนี้ไปกระโดดหินกัน!</div></div><div class="map-mini"><span style="left:28%;top:88%"><svg><use href="#i-star"/></svg></span><span style="left:70%;top:72%"><svg><use href="#i-star"/></svg></span><span style="left:28%;top:56%"></span><span style="left:70%;top:40%"></span><span style="left:28%;top:24%"></span><span style="left:70%;top:8%"></span></div><span class="btn gold" style="flex:none;width:180px"><svg><use href="#i-play"/></svg>ไปต่อ</span></div><span class="adult spot"><svg><use href="#i-user"/></svg>ผู้ใหญ่</span><div class="coach"><p>2 / 3 · ผู้ใหญ่ดูวิธีเล่น ตั้งค่า และผลได้ตรงนี้</p><small>แตะเพื่อไปต่อ</small></div></div></div><p class="frame-label">2 / 3 · ผู้ใหญ่ดูวิธีเล่น ตั้งค่า และผลได้ตรงนี้</p></div><div><div class="phone"><div class="kid"><div class="top"><span class="chip-sound">ก <small>เสียงที่ฝึก</small></span><span></span><span class="ibtn spot"><svg><use href="#i-book"/></svg></span><span class="ibtn spot"><svg><use href="#i-home"/></svg></span></div><div class="stage"><div class="mascot"><img class="pu" src="art/v2/crab.svg" alt="พี่ปู"><div class="bubble">วันนี้ไปกระโดดหินกัน!</div></div><div class="map-mini"><span style="left:28%;top:88%"><svg><use href="#i-star"/></svg></span><span style="left:70%;top:72%"><svg><use href="#i-star"/></svg></span><span style="left:28%;top:56%"></span><span style="left:70%;top:40%"></span><span style="left:28%;top:24%"></span><span style="left:70%;top:8%"></span></div><span class="btn gold" style="flex:none;width:180px"><svg><use href="#i-play"/></svg>ไปต่อ</span></div><span class="adult"><svg><use href="#i-user"/></svg>ผู้ใหญ่</span><div class="coach"><p>3 / 3 · บ้าน = กลับหน้าหลัก สมุด = ดูสติกเกอร์</p><small>แตะเพื่อไปต่อ</small></div></div></div><p class="frame-label">3 / 3 · บ้าน = กลับหน้าหลัก สมุด = ดูสติกเกอร์</p></div>
+  </div>
+</section>
+<div class="part" id="part4"><span>ส่วนที่ 4</span><h2>หน้าผู้ใหญ่ที่เรียบขึ้น</h2><p>รวมหน้าที่ซ้ำ ให้ตัวเลขตรงกัน และพาไปสิ่งที่ต้องทำต่อ</p></div>
+<section class="block" id="tabs">
+  <h2>7 · เมนูห้องฝึก: 6 แท็บ → 4</h2>
+  <p class="lead">ตอนนี้มีหน้าที่ทำเรื่องเดียวกันหลายที่ (เส้นทางกับแผนที่, ผลการฝึกในห้องฝึกกับความก้าวหน้าในเมนูซ้าย, เลือกระดับ 2 ที่) ผู้ใหญ่เลยไม่แน่ใจว่าควรดูตรงไหน</p>
+  <div class="box"><p class="col-title now">ปัจจุบัน</p><div class="tabrow"><span class="on"><svg><use href="#i-home"/></svg>แผนวันนี้</span><span class=""><svg><use href="#i-map"/></svg>เส้นทางของฉัน</span><span class=""><svg><use href="#i-book"/></svg>คลังกิจกรรม</span><span class=""><svg><use href="#i-chart"/></svg>ผลการฝึก</span><span class=""><svg><use href="#i-sliders"/></svg>จัดชุดฝึก</span><span class=""><svg><use href="#i-help"/></svg>คู่มือ</span></div>
+  <p class="col-title new" style="margin-top:16px">แบบใหม่</p><div class="tabrow"><span class="on"><svg><use href="#i-home"/></svg>แผนวันนี้</span><span class=""><svg><use href="#i-chart"/></svg>ผลการฝึก</span><span class=""><svg><use href="#i-print"/></svg>สติกเกอร์และพิมพ์</span><span class=""><svg><use href="#i-sliders"/></svg>จัดชุดฝึก</span></div><span class="help-dot"><svg><use href="#i-help"/></svg> คู่มือ (ปุ่ม ? มุมขวา)</span></div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="box"><h3>ย้ายไปไหน</h3><ul><li><b>เส้นทางของฉัน</b> <span class="t-move">→</span> แผนที่ของเด็ก (เด็กเห็นเหมือนเดิม) + รายการด่านในจัดชุดฝึก (ผู้ใหญ่)</li><li><b>คลังกิจกรรม</b> <span class="t-move">→</span> ขั้น "เลือกข้อเอง" ในจัดชุดฝึก</li><li><b>ผลการฝึก</b> + เมนูซ้าย <b>ความก้าวหน้า</b> <span class="t-move">→</span> หน้าเดียว (ข้อ 9)</li><li><b>คู่มือ</b> <span class="t-move">→</span> ปุ่ม ? ทุกหน้า</li></ul></div>
+    <div class="box"><h3>ตัวเลขต้องตรงกันทุกที่</h3><ul><li>เสียงที่ฝึกและดาวในเมนูซ้ายอ่านจากห้องฝึกแล้ว (แก้แล้ววันนี้)</li><li>ข้อความ "ส่งเข้าระบบไม่สำเร็จ" ที่ขึ้นค้าง แก้แล้ว: เป็นผลที่โรงเรียนให้ครูยืนยัน ตอนนี้บอกตรง ๆ แทน</li><li>ชื่อเล่นและอายุใช้จากข้อมูลลูกที่เดียว ไม่ถามซ้ำในจัดชุดฝึก</li></ul></div>
+  </div>
+</section>
+<section class="block" id="today">
+  <h2>8 · แผนวันนี้</h2>
+  <p class="lead">หน้าแรกของผู้ใหญ่ในห้องฝึก: ปุ่มเดียวพาเด็กเข้าโลกของพี่ปู และบอก 2 เรื่องที่ผู้ใหญ่ควรทำต่อ · การเลือกระดับย้ายไปจัดชุดฝึก</p>
+  <div class="compare"><div><p class="col-title now">ปัจจุบัน</p><div class="desk before pc-only"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="shot"><img src="before/pc/adult/home.jpg" alt=""></div></div><div class="phone before phone-only"><img src="before/adult/home.jpg" alt=""></div></div><div><p class="col-title new">แบบใหม่</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="site"><aside class="site-nav"><div class="site-brand"><span class="logo"><svg><use href="#i-mic"/></svg></span>Speech<small>Adventure</small></div><span class="">หน้าหลัก</span><span class="on">ฝึกและเรียน</span><span class="">ผลการฝึก</span><span class="">พิมพ์ให้น้อง</span><span class="">ข้อมูลลูก</span><span class="">ตั้งค่า</span></aside><main class="site-main"><div class="tabrow"><span class="on"><svg><use href="#i-home"/></svg>แผนวันนี้</span><span class=""><svg><use href="#i-chart"/></svg>ผลการฝึก</span><span class=""><svg><use href="#i-print"/></svg>สติกเกอร์และพิมพ์</span><span class=""><svg><use href="#i-sliders"/></svg>จัดชุดฝึก</span></div><div class="today-hero"><div><small>น้องฟ้า · เสียง ก · ระดับ 2 คำให้คล่อง</small><b>พร้อมผจญภัยวันนี้</b><span class="btn gold" style="flex:none;width:280px"><svg><use href="#i-play"/></svg>เข้าโลกของพี่ปู</span><span class="today-strip"><span><svg><use href="#i-star"/></svg>ดาว 30</span><span><svg><use href="#i-book"/></svg>สติกเกอร์ 14/25</span><span><svg><use href="#i-flag"/></svg>ด่านต่อไป: กระโดดหิน</span></span></div><div class="today-map"><img src="art/v2/crab-beach.svg" alt=""></div></div><div class="today-row"><div class="todo"><svg><use href="#i-ear"/></svg><span><b>รอผู้ใหญ่ฟัง 12 ข้อ</b><small>ให้ผลตอนนี้ ใช้ราว 2 นาที</small></span><em>›</em></div><div class="todo"><svg><use href="#i-print"/></svg><span><b>สติกเกอร์ใหม่ 3 ดวง</b><small>พิมพ์ให้น้องติดสมุดจริง</small></span><em>›</em></div><div class="week"><b>สัปดาห์นี้</b><span><i class="on">จ</i><i class="">อ</i><i class="on">พ</i><i class="on">พฤ</i><i class="">ศ</i><i class="">ส</i><i class="on">อา</i></span><small>เล่นแล้ว 4 วัน</small></div></div></main></div></div><p class="frame-label">บนคอม: แถบเดียวบนสุด ใต้ลงมาเป็นการ์ดสิ่งที่ต้องทำ</p></div></div><div class="phones phone-only"><div><div class="phone"><div class="adult-screen"><div class="hdr today"><small>น้องฟ้า · เสียง ก · ระดับ 2 คำให้คล่อง</small><b style="font-size:22px">พร้อมผจญภัยวันนี้</b><span class="btn gold wide" style="margin-top:12px"><svg><use href="#i-play"/></svg>เข้าโลกของพี่ปู</span><span class="today-strip"><span><svg><use href="#i-star"/></svg>ดาว 30</span><span><svg><use href="#i-book"/></svg>สติกเกอร์ 14/25</span><span><svg><use href="#i-flag"/></svg>ด่านต่อไป: กระโดดหิน</span></span></div><div class="list"><div class="todo"><svg><use href="#i-ear"/></svg><span><b>รอผู้ใหญ่ฟัง 12 ข้อ</b><small>ให้ผลตอนนี้ ใช้ราว 2 นาที</small></span><em>›</em></div><div class="todo"><svg><use href="#i-print"/></svg><span><b>สติกเกอร์ใหม่ 3 ดวง</b><small>พิมพ์ให้น้องติดสมุดจริง</small></span><em>›</em></div><div class="week"><b>สัปดาห์นี้</b><span><i class="on">จ</i><i class="">อ</i><i class="on">พ</i><i class="on">พฤ</i><i class="">ศ</i><i class="">ส</i><i class="on">อา</i></span><small>เล่นแล้ว 4 วัน · เป้าหมาย 5 วัน</small></div></div></div></div><p class="frame-label">ปุ่มทองปุ่มเดียว · 2 เรื่องที่ควรทำต่อ · สัปดาห์นี้</p></div></div></div><div class="notes"><div class="numbers"><div><b>2.6 → 1</b>ความสูงบนมือถือ (จอ)</div><div><b>4 การ์ดระดับ → 0</b>ย้ายไปจัดชุดฝึก</div></div>
+    <ul><li><span class="t-cut">ตัด</span> การ์ดเลือกระดับ 4 ใบ, สถิติ 3 ช่องที่ซ้ำกับผลการฝึก, รายการด่าน 3 ด่านแรก (ซ้ำแผนที่)</li><li><span class="t-add">เพิ่ม</span> "รอผู้ใหญ่ฟัง" และ "สติกเกอร์ใหม่" เป็นการ์ดที่กดไปทำต่อได้ทันที, แถบสัปดาห์นี้</li><li>ปุ่มทองพาเข้าแผนที่ของเด็ก (เหมือนปุ่ม "ฝึกต่อ" ในเมนูซ้าย)</li></ul></div></div>
+</section>
+<section class="block" id="results">
+  <h2>9 · ผลการฝึก (รวมกับความก้าวหน้า)</h2>
+  <p class="lead">หน้าเดียวสำหรับดูผล · บนสุดคือสิ่งที่ผู้ใหญ่ทำได้ทันที: ข้อที่ยังรอฟัง แตะผลได้ในหน้านี้ ไม่ต้องเปิดทีละรอบ</p>
+  <div class="compare"><div><p class="col-title now">ปัจจุบัน</p><div class="desk before pc-only"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ฝึกและเรียน</span></div><div class="shot"><img src="before/pc/adult/progress.jpg" alt=""></div></div><div class="phone before phone-only"><img src="before/adult/progress.jpg" alt=""></div></div><div><p class="col-title new">แบบใหม่</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · ผลการฝึก</span></div><div class="site"><aside class="site-nav"><div class="site-brand"><span class="logo"><svg><use href="#i-mic"/></svg></span>Speech<small>Adventure</small></div><span class="">หน้าหลัก</span><span class="">ฝึกและเรียน</span><span class="on">ผลการฝึก</span><span class="">พิมพ์ให้น้อง</span><span class="">ข้อมูลลูก</span><span class="">ตั้งค่า</span></aside><main class="site-main"><div class="site-title"><svg><use href="#i-chart"/></svg><b>ผลการฝึก</b><small>น้องฟ้า · 7 วันที่ผ่านมา · <u>พิมพ์รายงาน</u></small></div><div class="results-layout"><div class="review"><div class="review-head"><b>รอผู้ใหญ่ฟัง 12 ข้อ</b><small>ฟังเสียงที่น้องพูด แล้วแตะผล</small></div><div class="rv"><img src="art/v2/clock.svg" alt=""><span><b>นาฬิกา</b><small>กระจกวิเศษ · วันนี้</small></span><span class="rv-play"><svg><use href="#i-play"/></svg></span><span class="rv-faces"><i class="yes"><svg><use href="#i-smile"/></svg></i><i><svg><use href="#i-replay"/></svg></i><i><svg><use href="#i-skip"/></svg></i></span></div><div class="rv"><img src="art/v2/crow.svg" alt=""><span><b>กา</b><small>การ์ดสติกเกอร์ · วันนี้</small></span><span class="rv-play"><svg><use href="#i-play"/></svg></span><span class="rv-faces"><i class="yes"><svg><use href="#i-smile"/></svg></i><i><svg><use href="#i-replay"/></svg></i><i><svg><use href="#i-skip"/></svg></i></span></div><div class="rv"><img src="art/v2/chicken.svg" alt=""><span><b>ไก่กินข้าว</b><small>รถไฟคำ · เมื่อวาน</small></span><span class="rv-play"><svg><use href="#i-play"/></svg></span><span class="rv-faces"><i class="yes"><svg><use href="#i-smile"/></svg></i><i><svg><use href="#i-replay"/></svg></i><i><svg><use href="#i-skip"/></svg></i></span></div></div><div><div class="kpi-row"><span><b>43</b>รอบ</span><span><b>39/42</b>ฟังเลือกถูก</span><span><b>47</b>ผู้ใหญ่ฟังแล้ว</span></div><div class="bars"><span><i style="height:6px"></i><small>อ</small></span><span><i style="height:18px"></i><small>พ</small></span><span><i style="height:6px"></i><small>พฤ</small></span><span><i style="height:6px"></i><small>ศ</small></span><span><i style="height:12px"></i><small>ส</small></span><span><i style="height:12px"></i><small>อา</small></span><span><i style="height:87px"></i><small>จ</small></span></div></div></div></main></div></div><p class="frame-label">บนคอม: ซ้ายรายการรอฟัง ขวาภาพรวม</p></div></div><div class="phones phone-only"><div><div class="phone"><div class="adult-screen"><div class="hdr"><b>ผลการฝึก</b><small>น้องฟ้า · 7 วันที่ผ่านมา</small></div><div class="list"><div class="review"><div class="review-head"><b>รอผู้ใหญ่ฟัง 12 ข้อ</b><small>ฟังเสียงที่น้องพูด แล้วแตะผล</small></div><div class="rv"><img src="art/v2/clock.svg" alt=""><span><b>นาฬิกา</b><small>กระจกวิเศษ · วันนี้</small></span><span class="rv-play"><svg><use href="#i-play"/></svg></span><span class="rv-faces"><i class="yes"><svg><use href="#i-smile"/></svg></i><i><svg><use href="#i-replay"/></svg></i><i><svg><use href="#i-skip"/></svg></i></span></div><div class="rv"><img src="art/v2/crow.svg" alt=""><span><b>กา</b><small>การ์ดสติกเกอร์ · วันนี้</small></span><span class="rv-play"><svg><use href="#i-play"/></svg></span><span class="rv-faces"><i class="yes"><svg><use href="#i-smile"/></svg></i><i><svg><use href="#i-replay"/></svg></i><i><svg><use href="#i-skip"/></svg></i></span></div><div class="rv"><img src="art/v2/chicken.svg" alt=""><span><b>ไก่กินข้าว</b><small>รถไฟคำ · เมื่อวาน</small></span><span class="rv-play"><svg><use href="#i-play"/></svg></span><span class="rv-faces"><i class="yes"><svg><use href="#i-smile"/></svg></i><i><svg><use href="#i-replay"/></svg></i><i><svg><use href="#i-skip"/></svg></i></span></div></div><div class="kpi-row"><span><b>43</b>รอบ</span><span><b>39/42</b>ฟังเลือกถูก</span><span><b>47</b>ผู้ใหญ่ฟังแล้ว</span></div></div></div></div><p class="frame-label">ข้อรอฟังอยู่บนสุด: ฟังเสียง → แตะหน้ายิ้ม / ฝึกอีก / ข้าม</p></div></div></div><div class="notes"><div class="numbers"><div><b>2 หน้า → 1</b>ผลการฝึก + ความก้าวหน้า</div><div><b>39 → 12</b>ข้อค้าง (ตัวอย่างหลังผู้ใหญ่ให้ผลข้างเด็ก)</div></div>
+    <ul><li><span class="t-add">เพิ่ม</span> รายการ "รอผู้ใหญ่ฟัง" แตะผลได้ในบรรทัดเดียว</li><li><span class="t-move">ย้าย</span> สำรองข้อมูล / ส่งออก JSON ไปตั้งค่า · พิมพ์ไปหน้ารายงาน</li><li><b>ต้องตัดสินใจ:</b> ปุ่มฟังเสียงต้องเก็บเสียงไว้ในเครื่องชั่วคราว (เช่น 7 วัน แล้วลบเอง) · ถ้าไม่เก็บ แถวนี้ให้ผลจากความจำได้อย่างเดียว</li><li>ข้อของนักเรียนที่โรงเรียนให้ครูยืนยัน: แสดงเป็น "ครูจะฟัง" ไม่ให้แตะ</li></ul></div></div>
+</section>
+<section class="block" id="setup">
+  <h2>10 · จัดชุดฝึก: 3 คำถาม ทีละหน้า</h2>
+  <p class="lead">ตอนนี้เป็นฟอร์มยาวหน้าเดียว (เป้าหมาย ข้อมูลเด็กซ้ำ เสียง ระดับ จุดเริ่ม เลือกรายข้อ) · แบบใหม่ถาม 3 เรื่องที่จำเป็น ที่เหลือเป็น "ตั้งค่าเพิ่มเติม"</p>
+  <div class="compare"><div><p class="col-title now">ปัจจุบัน</p><div class="desk before pc-only"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · จัดชุดฝึก</span></div><div class="shot"><img src="before/pc/adult/plan.jpg" alt=""></div></div><div class="phone before phone-only"><img src="before/adult/plan.jpg" alt=""></div></div><div><p class="col-title new">แบบใหม่</p><div class="desks pc-only"><div><div class="desk"><div class="chrome"><i></i><i></i><i></i><span class="url">Speech Adventure · จัดชุดฝึก</span></div><div class="site"><aside class="site-nav"><div class="site-brand"><span class="logo"><svg><use href="#i-mic"/></svg></span>Speech<small>Adventure</small></div><span class="">หน้าหลัก</span><span class="on">ฝึกและเรียน</span><span class="">ผลการฝึก</span><span class="">พิมพ์ให้น้อง</span><span class="">ข้อมูลลูก</span><span class="">ตั้งค่า</span></aside><main class="site-main"><div class="tabrow"><span class=""><svg><use href="#i-home"/></svg>แผนวันนี้</span><span class=""><svg><use href="#i-chart"/></svg>ผลการฝึก</span><span class=""><svg><use href="#i-print"/></svg>สติกเกอร์และพิมพ์</span><span class="on"><svg><use href="#i-sliders"/></svg>จัดชุดฝึก</span></div><div class="setup-3"><div><p class="col-title">1 · ฝึกเรื่องอะไร</p><div class="choice on"><img src="art/v2/mouth-word.svg" alt=""><span><b>ฝึกออกเสียงให้ชัด</b><small>ฟัง เลียนแบบ แล้วใช้ในคำและประโยค</small></span></div><div class="choice"><img src="art/v2/aunt.svg" alt=""><span><b>พูดเพื่อสื่อสาร</b><small>เข้าใจ ขอสิ่งที่ต้องการ เล่าเรื่อง</small></span></div><div class="choice"><img src="art/v2/school.svg" alt=""><span><b>เสียงกับตัวอักษร</b><small>สำหรับเด็กอนุบาล</small></span></div></div><div><p class="col-title">2 · เสียงไหน</p><div class="sound-grid"><span class="">ป</span><span class="on">ก</span><span class="">ม</span><span class="soon">ค<small>เร็ว ๆ นี้</small></span><span class="soon">ต<small>เร็ว ๆ นี้</small></span><span class="soon">ช<small>เร็ว ๆ นี้</small></span></div><p class="hint">เลือกเสียงที่น้องยังพูดไม่ชัด ครูหรือนักแก้ไขการพูดแนะนำได้</p></div><div><p class="col-title">3 · ระดับไหน</p><div class="choice"><span class="lv">1</span><span><b>เริ่มคุ้นเสียง</b><small>3–4 ปี</small></span></div><div class="choice on"><span class="lv">2</span><span><b>คำให้คล่อง</b><small>4–6 ปี · แนะนำตามอายุ</small></span></div><div class="choice"><span class="lv">3</span><span><b>เล่าให้เห็นภาพ</b><small>ป.1–3</small></span></div><div class="choice"><span class="lv">4</span><span><b>เล่าเรื่องและอธิบาย</b><small>ป.4–6</small></span></div><p class="hint">ไม่ใช่เกณฑ์พัฒนาการ ปรับได้ตลอด</p></div></div><div class="setup-foot"><span class="more">ตั้งค่าเพิ่มเติม: จุดเริ่ม · เลือกข้อเองจากคลังกิจกรรม ›</span><span class="btn gold" style="flex:none;width:260px">บันทึกแล้วเริ่มเล่น</span></div></main></div></div><p class="frame-label">บนคอม: 3 คำถามเรียงในหน้าเดียว</p></div></div><div class="phones phone-only"><div><div class="phone"><div class="adult-screen"><div class="hdr"><small>จัดชุดฝึก · 1 / 3</small><b>ฝึกเรื่องอะไร</b></div><div class="list"><div class="choice on"><img src="art/v2/mouth-word.svg" alt=""><span><b>ฝึกออกเสียงให้ชัด</b><small>ฟัง เลียนแบบ แล้วใช้ในคำและประโยค</small></span></div><div class="choice"><img src="art/v2/aunt.svg" alt=""><span><b>พูดเพื่อสื่อสาร</b><small>เข้าใจ ขอสิ่งที่ต้องการ เล่าเรื่อง</small></span></div><div class="choice"><img src="art/v2/school.svg" alt=""><span><b>เสียงกับตัวอักษร</b><small>สำหรับเด็กอนุบาล</small></span></div><span class="btn go wide">ถัดไป <svg><use href="#i-next"/></svg></span></div></div></div><p class="frame-label">1 · เป้าหมาย</p></div><div><div class="phone"><div class="adult-screen"><div class="hdr"><small>จัดชุดฝึก · 2 / 3</small><b>เสียงไหน</b></div><div class="list"><div class="sound-grid"><span class="">ป</span><span class="on">ก</span><span class="">ม</span><span class="soon">ค<small>เร็ว ๆ นี้</small></span><span class="soon">ต<small>เร็ว ๆ นี้</small></span><span class="soon">ช<small>เร็ว ๆ นี้</small></span></div><p class="hint">เลือกเสียงที่น้องยังพูดไม่ชัด ครูหรือนักแก้ไขการพูดแนะนำได้</p><span class="btn go wide">ถัดไป <svg><use href="#i-next"/></svg></span></div></div></div><p class="frame-label">2 · เสียง (เฉพาะที่มีเกมรองรับ)</p></div><div><div class="phone"><div class="adult-screen"><div class="hdr"><small>จัดชุดฝึก · 3 / 3</small><b>ระดับไหน</b></div><div class="list"><div class="choice"><span class="lv">1</span><span><b>เริ่มคุ้นเสียง</b><small>3–4 ปี</small></span></div><div class="choice on"><span class="lv">2</span><span><b>คำให้คล่อง</b><small>4–6 ปี · แนะนำตามอายุ</small></span></div><div class="choice"><span class="lv">3</span><span><b>เล่าให้เห็นภาพ</b><small>ป.1–3</small></span></div><div class="choice"><span class="lv">4</span><span><b>เล่าเรื่องและอธิบาย</b><small>ป.4–6</small></span></div><p class="hint">ไม่ใช่เกณฑ์พัฒนาการ ปรับได้ตลอด</p><span class="btn gold wide">เสร็จ เริ่มเล่นได้เลย</span><span class="more">ตั้งค่าเพิ่มเติม: จุดเริ่ม · เลือกข้อเอง ›</span></div></div></div><p class="frame-label">3 · ระดับ แล้วเริ่มเล่น</p></div></div></div><div class="notes"><div class="numbers"><div><b>3</b>คำถามที่ต้องตอบ</div><div><b>6 → 3</b>เสียงที่ให้เลือก (เฉพาะที่ฝึกได้จริง)</div></div>
+    <ul><li><span class="t-cut">ตัด</span> ชื่อเล่นและช่วงอายุในฟอร์มนี้ (ใช้ข้อมูลลูกแทน), กล่อง "มีผู้ใหญ่ช่วย" (ใช้โหมดเล่นด้วยกัน/เล่นเองแทน)</li><li><span class="t-move">ย้าย</span> จุดเริ่มและเลือกรายข้อ (คลังกิจกรรมเดิม) ไป "ตั้งค่าเพิ่มเติม"</li><li>เสียงที่ยังไม่มีเกมแสดงเป็น "เร็ว ๆ นี้" แก้ปัญหาเลือก ค ต ช ตอนสมัครแล้วกลายเป็น ป</li></ul></div></div>
+</section>
+<section class="block" id="plan">
+  <h2>11 · แผนทำจริง</h2>
+  <p class="lead">ทำทีละชิ้น แต่ละชิ้นใช้ได้ทันทีเมื่อเสร็จ ไม่ต้องรอครบ</p>
+  <div class="phase-grid">
+    <div class="box"><h3>ก · สมุดสติกเกอร์ (ข้อ 1–2)</h3><ul><li>สติกเกอร์จากข้อที่เล่น ใช้ข้อมูลรอบเดิม</li><li>ปุ่มสมุดบนแผนที่ + ช่วงได้สติกเกอร์ใหม่</li><li>ครบหน้าได้ของแต่งตัวพี่ปู</li></ul></div>
+    <div class="box"><h3>ข · พิมพ์ให้น้อง (ข้อ 3–4)</h3><ul><li>หน้า A4 3 แบบด้วย CSS สำหรับพิมพ์</li><li>เมนูพิมพ์ในแถบผู้ใหญ่</li><li>ทดสอบพิมพ์จริงบนกระดาษสติกเกอร์</li></ul></div>
+    <div class="box"><h3>ค · คู่มือใหม่ (ข้อ 5–6)</h3><ul><li>โหมดสาธิตของหน้าเกม (ไม่บันทึกผล)</li><li>ภาพเคลื่อนไหว 4 ฉาก + เสียงพี่ปู</li><li>ป้ายแนะนำครั้งแรกบนแผนที่</li></ul></div>
+    <div class="box"><h3>ง · หน้าผู้ใหญ่ (ข้อ 7–10)</h3><ul><li>แท็บ 6 → 4 และย้ายหน้า</li><li>รวมผลการฝึกกับความก้าวหน้า + รายการรอฟัง</li><li>จัดชุดฝึก 3 คำถาม</li></ul></div>
+  </div>
+  <div class="box" style="margin-top:16px"><h3>ขอให้ช่วยตัดสินใจ</h3><ol>
+    <li>สติกเกอร์: ได้ทุกข้อที่ลองเล่น (เสนอ) หรือเฉพาะข้อที่ผู้ใหญ่ให้ "ทำได้"</li>
+    <li>เก็บเสียงเด็กไว้ในเครื่องชั่วคราวให้ผู้ใหญ่ฟังย้อนหลังได้ไหม (เช่น 7 วัน) → <a href="#results">ข้อ 9</a></li>
+    <li>กระดาษสติกเกอร์: แบบเต็มแผ่นตัดเอง (เสนอ) หรือแบบไดคัทวงกลมขนาดมาตรฐาน</li>
+    <li>ชื่อแท็บ "สติกเกอร์และพิมพ์" หรือ "ของรางวัล"</li>
+  </ol></div>
+</section>
+<script>
+(() => {
+  const buttons = [...document.querySelectorAll(".viewswitch button")];
+  const apply = (view) => {
+    document.body.classList.toggle("pc", view === "pc");
+    buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.view === view)));
+  };
+  apply(new URLSearchParams(location.search).get("view") || localStorage.getItem("wf-view") || "phone");
+  buttons.forEach((b) => b.addEventListener("click", () => {
+    apply(b.dataset.view);
+    localStorage.setItem("wf-view", b.dataset.view);
+    const url = new URL(location.href);
+    url.searchParams.set("view", b.dataset.view);
+    history.replaceState(null, "", url);
+  }));
+})();
+</script>
+</body>
+</html>

@@ -1,17 +1,19 @@
-// Packs docs/design/wireframes/kid-practice.html and every image it uses into one HTML file that can
+// Packs a wireframe in docs/design/wireframes and every image it uses into one HTML file that can
 // be sent by chat or email and opened by double-click. Screenshots are re-encoded as WebP to keep it small.
 // Fonts still load from Google Fonts, so the reader needs internet for the intended typefaces.
 //
-//   node scripts/design/bundle-wireframe.mjs
+//   node scripts/design/bundle-wireframe.mjs                  (kid-practice.html)
+//   node scripts/design/bundle-wireframe.mjs family-pages     (family-pages.html)
 //
-// Writes .learning-runtime/share/kid-practice-share.html (git-ignored; regenerate after changes).
+// Writes .learning-runtime/share/<name>-share.html (git-ignored; regenerate after changes).
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 
 const DIR = "docs/design/wireframes";
-const OUT = ".learning-runtime/share/kid-practice-share.html";
-let html = await readFile(path.join(DIR, "kid-practice.html"), "utf8");
+const NAME = (process.argv[2] ?? "kid-practice").replace(/\.html$/, "");
+const OUT = `.learning-runtime/share/${NAME}-share.html`;
+let html = await readFile(path.join(DIR, `${NAME}.html`), "utf8");
 
 const cache = new Map();
 async function dataUri(rel) {

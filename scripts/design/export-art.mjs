@@ -1,7 +1,8 @@
 // Renders the studio's own illustrations (src/features/learning-studio/Art.tsx) to static SVG files,
 // so design mockups use the real พี่ปู and picture cards instead of placeholders.
 //
-//   node scripts/design/export-art.mjs
+//   node scripts/design/export-art.mjs            (original set, art/)
+//   ART=v2 node scripts/design/export-art.mjs     (redrawn set, art/v2/)
 //
 // Writes docs/design/wireframes/art/<kind>.svg
 import { mkdir, writeFile } from "node:fs/promises";
@@ -9,8 +10,13 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { build } from "esbuild";
 
-const KINDS = ["crab", "mouth", "snake", "fish", "backpack", "banana", "crab-beach", "crab-box", "ball", "cup", "chicken", "cat", "shrimp", "clock"];
-const OUT = "docs/design/wireframes/art";
+// The approved kid-practice wireframe keeps its original pictures in art/; later wireframes use the
+// redrawn set:  ART=v2 node scripts/design/export-art.mjs  →  art/v2/<kind>.svg (every kind in use).
+const V2 = process.env.ART === "v2";
+const KINDS = V2
+  ? "crab crab-beach crab-box crow-box horse-box chicken-rice crow-tree cat-fish horse-garden box garden backpack clock cup ball coconut banana school cat mangosteen crow chicken hand horse fish pen umbrella market snake eye shrimp aunt rice tree mouth-word".split(" ")
+  : ["crab", "mouth", "snake", "fish", "backpack", "banana", "crab-beach", "crab-box", "ball", "cup", "chicken", "cat", "shrimp", "clock"];
+const OUT = V2 ? "docs/design/wireframes/art/v2" : "docs/design/wireframes/art";
 const TMP = ".learning-runtime/export-art";
 await mkdir(OUT, { recursive: true });
 await mkdir(TMP, { recursive: true });
