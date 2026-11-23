@@ -431,6 +431,16 @@ export function LearningStudio({
     [...stages.slice(currentIndex), ...stages.slice(0, currentIndex)].find(
       (s) => !finishedStages.has(s.id),
     ) ?? currentStage;
+  /** Kid screens move forward from the stage just played: the very next one (none after the last). */
+  const stageAfter = (stageId: string) => {
+    const i = stages.findIndex((s) => s.id === stageId);
+    return i < 0 ? undefined : stages[i + 1];
+  };
+  const lastPlayed = completed
+    .filter((x) => x.planId === state.plan.id)
+    .reduce<Session | undefined>((a, b) => (!a || (b.completedAt ?? "") > (a.completedAt ?? "") ? b : a), undefined);
+  /** Where พี่ปู waits on the map: after the last stage played; from the start when the round of stages is done. */
+  const mapNext = (lastPlayed && stageAfter(lastPlayed.stageId)) ?? (lastPlayed ? stages.find((s) => !finishedStages.has(s.id)) ?? stages[0] : nextStage);
   const continueLearning = () => {
     if (active) {
       go("practice");
@@ -465,6 +475,8 @@ export function LearningStudio({
   const sessionForSummary = state.sessions.find(
     (s) => s.id === state.lastCompletedId && s.childId === state.plan.childId,
   );
+  /** The round-end "ด่านต่อไป": the stage after the one just finished (none after the last stage). */
+  const roundNext = sessionForSummary ? stageAfter(sessionForSummary.stageId) : undefined;
   const reviewSession = state.sessions.find((s) => s.id === reviewId);
   const nav = [
     { id: "home", label: "แผนวันนี้" },
@@ -974,13 +986,13 @@ export function LearningStudio({
             <KidMap
               stages={stages}
               done={finishedStages}
-              next={nextStage}
+              next={mapNext}
               stars={completed
                 .filter((x) => x.planId === state.plan.id)
                 .reduce((n, x) => n + x.attempts.length, 0)}
               sound={state.plan.sound}
               onPick={(stage) => begin(stage)}
-              onGo={() => (active ? go("practice") : begin(nextStage))}
+              onGo={() => (active ? go("practice") : begin(mapNext))}
               onExit={() => go("home")}
             />
           )}
@@ -988,13 +1000,13 @@ export function LearningStudio({
             (sessionForSummary ? (
               <KidRoundEnd
                 session={sessionForSummary}
-                nextLabel={nextStage.id === sessionForSummary.stageId ? "กลับแผนที่" : "ด่านต่อไป"}
+                nextLabel={roundNext ? "ด่านต่อไป" : "กลับแผนที่"}
                 onAgain={() => {
                   const stage = stages.find((s) => s.id === sessionForSummary.stageId);
                   if (stage) begin(stage);
                   else go("play");
                 }}
-                onNext={() => (nextStage.id === sessionForSummary.stageId ? go("play") : begin(nextStage))}
+                onNext={() => (roundNext ? begin(roundNext) : go("play"))}
                 onAdult={() => go("summary")}
                 onMap={() => go("play")}
               />
