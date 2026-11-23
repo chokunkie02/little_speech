@@ -5,6 +5,7 @@ import { useStudioResultSync } from "./useStudioResultSync";
 import { CENTRAL_CHILD_ID, usePracticeItem } from "./usePracticeItem";
 import { KidPractice } from "./kid/KidPractice";
 import { usePracticeUi } from "./kid/preferences";
+import { KidMap, KidRoundEnd, KidStart } from "./kid/KidScreens";
 import AssessmentControls from "@/components/assessment/AssessmentControls";
 import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
 import RoundAdvice from "./RoundAdvice";
@@ -121,6 +122,8 @@ const routeFromHash = (): Route => {
     "practice",
     "summary",
     "guide",
+    "play",
+    "celebrate",
   ].includes(s)
     ? (s as Route)
     : "home";
@@ -321,7 +324,8 @@ export function LearningStudio({
   const [reviewId, setReviewId] = useState<string | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
   const [practiceUi, setPracticeUi] = usePracticeUi();
-  const PracticeView = practiceUi === "kid" ? KidPractice : Practice;
+  const kidMode = practiceUi === "kid";
+  const PracticeView = kidMode ? KidPractice : Practice;
   const commit = (
     next: AppState,
     event?: Omit<LearningEvent, "childId" | "planId">,
@@ -414,27 +418,28 @@ export function LearningStudio({
     go("practice");
   };
   const begin = (stage: Stage, ids?: string[]) => {
-    if (stage.items.some((i) => i.kind !== "choice"))
+    if (kidMode || stage.items.some((i) => i.kind !== "choice"))
       setStartRequest({ stage, ids });
     else start(stage, ids);
   };
+  const finishedStages = new Set(
+    completed.filter((x) => x.planId === state.plan.id).map((x) => x.stageId),
+  );
+  const nextStage =
+    [...stages.slice(currentIndex), ...stages.slice(0, currentIndex)].find(
+      (s) => !finishedStages.has(s.id),
+    ) ?? currentStage;
   const continueLearning = () => {
     if (active) {
       go("practice");
       return;
     }
-    const ordered = [
-      ...stages.slice(currentIndex),
-      ...stages.slice(0, currentIndex),
-    ];
-    const next =
-      ordered.find(
-        (s) =>
-          !completed.some(
-            (x) => x.planId === state.plan.id && x.stageId === s.id,
-          ),
-      ) ?? currentStage;
-    begin(next);
+    // The kid screens open on the adventure map; the child starts from there.
+    if (kidMode) {
+      go("play");
+      return;
+    }
+    begin(nextStage);
   };
   const chooseLevel = (level: LearningLevelId) => {
     if (level === getLevel(state.plan.level).id) return;
@@ -788,6 +793,8 @@ export function LearningStudio({
                         </div>
                         <Button
                           variant={current ? "primary" : "secondary"}
+                          // False positive: begin() reads stateRef only when clicked; stage is curriculum data.
+                          // eslint-disable-next-line react-hooks/refs
                           onClick={() => begin(stage)}
                         >
                           {done ? "ฝึกอีกครั้ง" : "เริ่มตรงนี้"}
@@ -836,6 +843,10 @@ export function LearningStudio({
                 session={active}
                 stages={getStages(active.track, active.sound, active.level)}
                 onPause={() => {
+                  if (kidMode) {
+                    go("play");
+                    return;
+                  }
                   setToast("พักรอบนี้ไว้แล้ว กลับมาฝึกต่อได้จากหน้าหลัก");
                   go("home");
                 }}
@@ -865,7 +876,7 @@ export function LearningStudio({
                         }
                       : undefined,
                   );
-                  if (r.done) go("summary");
+                  if (r.done) go(kidMode ? "celebrate" : "summary");
                 }}
               />
             ) : (
@@ -957,6 +968,41 @@ export function LearningStudio({
             />
           )}
           {route === "guide" && <Guide onReset={() => setResetOpen(true)} />}
+          {route === "play" && (
+            <KidMap
+              stages={stages}
+              done={finishedStages}
+              next={nextStage}
+              stars={completed
+                .filter((x) => x.planId === state.plan.id)
+                .reduce((n, x) => n + x.attempts.length, 0)}
+              sound={state.plan.sound}
+              onPick={(stage) => begin(stage)}
+              onGo={() => (active ? go("practice") : begin(nextStage))}
+              onExit={() => go("home")}
+            />
+          )}
+          {route === "celebrate" &&
+            (sessionForSummary ? (
+              <KidRoundEnd
+                session={sessionForSummary}
+                nextLabel={nextStage.id === sessionForSummary.stageId ? "กลับแผนที่" : "ด่านต่อไป"}
+                onAgain={() => {
+                  const stage = stages.find((s) => s.id === sessionForSummary.stageId);
+                  if (stage) begin(stage);
+                  else go("play");
+                }}
+                onNext={() => (nextStage.id === sessionForSummary.stageId ? go("play") : begin(nextStage))}
+                onAdult={() => go("summary")}
+                onMap={() => go("play")}
+              />
+            ) : (
+              <Empty
+                title="ยังไม่มีรอบที่จบ"
+                body="เล่นให้จบรอบ แล้วจะได้ฉลองที่นี่"
+                action={<Button onClick={() => go("play")}>ไปแผนที่</Button>}
+              />
+            ))}
         </section>
         <footer className="app-footer">
           <span>
@@ -984,7 +1030,14 @@ export function LearningStudio({
           }}
         />
       )}
-      {startRequest && (
+      {startRequest && kidMode && (
+        <KidStart
+          stage={startRequest.stage}
+          onStart={() => start(startRequest.stage, startRequest.ids)}
+          onBack={() => setStartRequest(null)}
+        />
+      )}
+      {startRequest && !kidMode && (
         <Modal
           title="เตรียมตัวก่อนเริ่มกัน"
           onClose={() => setStartRequest(null)}

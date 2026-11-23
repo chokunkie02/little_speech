@@ -150,7 +150,11 @@ async function shot(name, { full = false } = {}) {
 }
 
 try {
+  // These are the "before" pictures: use the classic practice screen, not the kid screens.
   await go("/training#path");
+  await evaluate(`localStorage.setItem("speech-adventure:practice-ui", "classic")`);
+  // A real reload (not a hash change) so the studio reads the setting.
+  await go("/training?ui=classic#path");
   await shot("01-path", { full: true });
 
   // Speech item: ดูปากและพูดตาม (stage 2)

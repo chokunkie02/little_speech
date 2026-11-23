@@ -10,6 +10,8 @@ export type Route =
   | "summary"
   | "progress"
   | "guide"
+  | "play"
+  | "celebrate"
   | "wireframes";
 export type Review = "pending" | "achieved" | "practice" | "unavailable";
 export interface Plan {

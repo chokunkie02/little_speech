@@ -195,6 +195,40 @@
 .kid-world .kw-sheet .kw-hint { background: var(--kw-surface-2); border-radius: 14px; padding: 10px 14px; font-size: 14px; line-height: 1.5; }
 @media (min-width: 820px) { .kid-world .kw-sheet-back { align-items: center; } .kid-world .kw-sheet { border-radius: 24px; } }
 
+/* ── Adventure map ── */
+.kid-world .kw-map-wrap { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 20px 18px; position: relative; z-index: 1; }
+.kid-world .kw-sound { position: absolute; left: 18px; top: -58px; height: 48px; padding: 0 14px; display: inline-flex; align-items: center; gap: 8px; border-radius: 16px; background: var(--kw-chip); border: 1px solid var(--kw-chip-line); font: 700 24px var(--kw-font-letter); }
+.kid-world .kw-sound small { font: 12px var(--kw-font-ui); color: var(--kw-muted); }
+.kid-world .kw-count { height: 48px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; border-radius: 16px; background: var(--kw-chip); border: 1px solid var(--kw-chip-line); font: 600 16px var(--kw-font-ui); }
+.kid-world .kw-count svg { width: 20px; height: 20px; fill: var(--kw-gold-1); color: var(--kw-gold-2); }
+.kid-world .kw-map { position: relative; width: 100%; max-width: 420px; flex: 1; min-height: 280px; margin-top: 26px; }
+.kid-world .kw-trail { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.kid-world .kw-trail path { fill: none; stroke: rgb(242 178 58 / 0.6); stroke-width: 5px; stroke-dasharray: 2 10; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.kid-world .kw-trail-d { display: none; }
+.kid-world .kw-node { position: absolute; left: var(--x-p); top: var(--y-p); transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 13px; color: var(--kw-muted); white-space: nowrap; }
+.kid-world .kw-disc { position: relative; width: 54px; height: 54px; border-radius: 50%; background: var(--kw-surface); border: 3px solid var(--kw-line); display: grid; place-items: center; box-shadow: 0 5px 0 rgb(40 30 110 / 0.3); }
+.kid-world .kw-disc > svg { width: 70%; height: 70%; border-radius: 50%; }
+.kid-world .kw-node.done .kw-disc { border-color: var(--kw-gold-2); }
+.kid-world .kw-node.now { color: var(--kw-text); font-size: 15px; z-index: 1; }
+.kid-world .kw-node.now .kw-disc { width: 70px; height: 70px; border-color: var(--kw-gold-1); box-shadow: 0 5px 0 rgb(40 30 110 / 0.3), 0 0 0 8px rgb(255 213 138 / 0.2), 0 0 26px 4px rgb(255 213 138 / 0.45); }
+.kid-world .kw-badge { position: absolute; top: -6px; right: -8px; width: 24px; height: 24px; border-radius: 50%; background: var(--kw-gold-1); display: grid; place-items: center; box-shadow: 0 2px 0 var(--kw-gold-edge); }
+.kid-world .kw-badge svg { width: 14px; height: 14px; fill: #2A1D05; color: #2A1D05; }
+.kid-world svg.kw-here { position: absolute; bottom: calc(100% - 22px); width: 48px; height: auto; }
+.kid-world .kw-card-icon { width: min(240px, 60vw); }
+.kid-world .kw-node-name { padding: 0 8px; border-radius: 999px; background: color-mix(in srgb, var(--kw-bg) 75%, transparent); }
+.kid-world .kw-map-wrap > .kw-btn.gold { margin-bottom: 52px; }
+@media (min-width: 820px) { .kid-world .kw-map-wrap > .kw-btn.gold { margin-bottom: 8px; } }
+@media (min-width: 820px) and (min-aspect-ratio: 1/1) {
+  .kid-world .kw-map { max-width: 1040px; min-height: 300px; margin-top: 10px; }
+  .kid-world .kw-trail-p { display: none; }
+  .kid-world .kw-trail-d { display: block; }
+  .kid-world .kw-node { left: var(--x-d); top: var(--y-d); font-size: 17px; }
+  .kid-world .kw-node.now { font-size: 20px; }
+  .kid-world .kw-disc { width: 80px; height: 80px; border-width: 4px; }
+  .kid-world .kw-node.now .kw-disc { width: 100px; height: 100px; }
+  .kid-world svg.kw-here { width: 72px; }
+}
+
 /* Notices inside the kid world stay calm and small */
 .kid-world .kw-note { font: 13px var(--kw-font-ui); color: var(--kw-muted); text-align: center; max-width: 360px; }
 
