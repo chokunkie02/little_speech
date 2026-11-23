@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import { ArrowRight, BookOpen, ChartColumn, Check, LogOut, Map as MapIcon, Mic, Play, RotateCcw, Star } from "lucide-react";
+import { ArrowRight, Award, BookOpen, ChartColumn, Check, LogOut, Map as MapIcon, Mic, Play, RotateCcw, Star } from "lucide-react";
 import { Art } from "../Art";
 import type { Attempt, Session, Stage } from "../types";
 import { VOICE_CUES, useSpeaker } from "../useSpeaker";
@@ -485,6 +485,7 @@ export function KidFinale({
   stages,
   latest,
   stickers,
+  onPrint,
   onAgain,
   onPick,
   onMap,
@@ -495,6 +496,8 @@ export function KidFinale({
   latest: Map<string, Session>;
   /** Stickers in the book. */
   stickers: number;
+  /** Adult: print the certificate. */
+  onPrint: () => void;
   onAgain: () => void;
   /** Play a station that was skipped. */
   onPick: (stage: Stage) => void;
@@ -595,6 +598,10 @@ export function KidFinale({
         head={`ผู้ใหญ่: ทั้งการผจญภัย ทำได้ ${totals.good} · ยังต้องฝึก ${totals.practice} · รอผู้ใหญ่ฟัง ${totals.pending} (จาก ${totals.total} ข้อ)`}
       >
         <div className="kw-faces">
+          <button type="button" onClick={onPrint}>
+            <Award />
+            พิมพ์ใบประกาศ
+          </button>
           <button type="button" onClick={onAdult}>
             <ChartColumn />
             ดูผลการฝึกทั้งหมด

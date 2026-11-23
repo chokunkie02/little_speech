@@ -10,6 +10,7 @@ await build({
     "src/features/learning-studio/kid/voice-activity.ts",
     "src/features/learning-studio/kid/games.ts",
     "src/features/learning-studio/kid/stickers.ts",
+    "src/features/learning-studio/printables.ts",
     "src/features/learning-studio/curriculum.ts",
   ],
   bundle: true,
@@ -21,6 +22,7 @@ await build({
 const voice = await import("../../.learning-runtime/tests/kid/kid/voice-activity.js");
 const games = await import("../../.learning-runtime/tests/kid/kid/games.js");
 const stickers = await import("../../.learning-runtime/tests/kid/kid/stickers.js");
+const printables = await import("../../.learning-runtime/tests/kid/printables.js");
 const { getStages } = await import("../../.learning-runtime/tests/kid/curriculum.js");
 
 let checks = 0;
@@ -153,6 +155,24 @@ check("Sticker book: earned once, in the round where it first appeared", () => {
   assert.deepEqual(stickers.stickersOfRound(later), [kind]);
   assert(stickers.stickerCatalog(getStages("speech", "ป", "starter")).includes(kind));
   assert.equal(stickers.stickerSource(getStages("speech", "ป", "starter"), kind).id, stage.id);
+});
+check("Take-home word cards: words with the practised sound, each with a sticker picture", () => {
+  for (const sound of ["ป", "ก", "ม"])
+    for (const level of ["starter", "explorer", "builder", "storyteller"]) {
+      const cards = printables.homeWordCards(getStages("speech", sound, level), sound);
+      assert(cards.length >= 3, `${sound}/${level}: only ${cards.length} cards`);
+      assert(cards.length <= 8);
+      assert.equal(new Set(cards.map((c) => c.word)).size, cards.length, "duplicate word");
+      for (const c of cards) {
+        assert(c.word.includes(sound), c.word);
+        assert(stickers.STICKERS[c.art], c.art);
+        assert(!/\s/.test(c.word), c.word);
+      }
+    }
+  // The practised sound is coloured with its marks; the rest of the word stays whole.
+  const marked = printables.markSound("กล้วย", "ก");
+  assert.deepEqual(marked, [{ text: "ก", hit: true }, { text: "ล้วย", hit: false }]);
+  assert.equal(printables.markSound("แก้ว", "ก").find((p) => p.hit).text, "ก้");
 });
 const css = postcss.parse(await readFile("src/features/learning-studio/kid/kid.css", "utf8"));
 check("Kid screen styles stay inside .kid-world", () => {

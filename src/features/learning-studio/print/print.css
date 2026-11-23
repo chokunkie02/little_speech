@@ -1,0 +1,64 @@
+/* Print-at-home sheets (A4). Not processed by learning:prepare: sheets keep their own print colours.
+   Every selector is scoped to .sa-sheet / .sa-print-*, or to body.sa-printing (set only while the
+   print dialog is open), so nothing here touches the rest of the site. */
+
+.sa-sheet {
+  width: 210mm;
+  height: 297mm;
+  background: #ffffff;
+  color: #1e1a4a;
+  font-family: "Kanit", "Noto Sans Thai", sans-serif;
+  padding: 14mm 14mm 12mm;
+  display: flex;
+  flex-direction: column;
+  gap: 7mm;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.sa-sheet *, .sa-sheet *::before, .sa-sheet *::after { box-sizing: border-box; }
+.sa-sheet-head { text-align: center; }
+.sa-sheet-head b { display: block; font-size: 22pt; font-weight: 600; line-height: 1.2; }
+.sa-sheet-head small { display: block; font-size: 10pt; color: #6b6790; }
+.sa-sheet-foot { margin-top: auto; text-align: center; font-size: 10pt; color: #6b6790; }
+.sa-sheet .art { width: 100%; height: 100%; display: block; }
+
+/* Sticker sheet: 4 × 5 circles with a dashed cut line */
+.sa-stickers { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6mm 5mm; }
+.sa-stickers span { aspect-ratio: 1; border-radius: 50%; border: 0.5mm dashed #b8b3d9; display: grid; place-items: center; padding: 3mm; }
+
+/* Word cards: 2 × 4 */
+.sa-cards { flex: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: repeat(4, 1fr); gap: 4mm; min-height: 0; }
+.sa-cards > div { border: 0.5mm dashed #b8b3d9; border-radius: 4mm; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2mm; padding: 3mm; min-height: 0; }
+.sa-cards .sa-pic { width: 34mm; height: 26mm; }
+.sa-cards .sa-word { font-family: "Sarabun", "Noto Sans Thai", sans-serif; font-weight: 700; font-size: 26pt; line-height: 1.25; }
+.sa-cards .sa-hit { color: #e8574a; }
+
+/* Certificate */
+.sa-cert { padding: 10mm; }
+.sa-cert-in { flex: 1; border: 2.5mm double #c98b1c; border-radius: 6mm; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5mm; text-align: center; background: radial-gradient(circle at 50% 28%, #fff6d8, #ffffff 65%); padding: 12mm; }
+.sa-cert-crab { width: 62mm; height: 46mm; }
+.sa-cert-title { font-size: 40pt; font-weight: 600; color: #c98b1c; line-height: 1.1; }
+.sa-cert-sub { font-size: 18pt; }
+.sa-cert-name { font-family: "Sarabun", "Noto Sans Thai", sans-serif; font-weight: 700; font-size: 36pt; min-width: 110mm; border-bottom: 0.4mm solid #c9c5e8; padding: 0 8mm 2mm; min-height: 20mm; }
+.sa-cert-facts { display: flex; gap: 8mm; font-size: 13pt; }
+.sa-cert-facts b { display: block; font-size: 24pt; color: #5548d4; }
+.sa-cert-date { font-size: 12pt; color: #6b6790; }
+.sa-cert-sign { display: flex; gap: 24mm; margin-top: 10mm; font-size: 11pt; color: #6b6790; }
+.sa-cert-sign span { width: 55mm; border-top: 0.3mm solid #c9c5e8; padding-top: 2mm; }
+
+/* On screen: a scaled preview; the print copy stays hidden until the dialog opens */
+.sa-print-preview { width: 100%; max-width: 380px; aspect-ratio: 210 / 297; position: relative; overflow: hidden; border-radius: 8px; box-shadow: 0 18px 30px -16px rgb(0 0 0 / 0.55); background: #fff; }
+.sa-print-preview .sa-sheet { position: absolute; left: 0; top: 0; transform-origin: 0 0; transform: scale(var(--sa-scale, 0.45)); }
+.sa-print-root { display: none; }
+.sa-print-option { border: 2px solid transparent; }
+.sa-print-option[aria-pressed="true"] { border-color: #7b6cf6 !important; box-shadow: 0 0 0 4px rgb(123 108 246 / 0.28) !important; }
+
+@media print {
+  @page { size: A4; margin: 0; }
+  body.sa-printing > *:not(.sa-print-root) { display: none !important; }
+  body.sa-printing { background: #ffffff !important; margin: 0; }
+  body.sa-printing .sa-print-root { display: block; }
+  body.sa-printing .sa-sheet { break-after: page; page-break-after: always; }
+  body.sa-printing .sa-sheet:last-child { break-after: auto; page-break-after: auto; }
+  body.sa-printing .sa-sheet, body.sa-printing .sa-sheet * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}

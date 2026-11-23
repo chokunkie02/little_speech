@@ -9,6 +9,7 @@ import { KidFinale, KidMap, KidRoundEnd, KidStart, KidTravel } from "./kid/KidSc
 import { KidHomeContext } from "./kid/KidShell";
 import { KidStickerBook, readSeenStickers } from "./kid/StickerBook";
 import { stickerBook, stickersOfRound } from "./kid/stickers";
+import { PrintCenter, type PrintKind } from "./print/PrintCenter";
 import AssessmentControls from "@/components/assessment/AssessmentControls";
 import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
 import RoundAdvice from "./RoundAdvice";
@@ -129,6 +130,7 @@ const routeFromHash = (): Route => {
     "celebrate",
     "finale",
     "stickers",
+    "print",
   ].includes(s)
     ? (s as Route)
     : "home";
@@ -329,6 +331,12 @@ export function LearningStudio({
     route: Route;
   } | null>(null);
   /** Cutscene from the stage just finished to the next one (kid screens), on the page it was asked from. */
+  /** Which sheet the print page opens on (the end-of-adventure screen asks for the certificate). */
+  const [printKind, setPrintKind] = useState<PrintKind>("stickers");
+  const openPrint = (kind: PrintKind) => {
+    setPrintKind(kind);
+    go("print");
+  };
   const [travel, setTravel] = useState<{ from: Stage; to: Stage; route: Route } | null>(null);
   const [reviewId, setReviewId] = useState<string | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
@@ -1030,8 +1038,28 @@ export function LearningStudio({
               book={stickers}
               latestRoundId={state.lastCompletedId}
               onPlay={(stage) => begin(stage)}
+              onPrint={() => openPrint("stickers")}
               onMap={() => go("play")}
             />
+          )}
+          {route === "print" && (
+            <>
+              <SectionHead
+                eyebrow="พิมพ์ให้น้องที่บ้าน"
+                title="พิมพ์ให้น้อง"
+                body="สติกเกอร์ที่น้องเก็บได้ บัตรคำฝึกเสียงที่บ้าน และใบประกาศ เลือกแบบ ดูตัวอย่าง แล้วพิมพ์ได้เลย"
+              />
+              <PrintCenter
+                key={printKind}
+                initial={printKind}
+                childName={state.plan.childName || child?.name || ""}
+                sound={state.plan.sound}
+                stages={stages}
+                book={stickers}
+                stagesDone={finishedStages.size}
+                stars={completed.reduce((n, x) => n + x.attempts.length, 0)}
+              />
+            </>
           )}
           {route === "celebrate" && travel && travel.route === route && (
             <KidTravel
@@ -1054,6 +1082,7 @@ export function LearningStudio({
               stages={stages}
               latest={latestRounds}
               stickers={stickers.owned.size}
+              onPrint={() => openPrint("certificate")}
               onAgain={() => begin(stages[0])}
               onPick={(stage) => begin(stage)}
               onMap={() => go("play")}

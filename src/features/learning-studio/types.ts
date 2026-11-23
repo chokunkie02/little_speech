@@ -14,6 +14,7 @@ export type Route =
   | "celebrate"
   | "finale"
   | "stickers"
+  | "print"
   | "wireframes";
 export type Review = "pending" | "achieved" | "practice" | "unavailable";
 export interface Plan {

@@ -1,5 +1,5 @@
 import { useEffect, useEffectEvent, useState } from "react";
-import { BookOpen, Play, Star, X } from "lucide-react";
+import { BookOpen, Play, Printer, Star, X } from "lucide-react";
 import { Art } from "../Art";
 import type { Stage } from "../types";
 import { GAME_INFO, gameFor } from "./games";
@@ -70,6 +70,7 @@ export function KidStickerBook({
   book,
   latestRoundId,
   onPlay,
+  onPrint,
   onMap,
 }: {
   childId: string;
@@ -79,6 +80,8 @@ export function KidStickerBook({
   /** Stickers first earned in this round are marked "ใหม่!". */
   latestRoundId?: string;
   onPlay: (stage: Stage) => void;
+  /** Adult menu: print the stickers on sticker paper. */
+  onPrint: () => void;
   onMap: () => void;
 }) {
   const catalog = [...new Set([...stickerCatalog(stages), ...book.owned.keys()])].filter((k) => STICKERS[k]);
@@ -107,6 +110,8 @@ export function KidStickerBook({
       label="สมุดสติกเกอร์"
       onPause={onMap}
       back="map"
+      adultActions={[{ label: "พิมพ์สติกเกอร์ให้น้อง", icon: <Printer />, onSelect: onPrint }]}
+      adultNote={<p>สติกเกอร์ได้จากการลองเล่นทุกข้อที่มีภาพ ไม่ต้องตอบถูก · พิมพ์ลงกระดาษสติกเกอร์ A4 ให้น้องติดสมุดจริงได้</p>}
       right={
         <span className="kw-count" aria-label={`สติกเกอร์ ${ownedCount} จาก ${catalog.length} ดวง`}>
           <BookOpen />
