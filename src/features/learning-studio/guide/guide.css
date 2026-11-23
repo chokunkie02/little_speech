@@ -1,0 +1,67 @@
+/* The guide's animated walkthrough and FAQ. Scoped to .guide-*; the scenes inside use the kid screens'
+   own styles (an inline .kid-world). Not processed by learning:prepare. */
+
+.guide-walk { display: flex; flex-direction: column; gap: 14px; }
+.guide-walk-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.guide-walk-head h2 { margin: 0; }
+.guide-walk-head span { font-size: 13px; color: var(--muted); }
+
+.guide-player { border-radius: 18px; overflow: hidden; border: 1px solid var(--border); }
+.guide-player .kid-world.kw-inline { position: relative; inset: auto; z-index: auto; height: 360px; border-radius: 0; user-select: none; }
+.guide-stage { justify-content: space-between; align-items: center; padding: 18px 16px 14px; }
+.guide-scene { flex: 1; width: 100%; min-height: 0; display: grid; place-items: center; position: relative; animation: guide-in 0.4s ease-out; }
+@keyframes guide-in { from { opacity: 0; transform: translateY(10px); } }
+.guide-caption { margin: 8px 0 0; text-align: center; font-family: var(--kw-font-ui); font-size: 14px; line-height: 1.5; color: var(--kw-muted); max-width: 520px; }
+.guide-caption b { display: block; font-family: var(--kw-font-kid); font-weight: 400; font-size: 22px; color: var(--kw-text); }
+
+/* 1 · hold the mic */
+.guide-player .guide-mic { width: 120px; height: 120px; animation: guide-pulse 1.4s ease-in-out infinite; }
+@keyframes guide-pulse { 50% { box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.6), 0 7px 0 var(--kw-gold-edge), 0 0 0 26px rgb(255 213 138 / 0.18), 0 0 0 48px rgb(255 213 138 / 0.07); } }
+.guide-finger { position: absolute; left: calc(50% + 18px); top: calc(50% + 6px); width: 46px; height: 46px; color: #FFFFFF; filter: drop-shadow(0 3px 4px rgb(0 0 0 / 0.5)); animation: guide-press 1.4s ease-in-out infinite; }
+@keyframes guide-press { 0%, 100% { transform: translate(14px, 14px); } 40%, 70% { transform: translate(0, 0) scale(0.92); } }
+
+/* 2 · the real stepping stones */
+.guide-stones .kw-scene { max-width: 380px; }
+.guide-stones .kw-line { display: none; }
+
+/* 3 · the adult's one tap */
+.guide-faces { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; font-family: var(--kw-font-ui); }
+.guide-faces span { display: inline-flex; align-items: center; gap: 6px; min-height: 48px; padding: 0 18px; border-radius: 14px; font-size: 16px; color: var(--kw-text); background: var(--kw-surface-2); border: 1px solid var(--kw-line); }
+.guide-faces span svg { width: 18px; height: 18px; }
+.guide-faces .yes { color: var(--kw-success-text); background: var(--kw-success-soft); border-color: rgb(76 175 130 / 0.6); animation: guide-tap 1.6s ease-in-out infinite; }
+@keyframes guide-tap { 0%, 30%, 100% { transform: scale(1); } 45% { transform: scale(0.9); } 60% { transform: scale(1.06); box-shadow: 0 0 0 6px rgb(76 175 130 / 0.25); } }
+
+/* 4 · sticker into the book */
+.guide-earn { grid-template-columns: auto auto; gap: 40px; }
+.guide-earn-stk { width: 120px; animation: guide-fly 2.4s ease-in-out infinite; }
+@keyframes guide-fly { 0%, 20% { transform: none; opacity: 1; } 70% { transform: translate(150px, 10px) scale(0.3) rotate(20deg); opacity: 0.9; } 71%, 100% { transform: translate(150px, 10px) scale(0.3); opacity: 0; } }
+.guide-earn-book { width: 76px; height: 76px; border-radius: 20px; display: grid; place-items: center; background: var(--kw-primary); color: #FFFFFF; box-shadow: 0 6px 0 #3A2EA8; animation: guide-bump 2.4s ease-in-out infinite; }
+.guide-earn-book svg { width: 38px; height: 38px; }
+@keyframes guide-bump { 0%, 68% { transform: none; } 76% { transform: scale(1.15); } 86% { transform: none; } }
+
+/* Controls */
+.guide-bar { display: flex; align-items: stretch; gap: 8px; padding: 10px; background: var(--surface); border-top: 1px solid var(--border); }
+.guide-bar > button { flex: none; width: 40px; border-radius: 10px; display: grid; place-items: center; background: var(--primary-soft); color: var(--primary); }
+.guide-chapters { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.guide-chapters button { position: relative; overflow: hidden; text-align: left; font-size: 12px; line-height: 1.3; padding: 8px 8px 10px; border-radius: 10px; border: 1px solid var(--border); color: var(--muted); background: transparent; }
+.guide-chapters button.on { color: var(--text); border-color: var(--primary); }
+.guide-chapters i { position: absolute; left: 0; bottom: 0; height: 3px; width: 0; background: var(--primary); }
+.guide-chapters i.done { width: 100%; opacity: 0.35; }
+.guide-chapters i.run { animation: guide-progress linear forwards; }
+@keyframes guide-progress { to { width: 100%; } }
+@media (max-width: 640px) { .guide-chapters { grid-template-columns: 1fr 1fr; } .guide-player .kid-world.kw-inline { height: 380px; } }
+
+.guide-try { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; padding: 12px 22px; border-radius: 16px; font-size: 17px; font-weight: 600; color: #2A1D05; background: linear-gradient(180deg, #FFD58A, #F2B23A); box-shadow: inset 0 2px 0 rgb(255 255 255 / 0.6), 0 5px 0 #C98B1C; }
+.guide-try small { font-weight: 400; font-size: 13px; }
+.guide-try:active { transform: translateY(3px); box-shadow: none; }
+
+/* FAQ */
+.guide-faq { display: flex; flex-direction: column; gap: 8px; }
+.guide-faq h2 { margin: 0 0 4px; }
+.guide-faq details { border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; background: var(--surface); }
+.guide-faq summary { cursor: pointer; font-weight: 600; }
+.guide-faq p { margin: 8px 0 0; color: var(--muted); line-height: 1.6; }
+
+@media (prefers-reduced-motion: reduce) {
+  .guide-player .guide-mic, .guide-finger, .guide-faces .yes, .guide-earn-stk, .guide-earn-book { animation: none !important; }
+}

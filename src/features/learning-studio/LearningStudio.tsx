@@ -10,6 +10,8 @@ import { KidHomeContext } from "./kid/KidShell";
 import { KidStickerBook, readSeenStickers } from "./kid/StickerBook";
 import { stickerBook, stickersOfRound } from "./kid/stickers";
 import { PrintCenter, type PrintKind } from "./print/PrintCenter";
+import { GuideFaq, GuideWalkthrough } from "./guide/GuideWalkthrough";
+import { gameFor } from "./kid/games";
 import AssessmentControls from "@/components/assessment/AssessmentControls";
 import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
 import RoundAdvice from "./RoundAdvice";
@@ -131,6 +133,7 @@ const routeFromHash = (): Route => {
     "finale",
     "stickers",
     "print",
+    "demo",
   ].includes(s)
     ? (s as Route)
     : "home";
@@ -495,6 +498,36 @@ export function LearningStudio({
   const roundStage = sessionForSummary ? stages.find((s) => s.id === sessionForSummary.stageId) : undefined;
   /** The child's sticker book, worked out from every round they played (nothing new is stored). */
   const stickers = useMemo(() => stickerBook(state.sessions, state.plan.childId), [state.sessions, state.plan.childId]);
+  /**
+   * "ลองเล่น 1 ข้อ" from the guide: one real game item (stepping stones when the plan has them) on a
+   * throwaway round. It is never stored, and its child id is not an account child, so nothing is sent.
+   */
+  const makeDemoSession = (): Session | null => {
+    const stage =
+      stages.find((s) => s.items.some((i) => gameFor(i) === "stones")) ?? stages.find((s) => s.items.some((i) => i.kind === "speech")) ?? stages[0];
+    const item = stage?.items.find((i) => gameFor(i) === "stones") ?? stage?.items.find((i) => i.kind === "speech") ?? stage?.items[0];
+    if (!stage || !item) return null;
+    return {
+      id: "guide-demo",
+      childId: "guide-demo",
+      planId: "guide-demo",
+      track: state.plan.track,
+      sound: state.plan.sound,
+      level: state.plan.level,
+      stageId: stage.id,
+      stageLabel: stage.label,
+      itemIds: [item.id],
+      index: 0,
+      attempts: [],
+      status: "active",
+      startedAt: new Date(0).toISOString(),
+    };
+  };
+  const demoSession = route === "demo" ? makeDemoSession() : null;
+  const endDemo = () => {
+    go("guide");
+    setToast("จบการลองเล่นแล้ว · ข้อนี้ไม่ได้บันทึกผล");
+  };
   /** Latest finished round of each stage in this plan, for the end-of-adventure summary. */
   const latestRounds = new globalThis.Map<string, Session>();
   for (const round of completed.filter((x) => x.planId === state.plan.id)) {
@@ -1015,7 +1048,18 @@ export function LearningStudio({
               onStart={() => go("path")}
             />
           )}
-          {route === "guide" && <Guide onReset={() => setResetOpen(true)} />}
+          {route === "guide" && <Guide onReset={() => setResetOpen(true)} onTry={() => go("demo")} />}
+          {route === "demo" && demoSession && (
+            <KidPractice
+              key="guide-demo"
+              session={demoSession}
+              stages={stages}
+              onSave={() => {}}
+              onNext={endDemo}
+              onPause={endDemo}
+              onSwitchUi={endDemo}
+            />
+          )}
           {(route === "play" || (route === "practice" && !active && kidMode)) && (
             <KidMap
               stages={stages}
@@ -2666,8 +2710,11 @@ function ReviewModal({
 }
 function Guide({
   onReset,
+  onTry,
 }: {
   onReset: () => void;
+  /** "ลองเล่น 1 ข้อ": one real game item that saves nothing. */
+  onTry: () => void;
 }) {
   return (
     <>
@@ -2677,15 +2724,10 @@ function Guide({
         body="คู่มือการจัดชุดฝึก การใช้เสียง และการดูผลในเครื่องนี้"
       />
       <div className="guide-layout">
+        <div className="flex min-w-0 flex-col gap-5">
+        <GuideWalkthrough onTry={onTry} />
+        <GuideFaq />
         <section className="panel prose">
-          <h2>เริ่มทดลองในไม่กี่นาที</h2>
-          <ol>
-            <li>เปิดจัดชุดฝึก เลือกเป้าหมาย เสียง ช่วงวัย และจุดเริ่ม</li>
-            <li>เลือกช่วงฝึกจากเส้นทาง หรือเลือกทีละข้อในคลังกิจกรรม</li>
-            <li>กิจกรรมฟังให้เลือกภาพ กิจกรรมพูดให้อัดเสียงหรือกดจำลองคำตอบ</li>
-            <li>บันทึกทุกข้อและกดดูสรุปรอบ ผลการพูดจะรอผู้ใหญ่ตรวจ</li>
-            <li>เปิดผลการฝึกเพื่อตรวจรายข้อ พิมพ์ หรือส่งออกข้อมูล JSON</li>
-          </ol>
           <details>
             <summary>รายละเอียดระดับ เสียง และการเก็บข้อมูล</summary>
           <h2>สิ่งที่ต้นแบบทำได้</h2>
@@ -2738,6 +2780,7 @@ function Guide({
           </p>
           </details>
         </section>
+        </div>
         <aside>
           <section className="panel guide-download">
             <div className="guide-icon">
