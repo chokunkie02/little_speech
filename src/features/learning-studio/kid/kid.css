@@ -77,6 +77,7 @@
 .kid-world .kw-dots i { width: 28px; height: 9px; border-radius: 999px; background: rgb(127 120 200 / 0.28); display: block; }
 .kid-world .kw-dots i.on { background: linear-gradient(90deg, var(--kw-gold-1), var(--kw-gold-2)); }
 .kid-world .kw-spacer { width: 48px; flex: none; }
+.kid-world .kw-top-right { display: flex; align-items: center; gap: 10px; flex: none; }
 
 /* ── Stage ── */
 .kid-world .kw-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 8px 20px 16px; position: relative; z-index: 1; overflow-y: auto; }
@@ -206,12 +207,14 @@
 .kid-world .kw-stone.landed::after { content: ""; position: absolute; inset: -6px; border-radius: 50%; border: 3px solid rgb(255 255 255 / 0.8); opacity: 0; animation: kw-ripple 0.7s 0.32s ease-out !important; }
 @keyframes kw-pulse { 50% { transform: translate(-50%, -50%) scale(1.07); } }
 /* Themed steps (sky, forest, night): the picture is an SVG, the glow follows its shape */
-.kid-world .kw-stone[class*="kw-step-"]:not(.kw-step-river) { background: none; box-shadow: none; aspect-ratio: 100 / 64; width: clamp(70px, 21%, 124px); }
+.kid-world .kw-stone[class*="kw-step-"]:not(.kw-step-river) { background: none; box-shadow: none; aspect-ratio: 100 / 76; }
 .kid-world .kw-stone[class*="kw-step-"]:not(.kw-step-river) > svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 6px 4px rgb(0 0 0 / 0.25)); transition: filter 0.3s; }
 .kid-world .kw-stone[class*="kw-step-"]:not(.kw-step-river) > b { position: relative; }
 .kid-world .kw-stone.kw-step-sky.next > svg, .kid-world .kw-stone.kw-step-forest.next > svg, .kid-world .kw-stone.kw-step-night.next > svg { filter: drop-shadow(0 0 4px #FFD58A) drop-shadow(0 0 12px #FFD58A); }
 .kid-world .kw-stone.kw-step-sky:is(.passed, .landed) > svg, .kid-world .kw-stone.kw-step-forest:is(.passed, .landed) > svg, .kid-world .kw-stone.kw-step-night:is(.passed, .landed) > svg { filter: drop-shadow(0 0 4px #7DDBB0) drop-shadow(0 0 10px #7DDBB0); }
-.kid-world .kw-step-forest > b { color: #FFFFFF; transform: translateY(-22%); text-shadow: 0 2px 0 #A9382E, 0 0 6px rgb(0 0 0 / 0.35); }
+.kid-world .kw-step-forest > b { color: #FFFFFF; transform: translateY(-18%); text-shadow: 0 2px 0 #A9382E, 0 0 6px rgb(0 0 0 / 0.35); }
+.kid-world .kw-step-sky > b { transform: translateY(8%); }
+.kid-world .kw-stone[class*="kw-step-"]:not(.kw-step-river) > b { font-size: min(28px, 28cqw); }
 .kid-world .kw-step-night > b { color: #17305A; }
 @keyframes kw-sink { 40% { transform: translate(-50%, -42%) scale(1.04, 0.94); } }
 @keyframes kw-ripple { 0% { opacity: 1; transform: scale(0.9); } 100% { opacity: 0; transform: scale(1.6, 1.4); } }

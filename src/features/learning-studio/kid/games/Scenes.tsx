@@ -158,114 +158,228 @@ function Backdrop({
       <>
         <defs>
           <linearGradient id="kw-sky" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#8FD3FF" />
-            <stop offset="1" stopColor="#FFD9EC" />
+            <stop offset="0" stopColor="#6EC6FF" />
+            <stop offset=".65" stopColor="#BFE6FF" />
+            <stop offset="1" stopColor="#FFE3F1" />
           </linearGradient>
+          <radialGradient id="kw-sky-sun" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stopColor="#FFF6C9" />
+            <stop offset=".55" stopColor="#FFE27A" />
+            <stop offset="1" stopColor="#FFE27A" stopOpacity="0" />
+          </radialGradient>
         </defs>
         <rect width="400" height="240" fill="url(#kw-sky)" />
+        <circle cx="58" cy="44" r="42" fill="url(#kw-sky-sun)" />
         <circle
-          cx="52"
-          cy="40"
-          r="22"
+          cx="58"
+          cy="44"
+          r="18"
           fill="#FFE27A"
-          stroke="#F2B23A"
+          stroke="#F5B83D"
           strokeWidth="3"
         />
-        <g fill="#FFFFFF" opacity=".55">
-          <ellipse cx="170" cy="40" rx="30" ry="10" />
-          <ellipse cx="300" cy="28" rx="24" ry="8" />
-          <ellipse cx="250" cy="215" rx="34" ry="9" />
+        <g
+          fill="none"
+          stroke="#5A7FB8"
+          strokeWidth="2.2"
+          strokeLinecap="round"
+          opacity=".55"
+        >
+          <path d="M150 36 q6 -6 12 0 q6 -6 12 0" />
+          <path d="M186 52 q5 -5 10 0 q5 -5 10 0" />
         </g>
+        <g fill="#FFFFFF" opacity=".7">
+          <path d="M228 46 q4 -16 20 -12 q8 -14 24 -4 q16 -2 16 12 q8 6 -2 12 h-54 q-10 -4 -4 -8z" />
+          <path d="M318 30 q3 -10 14 -8 q6 -10 17 -3 q11 -1 11 8 q6 4 -1 8 h-38 q-7 -3 -3 -5z" />
+        </g>
+        {/* A sea of clouds along the bottom */}
         <path
-          d={`M${sx - 46} 168 q8 -26 30 -18 q10 -22 34 -8 q24 -4 24 22 q14 8 0 22 h-82 q-18 -6 -6 -18z`}
+          d={`M0 240 V214 ${Array.from({ length: 11 }, (_, i) => `q${i % 2 ? 12 : 16} ${i % 2 ? -20 : -24} 36 ${i % 3 ? -2 : 2}`).join(" ")} V240 Z`}
           fill="#FFFFFF"
-          stroke="#C9DDF2"
+          opacity=".9"
+        />
+        <path
+          d={`M0 240 V228 ${Array.from({ length: 10 }, () => "q20 -10 40 0").join(" ")} V240 Z`}
+          fill="#EAF4FF"
+        />
+        {/* Start: a big cloud to stand on */}
+        <path
+          d={`M${sx - 44} 170 q-10 -14 6 -22 q2 -20 26 -16 q12 -18 34 -6 q22 -6 26 14 q14 4 8 20 q-2 10 -14 10 h-74 q-14 0 -12 0z`}
+          fill="#FFFFFF"
+          stroke="#B8D3EE"
           strokeWidth="3"
         />
-        <g fill="none" strokeWidth="9" strokeLinecap="round">
+        {/* Goal: rainbow resting on two clouds */}
+        <g fill="none" strokeWidth="8" strokeLinecap="round">
           {[
             "#FF6B6B",
-            "#FFB443",
+            "#FFA94D",
             "#FFE27A",
             "#6FD08C",
-            "#6FB7FF",
+            "#5DADFF",
             "#A98BFF",
           ].map((c, i) => (
             <path
               key={c}
-              d={`M${gx - 50 + i * 7} 190 A${50 - i * 7} ${62 - i * 7} 0 0 1 ${gx + 50 - i * 7} 190`}
+              d={`M${gx - 46 + i * 7} 176 A${46 - i * 7} ${58 - i * 7} 0 0 1 ${gx + 46 - i * 7} 176`}
               stroke={c}
             />
           ))}
         </g>
         <path
-          d={`M${gx - 62} 200 q6 -16 22 -10 q12 -14 28 0 q12 -4 14 10z M${gx + 18} 200 q6 -16 22 -10 q12 -14 28 0 q12 -4 14 10z`}
+          d={`M${gx - 70} 184 q4 -14 20 -10 q8 -14 24 -2 q14 -2 12 12 z M${gx + 18} 184 q4 -14 20 -10 q8 -14 24 -2 q14 -2 12 12 z`}
           fill="#FFFFFF"
+          stroke="#B8D3EE"
+          strokeWidth="2.5"
         />
       </>
     );
   if (theme === "forest")
     return (
       <>
-        <rect width="400" height="240" fill="#BFE9FF" />
-        <circle cx="350" cy="36" r="18" fill="#FFE27A" />
-        {[30, 110, 200, 290, 370].map((x, i) => (
+        <defs>
+          <linearGradient id="kw-forest-sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#8ED8FF" />
+            <stop offset="1" stopColor="#DFF6FF" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="240" fill="url(#kw-forest-sky)" />
+        <circle
+          cx="342"
+          cy="40"
+          r="20"
+          fill="#FFE27A"
+          stroke="#F5B83D"
+          strokeWidth="3"
+        />
+        <g fill="#FFFFFF" opacity=".85">
+          <path d="M70 40 q3 -12 16 -9 q6 -11 19 -3 q12 -1 12 9 q6 5 -1 9 h-42 q-8 -3 -4 -6z" />
+          <path d="M210 26 q3 -9 12 -7 q5 -8 14 -2 q9 -1 9 7 q5 3 -1 7 h-31 q-6 -2 -3 -5z" />
+        </g>
+        {/* Far hills, then two rows of trees */}
+        <path
+          d="M0 112 Q60 70 130 98 Q200 66 270 96 Q340 70 400 92 V240 H0 Z"
+          fill="#A6DCA0"
+        />
+        {[
+          [26, 92, 30, "#5FB86A"],
+          [96, 84, 24, "#4FA35D"],
+          [176, 90, 28, "#5FB86A"],
+          [250, 82, 22, "#4FA35D"],
+          [312, 88, 30, "#5FB86A"],
+          [384, 86, 24, "#4FA35D"],
+        ].map(([x, y, r, c]) => (
           <g key={x}>
             <rect
-              x={x - 5}
-              y={70 + (i % 2) * 8}
-              width="10"
-              height="50"
-              fill="#9C6B3F"
+              x={(x as number) - 4}
+              y={y as number}
+              width="8"
+              height="34"
+              rx="3"
+              fill="#8A5A2B"
             />
             <circle
-              cx={x}
-              cy={62 + (i % 2) * 8}
-              r={26 + (i % 3) * 4}
-              fill={i % 2 ? "#5FB86A" : "#4FA35D"}
+              cx={x as number}
+              cy={y as number}
+              r={r as number}
+              fill={c as string}
+              stroke="#3E8A4B"
+              strokeWidth="2.5"
+            />
+            <circle
+              cx={(x as number) - (r as number) / 3}
+              cy={(y as number) - (r as number) / 3}
+              r={(r as number) / 3.2}
+              fill="#FFFFFF"
+              opacity=".22"
             />
           </g>
         ))}
-        <path d="M0 116 Q100 104 200 118 T400 112 V240 H0 Z" fill="#8CCB7A" />
+        {[
+          [60, 96],
+          [212, 92],
+          [350, 100],
+        ].map(([x, y]) => (
+          <g key={x}>
+            <rect x={x - 3} y={y + 12} width="6" height="16" fill="#8A5A2B" />
+            <path
+              d={`M${x} ${y - 30} L${x + 20} ${y + 16} H${x - 20} Z`}
+              fill="#3F9A55"
+              stroke="#2E7440"
+              strokeWidth="2.5"
+              strokeLinejoin="round"
+            />
+          </g>
+        ))}
+        <path d="M0 128 Q100 112 200 126 T400 120 V240 H0 Z" fill="#86C96F" />
+        <path d="M0 160 Q120 146 220 162 T400 156 V240 H0 Z" fill="#74BA5E" />
+        {/* Path from start to the chest */}
         <path
-          d={`M${sx - 30} 190 Q200 150 ${gx + 30} 176`}
+          d={`M${sx - 40} 214 Q${(sx + gx) / 2} 158 ${gx + 40} 196`}
           fill="none"
-          stroke="#E7C98F"
-          strokeWidth="26"
+          stroke="#E9CF95"
+          strokeWidth="28"
           strokeLinecap="round"
-          opacity=".75"
         />
-        <g transform={`translate(${gx - 26} 118)`}>
+        <path
+          d={`M${sx - 40} 214 Q${(sx + gx) / 2} 158 ${gx + 40} 196`}
+          fill="none"
+          stroke="#D9B979"
+          strokeWidth="2"
+          strokeDasharray="4 10"
+          strokeLinecap="round"
+        />
+        {/* Flowers and bushes */}
+        {[
+          [30, 196, "#FF8FB1"],
+          [120, 222, "#FFE27A"],
+          [250, 226, "#FF8FB1"],
+          [370, 220, "#C9A2FF"],
+        ].map(([x, y, c]) => (
+          <g key={x as number}>
+            <circle
+              cx={x as number}
+              cy={y as number}
+              r="5"
+              fill={c as string}
+            />
+            <circle cx={x as number} cy={y as number} r="2" fill="#FFF6C9" />
+          </g>
+        ))}
+        {/* Goal: treasure chest with sparkles */}
+        <g transform={`translate(${gx - 24} 150)`}>
+          <ellipse cx="24" cy="44" rx="30" ry="6" fill="#000" opacity=".15" />
           <rect
             x="0"
-            y="22"
-            width="52"
-            height="34"
-            rx="5"
+            y="16"
+            width="48"
+            height="28"
+            rx="4"
             fill="#C27A3A"
             stroke="#7E4A1E"
             strokeWidth="3"
           />
           <path
-            d="M0 26 Q26 -4 52 26 Z"
+            d="M0 20 Q24 -6 48 20 Z"
             fill="#D98E46"
             stroke="#7E4A1E"
             strokeWidth="3"
+            strokeLinejoin="round"
           />
+          <path d="M0 20 H48" stroke="#E8B04A" strokeWidth="4" />
           <rect
-            x="22"
-            y="26"
+            x="20"
+            y="20"
             width="8"
-            height="12"
+            height="11"
             rx="2"
             fill="#FFD25E"
             stroke="#C98B1C"
             strokeWidth="2"
           />
           <g fill="#FFE27A">
-            <circle cx="10" cy="12" r="3" />
-            <circle cx="40" cy="8" r="2.5" />
-            <circle cx="26" cy="2" r="3" />
+            <path d="M6 2 l2 5 5 2 -5 2 -2 5 -2 -5 -5 -2 5 -2z" />
+            <path d="M42 -2 l1.5 4 4 1.5 -4 1.5 -1.5 4 -1.5 -4 -4 -1.5 4 -1.5z" />
           </g>
         </g>
       </>
@@ -275,43 +389,92 @@ function Backdrop({
       <>
         <defs>
           <linearGradient id="kw-night" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#1B1F5E" />
-            <stop offset="1" stopColor="#4A2D85" />
+            <stop offset="0" stopColor="#141850" />
+            <stop offset=".7" stopColor="#3A2C7E" />
+            <stop offset="1" stopColor="#5A3A92" />
           </linearGradient>
+          <radialGradient id="kw-moon-glow" cx=".5" cy=".5" r=".5">
+            <stop offset="0" stopColor="#FFF1B8" stopOpacity=".55" />
+            <stop offset="1" stopColor="#FFF1B8" stopOpacity="0" />
+          </radialGradient>
         </defs>
         <rect width="400" height="240" fill="url(#kw-night)" />
         <g fill="#FFF6D8">
           {[
-            [30, 30],
-            [90, 70],
-            [150, 22],
-            [210, 60],
-            [260, 18],
-            [320, 70],
-            [380, 30],
-            [60, 200],
-            [130, 225],
-            [240, 210],
-            [300, 230],
-            [370, 190],
-          ].map(([x, y]) => (
-            <circle key={`${x}-${y}`} cx={x} cy={y} r={x % 3 ? 1.6 : 2.6} />
+            [30, 30, 1.6],
+            [90, 70, 2.4],
+            [150, 22, 1.4],
+            [210, 60, 1.8],
+            [262, 18, 2.6],
+            [320, 74, 1.4],
+            [382, 30, 2],
+            [60, 206, 1.6],
+            [130, 226, 2],
+            [244, 212, 1.4],
+            [300, 230, 2.2],
+            [372, 196, 1.6],
+            [24, 120, 1.4],
+            [176, 112, 1.2],
+            [118, 150, 1.6],
+          ].map(([x, y, r]) => (
+            <circle key={`${x}-${y}`} cx={x} cy={y} r={r} />
           ))}
+          <path d="M98 34 l2 6 6 2 -6 2 -2 6 -2 -6 -6 -2 6 -2z" />
+          <path d="M286 52 l1.6 5 5 1.6 -5 1.6 -1.6 5 -1.6 -5 -5 -1.6 5 -1.6z" />
         </g>
-        <ellipse
-          cx={sx}
-          cy="176"
-          rx="38"
-          ry="12"
+        {/* Shooting star */}
+        <path
+          d="M232 30 L190 44"
+          stroke="#FFF6D8"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity=".7"
+        />
+        <circle cx="232" cy="30" r="3" fill="#FFF6D8" />
+        {/* A far planet */}
+        <circle
+          cx="160"
+          cy="62"
+          r="13"
+          fill="#FF9DB0"
+          stroke="#C9637A"
+          strokeWidth="2"
+        />
+        <path
+          d="M150 58 q10 4 20 0"
+          stroke="#C9637A"
+          strokeWidth="2"
+          fill="none"
+          opacity=".6"
+        />
+        {/* Start: a little purple planet top */}
+        <path
+          d={`M${sx - 42} 196 Q${sx} 156 ${sx + 42} 196 Z`}
           fill="#7B6CF6"
           stroke="#B9AEFF"
           strokeWidth="3"
+          strokeLinejoin="round"
         />
-        <g transform={`translate(${gx} 128)`}>
-          <circle r="34" fill="#FFE9A8" />
-          <circle cx="15" cy="-10" r="30" fill="#2A2470" />
-          <circle cx="-16" cy="8" r="4" fill="#F5D57A" />
-          <circle cx="-8" cy="-14" r="3" fill="#F5D57A" />
+        <circle cx={sx - 14} cy="184" r="4" fill="#5E4FD8" />
+        <circle cx={sx + 12} cy="178" r="3" fill="#5E4FD8" />
+        {/* Goal: glowing smiling moon */}
+        <circle cx={gx} cy="118" r="60" fill="url(#kw-moon-glow)" />
+        <g transform={`translate(${gx} 118)`}>
+          <circle r="30" fill="#FFE9A8" stroke="#F2C95C" strokeWidth="3" />
+          <circle cx="-12" cy="-13" r="5" fill="#F5D57A" />
+          <circle cx="14" cy="-14" r="3.5" fill="#F5D57A" />
+          <circle cx="17" cy="13" r="4" fill="#F5D57A" />
+          <circle cx="-8" cy="-2" r="2.4" fill="#3A2C7E" />
+          <circle cx="8" cy="-2" r="2.4" fill="#3A2C7E" />
+          <path
+            d="M-7 8 q7 7 14 0"
+            stroke="#3A2C7E"
+            strokeWidth="2.4"
+            fill="none"
+            strokeLinecap="round"
+          />
+          <circle cx="-16" cy="7" r="3.5" fill="#FFB3A7" opacity=".7" />
+          <circle cx="16" cy="5" r="3.5" fill="#FFB3A7" opacity=".7" />
         </g>
       </>
     );
@@ -376,64 +539,95 @@ function Backdrop({
 function StepShape({ theme }: { theme: StepTheme }) {
   if (theme === "sky")
     return (
-      <svg viewBox="0 0 100 64" aria-hidden="true">
+      <svg viewBox="0 0 100 76" aria-hidden="true">
         <path
-          d="M14 50 q-12 -2 -8 -16 q4 -12 18 -9 q4 -16 22 -15 q14 -10 28 2 q16 -2 18 14 q12 4 6 18 q-4 8 -14 8 h-62 z"
+          d="M14 66 q-14 -2 -10 -18 q4 -14 20 -11 q2 -20 24 -20 q14 -14 32 -2 q20 -2 20 18 q14 6 6 22 q-4 11 -16 11 z"
           fill="#FFFFFF"
-          stroke="#B8D3EE"
+          stroke="#A9C8EA"
           strokeWidth="3"
+          strokeLinejoin="round"
+        />
+        <path
+          d="M18 64 q40 6 72 0"
+          stroke="#DCEBFA"
+          strokeWidth="5"
+          fill="none"
+          strokeLinecap="round"
         />
       </svg>
     );
   if (theme === "forest")
     return (
-      <svg viewBox="0 0 100 64" aria-hidden="true">
-        <rect
-          x="38"
-          y="34"
-          width="24"
-          height="28"
-          rx="8"
+      <svg viewBox="0 0 100 76" aria-hidden="true">
+        <path
+          d="M38 44 h24 v22 q0 8 -8 8 h-8 q-8 0 -8 -8 z"
           fill="#FFF1DA"
           stroke="#C9A77A"
           strokeWidth="3"
         />
         <path
-          d="M6 40 Q8 2 50 2 Q92 2 94 40 Z"
+          d="M4 48 Q4 4 50 4 Q96 4 96 48 Q50 56 4 48 Z"
           fill="#E8574A"
           stroke="#A9382E"
           strokeWidth="3"
           strokeLinejoin="round"
         />
+        <path
+          d="M16 20 Q30 8 46 8"
+          stroke="#FFFFFF"
+          strokeWidth="4"
+          fill="none"
+          strokeLinecap="round"
+          opacity=".5"
+        />
         <g fill="#FFFFFF">
-          <circle cx="14" cy="32" r="4" />
-          <circle cx="86" cy="32" r="4" />
-          <circle cx="30" cy="10" r="3" />
-          <circle cx="70" cy="10" r="3" />
+          <circle cx="13" cy="38" r="4" />
+          <circle cx="87" cy="38" r="4" />
+          <circle cx="76" cy="15" r="3.5" />
         </g>
       </svg>
     );
   if (theme === "night")
     return (
-      <svg viewBox="0 0 100 64" aria-hidden="true">
-        <circle
-          cx="50"
-          cy="32"
-          r="26"
-          fill="#8FD3FF"
-          stroke="#4E8FC4"
-          strokeWidth="3"
-        />
+      <svg viewBox="0 0 100 76" aria-hidden="true">
         <ellipse
           cx="50"
-          cy="48"
-          rx="46"
-          ry="8"
+          cy="46"
+          rx="48"
+          ry="9"
           fill="none"
           stroke="#FFD25E"
           strokeWidth="4"
         />
-        <path d="M30 48 A26 26 0 0 0 70 48" fill="#8FD3FF" />
+        <circle
+          cx="50"
+          cy="38"
+          r="32"
+          fill="#8FD3FF"
+          stroke="#4E8FC4"
+          strokeWidth="3"
+        />
+        <path
+          d="M24 26 Q50 16 76 26"
+          stroke="#BDE6FF"
+          strokeWidth="4"
+          fill="none"
+          strokeLinecap="round"
+          opacity=".7"
+        />
+        <path
+          d="M18 46 A32 32 0 0 0 82 46"
+          fill="none"
+          stroke="#4E8FC4"
+          strokeWidth="0"
+        />
+        <path
+          d="M2 46 Q50 60 98 46"
+          fill="none"
+          stroke="#FFD25E"
+          strokeWidth="4"
+          strokeLinecap="round"
+        />
       </svg>
     );
   return null;
@@ -513,7 +707,11 @@ export function StonesScene({
             <span
               key={`${p}-${i}`}
               className={`kw-stone kw-step-${theme} ${state}`}
-              style={{ left: `${stoneX(i)}%`, top: `${stoneY(i)}%`, width: stepWidth }}
+              style={{
+                left: `${stoneX(i)}%`,
+                top: `${stoneY(i)}%`,
+                width: stepWidth,
+              }}
             >
               <StepShape theme={theme} />
               <b>{p}</b>
@@ -522,7 +720,11 @@ export function StonesScene({
         })}
         <span
           className="kw-river-crab"
-          style={{ left: `${crabX}%`, top: `${crabY}%`, width: `min(${(gap * 1.1).toFixed(1)}%, 104px)` }}
+          style={{
+            left: `${crabX}%`,
+            top: `${crabY}%`,
+            width: `min(${(gap * 1.1).toFixed(1)}%, 104px)`,
+          }}
         >
           <span key={spot} className={spot ? "kw-jump" : ""}>
             <Art kind="crab" label="" />

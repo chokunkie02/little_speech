@@ -6,6 +6,7 @@ import { CENTRAL_CHILD_ID, usePracticeItem } from "./usePracticeItem";
 import { KidPractice } from "./kid/KidPractice";
 import { usePracticeUi } from "./kid/preferences";
 import { KidFinale, KidMap, KidRoundEnd, KidStart, KidTravel } from "./kid/KidScreens";
+import { KidHomeContext } from "./kid/KidShell";
 import AssessmentControls from "@/components/assessment/AssessmentControls";
 import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
 import RoundAdvice from "./RoundAdvice";
@@ -496,7 +497,14 @@ export function LearningStudio({
     { id: "plan", label: "จัดชุดฝึก" },
     { id: "guide", label: "คู่มือ" },
   ] as const;
+  /** The kid screens' home button: back to the studio home (a round in progress stays paused). */
+  const goHome = () => {
+    setStartRequest(null);
+    setTravel(null);
+    go("home");
+  };
   return (
+    <KidHomeContext.Provider value={goHome}>
     <div className="app-shell">
       <audio
         data-sample-player="true"
@@ -1195,6 +1203,7 @@ export function LearningStudio({
         </Modal>
       )}
     </div>
+    </KidHomeContext.Provider>
   );
 }
 function StageCard({

@@ -1,6 +1,6 @@
 import "./kid.css";
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Ellipsis, Pause, UserRound, Volume2, X } from "lucide-react";
+import { Ellipsis, House, Pause, UserRound, Volume2, X } from "lucide-react";
 import { Art } from "../Art";
 
 /** Kid-only fonts: Itim for พี่ปู and buttons, Sarabun (textbook shapes) for the words being taught. */
@@ -28,6 +28,9 @@ function lockScroll() {
     if (--scrollLocks === 0) html.style.overflow = scrollBefore;
   };
 }
+
+/** "Go to the home page", provided by the studio. Every kid screen shows a home button when it is set. */
+export const KidHomeContext = createContext<(() => void) | null>(null);
 
 const ShellContext = createContext<{ openMenu: () => void; showBar: (on: boolean) => void }>({
   openMenu: () => {},
@@ -57,6 +60,7 @@ export function KidShell({
   children: ReactNode;
 }) {
   const [menu, setMenu] = useState(false);
+  const goHome = useContext(KidHomeContext);
   const [bars, setBars] = useState(0);
   const root = useRef<HTMLDivElement>(null);
   const [context] = useState(() => ({
@@ -120,7 +124,16 @@ export function KidShell({
           ) : (
             <span />
           )}
-          {right ?? <span className="kw-spacer" />}
+          <span className="kw-top-right">
+            {right}
+            {goHome ? (
+              <button type="button" className="kw-ibtn" onClick={goHome} aria-label="กลับหน้าหลัก">
+                <House />
+              </button>
+            ) : (
+              !right && <span className="kw-spacer" />
+            )}
+          </span>
         </div>
         {children}
         {bars === 0 && adultActions.length > 0 && (
