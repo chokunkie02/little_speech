@@ -46,6 +46,7 @@ export function KidShell({
   progress,
   onPause,
   back = "pause",
+  canLeave = true,
   spot,
   right,
   adultActions = [],
@@ -57,6 +58,8 @@ export function KidShell({
   onPause?: () => void;
   /** What the top-left button looks like: pause (in a game) or back to the map (book, round end). */
   back?: "pause" | "map";
+  /** False while a result is being sent: the home button waits, like pause. */
+  canLeave?: boolean;
   /** First-visit tips: light up the adult corner or the home button. */
   spot?: "adult" | "home";
   right?: ReactNode;
@@ -133,7 +136,7 @@ export function KidShell({
           <span className={`kw-top-right${spot === "home" ? " kw-spot" : ""}`}>
             {right}
             {goHome ? (
-              <button type="button" className="kw-ibtn" onClick={goHome} aria-label="กลับหน้าหลัก">
+              <button type="button" className="kw-ibtn" onClick={goHome} disabled={!canLeave} aria-label="กลับหน้าหลัก">
                 <House />
               </button>
             ) : (

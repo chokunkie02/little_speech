@@ -96,6 +96,7 @@ export function KidPractice({
       label={`${stage.label} ข้อที่ ${session.index + 1} จาก ${session.itemIds.length}`}
       progress={{ done, total: session.itemIds.length }}
       onPause={pause}
+      canLeave={!practice.assessmentBusy}
       adultActions={actions}
       adultNote={note}
     >

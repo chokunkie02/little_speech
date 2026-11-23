@@ -537,6 +537,8 @@ export function LearningStudio({
     setToast(review === "achieved" ? "บันทึกแล้ว: ทำได้" : review === "practice" ? "บันทึกแล้ว: ยังต้องฝึก" : "บันทึกแล้ว: ประเมินไม่ได้");
   };
   const endDemo = () => {
+    // Replace #demo in history, so Back from the guide does not start the demo again.
+    window.history.replaceState(null, "", "#guide");
     go("guide");
     setToast("จบการลองเล่นแล้ว · ข้อนี้ไม่ได้บันทึกผล");
   };
@@ -1097,6 +1099,7 @@ export function LearningStudio({
             <KidFinale
               stages={stages}
               latest={latestRounds}
+              stars={starTotal}
               stickers={stickers.owned.size}
               onPrint={() => openPrint("certificate")}
               onAgain={() => begin(stages[0])}
@@ -1259,6 +1262,12 @@ export function LearningStudio({
               variant="danger"
               onClick={() => {
                 commit(createStudioState(null, child));
+                try {
+                  localStorage.removeItem(`speech-adventure:stickers-seen:${state.plan.childId}`);
+                  localStorage.removeItem(MAP_TIPS_KEY);
+                } catch {
+                  // Storage blocked: nothing to clear.
+                }
                 setResetOpen(false);
                 go("home");
                 setToast("เริ่มพื้นที่ทดลองใหม่แล้ว");

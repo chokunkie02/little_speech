@@ -431,7 +431,8 @@
 .kid-world .kw-book-tabs button span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .kid-world .kw-book-tabs button b { font: 600 12px var(--kw-font-ui); }
 .kid-world .kw-book-tabs button.on { background: color-mix(in srgb, var(--kw-primary) 22%, transparent); border-color: var(--kw-primary); color: var(--kw-text); }
-.kid-world .kw-book-tabs button.full b { color: var(--kw-gold-2); }
+.kid-world .kw-book-tabs button.full b { color: #A8701A; }
+.dark .kid-world .kw-book-tabs button.full b { color: var(--kw-gold-1); }
 .kid-world .kw-book-page { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 12px; padding: 16px; border-radius: 26px; background: var(--kw-surface); border: 1px solid var(--kw-line); box-shadow: 0 8px 0 rgb(40 30 110 / 0.25); }
 .kid-world .kw-book-page.full { border: 3px solid var(--kw-gold-1); box-shadow: 0 8px 0 var(--kw-gold-edge), 0 0 26px 2px rgb(255 213 138 / 0.35); }
 @media (min-width: 620px) { .kid-world .kw-book-page { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

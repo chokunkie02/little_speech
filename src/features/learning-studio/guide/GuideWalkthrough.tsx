@@ -52,7 +52,7 @@ export function GuideWalkthrough({ onTry, onShowTips }: { onTry: () => void; onS
         <span>4 ขั้น · ไม่ถึง 1 นาที</span>
       </div>
       <div className="guide-player">
-        <div className="kid-world kw-inline guide-stage" aria-live="polite">
+        <div className="kid-world kw-inline guide-stage">
           {scene === 0 && (
             <div className="guide-scene">
               <span className="kw-mic live guide-mic">
@@ -108,7 +108,7 @@ export function GuideWalkthrough({ onTry, onShowTips }: { onTry: () => void; onS
           <div className="guide-chapters" role="tablist" aria-label="ขั้นตอน">
             {SCENES.map((s, i) => (
               <button key={s.title} type="button" role="tab" aria-selected={i === scene} className={i === scene ? "on" : ""} onClick={() => go(i)}>
-                <i style={i === scene && playing ? { animationDuration: `${SCENE_MS}ms` } : undefined} className={i === scene && playing ? "run" : i < scene ? "done" : ""} />
+                <i key={i === scene ? `run-${restart}` : "idle"} style={i === scene && playing ? { animationDuration: `${SCENE_MS}ms` } : undefined} className={i === scene && playing ? "run" : i < scene ? "done" : ""} />
                 {i + 1}. {s.title}
               </button>
             ))}

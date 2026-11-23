@@ -218,6 +218,23 @@ export function KidMap({
     if (tip !== null && tip + 1 < TIPS.length) setTip(tip + 1);
     else finishTips();
   };
+  const tipBox = useRef<HTMLDivElement>(null);
+  const closeTips = useEffectEvent(() => finishTips());
+  // Runs after KidShell's own focus (child effects first), so the tip keeps the keyboard focus.
+  useEffect(() => {
+    if (tip === null) return;
+    tipBox.current?.querySelector<HTMLButtonElement>(".kw-btn")?.focus();
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeTips();
+      if (e.key !== "Tab" || !tipBox.current) return;
+      const items = [...tipBox.current.querySelectorAll<HTMLButtonElement>("button")];
+      const i = items.indexOf(document.activeElement as HTMLButtonElement);
+      e.preventDefault();
+      items[(i + (e.shiftKey ? items.length - 1 : 1)) % items.length]?.focus();
+    };
+    window.addEventListener("keydown", key);
+    return () => window.removeEventListener("keydown", key);
+  }, [tip]);
   return (
     <KidShell
       label="แผนที่ผจญภัย"
@@ -251,7 +268,7 @@ export function KidMap({
       </div>
       {tip !== null && (
         <div className="kw-tips" onClick={nextTip} role="dialog" aria-modal="true" aria-label="แนะนำการใช้งาน">
-          <div className={`kw-tip at-${TIPS[tip].spot}`}>
+          <div ref={tipBox} className={`kw-tip at-${TIPS[tip].spot}`} onClick={(e) => e.stopPropagation()}>
             <small>
               {tip + 1} / {TIPS.length}
             </small>
@@ -267,7 +284,7 @@ export function KidMap({
               >
                 ข้าม
               </button>
-              <button type="button" className="kw-btn go" autoFocus>
+              <button type="button" className="kw-btn go" onClick={nextTip}>
                 {tip + 1 < TIPS.length ? "ต่อไป" : "เข้าใจแล้ว"}
               </button>
             </span>
@@ -539,6 +556,7 @@ function Trophy() {
 export function KidFinale({
   stages,
   latest,
+  stars,
   stickers,
   onPrint,
   onAgain,
@@ -549,6 +567,8 @@ export function KidFinale({
   stages: Stage[];
   /** Most recent finished round of each stage in this plan. */
   latest: Map<string, Session>;
+  /** Stars over all the child's rounds (same number as the map, home page and certificate). */
+  stars: number;
   /** Stickers in the book. */
   stickers: number;
   /** Adult: print the certificate. */
@@ -597,9 +617,9 @@ export function KidFinale({
             <Burst count={20} />
           </div>
           <div className="kw-row">
-            <div className="kw-total" aria-label={`ดาวทั้งหมด ${totals.stars} ดวง`}>
+            <div className="kw-total" aria-label={`ดาวทั้งหมด ${stars} ดวง`}>
               <Star />
-              {totals.stars}
+              {stars}
             </div>
             <div className="kw-total" aria-label={`สติกเกอร์ ${stickers} ดวง`}>
               <BookOpen />

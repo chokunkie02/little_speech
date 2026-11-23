@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { BookOpen, Play, Printer, Star, X } from "lucide-react";
 import { Art } from "../Art";
 import type { Stage } from "../types";
@@ -101,6 +101,26 @@ export function KidStickerBook({
   const markSeen = useEffectEvent(() => writeSeenStickers(childId, book.owned.size));
   useEffect(() => markSeen(), []);
 
+  const zoomBox = useRef<HTMLDivElement>(null);
+  const closeZoom = useEffectEvent(() => setZoom(null));
+  useEffect(() => {
+    if (!zoom) return;
+    const back = document.activeElement as HTMLElement | null;
+    zoomBox.current?.querySelector<HTMLButtonElement>("button")?.focus();
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeZoom();
+      if (e.key !== "Tab" || !zoomBox.current) return;
+      const items = [...zoomBox.current.querySelectorAll<HTMLButtonElement>("button")];
+      const i = items.indexOf(document.activeElement as HTMLButtonElement);
+      e.preventDefault();
+      items[(i + (e.shiftKey ? items.length - 1 : 1)) % items.length]?.focus();
+    };
+    window.addEventListener("keydown", key);
+    return () => {
+      window.removeEventListener("keydown", key);
+      back?.focus({ preventScroll: true });
+    };
+  }, [zoom]);
   const zoomed = zoom && STICKERS[zoom];
   const source = zoom && !book.owned.has(zoom) ? stickerSource(stages, zoom) : undefined;
   const missing = page ? page.kinds.filter((k) => !book.owned.has(k)).length : 0;
@@ -175,7 +195,7 @@ export function KidStickerBook({
       </div>
       {zoomed && (
         <div className="kw-sheet-back kw-zoom-back" onClick={() => setZoom(null)}>
-          <div className="kw-zoom" role="dialog" aria-modal="true" aria-label={book.owned.has(zoom) ? zoomed.name : "สติกเกอร์ที่ยังไม่ได้"} onClick={(e) => e.stopPropagation()}>
+          <div ref={zoomBox} className="kw-zoom" role="dialog" aria-modal="true" aria-label={book.owned.has(zoom) ? zoomed.name : "สติกเกอร์ที่ยังไม่ได้"} onClick={(e) => e.stopPropagation()}>
             <button type="button" className="kw-ibtn kw-zoom-x" onClick={() => setZoom(null)} aria-label="ปิด">
               <X />
             </button>

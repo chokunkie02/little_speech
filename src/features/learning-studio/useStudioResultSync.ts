@@ -16,6 +16,23 @@ export function useStudioResultSync(childId: string | undefined, accountId: stri
   const canReview = useRef<{ childId: string; allowed: boolean } | null>(null);
   const [teacherConfirms, setTeacherConfirms] = useState(false);
 
+  // Ask once per child who may confirm results, so pages can say "the class teacher confirms" up front.
+  useEffect(() => {
+    if (!childId || !accountId || !/^[0-9a-f-]{36}$/i.test(childId)) return;
+    const client = getSupabaseClient();
+    if (!client) return;
+    let active = true;
+    void (client.rpc as unknown as (fn: string, params: Record<string, unknown>) =>
+      PromiseLike<{ data: unknown; error: { message: string } | null }>)("can_review_assessment", { p_child_id: childId }).then(({ data, error }) => {
+      if (!active || error) return;
+      canReview.current = { childId, allowed: data === true };
+      setTeacherConfirms(data !== true);
+    });
+    return () => {
+      active = false;
+    };
+  }, [childId, accountId]);
+
   useEffect(() => {
     if (!childId || !accountId) return;
     let active = true;
