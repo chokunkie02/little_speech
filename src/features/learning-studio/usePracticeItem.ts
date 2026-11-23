@@ -196,6 +196,18 @@ export function usePracticeItem({
     setMicError("");
   }
 
+  const attachPlayer = (el: HTMLAudioElement | null) => {
+    recordedPlayer.current = el;
+  };
+  const playRecording = () => {
+    stopSpeaker();
+    const player = recordedPlayer.current;
+    if (!player) return;
+    player.currentTime = 0;
+    void player.play().catch(() => {});
+  };
+  const pauseRecording = () => recordedPlayer.current?.pause();
+
   const isChoice = item?.kind === "choice";
   const correctFor = (picked: string | null) => saved?.choiceCorrect ?? picked === item?.answer;
   const correct = correctFor(choice);
@@ -283,7 +295,10 @@ export function usePracticeItem({
     audio,
     recordedBlob,
     stream,
-    recordedPlayer,
+    /** Ref callback for the <audio> element that plays the child's recording. */
+    attachPlayer,
+    playRecording,
+    pauseRecording,
     assessment,
     setAssessment,
     assessmentBusy,
@@ -299,3 +314,5 @@ export function usePracticeItem({
     central: !!user && CENTRAL_CHILD_ID.test(session.childId),
   };
 }
+
+export type PracticeItem = ReturnType<typeof usePracticeItem>;

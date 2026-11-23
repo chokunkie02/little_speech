@@ -10,6 +10,8 @@ export const VOICE_CUES = {
   retry: "ไม่เป็นไรเลยจ้ะ มาฟังอีกครั้ง แล้วค่อย ๆ ลองกันใหม่นะ",
   complete: "จบภารกิจรอบนี้แล้ว เก่งมากจ้ะ พักสักนิด แล้วค่อยไปผจญภัยกันต่อนะ",
 };
+/** Whether a line has a recorded voice clip (only catalog lines can be spoken). */
+export const hasVoice = (text: string) => !!(VOICE_OVERRIDES[text] ?? AUDIO_FILES[text]);
 function prepareSample(player: HTMLAudioElement, src: string) {
   player.pause();
   player.src = src;

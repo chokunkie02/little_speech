@@ -3,6 +3,8 @@ import "./studio.generated.css";
 import "./host-theme.css";
 import { useStudioResultSync } from "./useStudioResultSync";
 import { CENTRAL_CHILD_ID, usePracticeItem } from "./usePracticeItem";
+import { KidPractice } from "./kid/KidPractice";
+import { usePracticeUi } from "./kid/preferences";
 import AssessmentControls from "@/components/assessment/AssessmentControls";
 import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
 import RoundAdvice from "./RoundAdvice";
@@ -318,6 +320,8 @@ export function LearningStudio({
   } | null>(null);
   const [reviewId, setReviewId] = useState<string | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
+  const [practiceUi, setPracticeUi] = usePracticeUi();
+  const PracticeView = practiceUi === "kid" ? KidPractice : Practice;
   const commit = (
     next: AppState,
     event?: Omit<LearningEvent, "childId" | "planId">,
@@ -826,8 +830,9 @@ export function LearningStudio({
           )}
           {route === "practice" &&
             (active ? (
-              <Practice
+              <PracticeView
                 key={active.id + ":" + active.index}
+                onSwitchUi={() => setPracticeUi(practiceUi === "kid" ? "classic" : "kid")}
                 session={active}
                 stages={getStages(active.track, active.sound, active.level)}
                 onPause={() => {
@@ -1553,12 +1558,14 @@ function Practice({
   onSave,
   onNext,
   onPause,
+  onSwitchUi,
 }: {
   session: Session;
   stages: Stage[];
   onSave: (a: Attempt) => void;
   onNext: () => void;
   onPause: () => void;
+  onSwitchUi?: () => void;
 }) {
   const stage = stages.find((s) => s.id === session.stageId);
   const item = stage?.items.find(
@@ -1569,8 +1576,9 @@ function Practice({
   const p = usePracticeItem({ session, item, onSave, stopSpeaker: speaker.stop });
   const {
     user, saved, choice, setChoice, support, setSupport, review, setReview, setRetries, demo,
-    recording, requesting, elapsed, audio, recordedBlob, recordedPlayer, setAssessment,
+    recording, requesting, elapsed, audio, recordedBlob, setAssessment,
     assessmentBusy, setAssessmentBusy, assessmentMessage, micError, record, resetAudio,
+    attachPlayer, pauseRecording, stopRecording, chooseDemo,
   } = p;
   if (!stage || !item)
     return (
@@ -1584,7 +1592,7 @@ function Practice({
   const correct = p.correct;
   const read = () => {
     if (recording || requesting) return;
-    recordedPlayer.current?.pause();
+    pauseRecording();
     speaker.speak(item.sample);
     setSupport((s) => (s === "adult" ? "adult" : "modeled"));
   };
@@ -1604,6 +1612,11 @@ function Practice({
           {session.index + 1}
           <em> / {session.itemIds.length}</em>
         </span>
+        {onSwitchUi && (
+          <button type="button" className="text-button" onClick={onSwitchUi} disabled={assessmentBusy}>
+            ใช้หน้าเด็กแบบใหม่
+          </button>
+        )}
       </div>
       <div
         className="lesson-progress"
@@ -1826,7 +1839,7 @@ function Practice({
                           className={`record-button ${recording ? "recording" : ""}`}
                           aria-label={recording ? "หยุดอัดเสียง" : "เริ่มอัดเสียง"}
                           onClick={() =>
-                            recording ? p.stopRecording() : record()
+                            recording ? stopRecording() : record()
                           }
                           disabled={requesting || assessmentBusy}
                         >
@@ -1848,7 +1861,7 @@ function Practice({
                         {audio && (
                           <>
                             <audio
-                              ref={recordedPlayer}
+                              ref={attachPlayer}
                               controls
                               preload="auto"
                               src={audio}
@@ -1865,7 +1878,7 @@ function Practice({
                           <button
                             disabled={assessmentBusy}
                             className={`demo-answer ${demo ? "active" : ""}`}
-                            onClick={p.chooseDemo}
+                            onClick={chooseDemo}
                           >
                             <MicOff size={15} />
                             {demo

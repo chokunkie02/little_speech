@@ -10,7 +10,7 @@
     "predev": "npm run learning:prepare",
     "prebuild": "npm run learning:prepare",
     "learning:prepare": "node scripts/learning-studio/prepare.mjs",
-    "learning:test": "npm run learning:prepare && node scripts/learning-studio/test.mjs && node scripts/learning-studio/test-levels.mjs && node scripts/learning-studio/test-assets.mjs && node scripts/learning-studio/test-integration.mjs",
+    "learning:test": "npm run learning:prepare && node scripts/learning-studio/test.mjs && node scripts/learning-studio/test-levels.mjs && node scripts/learning-studio/test-assets.mjs && node scripts/learning-studio/test-integration.mjs && node scripts/learning-studio/test-kid.mjs",
     "assessment:test": "node scripts/assessment/test.mjs",
     "assessment:check-openai": "node scripts/assessment/check-openai.mjs",
     "assessment:test-stages": "node scripts/assessment/test-stages.mjs",
