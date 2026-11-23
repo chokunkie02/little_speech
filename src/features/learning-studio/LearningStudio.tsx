@@ -2,12 +2,10 @@
 import "./studio.generated.css";
 import "./host-theme.css";
 import { useStudioResultSync } from "./useStudioResultSync";
-import { useAuth } from "@/hooks/useAuth";
+import { CENTRAL_CHILD_ID, usePracticeItem } from "./usePracticeItem";
 import AssessmentControls from "@/components/assessment/AssessmentControls";
 import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
 import RoundAdvice from "./RoundAdvice";
-import { submitStudioAssessment } from "./assessment-client";
-import type { AssessmentResult } from "@/lib/assessment/policy";
 import {
   createStudioState,
   studioStorageKey,
@@ -1549,7 +1547,6 @@ function Preview({
   );
 }
 /** Only cloud child profiles (uuid ids) have a central assessment history; local and demo ids do not. */
-const CENTRAL_CHILD_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 function Practice({
   session,
   stages,
@@ -1563,169 +1560,18 @@ function Practice({
   onNext: () => void;
   onPause: () => void;
 }) {
-  const { user } = useAuth();
   const stage = stages.find((s) => s.id === session.stageId);
   const item = stage?.items.find(
     (i) => i.id === session.itemIds[session.index],
   );
   const speaker = useSpeaker();
-  const [choice, setChoice] = useState<string | null>(
-    () =>
-      session.attempts.find((a) => a.itemId === session.itemIds[session.index])
-        ?.choiceId ?? null,
-  );
   const [showHelp, setShowHelp] = useState(false);
-
-  const [support, setSupport] = useState<Attempt["support"]>(
-    ["imitate", "syllables", "blend"].includes(session.stageId)
-      ? "modeled"
-      : "independent",
-  );
-  const [review, setReview] = useState<Review>("pending");
-  const [retries, setRetries] = useState(0);
-  const [demo, setDemo] = useState(false);
-  const [recording, setRecording] = useState(false);
-  const [requesting, setRequesting] = useState(false);
-  const [audio, setAudio] = useState("");
-  const [recordedBlob, setRecordedBlob] = useState<Blob>();
-  const [assessment, setAssessment] = useState<AssessmentResult>();
-  const [assessmentBusy, setAssessmentBusy] = useState(false);
-  const [assessmentMessage, setAssessmentMessage] = useState("");
-  const saveRequestId = useRef("");
-  const saveRequestInput = useRef("");
-  const [micError, setMicError] = useState("");
-  const [elapsed, setElapsed] = useState(0);
-  const mediaRef = useRef<MediaRecorder | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
-  const urlRef = useRef("");
-  const recordedPlayer = useRef<HTMLAudioElement | null>(null);
-  const timerRef = useRef<ReturnType<typeof setInterval> | undefined>(
-    undefined,
-  );
-  const mounted = useRef(true);
-  useEffect(() => {
-    window.dispatchEvent(
-      new CustomEvent("speech-adventure:recording", {
-        detail: recording || requesting,
-      }),
-    );
-    return () => {
-      window.dispatchEvent(
-        new CustomEvent("speech-adventure:recording", { detail: false }),
-      );
-    };
-  }, [recording, requesting]);
-  const saved = item
-    ? session.attempts.find((a) => a.itemId === item.id)
-    : undefined;
-  useEffect(() => {
-    // React Strict Mode runs setup/cleanup twice in development.
-    mounted.current = true;
-    return () => {
-      mounted.current = false;
-      clearInterval(timerRef.current);
-      if (mediaRef.current) {
-        mediaRef.current.onstop = null;
-        if (mediaRef.current.state === "recording") mediaRef.current.stop();
-      }
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      if (urlRef.current) URL.revokeObjectURL(urlRef.current);
-    };
-  }, []);
-  async function record() {
-    speaker.stop();
-    recordedPlayer.current?.pause();
-    window.dispatchEvent(
-      new CustomEvent("speech-adventure:recording", { detail: true }),
-    );
-    setMicError("");
-    setRequesting(true);
-    if (
-      !navigator.mediaDevices?.getUserMedia ||
-      typeof MediaRecorder === "undefined"
-    ) {
-      setMicError("เครื่องนี้ยังอัดเสียงไม่ได้ ใช้ปุ่มทดลองโดยไม่อัดเสียงได้");
-      window.dispatchEvent(
-        new CustomEvent("speech-adventure:recording", { detail: false }),
-      );
-      setRequesting(false);
-      return;
-    }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (!mounted.current) {
-        stream.getTracks().forEach((t) => t.stop());
-        return;
-      }
-      streamRef.current = stream;
-      const media = new MediaRecorder(stream);
-      mediaRef.current = media;
-      const parts: BlobPart[] = [];
-      media.ondataavailable = (e) => {
-        if (e.data.size) parts.push(e.data);
-      };
-      media.onstop = () => {
-        clearInterval(timerRef.current);
-        stream.getTracks().forEach((t) => t.stop());
-        if (!mounted.current) return;
-        const blob = new Blob(parts, { type: media.mimeType || "audio/webm" });
-        if (!blob.size) {
-          setMicError("ยังไม่ได้เสียง ลองอีกครั้งหรือใช้โหมดทดลอง");
-          setRecording(false);
-          return;
-        }
-        if (urlRef.current) URL.revokeObjectURL(urlRef.current);
-        urlRef.current = URL.createObjectURL(blob);
-        setAudio(urlRef.current);
-        setRecordedBlob(blob);
-        setRecording(false);
-        setDemo(false);
-      };
-      media.onerror = () => {
-        clearInterval(timerRef.current);
-        stream.getTracks().forEach((t) => t.stop());
-        setMicError("อัดเสียงไม่สำเร็จ ลองใหม่ได้");
-        setRecording(false);
-      };
-      setAudio("");
-      setRecordedBlob(undefined);
-      setAssessment(undefined);
-      setAssessmentMessage("");
-      setDemo(false);
-      setElapsed(0);
-      media.start();
-      setRecording(true);
-      let seconds = 0;
-      timerRef.current = setInterval(() => {
-        seconds++;
-        setElapsed(seconds);
-        if (seconds >= 30 && media.state === "recording") media.stop();
-      }, 1000);
-    } catch (e) {
-      streamRef.current?.getTracks().forEach((t) => t.stop());
-      setRecording(false);
-      window.dispatchEvent(
-        new CustomEvent("speech-adventure:recording", { detail: false }),
-      );
-      setMicError(
-        e instanceof DOMException && e.name === "NotAllowedError"
-          ? "ยังไม่ได้รับสิทธิ์ไมค์ เลือกอนุญาตจากเบราว์เซอร์ หรือใช้โหมดทดลองได้"
-          : "เปิดไมค์ไม่สำเร็จ ตรวจว่าเสียบไมค์แล้ว หรือใช้โหมดทดลองได้",
-      );
-    } finally {
-      if (mounted.current) setRequesting(false);
-    }
-  }
-  function resetAudio() {
-    if (urlRef.current) URL.revokeObjectURL(urlRef.current);
-    urlRef.current = "";
-    setAudio("");
-    setRecordedBlob(undefined);
-    setAssessment(undefined);
-    setAssessmentMessage("");
-    setDemo(false);
-    setRetries((v) => v + 1);
-  }
+  const p = usePracticeItem({ session, item, onSave, stopSpeaker: speaker.stop });
+  const {
+    user, saved, choice, setChoice, support, setSupport, review, setReview, setRetries, demo,
+    recording, requesting, elapsed, audio, recordedBlob, recordedPlayer, setAssessment,
+    assessmentBusy, setAssessmentBusy, assessmentMessage, micError, record, resetAudio,
+  } = p;
   if (!stage || !item)
     return (
       <Empty
@@ -1735,70 +1581,14 @@ function Practice({
       />
     );
   const isChoice = item.kind === "choice";
-  const correct = saved?.choiceCorrect ?? choice === item.answer;
+  const correct = p.correct;
   const read = () => {
     if (recording || requesting) return;
     recordedPlayer.current?.pause();
     speaker.speak(item.sample);
     setSupport((s) => (s === "adult" ? "adult" : "modeled"));
   };
-  const save = async () => {
-    if (assessmentBusy) return;
-    let assessed = assessment;
-    // The central copy is best effort: a child is never stuck on an item because the assessment
-    // service is unreachable, rate-limited or not deployed. The attempt is still saved locally.
-    // A recorded speech attempt that was not checked yet still goes to the central record, as waiting
-    // for an adult (no audio is sent), so it reaches the teacher's queue and the child's progress.
-    // Simulated answers ("ทดลองตอบโดยไม่อัดเสียง") stay local, like before.
-    const unsentSpeech = item.kind === "speech" && !assessed && !demo && !!recordedBlob;
-    if (user && CENTRAL_CHILD_ID.test(session.childId) && (isChoice || item.kind === "observation" || unsentSpeech)) {
-      setAssessmentBusy(true);
-      setAssessmentMessage("");
-      try {
-        const inputKey = JSON.stringify({ choice, review, unsentSpeech });
-        if (!saveRequestId.current || saveRequestInput.current !== inputKey) {
-          saveRequestId.current = uid();
-          saveRequestInput.current = inputKey;
-        }
-        assessed = await submitStudioAssessment(session, item, saveRequestId.current, {
-          selectedChoice: isChoice ? choice ?? undefined : undefined,
-          adultReview: item.kind === "observation" ? review : undefined,
-          adultOnly: unsentSpeech || undefined,
-        });
-        setAssessment(assessed);
-      } catch {
-        setAssessmentMessage("บันทึกในเครื่องแล้ว แต่ยังส่งผลเข้าศูนย์ประเมินไม่ได้");
-      }
-      setAssessmentBusy(false);
-    }
-    if (isChoice && correct)
-      window.dispatchEvent(
-        new CustomEvent("speech-adventure:chime", { detail: "success" }),
-      );
-    onSave({
-      id: uid(),
-      itemId: item.id,
-      createdAt: now(),
-      kind: item.kind,
-      mode: isChoice
-        ? "choice"
-        : item.kind === "observation"
-          ? "observation"
-          : demo
-            ? "demo"
-            : "recording",
-      choiceId: isChoice ? (choice ?? undefined) : undefined,
-      choiceCorrect: isChoice ? correct : undefined,
-      support: isChoice ? "independent" : support,
-      review: isChoice
-        ? correct ? "achieved" : "practice"
-        : item.kind === "observation"
-          ? review
-          : "pending",
-      retries,
-      assessment: assessed,
-    });
-  };
+  const save = () => p.save();
   return (
     <div className="practice-shell">
       <div className="practice-toolbar">
@@ -2036,7 +1826,7 @@ function Practice({
                           className={`record-button ${recording ? "recording" : ""}`}
                           aria-label={recording ? "หยุดอัดเสียง" : "เริ่มอัดเสียง"}
                           onClick={() =>
-                            recording ? mediaRef.current?.stop() : record()
+                            recording ? p.stopRecording() : record()
                           }
                           disabled={requesting || assessmentBusy}
                         >
@@ -2075,13 +1865,7 @@ function Practice({
                           <button
                             disabled={assessmentBusy}
                             className={`demo-answer ${demo ? "active" : ""}`}
-                            onClick={() => {
-                              setDemo(true);
-                              setAudio("");
-                              setRecordedBlob(undefined);
-                              setAssessment(undefined);
-                              setMicError("");
-                            }}
+                            onClick={p.chooseDemo}
                           >
                             <MicOff size={15} />
                             {demo
