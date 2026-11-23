@@ -50,3 +50,8 @@
 .learning-studio-scope .plan-more > summary span { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 6px; }
 .learning-studio-scope .plan-more[open] > summary { margin-bottom: 12px; }
 .learning-studio-scope .plan-more h3 { margin: 16px 0 8px; font-size: 15px; }
+
+/* Phones: the tab bar scrolls sideways; fade the right edge so the hidden tabs are noticed */
+@media (max-width: 760px) {
+  .learning-studio-scope .studio-nav { -webkit-mask-image: linear-gradient(90deg, #000 82%, transparent); mask-image: linear-gradient(90deg, #000 82%, transparent); padding-right: 36px; }
+}

@@ -549,17 +549,23 @@ export function LearningStudio({
     if (!seen || (round.completedAt ?? "") > (seen.completedAt ?? "")) latestRounds.set(round.stageId, round);
   }
   const reviewSession = state.sessions.find((s) => s.id === reviewId);
-  // Four tabs plus help. The path and the activity library stay one link away (from แผนวันนี้ and
-  // จัดชุดฝึก); the kid map is the child's path.
+  // Five tabs plus help. The library stays a tab: it is where adults see every activity, preview one and
+  // play a single item. The stage path is one link away (แผนวันนี้, จัดชุดฝึก); the kid map is the
+  // child's path.
   const nav = [
     { id: "home", label: "แผนวันนี้" },
+    { id: "library", label: "คลังกิจกรรม" },
     { id: "progress", label: "ผลการฝึก" },
     { id: "print", label: "สติกเกอร์และพิมพ์" },
     { id: "plan", label: "จัดชุดฝึก" },
     { id: "guide", label: "คู่มือ" },
   ] as const;
   const navCurrent = (id: string) =>
-    route === id || (id === "plan" && (route === "path" || route === "library")) || (id === "home" && route === "summary");
+    route === id || (id === "plan" && route === "path") || (id === "home" && route === "summary");
+  // Phones scroll the tab bar sideways: keep the current tab in sight when a page opens.
+  useEffect(() => {
+    document.querySelector(".studio-nav [aria-current=\"page\"]")?.scrollIntoView({ block: "nearest", inline: "nearest" });
+  }, [route]);
   /** The kid screens' home button: back to the studio home (a round in progress stays paused). */
   const goHome = () => {
     setStartRequest(null);
@@ -733,7 +739,7 @@ export function LearningStudio({
                   รายการด่านทั้งหมด <ArrowRight size={15} />
                 </button>
                 <button className="text-button" onClick={() => go("library")}>
-                  เลือกข้อเองจากคลังกิจกรรม <ArrowRight size={15} />
+                  ดูกิจกรรมทั้งหมดในคลัง <ArrowRight size={15} />
                 </button>
               </div>
               <div className="bottom-note">
