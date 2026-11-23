@@ -7,12 +7,14 @@ import { GAME_INFO, gameFor, type KidGame } from "./games";
 import { AdultBar, KidShell, Mascot } from "./KidShell";
 import { MouthCartoon } from "./mouths";
 import { useSay } from "./useSay";
+import { useTapMode } from "./preferences";
+import { Basket } from "./games/Scenes";
 
 /** Small picture for a station on the map and on the start screen. */
 export function GameIcon({ game }: { game: KidGame }) {
   switch (game) {
     case "feed":
-      return <Art kind="banana" label="" />;
+      return <Basket />;
     case "mirror":
       return <MouthCartoon pose="open" title="" />;
     case "stones":
@@ -94,7 +96,7 @@ export function KidMap({
 }) {
   const speaker = useSpeaker();
   const say = useSay(speaker);
-  const greet = useEffectEvent(() => say.say(VOICE_CUES.welcome));
+  const greet = useEffectEvent(() => void say.say(VOICE_CUES.welcome));
   useEffect(() => greet(), []);
   const nextGame = GAME_INFO[stageGame(next)];
   return (
@@ -165,9 +167,11 @@ export function KidStart({ stage, onStart, onBack }: { stage: Stage; onStart: ()
   const game = stageGame(stage);
   const speaks = stage.items.some((i) => i.kind === "speech");
   const [mic, setMic] = useState<"idle" | "asking" | "ready" | "blocked">("idle");
+  const [, setTapOnly] = useTapMode();
   const testMic = async () => {
     if (!navigator.mediaDevices?.getUserMedia) {
       setMic("blocked");
+      setTapOnly(true);
       return;
     }
     setMic("asking");
@@ -175,8 +179,11 @@ export function KidStart({ stage, onStart, onBack }: { stage: Stage; onStart: ()
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       stream.getTracks().forEach((t) => t.stop());
       setMic("ready");
+      setTapOnly(false);
     } catch {
+      // The screen says the game will use taps instead: make it so for this visit.
       setMic("blocked");
+      setTapOnly(true);
     }
   };
   return (

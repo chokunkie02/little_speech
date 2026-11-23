@@ -320,6 +320,8 @@ export function LearningStudio({
   const [startRequest, setStartRequest] = useState<{
     stage: Stage;
     ids?: string[];
+    /** Page it was asked from: the start screen only shows there (Back must not leave it on top). */
+    route: Route;
   } | null>(null);
   const [reviewId, setReviewId] = useState<string | null>(null);
   const [resetOpen, setResetOpen] = useState(false);
@@ -419,7 +421,7 @@ export function LearningStudio({
   };
   const begin = (stage: Stage, ids?: string[]) => {
     if (kidMode || stage.items.some((i) => i.kind !== "choice"))
-      setStartRequest({ stage, ids });
+      setStartRequest({ stage, ids, route });
     else start(stage, ids);
   };
   const finishedStages = new Set(
@@ -879,7 +881,7 @@ export function LearningStudio({
                   if (r.done) go(kidMode ? "celebrate" : "summary");
                 }}
               />
-            ) : (
+            ) : kidMode ? null : (
               <Empty
                 title="เลือกภารกิจก่อนเริ่มกัน"
                 body="ยังไม่มีรอบฝึกที่กำลังทำ เลือกช่วงที่อยากลองได้เลย"
@@ -968,7 +970,7 @@ export function LearningStudio({
             />
           )}
           {route === "guide" && <Guide onReset={() => setResetOpen(true)} />}
-          {route === "play" && (
+          {(route === "play" || (route === "practice" && !active && kidMode)) && (
             <KidMap
               stages={stages}
               done={finishedStages}
@@ -1030,14 +1032,14 @@ export function LearningStudio({
           }}
         />
       )}
-      {startRequest && kidMode && (
+      {startRequest && kidMode && startRequest.route === route && (
         <KidStart
           stage={startRequest.stage}
           onStart={() => start(startRequest.stage, startRequest.ids)}
           onBack={() => setStartRequest(null)}
         />
       )}
-      {startRequest && !kidMode && (
+      {startRequest && !kidMode && startRequest.route === route && (
         <Modal
           title="เตรียมตัวก่อนเริ่มกัน"
           onClose={() => setStartRequest(null)}

@@ -60,7 +60,7 @@ export function createVoiceTracker(options: VoiceTrackerOptions = {}) {
         roomSum += rms;
         roomSamples++;
         room = roomSum / roomSamples;
-        if (calibratedMs >= calibrateMs) noise = Math.max(noise, Math.min(room, 0.03));
+        if (calibratedMs >= calibrateMs) noise = Math.max(noise, Math.min(room, 0.02));
         level = 0;
         return this.state();
       }

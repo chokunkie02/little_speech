@@ -55,6 +55,16 @@ check("A tap or click on the mic is not voice; short pauses stay in one burst", 
   feed(t, 0.004, 120);
   assert.equal(feed(t, 0.1, 200).segments, 1);
 });
+check("Stones and train: syllables said with short pauses are separate jumps", () => {
+  // "ปา ปี ปู" with ~200 ms between syllables: one burst each at the games' shorter release.
+  const t = voice.createVoiceTracker({ releaseMs: 170 });
+  feed(t, 0.004, 300);
+  for (let i = 0; i < 3; i++) {
+    feed(t, 0.1, 260);
+    feed(t, 0.004, 200);
+  }
+  assert.equal(feed(t, 0.004, 300).segments, 3);
+});
 check("A child who speaks the moment the mic opens is still heard", () => {
   const t = voice.createVoiceTracker();
   const end = feed(t, 0.1, 600);
@@ -91,6 +101,12 @@ check("Thai phrases split into train cars; young levels play together, older alo
   assert.deepEqual(games.splitWords("ปูตัวเล็ก"), ["ปู", "ตัว", "เล็ก"]);
   assert.deepEqual(games.splitWords("ปู"), ["ปู"]);
   assert.deepEqual(games.splitWords("  "), []);
+  assert.deepEqual(games.trainCars("ปูตัวเล็ก"), ["ปู", "ตัว", "เล็ก"]);
+  const long = "ปูตัวเล็กกำลังเดินอยู่บนทรายริมทะเล";
+  const cars = games.trainCars(long);
+  assert.equal(cars.length, 4, cars.join(" · "));
+  assert.equal(cars.join(""), long);
+  assert(cars.every((c) => c.length >= 3), cars.join(" · "));
   assert.equal(games.defaultPlayMode("starter"), "together");
   assert.equal(games.defaultPlayMode(undefined), "together");
   assert.equal(games.defaultPlayMode("storyteller"), "alone");

@@ -1,4 +1,4 @@
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { ArrowRight, CircleHelp, RotateCcw, Smile } from "lucide-react";
 import { Art } from "../../Art";
 import type { Item, Review } from "../../types";
@@ -16,13 +16,21 @@ export function TogetherGame({ item, practice, say, onNext }: { item: Item; prac
   const speakOnOpen = useEffectEvent(() => {
     if (!practice.saved) say.say(item.instruction);
   });
-  useEffect(() => speakOnOpen(), []);
+  const alive = useRef(true);
+  useEffect(() => {
+    alive.current = true;
+    speakOnOpen();
+    return () => {
+      alive.current = false;
+    };
+  }, []);
   const finish = async (review: Exclude<Review, "pending">) => {
     if (busy) return;
     setBusy(true);
     say.hush();
     await practice.save({ review, support: "adult" });
-    onNext();
+    // Paused while the result was being sent: this item is gone, stay put.
+    if (alive.current) onNext();
   };
   return (
     <>

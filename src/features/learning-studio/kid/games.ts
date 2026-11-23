@@ -6,11 +6,11 @@ export type KidGame = "feed" | "mirror" | "stones" | "card" | "train" | "togethe
 
 /** Name on the map and start screen, and พี่ปู's invitation. */
 export const GAME_INFO: Record<KidGame, { name: string; line: string }> = {
-  feed: { name: "ป้อนอาหารพี่ปู", line: "พี่ปูหิวแล้ว! ฟังให้ดี แล้วป้อนภาพที่ได้ยินนะ" },
+  feed: { name: "ส่งของให้พี่ปู", line: "พี่ปูมีตะกร้าใบใหญ่! ฟังให้ดี แล้วส่งของที่ได้ยินให้พี่ปูนะ" },
   mirror: { name: "กระจกวิเศษ", line: "มาเล่นกระจกวิเศษกับพี่ปูกัน! ดูปากพี่ปู แล้วทำตามนะ" },
-  stones: { name: "กระโดดหิน", line: "พูดทีละก้อน แล้วพี่ปูจะกระโดดข้ามลำธาร!" },
+  stones: { name: "กระโดดหิน", line: "หนูพูดหนึ่งครั้ง พี่ปูกระโดดหนึ่งก้อน! พาพี่ปูข้ามลำธารกัน" },
   card: { name: "การ์ดสติกเกอร์", line: "ดูภาพแล้วบอกพี่ปูว่าคืออะไร ได้สติกเกอร์ด้วยนะ" },
-  train: { name: "รถไฟคำ", line: "พูดให้ต่อกันจนจบ รถไฟจะได้ออกเดินทาง!" },
+  train: { name: "รถไฟคำ", line: "พูดหนึ่งคำ ได้ตู้รถไฟหนึ่งตู้! ต่อให้ครบแล้วรถไฟจะออกวิ่ง ปู้น ปู้น" },
   together: { name: "เล่นกับผู้ใหญ่", line: "ชวนผู้ใหญ่มาเล่นด้วยกันนะ" },
 };
 
@@ -44,6 +44,32 @@ export function splitWords(text: string): string[] {
     if (words.length) return words;
   }
   return clean.split(/\s+/).filter(Boolean);
+}
+
+/** Most cars a word train has: longer sentences group neighbouring words so each car stays readable. */
+export const MAX_CARS = 4;
+
+/**
+ * Train cars for a phrase: one word per car, or for long sentences, neighbouring words grouped into
+ * at most MAX_CARS cars of about equal length ("ปูตัวเล็ก · กำลังเดิน · อยู่บนทราย · ริมทะเล").
+ */
+export function trainCars(text: string, max = MAX_CARS): string[] {
+  const words = splitWords(text);
+  if (words.length <= max) return words;
+  const cars: string[] = [];
+  let rest = words.join("").length;
+  let i = 0;
+  for (let car = max; car > 0; car--) {
+    const target = rest / car;
+    let chunk = words[i++];
+    // Keep adding words while it brings the car closer to its share and leaves a word for each car left.
+    while (i < words.length && words.length - i > car - 1 && Math.abs(chunk.length + words[i].length - target) <= Math.abs(chunk.length - target))
+      chunk += words[i++];
+    if (car === 1) while (i < words.length) chunk += words[i++];
+    cars.push(chunk);
+    rest -= chunk.length;
+  }
+  return cars;
 }
 
 /** Who is expected next to the child. Young levels play with an adult; older children may play alone. */

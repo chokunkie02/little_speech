@@ -12,6 +12,23 @@ export interface AdultAction {
   onSelect: () => void;
 }
 
+/**
+ * Page scroll lock shared by every kid screen. Counted, so screens that overlap for a moment (map, start
+ * screen, browser Back) always hand the page back exactly as it was.
+ */
+let scrollLocks = 0;
+let scrollBefore = "";
+function lockScroll() {
+  const html = document.documentElement;
+  if (scrollLocks++ === 0) {
+    scrollBefore = html.style.overflow;
+    html.style.overflow = "hidden";
+  }
+  return () => {
+    if (--scrollLocks === 0) html.style.overflow = scrollBefore;
+  };
+}
+
 const ShellContext = createContext<{ openMenu: () => void; showBar: (on: boolean) => void }>({
   openMenu: () => {},
   showBar: () => {},
@@ -46,26 +63,41 @@ export function KidShell({
     openMenu: () => setMenu(true),
     showBar: (on: boolean) => setBars((n) => n + (on ? 1 : -1)),
   }));
+  const sheet = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    const html = document.documentElement;
-    const before = html.style.overflow;
-    html.style.overflow = "hidden";
-    root.current?.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true });
-    return () => {
-      html.style.overflow = before;
-    };
+    const unlock = lockScroll();
+    // Focus the world itself, not its first button: that is pause, and Space would press it.
+    root.current?.focus({ preventScroll: true });
+    return unlock;
   }, []);
   useEffect(() => {
     if (!menu) return;
+    const back = root.current;
+    sheet.current?.querySelector<HTMLButtonElement>("button")?.focus();
     const key = (e: KeyboardEvent) => {
       if (e.key === "Escape") setMenu(false);
+      if (e.key !== "Tab" || !sheet.current) return;
+      // Keep Tab inside the menu while it is open.
+      const items = [...sheet.current.querySelectorAll<HTMLButtonElement>("button")];
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first?.focus();
+      }
     };
     window.addEventListener("keydown", key);
-    return () => window.removeEventListener("keydown", key);
+    return () => {
+      window.removeEventListener("keydown", key);
+      back?.focus({ preventScroll: true });
+    };
   }, [menu]);
   return (
     <ShellContext.Provider value={context}>
-      <div className="kid-world" ref={root} role="region" aria-label={label}>
+      <div className="kid-world" ref={root} role="region" aria-label={label} tabIndex={-1}>
         <link rel="stylesheet" href={KID_FONTS} precedence="default" />
         <div className="kw-top">
           {onPause ? (
@@ -100,6 +132,7 @@ export function KidShell({
         {menu && (
           <div className="kw-sheet-back" onClick={() => setMenu(false)}>
             <div
+              ref={sheet}
               className="kw-sheet"
               role="dialog"
               aria-modal="true"

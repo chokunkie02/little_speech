@@ -43,6 +43,10 @@ export function KidPractice({
     if (micProblem === "denied" || micProblem === "unsupported") setTapOnly(true);
   }, [micProblem, setTapOnly]);
 
+  // While a result is being sent, wait: leaving now would let the late reply move the old round on.
+  const pause = () => {
+    if (!practice.assessmentBusy) onPause();
+  };
   const actions: AdultAction[] = [
     ...(item ? [{ label: "ฟังวิธีเล่น", icon: <Volume2 />, onSelect: () => say.say(item.instruction) }] : []),
     {
@@ -60,7 +64,7 @@ export function KidPractice({
         ]
       : []),
     { label: "ใช้หน้าฝึกแบบเดิม", icon: <LayoutList />, onSelect: onSwitchUi },
-    { label: "พักรอบนี้ กลับหน้าหลัก", icon: <LogOut />, onSelect: onPause },
+    { label: "พักรอบนี้ กลับหน้าหลัก", icon: <LogOut />, onSelect: pause },
   ];
   const note = item && (
     <>
@@ -91,7 +95,7 @@ export function KidPractice({
     <KidShell
       label={`${stage.label} ข้อที่ ${session.index + 1} จาก ${session.itemIds.length}`}
       progress={{ done, total: session.itemIds.length }}
-      onPause={onPause}
+      onPause={pause}
       adultActions={actions}
       adultNote={note}
     >

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { LearningLevelId } from "../learning-levels";
 import { defaultPlayMode, type PlayMode } from "./games";
 
@@ -47,18 +47,17 @@ export function useTapMode() {
       return false;
     }
   });
-  return [
-    tap,
-    (next: boolean) => {
-      try {
-        if (next) sessionStorage.setItem(TAP_KEY, "on");
-        else sessionStorage.removeItem(TAP_KEY);
-      } catch {
-        // Storage blocked: tap mode lasts until this item changes.
-      }
-      setTap(next);
-    },
-  ] as const;
+  // Stable, so effects that depend on it do not re-run every render.
+  const set = useCallback((next: boolean) => {
+    try {
+      if (next) sessionStorage.setItem(TAP_KEY, "on");
+      else sessionStorage.removeItem(TAP_KEY);
+    } catch {
+      // Storage blocked: tap mode lasts until this item changes.
+    }
+    setTap(next);
+  }, []);
+  return [tap, set] as const;
 }
 
 /** Play together or alone. Follows the content level until an adult picks one. */

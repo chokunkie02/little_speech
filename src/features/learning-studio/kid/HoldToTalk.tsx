@@ -27,6 +27,7 @@ export function HoldToTalk({
 }) {
   const pressed = useRef(false);
   const stopWhenReady = useRef(false);
+  const mic = useRef<HTMLButtonElement>(null);
   const start = () => {
     if (disabled || recorder.recording || recorder.requesting || pressed.current) return;
     pressed.current = true;
@@ -40,6 +41,23 @@ export function HoldToTalk({
     else stopWhenReady.current = true;
   };
   const onSpace = useEffectEvent((down: boolean) => (down ? start() : stop()));
+  const onLeave = useEffectEvent(() => {
+    // The mic button is going away (replay, tap mode, next phase) or the window lost focus mid-hold:
+    // never leave the microphone recording with no button to stop it.
+    if (pressed.current || recorder.recording) {
+      pressed.current = false;
+      if (recorder.recording) recorder.stopRecording();
+      else stopWhenReady.current = true;
+    }
+  });
+  useEffect(() => {
+    const blur = () => onLeave();
+    window.addEventListener("blur", blur);
+    return () => {
+      window.removeEventListener("blur", blur);
+      onLeave();
+    };
+  }, []);
   useEffect(() => {
     if (recorder.recording && stopWhenReady.current) {
       stopWhenReady.current = false;
@@ -48,7 +66,12 @@ export function HoldToTalk({
     if (!recorder.recording && !recorder.requesting) stopWhenReady.current = false;
   }, [recorder]);
   useEffect(() => {
-    const typing = (e: KeyboardEvent) => e.target instanceof HTMLElement && e.target.closest("input, textarea, select, [contenteditable]");
+    // Space belongs to the mic only when nothing else wants it: not while typing, not on another button
+    // (let that button press), not inside the adult menu.
+    const typing = (e: KeyboardEvent) =>
+      e.target instanceof HTMLElement &&
+      ((e.target.closest("button, input, textarea, select, [contenteditable], [role=dialog]") && e.target !== mic.current) ||
+        !!document.querySelector(".kid-world [role=dialog]"));
     const down = (e: KeyboardEvent) => {
       if (e.code !== "Space" || typing(e)) return;
       e.preventDefault();
@@ -70,6 +93,7 @@ export function HoldToTalk({
   return (
     <>
       <button
+        ref={mic}
         type="button"
         className={`kw-mic${live ? " live" : ""}`}
         style={{ ["--kw-level" as string]: live ? level.toFixed(2) : "0" }}
@@ -88,6 +112,7 @@ export function HoldToTalk({
           // Keyboard users without Space-hold: Enter toggles.
           if (e.key !== "Enter") return;
           e.preventDefault();
+          if (e.repeat) return;
           if (pressed.current) stop();
           else start();
         }}
@@ -106,11 +131,11 @@ export function HoldToTalk({
 }
 
 /** Tap mode, when the microphone cannot be used: the child speaks to the adult and taps when done. */
-export function SaidItButton({ onSaid, disabled }: { onSaid: () => void; disabled?: boolean }) {
+export function SaidItButton({ onSaid, disabled, label = "หนูพูดแล้ว" }: { onSaid: () => void; disabled?: boolean; label?: string }) {
   return (
     <button type="button" className="kw-btn gold big" onClick={onSaid} disabled={disabled}>
       <Hand />
-      หนูพูดแล้ว
+      {label}
     </button>
   );
 }
