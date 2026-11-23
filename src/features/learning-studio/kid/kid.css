@@ -410,6 +410,54 @@
 .kid-world .kw-journey-stars svg.on { fill: var(--kw-gold-1); color: var(--kw-gold-2); }
 @keyframes kw-row-in { from { opacity: 0; transform: translateX(24px); } }
 
+/* ── Sticker book ── */
+.kid-world .kw-stk { position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.kid-world .kw-stk-pic { width: 100%; aspect-ratio: 1; border-radius: 24px; background: #FFFDF6; border: 5px solid #FFFFFF; box-shadow: 0 5px 0 rgb(0 0 0 / 0.28), 0 0 0 1px rgb(0 0 0 / 0.08); display: grid; place-items: center; transform: rotate(-2deg); transition: transform 0.15s; }
+.kid-world .kw-stk:nth-child(even) .kw-stk-pic { transform: rotate(2deg); }
+.kid-world button.kw-stk:hover .kw-stk-pic { transform: rotate(0) scale(1.04); }
+.kid-world .kw-stk-pic svg { width: 88%; height: 88%; }
+.kid-world .kw-stk small { font-size: 15px; line-height: 1.2; color: var(--kw-text); text-align: center; }
+.kid-world .kw-stk.locked .kw-stk-pic { background: rgb(127 120 200 / 0.08); border: 2px dashed rgb(127 120 200 / 0.4); box-shadow: none; transform: none; }
+.kid-world .kw-stk.locked svg { filter: brightness(0) opacity(0.22); }
+.dark .kid-world .kw-stk.locked svg { filter: brightness(0) invert(1) opacity(0.16); }
+.kid-world .kw-stk.locked small { color: var(--kw-muted); }
+.kid-world .kw-stk.fresh .kw-stk-pic { box-shadow: 0 5px 0 rgb(0 0 0 / 0.28), 0 0 0 4px var(--kw-gold-1), 0 0 22px 4px rgb(255 213 138 / 0.6); }
+.kid-world .kw-stk-new { position: absolute; top: -8px; right: -6px; font: normal 600 12px var(--kw-font-ui); color: #2A1D05; background: var(--kw-gold-1); border-radius: 999px; padding: 2px 9px; transform: rotate(8deg); box-shadow: 0 2px 0 var(--kw-gold-edge); }
+.kid-world .kw-book { justify-content: flex-start; gap: 14px; max-width: 900px; width: 100%; margin: 0 auto; }
+.kid-world .kw-book .kw-title { font-size: clamp(24px, 4vw, 36px); }
+.kid-world .kw-book-tabs { display: flex; gap: 8px; width: 100%; }
+.kid-world .kw-book-tabs button { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 4px; border-radius: 16px; background: var(--kw-chip); border: 1px solid var(--kw-chip-line); font-size: 14px; color: var(--kw-muted); }
+.kid-world .kw-book-tabs button svg { width: 42px; height: 32px; }
+.kid-world .kw-book-tabs button span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.kid-world .kw-book-tabs button b { font: 600 12px var(--kw-font-ui); }
+.kid-world .kw-book-tabs button.on { background: color-mix(in srgb, var(--kw-primary) 22%, transparent); border-color: var(--kw-primary); color: var(--kw-text); }
+.kid-world .kw-book-tabs button.full b { color: var(--kw-gold-2); }
+.kid-world .kw-book-page { width: 100%; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 12px; padding: 16px; border-radius: 26px; background: var(--kw-surface); border: 1px solid var(--kw-line); box-shadow: 0 8px 0 rgb(40 30 110 / 0.25); }
+.kid-world .kw-book-page.full { border: 3px solid var(--kw-gold-1); box-shadow: 0 8px 0 var(--kw-gold-edge), 0 0 26px 2px rgb(255 213 138 / 0.35); }
+@media (min-width: 620px) { .kid-world .kw-book-page { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+@media (min-width: 900px) { .kid-world .kw-book-page { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.kid-world .kw-book .kw-mascot { max-width: 520px; }
+.kid-world .kw-book-btn { position: relative; }
+.kid-world .kw-dot { position: absolute; top: -3px; right: -3px; width: 14px; height: 14px; border-radius: 50%; background: #FF6B6B; border: 2px solid var(--kw-bg); }
+/* A sticker shown big */
+.kid-world .kw-zoom-back { align-items: center; }
+.kid-world .kw-zoom { position: relative; width: min(360px, calc(100% - 32px)); display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 30px 22px 24px; border-radius: 28px; background: var(--kw-surface); border: 1px solid var(--kw-line); box-shadow: 0 20px 40px -20px rgb(0 0 0 / 0.7); font-family: var(--kw-font-kid); animation: kw-pop 0.35s cubic-bezier(0.3, 1.5, 0.5, 1) !important; }
+.kid-world .kw-zoom-x { position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; }
+.kid-world .kw-zoom-stk { position: relative; width: 170px; }
+.kid-world .kw-zoom-stk .kw-stk small { display: none; }
+.kid-world .kw-zoom .kw-btn { flex: none; min-width: 200px; }
+.kid-world .kw-inline-star { width: 18px; height: 18px; vertical-align: -3px; fill: var(--kw-gold-1); color: var(--kw-gold-2); }
+/* Round end: stickers fly into the book */
+.kid-world svg.kw-pu.mid { width: min(150px, 34vw); }
+.kid-world .kw-earn { display: flex; flex-direction: column; align-items: center; gap: 12px; width: 100%; max-width: 380px; }
+.kid-world .kw-earn-row { display: flex; gap: 12px; justify-content: center; width: 100%; }
+.kid-world .kw-earn-item { width: min(108px, 28vw); animation: kw-earn-in 0.55s cubic-bezier(0.3, 1.5, 0.5, 1) both !important; }
+@keyframes kw-earn-in { from { opacity: 0; transform: translateY(-50px) scale(0.4) rotate(-20deg); } }
+.kid-world .kw-earn-book { flex: none; min-height: 48px; font-size: 17px; }
+.kid-world .kw-finale .kw-row { flex-wrap: wrap; }
+.kid-world .kw-total svg { width: 30px; height: 30px; }
+.kid-world .kw-total svg.lucide-book-open { fill: none; color: var(--kw-primary-text); }
+
 /* Reduced motion (also on when Windows animations are off for performance): the short, one-off moves
    that ARE the game's answer to the child (jump, fly to the basket, couple a car, the train trip) are
    marked !important above so the site-wide "motion off" rules don't remove them; everything that loops

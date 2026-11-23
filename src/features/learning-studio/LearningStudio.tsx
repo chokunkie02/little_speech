@@ -7,6 +7,8 @@ import { KidPractice } from "./kid/KidPractice";
 import { usePracticeUi } from "./kid/preferences";
 import { KidFinale, KidMap, KidRoundEnd, KidStart, KidTravel } from "./kid/KidScreens";
 import { KidHomeContext } from "./kid/KidShell";
+import { KidStickerBook, readSeenStickers } from "./kid/StickerBook";
+import { stickerBook, stickersOfRound } from "./kid/stickers";
 import AssessmentControls from "@/components/assessment/AssessmentControls";
 import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
 import RoundAdvice from "./RoundAdvice";
@@ -15,7 +17,7 @@ import {
   studioStorageKey,
   type StudioChild,
 } from "./integration";
-import React, { useState, useEffect, useRef, useEffectEvent } from "react";
+import React, { useState, useEffect, useMemo, useRef, useEffectEvent } from "react";
 import {
   Home,
   Map,
@@ -126,6 +128,7 @@ const routeFromHash = (): Route => {
     "play",
     "celebrate",
     "finale",
+    "stickers",
   ].includes(s)
     ? (s as Route)
     : "home";
@@ -482,6 +485,8 @@ export function LearningStudio({
   /** The round-end "ด่านต่อไป": the stage after the one just finished (none after the last stage). */
   const roundNext = sessionForSummary ? stageAfter(sessionForSummary.stageId) : undefined;
   const roundStage = sessionForSummary ? stages.find((s) => s.id === sessionForSummary.stageId) : undefined;
+  /** The child's sticker book, worked out from every round they played (nothing new is stored). */
+  const stickers = useMemo(() => stickerBook(state.sessions, state.plan.childId), [state.sessions, state.plan.childId]);
   /** Latest finished round of each stage in this plan, for the end-of-adventure summary. */
   const latestRounds = new globalThis.Map<string, Session>();
   for (const round of completed.filter((x) => x.planId === state.plan.id)) {
@@ -1013,7 +1018,19 @@ export function LearningStudio({
               sound={state.plan.sound}
               onPick={(stage) => begin(stage)}
               onGo={() => (active ? go("practice") : begin(mapNext))}
+              newStickers={stickers.owned.size > readSeenStickers(state.plan.childId)}
+              onBook={() => go("stickers")}
               onExit={() => go("home")}
+            />
+          )}
+          {route === "stickers" && (
+            <KidStickerBook
+              childId={state.plan.childId}
+              stages={stages}
+              book={stickers}
+              latestRoundId={state.lastCompletedId}
+              onPlay={(stage) => begin(stage)}
+              onMap={() => go("play")}
             />
           )}
           {route === "celebrate" && travel && travel.route === route && (
@@ -1036,6 +1053,7 @@ export function LearningStudio({
             <KidFinale
               stages={stages}
               latest={latestRounds}
+              stickers={stickers.owned.size}
               onAgain={() => begin(stages[0])}
               onPick={(stage) => begin(stage)}
               onMap={() => go("play")}
@@ -1056,6 +1074,9 @@ export function LearningStudio({
                 onNext={() =>
                   roundNext && roundStage ? setTravel({ from: roundStage, to: roundNext, route }) : go("finale")
                 }
+                roundStickers={stickersOfRound(sessionForSummary)}
+                freshStickers={stickers.newIn.get(sessionForSummary.id) ?? []}
+                onBook={() => go("stickers")}
                 onAdult={() => go("summary")}
                 onMap={() => go("play")}
               />

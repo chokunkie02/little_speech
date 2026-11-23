@@ -1,6 +1,6 @@
 import "./kid.css";
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
-import { Ellipsis, House, Pause, UserRound, Volume2, X } from "lucide-react";
+import { Ellipsis, House, Map as MapIcon, Pause, UserRound, Volume2, X } from "lucide-react";
 import { Art } from "../Art";
 
 /** Kid-only fonts: Itim for พี่ปู and buttons, Sarabun (textbook shapes) for the words being taught. */
@@ -45,6 +45,7 @@ const ShellContext = createContext<{ openMenu: () => void; showBar: (on: boolean
 export function KidShell({
   progress,
   onPause,
+  back = "pause",
   right,
   adultActions = [],
   adultNote,
@@ -53,6 +54,8 @@ export function KidShell({
 }: {
   progress?: { done: number; total: number };
   onPause?: () => void;
+  /** What the top-left button looks like: pause (in a game) or back to the map (book, round end). */
+  back?: "pause" | "map";
   right?: ReactNode;
   adultActions?: AdultAction[];
   adultNote?: ReactNode;
@@ -105,8 +108,8 @@ export function KidShell({
         <link rel="stylesheet" href={KID_FONTS} precedence="default" />
         <div className="kw-top">
           {onPause ? (
-            <button type="button" className="kw-ibtn" onClick={onPause} aria-label="พักไว้ก่อน">
-              <Pause />
+            <button type="button" className="kw-ibtn" onClick={onPause} aria-label={back === "map" ? "กลับแผนที่" : "พักไว้ก่อน"}>
+              {back === "map" ? <MapIcon /> : <Pause />}
             </button>
           ) : (
             <span className="kw-spacer" />

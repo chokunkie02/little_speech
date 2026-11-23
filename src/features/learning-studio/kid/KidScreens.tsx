@@ -9,6 +9,7 @@ import { MouthCartoon } from "./mouths";
 import { useSay } from "./useSay";
 import { useTapMode } from "./preferences";
 import { Basket, Burst } from "./games/Scenes";
+import { RoundStickers } from "./StickerBook";
 import { sfx, unlockSfx } from "./sfx";
 
 /** Small picture for a station on the map and on the start screen. */
@@ -162,8 +163,10 @@ export function KidMap({
   next,
   stars,
   sound,
+  newStickers = false,
   onPick,
   onGo,
+  onBook,
   onExit,
 }: {
   stages: Stage[];
@@ -172,8 +175,11 @@ export function KidMap({
   next: Stage;
   stars: number;
   sound: string;
+  /** Stickers the child has not seen in the book yet: a dot on the book button. */
+  newStickers?: boolean;
   onPick: (stage: Stage) => void;
   onGo: () => void;
+  onBook: () => void;
   onExit: () => void;
 }) {
   const speaker = useSpeaker();
@@ -187,10 +193,16 @@ export function KidMap({
     <KidShell
       label="แผนที่ผจญภัย"
       right={
-        <span className="kw-count" aria-label={`ดาวสะสม ${stars} ดวง`}>
-          <Star />
-          {stars}
-        </span>
+        <>
+          <span className="kw-count" aria-label={`ดาวสะสม ${stars} ดวง`}>
+            <Star />
+            {stars}
+          </span>
+          <button type="button" className="kw-ibtn kw-book-btn" onClick={onBook} aria-label={newStickers ? "สมุดสติกเกอร์ มีสติกเกอร์ใหม่" : "สมุดสติกเกอร์"}>
+            <BookOpen />
+            {newStickers && <i className="kw-dot" />}
+          </button>
+        </>
       }
       adultActions={[{ label: "กลับหน้าหลักของผู้ใหญ่", icon: <LogOut />, onSelect: onExit }]}
       adultNote={<p>ทุกด่านกดเล่นได้ ด่านที่เล่นจบแล้วมีดาว · ปรับระดับและชุดฝึกได้ที่หน้าหลักของผู้ใหญ่</p>}
@@ -293,6 +305,9 @@ export function KidRoundEnd({
   onAgain,
   onNext,
   nextLabel,
+  roundStickers = [],
+  freshStickers = [],
+  onBook,
   onAdult,
   onMap,
 }: {
@@ -300,6 +315,10 @@ export function KidRoundEnd({
   onAgain: () => void;
   onNext: () => void;
   nextLabel: string;
+  /** Stickers this round's pictures give, and which of them are new to the book. */
+  roundStickers?: string[];
+  freshStickers?: string[];
+  onBook: () => void;
   onAdult: () => void;
   onMap: () => void;
 }) {
@@ -315,12 +334,16 @@ export function KidRoundEnd({
     <KidShell label="จบภารกิจ" onPause={onMap}>
       <div className="kw-split">
         <div className="kw-col">
-          <Art kind="crab" className="kw-pu big" label="พี่ปูดีใจ" />
-          <div className="kw-stars" aria-label={`ได้ดาว ${stars} ดวง`}>
-            {Array.from({ length: stars }, (_, i) => (
-              <Star key={i} />
-            ))}
-          </div>
+          <Art kind="crab" className={`kw-pu ${roundStickers.length ? "mid" : "big"}`} label="พี่ปูดีใจ" />
+          {roundStickers.length ? (
+            <RoundStickers kinds={roundStickers} fresh={freshStickers} onOpen={onBook} />
+          ) : (
+            <div className="kw-stars" aria-label={`ได้ดาว ${stars} ดวง`}>
+              {Array.from({ length: stars }, (_, i) => (
+                <Star key={i} />
+              ))}
+            </div>
+          )}
         </div>
         <div className="kw-col">
           <div className="kw-title">ภารกิจสำเร็จ!</div>
@@ -461,6 +484,7 @@ function Trophy() {
 export function KidFinale({
   stages,
   latest,
+  stickers,
   onAgain,
   onPick,
   onMap,
@@ -469,6 +493,8 @@ export function KidFinale({
   stages: Stage[];
   /** Most recent finished round of each stage in this plan. */
   latest: Map<string, Session>;
+  /** Stickers in the book. */
+  stickers: number;
   onAgain: () => void;
   /** Play a station that was skipped. */
   onPick: (stage: Stage) => void;
@@ -512,9 +538,15 @@ export function KidFinale({
             <Trophy />
             <Burst count={20} />
           </div>
-          <div className="kw-total" aria-label={`ดาวทั้งหมด ${totals.stars} ดวง`}>
-            <Star />
-            {totals.stars}
+          <div className="kw-row">
+            <div className="kw-total" aria-label={`ดาวทั้งหมด ${totals.stars} ดวง`}>
+              <Star />
+              {totals.stars}
+            </div>
+            <div className="kw-total" aria-label={`สติกเกอร์ ${stickers} ดวง`}>
+              <BookOpen />
+              {stickers}
+            </div>
           </div>
         </div>
         <div className="kw-col">

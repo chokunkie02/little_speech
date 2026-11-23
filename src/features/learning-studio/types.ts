@@ -13,6 +13,7 @@ export type Route =
   | "play"
   | "celebrate"
   | "finale"
+  | "stickers"
   | "wireframes";
 export type Review = "pending" | "achieved" | "practice" | "unavailable";
 export interface Plan {
