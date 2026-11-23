@@ -125,9 +125,324 @@ function Line({
 
 /* ─────────────── Stepping stones ─────────────── */
 
+/** Backdrops for the stepping game, so it is not always the same river. */
+export type StepTheme = "river" | "sky" | "forest" | "night";
+export const STEP_THEMES: StepTheme[] = ["river", "sky", "forest", "night"];
+/** Same item, same scene; neighbouring items usually differ. */
+export const stepThemeFor = (id: string) =>
+  STEP_THEMES[
+    [...id].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7) %
+      STEP_THEMES.length
+  ];
+
+const STEP_WORDS: Record<StepTheme, { thing: string; goal: string }> = {
+  river: { thing: "ก้อนหิน", goal: "ข้ามลำธาร" },
+  sky: { thing: "ก้อนเมฆ", goal: "ไปถึงสายรุ้ง" },
+  forest: { thing: "ดอกเห็ด", goal: "ไปถึงหีบสมบัติ" },
+  night: { thing: "ดาวเคราะห์", goal: "ไปถึงดวงจันทร์" },
+};
+export const stepWords = (theme: StepTheme) => STEP_WORDS[theme];
+
+/** Background for a theme. `sx` and `gx` are the start and goal x in the 400 × 240 drawing. */
+function Backdrop({
+  theme,
+  sx,
+  gx,
+}: {
+  theme: StepTheme;
+  sx: number;
+  gx: number;
+}) {
+  if (theme === "sky")
+    return (
+      <>
+        <defs>
+          <linearGradient id="kw-sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#8FD3FF" />
+            <stop offset="1" stopColor="#FFD9EC" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="240" fill="url(#kw-sky)" />
+        <circle
+          cx="52"
+          cy="40"
+          r="22"
+          fill="#FFE27A"
+          stroke="#F2B23A"
+          strokeWidth="3"
+        />
+        <g fill="#FFFFFF" opacity=".55">
+          <ellipse cx="170" cy="40" rx="30" ry="10" />
+          <ellipse cx="300" cy="28" rx="24" ry="8" />
+          <ellipse cx="250" cy="215" rx="34" ry="9" />
+        </g>
+        <path
+          d={`M${sx - 46} 168 q8 -26 30 -18 q10 -22 34 -8 q24 -4 24 22 q14 8 0 22 h-82 q-18 -6 -6 -18z`}
+          fill="#FFFFFF"
+          stroke="#C9DDF2"
+          strokeWidth="3"
+        />
+        <g fill="none" strokeWidth="9" strokeLinecap="round">
+          {[
+            "#FF6B6B",
+            "#FFB443",
+            "#FFE27A",
+            "#6FD08C",
+            "#6FB7FF",
+            "#A98BFF",
+          ].map((c, i) => (
+            <path
+              key={c}
+              d={`M${gx - 50 + i * 7} 190 A${50 - i * 7} ${62 - i * 7} 0 0 1 ${gx + 50 - i * 7} 190`}
+              stroke={c}
+            />
+          ))}
+        </g>
+        <path
+          d={`M${gx - 62} 200 q6 -16 22 -10 q12 -14 28 0 q12 -4 14 10z M${gx + 18} 200 q6 -16 22 -10 q12 -14 28 0 q12 -4 14 10z`}
+          fill="#FFFFFF"
+        />
+      </>
+    );
+  if (theme === "forest")
+    return (
+      <>
+        <rect width="400" height="240" fill="#BFE9FF" />
+        <circle cx="350" cy="36" r="18" fill="#FFE27A" />
+        {[30, 110, 200, 290, 370].map((x, i) => (
+          <g key={x}>
+            <rect
+              x={x - 5}
+              y={70 + (i % 2) * 8}
+              width="10"
+              height="50"
+              fill="#9C6B3F"
+            />
+            <circle
+              cx={x}
+              cy={62 + (i % 2) * 8}
+              r={26 + (i % 3) * 4}
+              fill={i % 2 ? "#5FB86A" : "#4FA35D"}
+            />
+          </g>
+        ))}
+        <path d="M0 116 Q100 104 200 118 T400 112 V240 H0 Z" fill="#8CCB7A" />
+        <path
+          d={`M${sx - 30} 190 Q200 150 ${gx + 30} 176`}
+          fill="none"
+          stroke="#E7C98F"
+          strokeWidth="26"
+          strokeLinecap="round"
+          opacity=".75"
+        />
+        <g transform={`translate(${gx - 26} 118)`}>
+          <rect
+            x="0"
+            y="22"
+            width="52"
+            height="34"
+            rx="5"
+            fill="#C27A3A"
+            stroke="#7E4A1E"
+            strokeWidth="3"
+          />
+          <path
+            d="M0 26 Q26 -4 52 26 Z"
+            fill="#D98E46"
+            stroke="#7E4A1E"
+            strokeWidth="3"
+          />
+          <rect
+            x="22"
+            y="26"
+            width="8"
+            height="12"
+            rx="2"
+            fill="#FFD25E"
+            stroke="#C98B1C"
+            strokeWidth="2"
+          />
+          <g fill="#FFE27A">
+            <circle cx="10" cy="12" r="3" />
+            <circle cx="40" cy="8" r="2.5" />
+            <circle cx="26" cy="2" r="3" />
+          </g>
+        </g>
+      </>
+    );
+  if (theme === "night")
+    return (
+      <>
+        <defs>
+          <linearGradient id="kw-night" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#1B1F5E" />
+            <stop offset="1" stopColor="#4A2D85" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="240" fill="url(#kw-night)" />
+        <g fill="#FFF6D8">
+          {[
+            [30, 30],
+            [90, 70],
+            [150, 22],
+            [210, 60],
+            [260, 18],
+            [320, 70],
+            [380, 30],
+            [60, 200],
+            [130, 225],
+            [240, 210],
+            [300, 230],
+            [370, 190],
+          ].map(([x, y]) => (
+            <circle key={`${x}-${y}`} cx={x} cy={y} r={x % 3 ? 1.6 : 2.6} />
+          ))}
+        </g>
+        <ellipse
+          cx={sx}
+          cy="176"
+          rx="38"
+          ry="12"
+          fill="#7B6CF6"
+          stroke="#B9AEFF"
+          strokeWidth="3"
+        />
+        <g transform={`translate(${gx} 128)`}>
+          <circle r="34" fill="#FFE9A8" />
+          <circle cx="15" cy="-10" r="30" fill="#2A2470" />
+          <circle cx="-16" cy="8" r="4" fill="#F5D57A" />
+          <circle cx="-8" cy="-14" r="3" fill="#F5D57A" />
+        </g>
+      </>
+    );
+  // River: banks at the start and the goal, water between, a flag on the far bank.
+  return (
+    <>
+      <defs>
+        <linearGradient id="kw-water" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#7FD3F2" />
+          <stop offset="1" stopColor="#3C9BD6" />
+        </linearGradient>
+      </defs>
+      <rect width="400" height="240" fill="url(#kw-water)" />
+      <g
+        className="kw-waves"
+        stroke="#D8F3FF"
+        strokeWidth="3"
+        fill="none"
+        strokeLinecap="round"
+        opacity=".7"
+      >
+        <path d={`M${sx + 40} 60 q10 -6 20 0 t20 0`} />
+        <path d="M190 34 q10 -6 20 0 t20 0" />
+        <path d={`M${sx + 60} 214 q10 -6 20 0 t20 0`} />
+        <path d={`M${gx - 90} 200 q10 -6 20 0 t20 0`} />
+      </g>
+      <path
+        d={`M0 0 H${sx + 18} Q${sx + 2} 60 ${sx + 26} 120 Q${sx + 4} 180 ${sx + 20} 240 H0 Z`}
+        fill="#F3D79A"
+      />
+      <path
+        d={`M0 0 H${sx + 6} Q${sx - 10} 60 ${sx + 12} 120 Q${sx - 8} 180 ${sx + 6} 240 H0 Z`}
+        fill="#8CCB7A"
+      />
+      <path
+        d={`M400 0 H${gx - 18} Q${gx - 2} 60 ${gx - 26} 120 Q${gx - 4} 180 ${gx - 20} 240 H400 Z`}
+        fill="#F3D79A"
+      />
+      <path
+        d={`M400 0 H${gx - 6} Q${gx + 10} 60 ${gx - 12} 120 Q${gx + 8} 180 ${gx - 6} 240 H400 Z`}
+        fill="#8CCB7A"
+      />
+      <path
+        d={`M${gx + 14} 46 V118`}
+        stroke="#8A5A2B"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+      <path
+        className="kw-flag"
+        d={`M${gx + 16} 48 L${gx + 40} 58 L${gx + 16} 68 Z`}
+        fill="#FF6B6B"
+        stroke="#C94545"
+        strokeWidth="2"
+        strokeLinejoin="round"
+      />
+    </>
+  );
+}
+
+/** One step's picture (the stone itself is drawn by CSS). */
+function StepShape({ theme }: { theme: StepTheme }) {
+  if (theme === "sky")
+    return (
+      <svg viewBox="0 0 100 64" aria-hidden="true">
+        <path
+          d="M14 50 q-12 -2 -8 -16 q4 -12 18 -9 q4 -16 22 -15 q14 -10 28 2 q16 -2 18 14 q12 4 6 18 q-4 8 -14 8 h-62 z"
+          fill="#FFFFFF"
+          stroke="#B8D3EE"
+          strokeWidth="3"
+        />
+      </svg>
+    );
+  if (theme === "forest")
+    return (
+      <svg viewBox="0 0 100 64" aria-hidden="true">
+        <rect
+          x="38"
+          y="34"
+          width="24"
+          height="28"
+          rx="8"
+          fill="#FFF1DA"
+          stroke="#C9A77A"
+          strokeWidth="3"
+        />
+        <path
+          d="M6 40 Q8 2 50 2 Q92 2 94 40 Z"
+          fill="#E8574A"
+          stroke="#A9382E"
+          strokeWidth="3"
+          strokeLinejoin="round"
+        />
+        <g fill="#FFFFFF">
+          <circle cx="14" cy="32" r="4" />
+          <circle cx="86" cy="32" r="4" />
+          <circle cx="30" cy="10" r="3" />
+          <circle cx="70" cy="10" r="3" />
+        </g>
+      </svg>
+    );
+  if (theme === "night")
+    return (
+      <svg viewBox="0 0 100 64" aria-hidden="true">
+        <circle
+          cx="50"
+          cy="32"
+          r="26"
+          fill="#8FD3FF"
+          stroke="#4E8FC4"
+          strokeWidth="3"
+        />
+        <ellipse
+          cx="50"
+          cy="48"
+          rx="46"
+          ry="8"
+          fill="none"
+          stroke="#FFD25E"
+          strokeWidth="4"
+        />
+        <path d="M30 48 A26 26 0 0 0 70 48" fill="#8FD3FF" />
+      </svg>
+    );
+  return null;
+}
+
 /**
- * A stream with one stone per syllable. พี่ปู starts on the near bank, jumps one stone for every burst of
- * voice (`hops`), and once every stone is crossed (`finished`) leaps to the far bank for a party.
+ * The stepping game: one step per syllable between a start and a goal. พี่ปู starts on the left,
+ * jumps one step for every burst of voice (`hops`), and once every step is crossed (`finished`)
+ * leaps to the goal for a party. Steps keep an even, short gap whatever their number.
  */
 export function StonesScene({
   parts,
@@ -135,6 +450,7 @@ export function StonesScene({
   finished,
   quiet,
   blend = false,
+  theme = "river",
 }: {
   parts: string[];
   hops: number;
@@ -142,28 +458,39 @@ export function StonesScene({
   quiet: boolean;
   /** Sounds that join into a syllable (ป + า → ปา) rather than separate syllables (ปา ปี ปู). */
   blend?: boolean;
+  theme?: StepTheme;
 }) {
   const n = parts.length;
-  // Percent positions across the scene: near bank 9%, stones spread over 22–78%, far bank 91%.
-  const stoneX = (i: number) => (n === 1 ? 50 : 22 + (56 * i) / (n - 1));
-  const stoneY = (i: number) => (i % 2 ? 60 : 68);
+  // Even gaps (start → steps → goal), short when there are few steps, all within 12–88%.
+  const gap = Math.min(20, 76 / (n + 1));
+  const startX = 50 - (gap * (n + 1)) / 2;
+  const goalX = 100 - startX;
+  const stoneX = (i: number) => startX + gap * (i + 1);
+  const stoneY = (i: number) => (i % 2 ? 58 : 66);
   const spot = finished ? n + 1 : Math.min(hops, n);
-  const crabX = spot === 0 ? 9 : spot > n ? 91 : stoneX(spot - 1);
-  const crabY = spot === 0 || spot > n ? 58 : stoneY(spot - 1) - 4;
+  const crabX = spot === 0 ? startX : spot > n ? goalX : stoneX(spot - 1);
+  // Standing on top of the step, so the syllable under พี่ปู stays readable.
+  const crabY = spot === 0 || spot > n ? 60 : stoneY(spot - 1) - 9;
+  // Steps never wider than the gap between them (four or five syllables would overlap).
+  const stepWidth = `min(${(gap * 0.9).toFixed(1)}%, ${theme === "river" ? 96 : 124}px)`;
+  const words = STEP_WORDS[theme];
 
   const land = useEffectEvent((s: number) => {
     if (quiet || s === 0) return;
     sfx("hop");
-    setTimeout(() => sfx(s > n ? "fanfare" : "splash"), s > n ? 380 : 330);
+    setTimeout(
+      () => sfx(s > n ? "fanfare" : theme === "river" ? "splash" : "pop"),
+      s > n ? 380 : 330,
+    );
   });
   useEffect(() => land(spot), [spot]);
 
   return (
     <div className="kw-scene">
       <div
-        className={`kw-river${finished ? " won" : ""}`}
+        className={`kw-river kw-theme-${theme}${finished ? " won" : ""}`}
         role="img"
-        aria-label={`พี่ปูกระโดดข้ามหิน ${Math.min(hops, n)} จาก ${n} ก้อน`}
+        aria-label={`พี่ปูกระโดดบน${words.thing} ${Math.min(hops, n)} จาก ${n}`}
       >
         <svg
           className="kw-river-bg"
@@ -171,51 +498,7 @@ export function StonesScene({
           preserveAspectRatio="none"
           aria-hidden="true"
         >
-          <defs>
-            <linearGradient id="kw-water" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stopColor="#7FD3F2" />
-              <stop offset="1" stopColor="#3C9BD6" />
-            </linearGradient>
-          </defs>
-          <rect x="0" y="0" width="400" height="240" fill="url(#kw-water)" />
-          <g
-            className="kw-waves"
-            stroke="#D8F3FF"
-            strokeWidth="3"
-            fill="none"
-            strokeLinecap="round"
-            opacity=".7"
-          >
-            <path d="M70 60 q10 -6 20 0 t20 0" />
-            <path d="M210 40 q10 -6 20 0 t20 0" />
-            <path d="M150 200 q10 -6 20 0 t20 0" />
-            <path d="M260 210 q10 -6 20 0 t20 0" />
-            <path d="M120 120 q10 -6 20 0 t20 0" />
-          </g>
-          <path d="M0 0 H62 Q46 60 70 120 Q48 180 64 240 H0 Z" fill="#F3D79A" />
-          <path d="M0 0 H50 Q34 60 56 120 Q36 180 50 240 H0 Z" fill="#8CCB7A" />
-          <path
-            d="M400 0 H338 Q354 60 330 120 Q352 180 336 240 H400 Z"
-            fill="#F3D79A"
-          />
-          <path
-            d="M400 0 H350 Q366 60 344 120 Q364 180 350 240 H400 Z"
-            fill="#8CCB7A"
-          />
-          <path
-            d="M372 40 V112"
-            stroke="#8A5A2B"
-            strokeWidth="4"
-            strokeLinecap="round"
-          />
-          <path
-            className="kw-flag"
-            d="M374 42 L398 52 L374 62 Z"
-            fill="#FF6B6B"
-            stroke="#C94545"
-            strokeWidth="2"
-            strokeLinejoin="round"
-          />
+          <Backdrop theme={theme} sx={startX * 4} gx={goalX * 4} />
         </svg>
         {parts.map((p, i) => {
           const state =
@@ -229,28 +512,33 @@ export function StonesScene({
           return (
             <span
               key={`${p}-${i}`}
-              className={`kw-stone ${state}`}
-              style={{ left: `${stoneX(i)}%`, top: `${stoneY(i)}%` }}
+              className={`kw-stone kw-step-${theme} ${state}`}
+              style={{ left: `${stoneX(i)}%`, top: `${stoneY(i)}%`, width: stepWidth }}
             >
+              <StepShape theme={theme} />
               <b>{p}</b>
             </span>
           );
         })}
         <span
           className="kw-river-crab"
-          style={{ left: `${crabX}%`, top: `${crabY}%` }}
+          style={{ left: `${crabX}%`, top: `${crabY}%`, width: `min(${(gap * 1.1).toFixed(1)}%, 104px)` }}
         >
           <span key={spot} className={spot ? "kw-jump" : ""}>
             <Art kind="crab" label="" />
           </span>
         </span>
         {finished && (
-          <span className="kw-river-party">
+          <span className="kw-river-party" style={{ left: `${goalX}%` }}>
             <Burst count={18} />
           </span>
         )}
       </div>
-      <Line parts={parts} done={finished ? n : Math.min(hops, n)} joiner={(i) => (!blend ? " " : i === n - 1 ? " → " : " + ")} />
+      <Line
+        parts={parts}
+        done={finished ? n : Math.min(hops, n)}
+        joiner={(i) => (!blend ? " " : i === n - 1 ? " → " : " + ")}
+      />
     </div>
   );
 }
@@ -469,7 +757,11 @@ export function TrainScene({
 
   return (
     <div className="kw-scene">
-      <Line parts={parts} done={finished ? parts.length : coupled} joiner={() => ""} />
+      <Line
+        parts={parts}
+        done={finished ? parts.length : coupled}
+        joiner={() => ""}
+      />
       <div
         className={`kw-rail${finished ? " go" : ""}`}
         role="img"

@@ -1,5 +1,19 @@
-import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from "react";
-import { ArrowRight, Lightbulb, Play, RotateCcw, SkipForward, Smile, Star } from "lucide-react";
+import {
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import {
+  ArrowRight,
+  Lightbulb,
+  Play,
+  RotateCcw,
+  SkipForward,
+  Smile,
+  Star,
+} from "lucide-react";
 import { Art } from "../../Art";
 import type { Item } from "../../types";
 import type { PracticeItem } from "../../usePracticeItem";
@@ -7,7 +21,13 @@ import { stonesFor, trainCars, type PlayMode } from "../games";
 import { AdultBar, Mascot } from "../KidShell";
 import { HoldToTalk, SaidItButton } from "../HoldToTalk";
 import { unlockSfx } from "../sfx";
-import { StickerCard, StonesScene, TrainScene } from "./Scenes";
+import {
+  StickerCard,
+  StonesScene,
+  TrainScene,
+  stepThemeFor,
+  stepWords,
+} from "./Scenes";
 import { MouthCartoon, ModelMouth, mouthSteps, type Pose } from "../mouths";
 import { useVoiceActivity } from "../useVoiceActivity";
 import type { Say } from "../useSay";
@@ -64,18 +84,34 @@ export function SpeakGame({
   const { attachPlayer } = practice;
   /* Stones and train move one step per burst of voice (no judging of the words: that stays with the adult). */
   const stepping = kind === "stones" || kind === "train";
-  const parts = kind === "stones" ? stonesFor(item) : kind === "train" ? trainCars(item.prompt) : [];
-  const [hops, setHops] = useState(practice.saved && stepping ? parts.length : 0);
+  const parts =
+    kind === "stones"
+      ? stonesFor(item)
+      : kind === "train"
+        ? trainCars(item.prompt)
+        : [];
+  const [hops, setHops] = useState(
+    practice.saved && stepping ? parts.length : 0,
+  );
   const [takes, setTakes] = useState(0);
   const voice = useVoiceActivity(practice.stream, {
     releaseMs: stepping ? STEP_RELEASE_MS : undefined,
-    onBurst: stepping ? () => setHops((h) => Math.min(parts.length, h + 1)) : undefined,
+    onBurst: stepping
+      ? () => setHops((h) => Math.min(parts.length, h + 1))
+      : undefined,
   });
   const heard = !voice || voice.voicedMs >= MIN_VOICE_MS;
   const listening = practice.recording || practice.requesting;
-  const crossed = stepping && !listening && (hops >= parts.length || (takes >= MAX_TAKES && hops > 0));
+  const crossed =
+    stepping &&
+    !listening &&
+    (hops >= parts.length || (takes >= MAX_TAKES && hops > 0));
   const answered = stepping ? crossed : (!!practice.audio && heard) || tapped;
-  const phase: Phase = modelling ? "model" : answered || practice.saved ? "echo" : "turn";
+  const phase: Phase = modelling
+    ? "model"
+    : answered || practice.saved
+      ? "echo"
+      : "turn";
   const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   /** Speaks the example and steps the mouth beats; the caller has already shown beat 0. */
@@ -151,7 +187,8 @@ export function SpeakGame({
     if (showsModel) playModel();
   };
 
-  const kidMouth: Pose = phase === "echo" ? vowel : voice?.speaking ? vowel : "closed";
+  const kidMouth: Pose =
+    phase === "echo" ? vowel : voice?.speaking ? vowel : "closed";
   const word = <div className="kw-word">{item.prompt}</div>;
 
   /* ── Picture area for each game ── */
@@ -163,13 +200,29 @@ export function SpeakGame({
         <div className="kw-mirrors">
           <div className={`kw-mirror ${modelOn ? "on" : "off"}`}>
             <div className="kw-glass">
-              <ModelMouth pose={phase === "model" ? steps[beat].pose : phase === "echo" ? vowel : "smile"} />
+              <ModelMouth
+                pose={
+                  phase === "model"
+                    ? steps[beat].pose
+                    : phase === "echo"
+                      ? vowel
+                      : "smile"
+                }
+              />
             </div>
             <span className="kw-name">พี่ปู</span>
           </div>
           <div className={`kw-mirror ${phase === "model" ? "off" : "on"}`}>
             <div className="kw-glass">
-              {phase === "model" ? <span className="kw-q">?</span> : <MouthCartoon pose={kidMouth} title="เพื่อนในกระจกขยับปากตามเสียงหนู" fill />}
+              {phase === "model" ? (
+                <span className="kw-q">?</span>
+              ) : (
+                <MouthCartoon
+                  pose={kidMouth}
+                  title="เพื่อนในกระจกขยับปากตามเสียงหนู"
+                  fill
+                />
+              )}
             </div>
             <span className="kw-name">หนู</span>
           </div>
@@ -192,35 +245,64 @@ export function SpeakGame({
   } else if (kind === "card") {
     visual = (
       <StickerCard won={phase === "echo" && !practice.saved}>
-        <Art kind={item.art} label={phase === "echo" ? item.prompt : "ภาพปริศนา"} />
+        <Art
+          kind={item.art}
+          label={phase === "echo" ? item.prompt : "ภาพปริศนา"}
+        />
       </StickerCard>
     );
   } else if (kind === "stones") {
-    visual = <StonesScene parts={parts} hops={hops} finished={crossed} quiet={listening || !!practice.saved} blend={!!item.segments?.length} />;
+    visual = (
+      <StonesScene
+        parts={parts}
+        hops={hops}
+        finished={crossed}
+        quiet={listening || !!practice.saved}
+        blend={!!item.segments?.length}
+        theme={stepThemeFor(item.id)}
+      />
+    );
   } else {
-    visual = <TrainScene parts={parts} cars={hops} finished={crossed} quiet={listening || !!practice.saved} />;
+    visual = (
+      <TrainScene
+        parts={parts}
+        cars={hops}
+        finished={crossed}
+        quiet={listening || !!practice.saved}
+      />
+    );
   }
   const left = parts.length - hops;
+  const theme = stepThemeFor(item.id);
+  const place = stepWords(theme);
 
   const line =
     phase === "model"
-      ? kind === "mirror" ? "ดูกระจกพี่ปูนะ แล้วพูดตาม" : kind === "stones" ? "ฟังพี่ปูก่อน แล้วพูดทีละก้อนนะ" : "ฟังพี่ปูก่อน แล้วพูดให้ต่อกันนะ"
+      ? kind === "mirror"
+        ? "ดูกระจกพี่ปูนะ แล้วพูดตาม"
+        : kind === "stones"
+          ? "ฟังพี่ปูก่อน แล้วพูดทีละก้อนนะ"
+          : "ฟังพี่ปูก่อน แล้วพูดให้ต่อกันนะ"
       : phase === "turn"
         ? kind === "card"
           ? "นี่คืออะไรเอ่ย? บอกพี่ปูหน่อย"
           : kind === "stones"
             ? hops === 0
-              ? "พูดทีละก้อนนะ พี่ปูจะกระโดดตามเสียงหนู!"
-              : listening ? "กระโดด!" : `เกือบแล้ว! อีก ${left} ก้อน พูดต่อเลย`
+              ? `พูดทีละ${place.thing}นะ พี่ปูจะกระโดดตามเสียงหนู!`
+              : listening
+                ? "กระโดด!"
+                : `เกือบแล้ว! อีก ${left} ${place.thing} พูดต่อเลย`
             : kind === "train"
               ? hops === 0
                 ? "พูดทีละคำ รถไฟจะต่อตู้ทีละตู้!"
-                : listening ? "ต่อตู้แล้ว!" : `อีก ${left} ตู้ พูดต่อเลย`
+                : listening
+                  ? "ต่อตู้แล้ว!"
+                  : `อีก ${left} ตู้ พูดต่อเลย`
               : "ถึงตาหนูแล้ว!"
         : kind === "mirror"
           ? "กระจกวิ้ง! เก่งมาก"
           : kind === "stones"
-            ? "ข้ามลำธารได้แล้ว! เก่งมาก"
+            ? `${place.goal}ได้แล้ว! เก่งมาก`
             : kind === "train"
               ? "ปู้น ปู้น! รถไฟออกเดินทางแล้ว"
               : "ใช่เลย! ได้สติกเกอร์ด้วย";
@@ -233,11 +315,16 @@ export function SpeakGame({
       </span>
     ) : phase === "turn" ? (
       <>
-        {!listening && practice.audio && !heard && (!stepping || hops === 0) && <div className="kw-note">ไม่ได้ยินเสียงเลย กดค้างแล้วพูดอีกครั้งนะ</div>}
+        {!listening &&
+          practice.audio &&
+          !heard &&
+          (!stepping || hops === 0) && (
+            <div className="kw-note">ไม่ได้ยินเสียงเลย กดค้างแล้วพูดอีกครั้งนะ</div>
+          )}
         {tapOnly ? (
           stepping ? (
             <SaidItButton
-              label={`พูดแล้ว (${kind === "stones" ? "ก้อน" : "ตู้"}ที่ ${Math.min(hops + 1, parts.length)})`}
+              label={`พูดแล้ว (${kind === "stones" ? place.thing : "ตู้"}ที่ ${Math.min(hops + 1, parts.length)})`}
               onSaid={() => {
                 unlockSfx();
                 setHops((h) => Math.min(parts.length, h + 1));
@@ -254,7 +341,7 @@ export function SpeakGame({
               kind === "card"
                 ? "กดค้างแล้วบอกชื่อภาพ"
                 : kind === "stones"
-                  ? "กดค้างแล้วพูดทีละก้อน"
+                  ? `กดค้างแล้วพูดทีละ${place.thing}`
                   : kind === "train"
                     ? "กดค้างแล้วพูดทีละคำ"
                     : `กดค้างแล้วพูด "${item.prompt}"`
@@ -262,8 +349,16 @@ export function SpeakGame({
           />
         )}
         {kind === "card" && (
-          <button type="button" className="kw-link" onClick={() => { practice.setSupport("modeled"); say.say(item.sample); }}>
-            <Lightbulb size={15} style={{ verticalAlign: "-2px" }} /> นึกไม่ออก? ให้พี่ปูใบ้
+          <button
+            type="button"
+            className="kw-link"
+            onClick={() => {
+              practice.setSupport("modeled");
+              say.say(item.sample);
+            }}
+          >
+            <Lightbulb size={15} style={{ verticalAlign: "-2px" }} /> นึกไม่ออก?
+            ให้พี่ปูใบ้
           </button>
         )}
       </>
@@ -274,19 +369,32 @@ export function SpeakGame({
         </div>
         {kind === "card" && word}
         <div className="kw-row">
-          <button type="button" className="kw-btn" onClick={() => say.say(item.sample)}>
+          <button
+            type="button"
+            className="kw-btn"
+            onClick={() => say.say(item.sample)}
+          >
             <Play />
             ฟังพี่ปู
           </button>
           {practice.audio && (
-            <button type="button" className="kw-btn" onClick={practice.playRecording}>
+            <button
+              type="button"
+              className="kw-btn"
+              onClick={practice.playRecording}
+            >
               <Play />
               ฟังหนู
             </button>
           )}
         </div>
         {(mode === "alone" || practice.saved) && (
-          <button type="button" className="kw-btn go big" onClick={() => (practice.saved ? onNext() : void finish())} disabled={busy}>
+          <button
+            type="button"
+            className="kw-btn go big"
+            onClick={() => (practice.saved ? onNext() : void finish())}
+            disabled={busy}
+          >
             ไปต่อ
             <ArrowRight />
           </button>
@@ -302,19 +410,38 @@ export function SpeakGame({
           {phase !== "echo" && kind === "mirror" && word}
         </div>
         <div className="kw-col">
-          <Mascot text={line} onReplay={() => (showsModel ? playModel() : say.say(item.instruction))} />
+          <Mascot
+            text={line}
+            onReplay={() =>
+              showsModel ? playModel() : say.say(item.instruction)
+            }
+          />
           {actions}
-          {practice.assessmentMessage && <div className="kw-note">{practice.assessmentMessage}</div>}
-          {phase === "turn" && practice.micError && !tapOnly && <div className="kw-note">{practice.micError}</div>}
+          {practice.assessmentMessage && (
+            <div className="kw-note">{practice.assessmentMessage}</div>
+          )}
+          {phase === "turn" && practice.micError && !tapOnly && (
+            <div className="kw-note">{practice.micError}</div>
+          )}
         </div>
       </div>
       {practice.audio && (
-        <audio ref={attachPlayer} src={practice.audio} preload="auto" aria-label="เสียงของหนู" />
+        <audio
+          ref={attachPlayer}
+          src={practice.audio}
+          preload="auto"
+          aria-label="เสียงของหนู"
+        />
       )}
       {phase === "echo" && mode === "together" && !practice.saved && (
         <AdultBar head="ผู้ใหญ่ฟังแล้ว เด็กพูดเป็นอย่างไร">
           <div className="kw-faces">
-            <button type="button" className="yes" onClick={() => void finish("achieved")} disabled={busy}>
+            <button
+              type="button"
+              className="yes"
+              onClick={() => void finish("achieved")}
+              disabled={busy}
+            >
               <Smile />
               ทำได้
             </button>
@@ -324,12 +451,21 @@ export function SpeakGame({
                 ฝึกอีก
               </button>
             ) : (
-              <button type="button" onClick={() => void finish("practice")} disabled={busy}>
+              <button
+                type="button"
+                onClick={() => void finish("practice")}
+                disabled={busy}
+              >
                 <RotateCcw />
                 ยังต้องฝึก
               </button>
             )}
-            <button type="button" onClick={() => void finish()} disabled={busy} title="บันทึกไว้ตรวจทีหลัง">
+            <button
+              type="button"
+              onClick={() => void finish()}
+              disabled={busy}
+              title="บันทึกไว้ตรวจทีหลัง"
+            >
               <SkipForward />
               ข้าม
             </button>
