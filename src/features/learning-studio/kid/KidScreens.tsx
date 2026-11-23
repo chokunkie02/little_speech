@@ -82,10 +82,13 @@ function MapBoard({
   here,
   glow,
   onPick,
+  note,
   children,
 }: {
   stages: Stage[];
   done: Set<string>;
+  /** A small tag under one station (where a paused round stopped). */
+  note?: { stageId: string; text: string };
   here?: string;
   /** Station to light up as the next one. */
   glow?: string;
@@ -116,6 +119,7 @@ function MapBoard({
               )}
             </span>
             <span className="kw-node-name">{name}</span>
+            {note?.stageId === stage.id && <span className="kw-node-note">{note.text}</span>}
           </>
         );
         const className = `kw-node${finished ? " done" : ""}${isNext ? " now" : ""}`;
@@ -178,6 +182,7 @@ export function KidMap({
   next,
   stars,
   sound,
+  resume,
   newStickers = false,
   onPick,
   onGo,
@@ -190,6 +195,8 @@ export function KidMap({
   next: Stage;
   stars: number;
   sound: string;
+  /** A paused round on the `next` station: which item it stopped at. */
+  resume?: { index: number; total: number };
   /** Stickers the child has not seen in the book yet: a dot on the book button. */
   newStickers?: boolean;
   onPick: (stage: Stage) => void;
@@ -259,11 +266,19 @@ export function KidMap({
           {sound}
           <small>เสียงที่ฝึก</small>
         </div>
-        <Mascot text={`วันนี้ไป${nextGame.name}กัน!`} onReplay={() => say.say(VOICE_CUES.welcome)} replayLabel="พี่ปูพูดให้ฟัง" />
-        <MapBoard stages={stages} done={done} here={next.id} glow={next.id} onPick={onPick} />
+        <Mascot
+          text={resume ? `กลับมาเล่น${nextGame.name}ต่อกัน! หยุดไว้ที่ข้อ ${resume.index + 1} จาก ${resume.total}` : `วันนี้ไป${nextGame.name}กัน!`} onReplay={() => say.say(VOICE_CUES.welcome)} replayLabel="พี่ปูพูดให้ฟัง" />
+        <MapBoard
+          stages={stages}
+          done={done}
+          here={next.id}
+          glow={next.id}
+          onPick={onPick}
+          note={resume ? { stageId: next.id, text: `ข้อ ${resume.index + 1}/${resume.total}` } : undefined}
+        />
         <button type="button" className={`kw-btn gold big${tipSpot === "go" ? " kw-spot" : ""}`} onClick={onGo}>
           <Play />
-          ไปต่อ
+          {resume ? "เล่นต่อ" : "ไปต่อ"}
         </button>
       </div>
       {tip !== null && (

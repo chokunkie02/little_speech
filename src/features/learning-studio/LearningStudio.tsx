@@ -475,17 +475,20 @@ export function LearningStudio({
   /** Where พี่ปู waits on the map: after the last stage played; from the start when the round of stages is done. */
   const mapNext = (lastPlayed && stageAfter(lastPlayed.stageId)) ?? (lastPlayed ? stages.find((s) => !finishedStages.has(s.id)) ?? stages[0] : nextStage);
   const continueLearning = () => {
-    if (active) {
-      go("practice");
-      return;
-    }
-    // The kid screens open on the adventure map; the child starts from there.
+    // The kid screens always open on the adventure map, which shows where the child is (a paused round
+    // included) before anything starts.
     if (kidMode) {
       go("play");
       return;
     }
+    if (active) {
+      go("practice");
+      return;
+    }
     begin(nextStage);
   };
+  /** The paused round's stage on this plan's map, if any. */
+  const activeStage = active ? stages.find((s) => s.id === active.stageId) : undefined;
   const sessionForSummary = state.sessions.find(
     (s) => s.id === state.lastCompletedId && s.childId === state.plan.childId,
   );
@@ -1044,11 +1047,13 @@ export function LearningStudio({
             <KidMap
               stages={stages}
               done={finishedStages}
-              next={mapNext}
+              next={activeStage ?? mapNext}
+              resume={active && activeStage ? { index: active.index, total: active.itemIds.length } : undefined}
               // All rounds this child finished, not only this plan's: changing level must not empty the jar.
               stars={completed.reduce((n, x) => n + x.attempts.length, 0)}
               sound={state.plan.sound}
-              onPick={(stage) => begin(stage)}
+              // The paused stage resumes where it stopped; any other station starts a new round.
+              onPick={(stage) => (active && stage.id === active.stageId ? go("practice") : begin(stage))}
               onGo={() => (active ? go("practice") : begin(mapNext))}
               newStickers={stickers.owned.size > readSeenStickers(state.plan.childId)}
               onBook={() => go("stickers")}

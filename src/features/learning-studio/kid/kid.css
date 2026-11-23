@@ -354,6 +354,7 @@
 .kid-world .kw-badge svg { width: 14px; height: 14px; fill: #2A1D05; color: #2A1D05; }
 .kid-world svg.kw-here { position: absolute; bottom: calc(100% - 22px); width: 48px; height: auto; }
 .kid-world .kw-card-icon { width: min(240px, 60vw); }
+.kid-world .kw-node-note { font: 600 11px var(--kw-font-ui); color: #2A1D05; background: var(--kw-gold-1); border-radius: 999px; padding: 1px 8px; }
 .kid-world .kw-node-name { padding: 0 8px; border-radius: 999px; background: color-mix(in srgb, var(--kw-bg) 75%, transparent); }
 .kid-world .kw-map-wrap > .kw-btn.gold { margin-bottom: 52px; }
 @media (min-width: 820px) { .kid-world .kw-map-wrap > .kw-btn.gold { margin-bottom: 8px; } }
