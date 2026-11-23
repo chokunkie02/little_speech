@@ -82,16 +82,18 @@
 .kid-world .kw-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 8px 20px 16px; position: relative; z-index: 1; overflow-y: auto; }
 .kid-world .kw-split { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; padding: 8px 20px 16px; overflow-y: auto; }
 .kid-world .kw-col { display: flex; flex-direction: column; align-items: center; gap: 16px; width: 100%; max-width: 420px; }
-@media (min-width: 820px) and (min-aspect-ratio: 1/1) {
-  .kid-world .kw-split { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; padding: 0 72px 24px; align-items: center; justify-items: center; }
-  .kid-world .kw-col { max-width: 520px; gap: 20px; }
-}
-
 /* Centre the column only when it fits: taller content starts at the top and scrolls, instead of
    spilling above the screen where it cannot be reached (plain justify-content: center does that). */
 .kid-world .kw-stage, .kid-world .kw-split { justify-content: flex-start; }
 .kid-world .kw-stage > :first-child, .kid-world .kw-split > :first-child { margin-top: auto; }
 .kid-world .kw-stage > :last-child, .kid-world .kw-split > :last-child { margin-bottom: auto; }
+
+@media (min-width: 820px) and (min-aspect-ratio: 1/1) {
+  .kid-world .kw-split { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; padding: 0 72px 24px; align-items: center; justify-items: center; }
+  .kid-world .kw-col { max-width: 520px; gap: 20px; }
+  /* Side by side: each column centres itself (and still starts at the top when taller than the screen). */
+  .kid-world .kw-split > .kw-col { margin-block: auto; }
+}
 
 /* ── พี่ปู and speech bubble ── */
 .kid-world .kw-mascot { display: flex; align-items: flex-end; gap: 8px; align-self: stretch; max-width: 420px; margin: 0 auto; }
