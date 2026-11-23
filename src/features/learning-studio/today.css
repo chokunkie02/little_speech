@@ -21,3 +21,32 @@
 
 /* Studio tabs: the guide sits on the right as a help item */
 .learning-studio-scope .studio-nav .studio-nav-help { margin-left: auto; }
+
+/* Results: speech items waiting for an adult */
+.learning-studio-scope .waiting { margin-bottom: 22px; display: flex; flex-direction: column; gap: 12px; }
+.learning-studio-scope .waiting-head { display: flex; gap: 12px; align-items: flex-start; }
+.learning-studio-scope .waiting-head h2 { margin: 0; font-size: 18px; }
+.learning-studio-scope .waiting-head p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.learning-studio-scope .waiting-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.learning-studio-scope .waiting-list li { display: grid; grid-template-columns: 52px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 8px 10px; border-radius: 14px; border: 1px solid var(--border); background: var(--bg); }
+.learning-studio-scope .waiting-pic { width: 52px; height: 40px; border-radius: 10px; background: #FFFDF6; display: grid; place-items: center; overflow: hidden; }
+.learning-studio-scope .waiting-pic svg { width: 100%; height: 100%; }
+.learning-studio-scope .waiting-word { min-width: 0; }
+.learning-studio-scope .waiting-word b { display: block; font-family: "Sarabun", "Noto Sans Thai", sans-serif; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.learning-studio-scope .waiting-word small { color: var(--muted); font-size: 12px; }
+.learning-studio-scope .waiting-actions { display: flex; gap: 6px; }
+.learning-studio-scope .waiting-actions button { display: inline-flex; align-items: center; gap: 5px; min-height: 40px; padding: 0 12px; border-radius: 11px; font-size: 14px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+.learning-studio-scope .waiting-actions button.yes { color: #1F6B47; background: #E8F6EF; border-color: rgb(76 175 130 / 0.6); }
+.learning-studio-scope.dark .waiting-actions button.yes { color: #7DDBB0; background: rgb(76 175 130 / 0.16); }
+.learning-studio-scope .waiting-actions button:hover { border-color: var(--primary); }
+@media (max-width: 560px) {
+  .learning-studio-scope .waiting-list li { grid-template-columns: 44px minmax(0, 1fr); }
+  .learning-studio-scope .waiting-actions { grid-column: 1 / -1; }
+  .learning-studio-scope .waiting-actions button { flex: 1; justify-content: center; }
+}
+
+/* จัดชุดฝึก: extra settings folded away */
+.learning-studio-scope .plan-more > summary { cursor: pointer; font-size: 18px; font-weight: 600; list-style-position: inside; }
+.learning-studio-scope .plan-more > summary span { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+.learning-studio-scope .plan-more[open] > summary { margin-bottom: 12px; }
+.learning-studio-scope .plan-more h3 { margin: 16px 0 8px; font-size: 15px; }

@@ -13,6 +13,7 @@ import { stickerBook, stickersOfRound } from "./kid/stickers";
 import { PrintCenter, type PrintKind } from "./print/PrintCenter";
 import { GuideFaq, GuideWalkthrough } from "./guide/GuideWalkthrough";
 import { gameFor } from "./kid/games";
+import { WaitingReviews } from "./WaitingReviews";
 import AssessmentControls from "@/components/assessment/AssessmentControls";
 import AssessmentResultCard from "@/components/assessment/AssessmentResultCard";
 import RoundAdvice from "./RoundAdvice";
@@ -493,10 +494,8 @@ export function LearningStudio({
   const roundStage = sessionForSummary ? stages.find((s) => s.id === sessionForSummary.stageId) : undefined;
   /** Stars: one per activity tried, over every round the child finished (same as the map and sidebar). */
   const starTotal = completed.reduce((n, x) => n + x.attempts.length, 0);
-  /** Recorded speech attempts still waiting for an adult (tap-mode tries are practice only). */
-  const waitingSpeech = completed
-    .flatMap((x) => x.attempts)
-    .filter((a) => a.kind === "speech" && a.review === "pending" && a.mode !== "demo").length;
+  /** Items still waiting for an adult's result (same rule as the results page and its stats). */
+  const waitingSpeech = completed.flatMap((x) => x.attempts).filter((a) => a.kind !== "choice" && a.review === "pending").length;
   const week = practiceWeek(completed);
   /** The child's sticker book, worked out from every round they played (nothing new is stored). */
   const stickers = useMemo(() => stickerBook(state.sessions, state.plan.childId), [state.sessions, state.plan.childId]);
@@ -526,6 +525,17 @@ export function LearningStudio({
     };
   };
   const demoSession = route === "demo" ? makeDemoSession() : null;
+  /** One adult result from the waiting list: saved like the review dialog, one attempt at a time. */
+  const reviewOne = (sessionId: string, attemptId: string, review: Exclude<Review, "pending">) => {
+    const next = {
+      ...state,
+      sessions: state.sessions.map((s) =>
+        s.id === sessionId ? { ...s, attempts: s.attempts.map((a) => (a.id === attemptId ? { ...a, review } : a)) } : s,
+      ),
+    };
+    commit(next, { type: "review.saved", sessionId, payload: next.sessions.find((s) => s.id === sessionId) });
+    setToast(review === "achieved" ? "บันทึกแล้ว: ทำได้" : review === "practice" ? "บันทึกแล้ว: ยังต้องฝึก" : "บันทึกแล้ว: ประเมินไม่ได้");
+  };
   const endDemo = () => {
     go("guide");
     setToast("จบการลองเล่นแล้ว · ข้อนี้ไม่ได้บันทึกผล");
@@ -967,6 +977,9 @@ export function LearningStudio({
               />
             ))}
           {route === "progress" && (
+            <WaitingReviews sessions={completed} teacherConfirms={sync.teacherConfirms} onReview={reviewOne} />
+          )}
+          {route === "progress" && (
             <Progress
               allowExport={allowExport}
               sessions={completed}
@@ -1273,6 +1286,8 @@ function PlanPage({
   const [draft, setDraft] = useState<Plan>({ ...plan });
   const stages = getStages(draft.track, draft.sound, draft.level);
   const [error, setError] = useState("");
+  /** "ตั้งค่าเพิ่มเติม" opens by itself when the nickname is missing, so the required field is never hidden. */
+  const [more, setMore] = useState(!plan.childName.trim());
   const update = (value: Partial<Plan>) =>
     setDraft((d) => ({ ...d, ...value }));
   const switchTrack = (track: Track) =>
@@ -1293,6 +1308,7 @@ function PlanPage({
           e.preventDefault();
           if (!draft.childName.trim()) {
             setError("ใส่ชื่อเล่นก่อนบันทึกแผน");
+            setMore(true);
             return;
           }
           onSave({
@@ -1307,7 +1323,7 @@ function PlanPage({
           <div>
             <section className="panel form-section">
               <h2>
-                <span className="step-number">1</span>เริ่มจากเป้าหมายไหน
+                <span className="step-number">1</span>ฝึกเรื่องอะไร
               </h2>
               <div className="track-options">
                 {(Object.keys(TRACKS) as Track[]).map((track) => (
@@ -1330,41 +1346,9 @@ function PlanPage({
             </section>
             <section className="panel form-section">
               <h2>
-                <span className="step-number">2</span>รู้จักเพื่อนตัวน้อย
+                <span className="step-number">2</span>
+                {draft.track === "speech" ? "เสียงไหน" : "กลุ่มคำไหน"}
               </h2>
-              <div className="form-row">
-                <label>
-                  ชื่อเล่น
-                  <input
-                    value={draft.childName}
-                    maxLength={30}
-                    onChange={(e) => update({ childName: e.target.value })}
-                    placeholder="ชื่อเล่นของเด็ก"
-                    required
-                  />
-                </label>
-                <label>
-                  ช่วงวัย
-                  <select
-                    value={draft.age}
-                    onChange={(e) => update({ age: e.target.value })}
-                  >
-                    {["3–4 ปี", "4–5 ปี", "5–7 ปี", "7–9 ปี", "9–12 ปี"].map(
-                      (v) => (
-                        <option key={v}>{v}</option>
-                      ),
-                    )}
-                  </select>
-                </label>
-              </div>
-              <p className="footnote">
-                ช่วงวัยเป็นข้อมูลในแผน เลือกระดับเนื้อหาด้านล่างตามความพร้อมได้
-              </p>
-              <h3>
-                {draft.track === "speech"
-                  ? "เลือกเสียงเป้าหมาย"
-                  : "เลือกกลุ่มคำตัวอย่าง"}
-              </h3>
               <div className="sound-options">
                 {Object.entries(SOUNDS).map(([key, s]) => (
                   <button
@@ -1386,10 +1370,44 @@ function PlanPage({
                 onChange={(level) => update({ level, selectedItems: [] })}
               />
             </section>
-            <section className="panel form-section">
-              <h2>
-                <span className="step-number">3</span>เลือกจุดเริ่มและกิจกรรม
-              </h2>
+            <details
+              className="panel form-section plan-more"
+              open={more}
+              onToggle={(e) => setMore(e.currentTarget.open)}
+            >
+              <summary>
+                ตั้งค่าเพิ่มเติม <span>ชื่อเล่น ช่วงวัย จุดเริ่ม และเลือกข้อเอง</span>
+              </summary>
+              <h3>ชื่อเล่นและช่วงวัย</h3>
+              <div className="form-row">
+                <label>
+                  ชื่อเล่น
+                  <input
+                    value={draft.childName}
+                    maxLength={30}
+                    onChange={(e) => update({ childName: e.target.value })}
+                    placeholder="ชื่อเล่นของเด็ก"
+                    aria-required="true"
+                  />
+                </label>
+                <label>
+                  ช่วงวัย
+                  <select
+                    value={draft.age}
+                    onChange={(e) => update({ age: e.target.value })}
+                  >
+                    {["3–4 ปี", "4–5 ปี", "5–7 ปี", "7–9 ปี", "9–12 ปี"].map(
+                      (v) => (
+                        <option key={v}>{v}</option>
+                      ),
+                    )}
+                  </select>
+                </label>
+              </div>
+              <p className="footnote">
+                ช่วงวัยเป็นข้อมูลในแผน เลือกระดับเนื้อหาตามความพร้อมได้
+              </p>
+              <h3>จุดเริ่มและกิจกรรม</h3>
               <label>
                 เริ่มจากช่วงไหน
                 <select
@@ -1448,7 +1466,7 @@ function PlanPage({
                   </div>
                 ))}
               </details>
-            </section>
+            </details>
           </div>
           <aside className="plan-preview panel">
             <span className="eyebrow">แผนที่กำลังจัด</span>
