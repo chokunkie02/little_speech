@@ -1,6 +1,7 @@
 "use client";
 import "./studio.generated.css";
 import "./host-theme.css";
+import "./today.css";
 import { useStudioResultSync } from "./useStudioResultSync";
 import { CENTRAL_CHILD_ID, usePracticeItem } from "./usePracticeItem";
 import { KidPractice } from "./kid/KidPractice";
@@ -58,7 +59,6 @@ import {
   Heart,
   RefreshCw,
   ExternalLink,
-  Settings2,
 } from "lucide-react";
 import type { LucideProps } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageLayout";
@@ -95,6 +95,7 @@ import { getLevel, type LearningLevelId } from "./learning-levels";
 import { useSpeaker, VOICE_CUES } from "./useSpeaker";
 const icons: Record<string, React.ComponentType<LucideProps>> = {
   home: Home,
+  print: Printer,
   path: Map,
   library: BookOpen,
   progress: BarChart3,
@@ -113,6 +114,20 @@ const icons: Record<string, React.ComponentType<LucideProps>> = {
 function Icon({ name, ...props }: { name: string } & LucideProps) {
   const I = icons[name] ?? Sparkles;
   return <I size={20} strokeWidth={1.8} {...props} />;
+}
+/** Monday to Sunday of this week, marking the days a round was finished. */
+function practiceWeek(rounds: Session[]) {
+  const today = new Date();
+  const monday = new Date(today);
+  monday.setHours(0, 0, 0, 0);
+  monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
+  const key = (d: Date) => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  const played = new Set(rounds.filter((r) => r.completedAt).map((r) => key(new Date(r.completedAt!))));
+  return ["จ", "อ", "พ", "พฤ", "ศ", "ส", "อา"].map((label, i) => {
+    const day = new Date(monday);
+    day.setDate(monday.getDate() + i);
+    return { key: key(day), label, played: played.has(key(day)), today: key(day) === key(today) };
+  });
 }
 const date = (v: string) =>
   new Date(v).toLocaleDateString("th-TH", { day: "numeric", month: "short" });
@@ -412,7 +427,6 @@ export function LearningStudio({
   const completed = state.sessions.filter(
     (s) => s.status === "completed" && s.childId === state.plan.childId,
   );
-  const stats = metrics(completed);
   const currentIndex = Math.max(
     0,
     stages.findIndex((s) => s.id === state.plan.startStage),
@@ -471,31 +485,19 @@ export function LearningStudio({
     }
     begin(nextStage);
   };
-  const chooseLevel = (level: LearningLevelId) => {
-    if (level === getLevel(state.plan.level).id) return;
-    const plan = {
-      ...state.plan,
-      level,
-      id: uid(),
-      createdAt: now(),
-      selectedItems: [],
-    };
-    commit(
-      { ...state, plan, activeSessionId: undefined },
-      { type: "plan.saved", payload: plan },
-    );
-    setToast(
-      "เลือกระดับ " +
-        getLevel(level).label +
-        " แล้ว ประวัติรอบที่จบยังอยู่ในผลการฝึก",
-    );
-  };
   const sessionForSummary = state.sessions.find(
     (s) => s.id === state.lastCompletedId && s.childId === state.plan.childId,
   );
   /** The round-end "ด่านต่อไป": the stage after the one just finished (none after the last stage). */
   const roundNext = sessionForSummary ? stageAfter(sessionForSummary.stageId) : undefined;
   const roundStage = sessionForSummary ? stages.find((s) => s.id === sessionForSummary.stageId) : undefined;
+  /** Stars: one per activity tried, over every round the child finished (same as the map and sidebar). */
+  const starTotal = completed.reduce((n, x) => n + x.attempts.length, 0);
+  /** Recorded speech attempts still waiting for an adult (tap-mode tries are practice only). */
+  const waitingSpeech = completed
+    .flatMap((x) => x.attempts)
+    .filter((a) => a.kind === "speech" && a.review === "pending" && a.mode !== "demo").length;
+  const week = practiceWeek(completed);
   /** The child's sticker book, worked out from every round they played (nothing new is stored). */
   const stickers = useMemo(() => stickerBook(state.sessions, state.plan.childId), [state.sessions, state.plan.childId]);
   /**
@@ -535,14 +537,17 @@ export function LearningStudio({
     if (!seen || (round.completedAt ?? "") > (seen.completedAt ?? "")) latestRounds.set(round.stageId, round);
   }
   const reviewSession = state.sessions.find((s) => s.id === reviewId);
+  // Four tabs plus help. The path and the activity library stay one link away (from แผนวันนี้ and
+  // จัดชุดฝึก); the kid map is the child's path.
   const nav = [
     { id: "home", label: "แผนวันนี้" },
-    { id: "path", label: "เส้นทางของฉัน" },
-    { id: "library", label: "คลังกิจกรรม" },
     { id: "progress", label: "ผลการฝึก" },
+    { id: "print", label: "สติกเกอร์และพิมพ์" },
     { id: "plan", label: "จัดชุดฝึก" },
     { id: "guide", label: "คู่มือ" },
   ] as const;
+  const navCurrent = (id: string) =>
+    route === id || (id === "plan" && (route === "path" || route === "library")) || (id === "home" && route === "summary");
   /** The kid screens' home button: back to the studio home (a round in progress stays paused). */
   const goHome = () => {
     setStartRequest(null);
@@ -578,8 +583,9 @@ export function LearningStudio({
             actions={<MusicRoom />} />
           {route !== "practice" && <nav aria-label="เมนูห้องฝึกการพูด" className="studio-nav">
             {nav.map((item) => (
-              <button key={item.id} type="button" onClick={() => go(item.id)}
-                aria-current={route === item.id ? "page" : undefined}>
+              <button key={item.id} type="button" onClick={() => (item.id === "print" ? openPrint("stickers") : go(item.id))}
+                className={item.id === "guide" ? "studio-nav-help" : undefined}
+                aria-current={navCurrent(item.id) ? "page" : undefined}>
                 <Icon name={item.id} size={17} />
                 {item.label}
               </button>
@@ -601,15 +607,13 @@ export function LearningStudio({
               <section className="hero">
                 <div className="hero-copy">
                   <p className="hero-learner">{state.plan.childName} · {TRACKS[state.plan.track].label} · เสียง {state.plan.sound}</p>
-                  <h2>
-                    ฝึกตามแผนวันนี้
-                  </h2>
+                  <h2>{kidMode ? "พร้อมผจญภัยวันนี้" : "ฝึกตามแผนวันนี้"}</h2>
                   <p>
                     {getLevel(state.plan.level).label} · ฟังตัวอย่าง แล้วลองทำกิจกรรมทีละข้อ
                   </p>
                   <Button onClick={continueLearning}>
                     {active ? <RefreshCw size={17} /> : <Play size={17} />}{" "}
-                    {active ? "กลับมาฝึกต่อ" : "เริ่มภารกิจวันนี้"}
+                    {active ? "กลับมาฝึกต่อ" : kidMode ? "เข้าโลกของพี่ปู" : "เริ่มภารกิจวันนี้"}
                     <ArrowRight size={17} />
                   </Button>
                   <div className="hero-voice">
@@ -649,132 +653,76 @@ export function LearningStudio({
                   <div className="hero-star two">✧</div>
                 </div>
               </section>
-              <LevelPicker
-                value={state.plan.level}
-                onChange={chooseLevel}
-                compact
-              />
-              <div className="stats-grid">
-                <Stat
-                  icon={<Flag />}
-                  label="รอบที่ฝึกครบ"
-                  value={
-                    <>
-                      {stats.sessions}
-                      <em> รอบ</em>
-                    </>
-                  }
-                />
-                <Stat
-                  icon={<Star />}
-                  color="orange"
-                  label="ดาวความพยายาม"
-                  value={
-                    <>
-                      {stats.participation}
-                      <em> ดวง</em>
-                    </>
-                  }
-                  detail="ให้เมื่อทำกิจกรรม ไม่ใช่คะแนนความชัด"
-                />
-                <Stat
-                  icon={<Ear />}
-                  color="green"
-                  label="ฟังแล้วเลือกภาพ"
-                  value={
-                    stats.listeningTotal
-                      ? `${stats.listeningCorrect}/${stats.listeningTotal}`
-                      : "ยังไม่มีผล"
-                  }
-                  detail={
-                    stats.listeningTotal
-                      ? "จำนวนที่ตอบตรงกับเสียง"
-                      : "เริ่มจากเกมฟังกันได้เลย"
-                  }
-                />
+              <div className="today-strip" aria-label="สรุปสั้น ๆ">
+                <span>
+                  <Star size={16} />
+                  ดาว {starTotal}
+                </span>
+                <span>
+                  <BookOpen size={16} />
+                  สติกเกอร์ {stickers.owned.size}
+                </span>
+                <span>
+                  <Flag size={16} />
+                  ด่านต่อไป: {mapNext.label}
+                </span>
               </div>
-              <div className="two-column">
-                <section className="panel plan-card">
-                  <div className="panel-title">
-                    <h2>แผนเล็ก ๆ ของวันนี้</h2>
-                    <button className="text-button" onClick={() => go("plan")}>
-                      ปรับแผน <Settings2 size={15} />
-                    </button>
-                  </div>
-                  <div className="current-plan">
-                    <span className="plan-symbol">
-                      {state.plan.track === "speech" ? (
-                        state.plan.sound
-                      ) : (
-                        <Icon name={TRACKS[state.plan.track].icon} />
-                      )}
-                    </span>
-                    <div>
-                      <span className="muted">
-                        {TRACKS[state.plan.track].label}
-                      </span>
-                      <h3>
-                        {state.plan.track === "speech"
-                          ? `ผจญภัยไปกับเสียง ${state.plan.sound}`
-                          : TRACKS[state.plan.track].description}
-                      </h3>
-                      <p>
-                        {getLevel(state.plan.level).label} · {stages.length}{" "}
-                        ช่วงการเรียนรู้
-                      </p>
-                    </div>
-                  </div>
-                  <div className="plan-facts">
-                    <span>
-                      <Users size={15} />
-                      {state.plan.adultSupport
-                        ? "มีผู้ใหญ่เล่นด้วย"
-                        : "ลองเองแล้วขอช่วยได้"}
+              <div className="today-todo">
+                {waitingSpeech > 0 && (
+                  <button type="button" className="panel today-card" onClick={() => go("progress")}>
+                    <span className="today-card-icon">
+                      <Ear size={20} />
                     </span>
                     <span>
-                      <BookOpen size={15} />
-                      {stages.reduce((sum, s) => sum + s.items.length, 0)}{" "}
-                      กิจกรรมพร้อมลอง
+                      <b>{sync.teacherConfirms ? `ครูประจำห้องจะฟัง ${waitingSpeech} ข้อ` : `รอผู้ใหญ่ฟัง ${waitingSpeech} ข้อ`}</b>
+                      <small>{sync.teacherConfirms ? "ดูรายการได้ที่ผลการฝึก" : "แตะผลได้เลยที่หน้าผลการฝึก"}</small>
                     </span>
-                  </div>
-                </section>
-                <section className="panel tip-card">
-                  <span className="tip-illustration">
-                    <Smile size={37} />
-                  </span>
-                  <span className="eyebrow">ถึงคนข้าง ๆ</span>
-                  <h3>เว้นจังหวะให้หนูได้ลอง</h3>
-                  <p>
-                    ฟังไปด้วยกัน ชมเมื่อเด็กพยายาม
-                    และให้ตัวอย่างเมื่อขอความช่วยเหลือ
-                  </p>
-                  <button className="text-button" onClick={() => go("guide")}>
-                    อ่านวิธีเล่นด้วยกัน <ArrowRight size={15} />
+                    <ArrowRight size={17} />
                   </button>
+                )}
+                <button type="button" className="panel today-card" onClick={() => openPrint(stickers.owned.size ? "stickers" : "cards")}>
+                  <span className="today-card-icon">
+                    <Printer size={20} />
+                  </span>
+                  <span>
+                    <b>{stickers.owned.size ? `สติกเกอร์ ${stickers.owned.size} ดวง` : `บัตรคำฝึกเสียง ${state.plan.sound}`}</b>
+                    <small>{stickers.owned.size ? "พิมพ์ให้น้องติดสมุดจริงได้" : "พิมพ์ไปเล่นต่อที่บ้านได้"}</small>
+                  </span>
+                  <ArrowRight size={17} />
+                </button>
+                <section className="panel today-week" aria-label="สัปดาห์นี้">
+                  <b>สัปดาห์นี้</b>
+                  <span className="today-days">
+                    {week.map((d) => (
+                      <i key={d.key} className={`${d.played ? "on" : ""}${d.today ? " now" : ""}`} title={d.played ? "ได้เล่นแล้ว" : undefined}>
+                        {d.label}
+                      </i>
+                    ))}
+                  </span>
+                  <small>{week.filter((d) => d.played).length ? `เล่นแล้ว ${week.filter((d) => d.played).length} วัน` : "ยังไม่ได้เล่นสัปดาห์นี้"}</small>
                 </section>
               </div>
-              <div className="panel-title section-space">
-                <div>
-                  <h2>เส้นทางของเรา</h2>
-                  <p className="muted">เลือกช่วงที่พร้อม แล้วเริ่มได้เลย</p>
-                </div>
-                <button className="text-button" onClick={() => go("path")}>
-                  ดูเส้นทางทั้งหมด <ArrowRight size={16} />
+              <section className="panel tip-card">
+                <span className="tip-illustration">
+                  <Smile size={37} />
+                </span>
+                <span className="eyebrow">ถึงคนข้าง ๆ</span>
+                <h3>เว้นจังหวะให้หนูได้ลอง</h3>
+                <p>
+                  ฟังไปด้วยกัน ชมเมื่อเด็กพยายาม
+                  และให้ตัวอย่างเมื่อขอความช่วยเหลือ
+                </p>
+                <button className="text-button" onClick={() => go("guide")}>
+                  ดูพี่ปูสอนเล่น <ArrowRight size={15} />
                 </button>
-              </div>
-              <div className="stage-grid">
-                {stages.slice(0, 3).map((stage, i) => (
-                  <StageCard
-                    key={stage.id}
-                    stage={stage}
-                    index={i}
-                    done={completed.some(
-                      (s) =>
-                        s.planId === state.plan.id && s.stageId === stage.id,
-                    )}
-                    onClick={() => begin(stage)}
-                  />
-                ))}
+              </section>
+              <div className="today-links">
+                <button className="text-button" onClick={() => go("path")}>
+                  รายการด่านทั้งหมด <ArrowRight size={15} />
+                </button>
+                <button className="text-button" onClick={() => go("library")}>
+                  เลือกข้อเองจากคลังกิจกรรม <ArrowRight size={15} />
+                </button>
               </div>
               <div className="bottom-note">
                 <ShieldCheck size={16} />
@@ -1311,45 +1259,6 @@ export function LearningStudio({
       )}
     </div>
     </KidHomeContext.Provider>
-  );
-}
-function StageCard({
-  stage,
-  index,
-  done,
-  onClick,
-}: {
-  stage: Stage;
-  index: number;
-  done: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button className="stage-card" onClick={onClick}>
-      <div className="stage-card-top">
-        <span
-          className="stage-icon"
-          style={{ background: stage.color + "19", color: stage.color }}
-        >
-          <Icon name={stage.icon} size={24} />
-        </span>
-        <span className="chapter" aria-hidden="true">
-          {done ? (
-            <CheckCircle2 size={19} />
-          ) : (
-            String(index + 1).padStart(2, "0")
-          )}
-        </span>
-      </div>
-      <h3>{stage.label}</h3>
-      <p>{stage.description}</p>
-      <div className="stage-card-bottom">
-        <span>{stage.items.length} กิจกรรม</span>
-        <span className="round-arrow">
-          <ArrowRight size={18} />
-        </span>
-      </div>
-    </button>
   );
 }
 function PlanPage({
